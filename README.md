@@ -1,11 +1,18 @@
-This repository contains the following:
+Gobi Platform SDK
+=================
 
-* A JavaScript library for consuming [SData](http://sdata.sage.com).
-* A framework for developing mobile applications driven by SData.
-* A set of customizations for the mobile framework pertaining to SalesLogix.
+Installation
+------------
+### Prerequisites
+*	None
 
-<b>Note:</b> As of 5/18/10, the SalesLogix demo application will only work with the "Augusta" build of SalesLogix provided in the Cloud for Sage Insights attendees. It will also be compatible with the next SalesLogix release.
+### Clone repository
+*	Open a command prompt
+*	change to the base directory where you want to download source code, eg
 
-Check out the Wiki for an overview of the SData JavaScript Client Library and corresponding applications: [Wiki Link](https://github.com/SageScottsdalePlatform/SDataJavaScriptClientLib/wikis)
-
-Looking into adding project management through [Pivotal Tracker](http://www.pivotaltracker.com/projects/83955)
+		cd \projects
+*	Execute the following commands
+		
+		mkdir sage\mobile\products
+		cd sage\mobile
+		git clone git@github.com:SageScottsdalePlatform/argos-sdk.git
