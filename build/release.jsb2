@@ -1,0 +1,100 @@
+{
+	projectName: 'SData Mobile Application Framework',
+	licenseText: '',
+	deployDir: 'deploy/',
+	pkgs: [{
+		name: 'SData Mobile Application Framework',
+		file: 'app/content/javascript/argos-sdk.js',
+		isDebug: true,
+		fileIncludes: [{
+			text: 'Application.js',
+			path: '../src/'
+		},{
+			text: 'View.js',
+			path: '../src/'
+		},{
+			text: 'List.js',
+			path: '../src/'
+		},{
+			text: 'Detail.js',
+			path: '../src/'
+		},{
+			text: 'Edit.js',
+			path: '../src/'
+		},{
+			text: 'Format.js',
+			path: '../src/'
+		},{
+			text: 'Toolbar.js',
+			path: '../src/'
+		},{
+			text: 'MainToolbar.js',
+			path: '../src/'
+		},{
+			text: 'FloatToolbar.js',
+			path: '../src/'
+		},{
+			text: 'Utility.js',
+			path: '../src/'
+		}]
+	},{
+		name: 'SData Mobile Application Framework Dependencies',
+		file: 'app/content/javascript/argos-dependencies.js',
+		isDebug: true,
+		fileIncludes: [{
+			text: 'ext-core-debug.js',
+			path: '../libraries/ext/'
+		},{
+			text: 'Base64.js',
+			path: '../libraries/'
+		},{
+			text: 'ObjTree.js',
+			path: '../libraries/'
+		},{
+			text: 'Simplate.js',
+			path: '../libraries/'
+		},{
+			text: 'sdata-client-debug.js',
+			path: '../libraries/sdata/'
+		},{
+			text: 'reui.js',
+			path: '../libraries/reui/'
+		},{
+			text: 'core-debug.js',
+			path: '../libraries/datejs/src/'
+		}]
+	}],
+	resources: [{
+		src: '../libraries/ext',
+		dest: 'src/argos-sdk/libraries/ext',
+		filters: ".*[ext\\-core\\-debug\\.js]"
+	},{
+		src: '../libraries',
+		dest: 'src/argos-sdk/libraries',
+		filters: ".*[Base64|ObjTree|Simplate]"
+	},{
+		src: '../libraries/reui',
+		dest: 'src/argos-sdk/libraries/reui',
+		filters: ".*[reui\\.js]"
+	},{
+		src: '../libraries/datejs/src',
+		dest: 'src/argos-sdk/libraries/datejs',
+		filters: ".*[core\\-debug\\.js]"
+	},{
+		src: '../libraries/sdata',
+		dest: 'src/argos-sdk/libraries/sdata',
+		filters: ".*[sdata\\-client\\-debug.js.js]"
+	},{
+		src: '../src',
+		dest: 'src/argos-sdk',
+		filters: ".*\\.js"
+	},{
+		src: '../libraries/reui/themes',
+		dest: 'app/content/reui/themes',
+		filters: ".*[\\.css|\\.jpg|\\.png|\\.gif]"
+	},{
+		src: '../content/',
+		dest: 'app/content',
+		filters: ".*[\\.css|\\.jpg|\\.png|\\.gif]"
+	}]
+}
