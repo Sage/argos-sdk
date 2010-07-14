@@ -24,19 +24,19 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         '{% if ($["list"]) { %}</ul>{% } else { %}</fieldset>{% } %}'
     ]),
     propertyTemplate: new Simplate([
-        '<div class="row">',
+        '<div class="row {%= $["cls"] %}">',
         '<label>{%= label %}</label>',       
         '<span>{%= value %}</span>',
         '</div>'
     ]),
     relatedPropertyTemplate: new Simplate([
-        '<div class="row">',
+        '<div class="row {%= $["cls"] %}">',
         '<label>{%= label %}</label>',       
-        '<a href="#{%= view %}" target="_related" m:key="{%= key %}" m:descriptor="{%: value %}">{%: value %}</a>',
+        '<a href="#{%= view %}" target="_related" m:context="{%= context %}" m:descriptor="{%: value %}">{%: value %}</a>',
         '</div>'
     ]),
     relatedTemplate: new Simplate([
-        '<li>',
+        '<li class="{%= $["cls"] %}">',
         '<a href="#{%= view %}" target="_related" m:context="{%= context %}">', 
         '{% if ($["icon"]) { %}',
         '<img src="{%= $["icon"] %}" alt="icon" class="icon" />',
@@ -119,7 +119,11 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                 descriptor: descriptor
             };
         else
+        {
             var context = o;
+
+            if (descriptor) context['descriptor'] = descriptor;
+        }
         
         if (context) 
         {            
@@ -142,7 +146,20 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             request.setResourceKind(this.resourceKind);
 
         return request;
-    },    
+    }, 
+    expandExpression: function(expression) {
+        /// <summary>
+        ///     Expands the passed expression if it is a function.
+        /// </summary>
+        /// <param name="expression" type="String">
+        ///     1: function - Called on this object and must return a string.
+        ///     2: string - Returned directly.
+        /// </param>
+        if (typeof expression === 'function') 
+            return expression.apply(this, Array.prototype.slice.call(arguments, 1));
+        else
+            return expression;
+    },   
     processLayout: function(layout, options, entry, el)
     {
         var sections = [];
@@ -159,74 +176,52 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                 sections.push(current);
                 continue;
             } 
-            else if (current['view'] && current['property'] !== true)
-            {
-                var related = Ext.apply({}, current);
-                var context = {};
 
-                if (related['key'])
-                    context['key'] = typeof related['key'] === 'function' 
-                        ? related['key'](entry)
-                        : related['key']; 
-                
-                if (related['where'])
-                    context['where'] = typeof related['where'] === 'function' 
-                        ? related['where'](entry)
-                        : related['where'];       
-                        
-                if (related['resourceKind'])
-                    context['resourceKind'] = typeof related['resourceKind'] === 'function' 
-                        ? related['resourceKind'](entry)
-                        : related['resourceKind']; 
-                        
-                if (related['resourcePredicate'])
-                    context['resourcePredicate'] = typeof related['resourcePredicate'] === 'function' 
-                        ? related['resourcePredicate'](entry)
-                        : related['resourcePredicate'];
-                        
-                // todo: find a better way of storing this information.  this method is flexible at least.
-                related["context"] = Sage.Platform.Mobile.Format.encode(Ext.util.JSON.encode(context));        
-                
-                content.push(this.relatedTemplate.apply(related));                                    
-                continue;
+            var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue;
+            var value = provider(entry, current['name']);
+            var formatted = current['tpl']
+                ? current['tpl'].apply(value)
+                : current['renderer']
+                    ? current['renderer'](value)
+                    : value;                 
+
+            var options = {
+                cls: current['cls'],
+                icon: current['icon'],
+                name: current['name'],
+                label: current['label'],             
+                entry: entry,
+                value: formatted,
+                raw: value                                              
+            };
+
+            if (current['view'])
+            {
+                var context = {};           
+                if (current['key'])
+                    context['key'] = typeof current['key'] === 'function'
+                    ? this.expandExpression(current['key'], entry)
+                    : provider(entry, current['key']);
+                if (current['where'])
+                    context['where'] = this.expandExpression(current['where'], entry);
+                if (current['resourceKind'])
+                    context['resourceKind'] = this.expandExpression(current['resourceKind'], entry);
+                if (current['resourcePredicate'])
+                    context['resourcePredicate'] = this.expandExpression(current['resourcePredicate'], entry);  
+
+                options['view'] = current['view'];
+                options['context'] = Sage.Platform.Mobile.Format.encode(Ext.util.JSON.encode(context));
             }
-            else
-            {            
-                var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue;
-                var value = provider(entry, current['name']);
-                var formatted = current['tpl']
-                    ? current['tpl'].apply(value)
-                    : current['renderer']
-                        ? current['renderer'](value)
-                        : value;     
-                        
-                if (current['view'] && current['key'])
-                {
-                    content.push(this.relatedPropertyTemplate.apply({
-                        name: current['name'],
-                        label: current['label'],
-                        renderer: current['renderer'],
-                        provider: current['provider'],                
-                        entry: entry,
-                        raw: value,
-                        value: formatted,
-                        key: provider(entry, current['key']),
-                        view: current['view']
-                    }));
-                }
-                else
-                {
-                    content.push(this.propertyTemplate.apply({
-                        name: current['name'],
-                        label: current['label'],
-                        renderer: current['renderer'],
-                        provider: current['provider'],                
-                        entry: entry,
-                        raw: value,
-                        value: formatted
-                    }));
-                }
-            }
+
+            var template = current['wrap'] 
+                ? current['wrap']
+                : current['view']
+                    ? current['property'] === true
+                        ? this.relatedPropertyTemplate
+                        : this.relatedTemplate
+                    : this.propertyTemplate;
+                
+            content.push(template.apply(options));                          
         }
 
         content.push(this.sectionEndTemplate.apply(options));
