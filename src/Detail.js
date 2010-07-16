@@ -25,23 +25,23 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     propertyTemplate: new Simplate([
         '<div class="row {%= $["cls"] %}">',
-        '<label>{%= label %}</label>',       
-        '<span>{%= value %}</span>',
+        '<label>{%= $["label"] %}</label>',       
+        '<span>{%= $["value"] %}</span>',
         '</div>'
     ]),
     relatedPropertyTemplate: new Simplate([
         '<div class="row {%= $["cls"] %}">',
-        '<label>{%= label %}</label>',       
-        '<a href="#{%= view %}" target="_related" m:context="{%= context %}" m:descriptor="{%: value %}">{%: value %}</a>',
+        '<label>{%= $["label"] %}</label>',       
+        '<a href="#{%= $["view"] %}" target="_related" m:context="{%: $["context"] %}" {% if ($["descriptor"]) { %}m:descriptor="{%: $["descriptor"] %}"{% } %}>{%= $["value"] %}</a>',
         '</div>'
     ]),
     relatedTemplate: new Simplate([
         '<li class="{%= $["cls"] %}">',
-        '<a href="#{%= view %}" target="_related" m:context="{%= context %}">', 
+        '<a href="#{%= $["view"] %}" target="_related" m:context="{%: $["context"] %}">', 
         '{% if ($["icon"]) { %}',
         '<img src="{%= $["icon"] %}" alt="icon" class="icon" />',
         '{% } %}',
-        '{%= label %}',
+        '{%= $["label"] %}',
         '</a>',
         '</li>'
     ]),    
@@ -77,7 +77,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     init: function() {  
         Sage.Platform.Mobile.Detail.superclass.init.call(this);
         
-        this.el.on('click', this.onClick, this, {delegate: 'a[target="_related"]'});
+        this.el.on('click', this.onClick, this);
         
         // todo: find a better way to handle these notifications
         App.on('refresh', this.onRefresh, this);  
@@ -92,15 +92,21 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         }
     },
     onClick: function(evt, el, o) {
-        evt.stopEvent();
-
         var el = Ext.get(el);
-        var view = el.dom.hash.substring(1);
 
-        var value = el.getAttribute('key', 'm') || Ext.util.JSON.decode(el.getAttribute('context', 'm'));
-        var descriptor = el.getAttribute('descriptor', 'm');
+        var link = el;
+        if (link.is('a[target="_related"]') || (link = link.up('a[target="_related"]')))
+        {
+            evt.stopEvent();
+
+            var view = link.dom.hash.substring(1);
+
+            var value = link.getAttribute('key', 'm') || Ext.util.JSON.decode(link.getAttribute('context', 'm'));
+            var descriptor = link.getAttribute('descriptor', 'm');
         
-        this.navigateToRelated(view, value, descriptor);   
+            this.navigateToRelated(view, value, descriptor);   
+            return;
+        }  
     },
     formatRelatedQuery: function(entry, fmt, property) {
         var property = property || '$key';
@@ -178,22 +184,43 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             } 
 
             var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue;
-            var value = provider(entry, current['name']);
-            var formatted = current['tpl']
-                ? current['tpl'].apply(value)
-                : current['renderer']
-                    ? current['renderer'](value)
-                    : value;                 
+            var value = provider(entry, current['name']);            
+            
+            if (current['tpl'])
+            {
+                var rendered = current['tpl'].apply(value);
+                var formatted = current['encode'] === true
+                    ? Sage.Platform.Mobile.Format.encode(rendered)
+                    : rendered;
+            }
+            else if (current['renderer'] && typeof current['renderer'] === 'function')
+            {         
+                var rendered = current['renderer'].call(this, value);       
+                var formatted = current['encode'] === true
+                    ? Sage.Platform.Mobile.Format.encode(rendered)
+                    : rendered;
+            }
+            else
+            {
+                var formatted = current['encode'] !== false
+                    ? Sage.Platform.Mobile.Format.encode(value)
+                    : value;
+            }                                   
 
             var options = {
                 cls: current['cls'],
                 icon: current['icon'],
                 name: current['name'],
-                label: current['label'],             
+                label: current['label'],          
                 entry: entry,
                 value: formatted,
                 raw: value                                              
             };
+
+            if (current['descriptor'])
+                options['descriptor'] = typeof current['descriptor'] === 'function'
+                    ? this.expandExpression(current['descriptor'], entry)
+                    : provider(entry, current['descriptor']);
 
             if (current['view'])
             {
@@ -210,7 +237,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                     context['resourcePredicate'] = this.expandExpression(current['resourcePredicate'], entry);  
 
                 options['view'] = current['view'];
-                options['context'] = Sage.Platform.Mobile.Format.encode(Ext.util.JSON.encode(context));
+                options['context'] = Ext.util.JSON.encode(context);
             }
 
             var template = current['wrap'] 

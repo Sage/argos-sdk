@@ -73,11 +73,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         App.on('refresh', this.onRefresh, this); 
     },
     onClick: function(evt, el, o) {
-        evt.stopEvent();
-
         var el = Ext.get(el);
         if (el.is('.more') || el.up('.more'))     
-        {           
+        {   
+            evt.stopEvent();
+                    
             this.more();
             return;
         }        
@@ -85,6 +85,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         var link = el;
         if (link.is('a[target="_detail"]') || (link = link.up('a[target="_detail"]')))
         {
+            evt.stopEvent();
+
             var view = link.dom.hash.substring(1);
 
             var key = link.getAttribute("key", "m");              
