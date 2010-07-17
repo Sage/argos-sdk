@@ -265,20 +265,23 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     requestFailure: function(response, o) {
        
     },
+    processEntry: function(entry) {
+        this.el
+            .select('.loading')
+            .remove();                
+
+        this.entry = entry;
+                
+        if (this.entry)         
+        {               
+            this.processLayout(this.layout, {title: this.detailsText}, this.entry);
+        }
+    },
     requestData: function() {
         var request = this.createRequest();        
         request.read({  
             success: function(entry) {   
-                this.el
-                    .select('.loading')
-                    .remove();                
-
-                this.entry = entry;
-                
-                if (this.entry)         
-                {               
-                    this.processLayout(this.layout, {title: this.detailsText}, this.entry);
-                }
+                this.processEntry(entry);
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);

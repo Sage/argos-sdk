@@ -82,8 +82,8 @@
             fragments[i] = "__p('" + fragments[i].replace(/'/g, "\\'").replace(/\n/g, "\\n") + "');";
            
         var source = [
-            'var __r = [], $ = __v || {}, __s = Simplate, __p = function() { __r.push.apply(__r, arguments); };',
-            'with ($) {',
+            'var __r = [], $ = __v, __s = Simplate, __p = function() { __r.push.apply(__r, arguments); };',
+            'with ($ || {}) {',
             fragments.join(''),
             '}',
             'return __r.join(\'\');'
