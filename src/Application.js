@@ -27,6 +27,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.defaultService = false; 
         this.bars = {};    
         this.addEvents(
+            'resize',
             'registered',
             'beforeviewtransitionaway',
             'beforeviewtransitionto',
@@ -38,6 +39,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// <summary>
         ///     Sets up the handling for transition events from iUI.
         /// </summary>
+        Ext.EventManager.on(window, 'resize', function() {
+            this.fireEvent('resize');
+        }, this, {buffer: 250});
         Ext.getBody().on('beforetransition', function(evt, el, o) {
             var view = this.getView(el);
             if (view)
