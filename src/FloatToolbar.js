@@ -206,6 +206,9 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
     display: function(tools) {
         /* if there are no tools to display, hide this bar */
         /* this toolbar only supports a single action */
+
+        if (this.timer) clearTimeout(this.timer);
+
         if (tools.length > 0)
         {
             var content = [];
@@ -218,10 +221,13 @@ Sage.Platform.Mobile.FloatToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
 
                 this.tools[tool.name] = tool;
             }            
-
-            this.move(this.calculateNoVisY(), false); 
-            this.el.show();                       
-            this.move(this.calculateY());
+           
+            this.timer = (function() {
+                this.move(this.calculateNoVisY(), false); 
+                this.el.show();                       
+                this.move(this.calculateY());
+                this.timer = false;
+            }).defer(250, this);
         }
     }    
 });

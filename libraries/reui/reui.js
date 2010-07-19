@@ -186,6 +186,8 @@ ReUI = {};
         }
 
         context.transitioning = false;
+
+        if (o.scroll !== false) D.wait(scrollTo, 0, 0, 1); 
           
         if (o.update !== false) 
         {
@@ -222,9 +224,9 @@ ReUI = {};
     
     var transition = function(from, to, o) {            
         function complete() {            
-            context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);    
-                
-            D.wait(transitionComplete, 0, to, o);                               
+            D.wait(transitionComplete, 0, to, o);
+
+            context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);                                                               
                 
             D.dispatch(from, 'aftertransition', {out: true});            
             D.dispatch(to, 'aftertransition', {out: false});
@@ -450,6 +452,7 @@ ReUI = {};
         ///     reverse: True if the transition is a reverse transition (right/down), False otherwise.
         ///     track: False if the transition should not be tracked in history, True otherwise.
         ///     update: False if the transition should not update title and back button, True otherwise.
+        ///     scroll: False if the transition should not scroll to the top, True otherwise.
         /// </summary>
         show: function(page, o) {
             if (context.transitioning) return; /* todo: should we queue the transition? */
@@ -469,6 +472,9 @@ ReUI = {};
                     context.history.splice(index);
                 }
             }
+
+            // don't auto-scroll by default if reversing
+            if (o.reverse && typeof o.scroll === 'undefined') o.scroll = !o.reverse;
 
             if (context.dialog)
             {
