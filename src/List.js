@@ -9,16 +9,20 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<ul id="{%= id %}" title="{%= title %}">',                       
         '</ul>'
     ]),
-    contentTemplate: new Simplate([
+    loadingTemplate: new Simplate([
         '<li class="loading"><div class="loading-indicator">{%= loadingText %}</div></li>',
         '<li class="more" style="display: none;"><a href="#" target="_none" class="whiteButton moreButton"><span>{%= moreText %}</span></a></li>'
     ]),
     itemTemplate: new Simplate([
-        '<li>',
-        '<a href="#" target="_detail" m:key="{%= $["$key"] || $["$uuid"] %}">',
-        '<h3>{%= $["$descriptor"] %}</h3>',
-        '</a>',
+        '<li>', 
+        '{% if (this.allowSelection) { %}',
+        '<input type="checkbox" m:key="{%= $["$key"] %}" class="list-selector" />',
+        '{% } %}',
+        '{%! this.contentTemplate %}',       
         '</li>'
+    ]),
+    contentTemplate: new Simplate([       
+        '<h3>{%= $["$descriptor"] %}</h3>'        
     ]),    
     noDataTemplate: new Simplate([
         '<li class="no-data">',
@@ -47,8 +51,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             id: 'generic_list',
             title: this.titleText,
             pageSize: 20,
+            allowSelection: true,
             requestedFirstPage: false,
-            searchDialog: 'search_dialog',
+            searchDialog: 'search_dialog',            
             tools: {
                 tbar: [{
                     name: 'search',
@@ -71,6 +76,13 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         this.el.on('click', this.onClick, this);                      
 
         App.on('refresh', this.onRefresh, this); 
+    },
+    getSelected: function() {
+        var checked = [];
+        this.el.select("input.list-selector:checked").each(function(el) {
+            checked.push(el.getAttribute("m:key"));
+        }, this);
+        return checked;
     },
     onClick: function(evt, el, o) {
         var el = Ext.get(el);
@@ -229,7 +241,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         {
             var o = [];
             for (var i = 0; i < feed.$resources.length; i++)                
-                o.push(this.itemTemplate.apply(feed.$resources[i]));
+                o.push(this.itemTemplate.apply(feed.$resources[i], this));
         
             if (o.length > 0)                    
                 Ext.DomHelper.insertBefore(this.moreEl, o.join(''));
@@ -356,7 +368,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         /// <summary>
         ///     Clears the view and re-applies the default content template.
         /// </summary>
-        this.el.update(this.contentTemplate.apply(this));
+        this.el.update(this.loadingTemplate.apply(this));
 
         this.moreEl = this.el.down(".more"); 
 
