@@ -8,8 +8,9 @@ Ext.namespace('Sage.Platform.Mobile');
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 // todo: move to separate files
-Sage.Platform.Mobile.Controls.Field = function(name) {
-    this.name = name;    
+Sage.Platform.Mobile.Controls.Field = function(o) {
+    Ext.apply(this, o, {
+    });
 };
 
 Sage.Platform.Mobile.Controls.Field.prototype = {
@@ -21,7 +22,42 @@ Sage.Platform.Mobile.Controls.Field.prototype = {
     },   
     isDirty: function() {
         return true;
-    }
+    },
+    validate: function() {        
+        if (typeof this.validator === 'undefined') 
+            return false; 
+
+        if (this.validator instanceof RegExp)                      
+            var o = {
+                test: this.validator
+            };
+        else if (typeof this.validator === 'function')        
+            var o = {
+                fn: this.validator
+            };            
+        else
+            var o = this.validator;
+         
+        var value = this.getValue();
+           
+        if (typeof o.fn === 'function')      
+        {  
+            return o.fn.call(o.scope || this, value);        
+        }
+        else if (o.test instanceof RegExp)
+        {  
+            if (!o.test.test(value))
+            {
+                var message = typeof o.message === 'function'
+                    ? o.message.call(o.scope || this, value)
+                    : o.message;
+
+                return message || true;
+            }             
+        }
+
+        return false;
+    }       
 };
 
 Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
@@ -142,7 +178,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             else
             {   
                 var ctor = Sage.Platform.Mobile.Controls.registered[current['type']];
-                var field = this.fields[current['name']] = new ctor(current['name']);
+                var field = this.fields[current['name']] = new ctor(current);
 
                 content.push(this.propertyTemplate.apply({
                     label: current['label'],
@@ -221,6 +257,31 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         }
         return empty ? false : o;
     },
+    validate: function() {
+        this.errors = [];
+
+        for (var name in this.fields)
+        {
+            var result;
+            if (false !== (result = this.fields[name].validate()))
+            {
+                this.fields[name].el.addClass('field-error');
+
+                this.errors.push({
+                    name: name,
+                    message: result
+                });                
+            }
+            else
+            {
+                this.fields[name].el.removeClass('field-error');
+            }
+        }
+
+        return this.errors.length > 0
+            ? this.errors
+            : false;
+    },
     createEntryForUpdate: function(values) {
         return Ext.apply(values, {
             '$key': this.entry['$key'],
@@ -229,7 +290,18 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         });
     },
     save: function() {
-        if (this.busy) return;        
+        if (this.busy) 
+            return;    
+        
+        if (this.validate() !== false) 
+        {
+            this.el.addClass('form-error');
+            return;
+        }          
+        else
+        {
+            this.el.removeClass('form-error');
+        } 
 
         var values = this.getValues();                        
         if (values) 
