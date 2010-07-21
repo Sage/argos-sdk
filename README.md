@@ -13,6 +13,6 @@ Installation
 		cd \projects
 *	Execute the following commands
 		
-		mkdir sage\mobile\products
+		mkdir sage\mobile\products (or "mkdir -p sage\mobile\products" from Git Bash)
 		cd sage\mobile
 		git clone git@github.com:SageScottsdalePlatform/argos-sdk.git
