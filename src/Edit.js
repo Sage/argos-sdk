@@ -19,38 +19,40 @@ Sage.Platform.Mobile.Controls.Field.prototype = {
     },
     bind: function(container) {
         this.el = container.child(String.format('input[name="{0}"]', this.name));
-    },   
+    },       
     isDirty: function() {
         return true;
     },
-    validate: function() {        
+    validate: function(value) {        
         if (typeof this.validator === 'undefined') 
             return false; 
 
         if (this.validator instanceof RegExp)                      
-            var o = {
+            var definition = {
                 test: this.validator
             };
         else if (typeof this.validator === 'function')        
-            var o = {
+            var definition = {
                 fn: this.validator
             };            
         else
-            var o = this.validator;
-         
-        var value = this.getValue();
+            var definition = this.validator;
+                
+        var value = typeof value === 'undefined'
+            ? this.getValue()
+            : value;
            
-        if (typeof o.fn === 'function')      
+        if (typeof definition.fn === 'function')      
         {  
-            return o.fn.call(o.scope || this, value);        
+            return definition.fn.call(definition.scope || this, value, this.editor);        
         }
-        else if (o.test instanceof RegExp)
+        else if (definition.test instanceof RegExp)
         {  
-            if (!o.test.test(value))
+            if (!definition.test.test(value))
             {
-                var message = typeof o.message === 'function'
-                    ? o.message.call(o.scope || this, value)
-                    : o.message;
+                var message = typeof definition.message === 'function'
+                    ? definition.message.call(definition.scope || this, value, field)
+                    : String.format(definition.message, value, field);
 
                 return message || true;
             }             
@@ -64,6 +66,43 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
     template: new Simplate([
         '<input type="text" name="{%= name %}">',
     ]),
+    bind: function(container) {
+        Sage.Platform.Mobile.Controls.TextField.superclass.bind.apply(this, arguments);   
+        
+        if (this.validInputOnly)
+        {
+            this.el.on('keypress', this.onKeyPress, this);
+        }
+        else
+        {
+            switch (this.validationTrigger)
+            {
+                case 'keyup':
+                    this.el.on('keyup', this.onValidationTrigger, this);
+                    break;
+                case 'blur':
+                    this.el.on('blur', this.onValidationTrigger, this);
+                    break;
+            }
+        }
+    },
+    onKeyPress: function(evt, el, o) {
+        if (this.validInputOnly)
+        {
+            var v = this.getValue() + String.fromCharCode(evt.getCharCode());
+            if (this.validate(v))
+            {
+                evt.stopEvent();
+                return;
+            }     
+        }
+    },
+    onValidationTrigger: function(evt, el, o) {
+        if (this.validate())
+            this.el.addClass('field-error');
+        else
+            this.el.removeClass('field-error');
+    },    
     getValue: function() {
         return this.el.getValue();
     },
@@ -178,7 +217,9 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             else
             {   
                 var ctor = Sage.Platform.Mobile.Controls.registered[current['type']];
-                var field = this.fields[current['name']] = new ctor(current);
+                var field = this.fields[current['name']] = new ctor(Ext.apply({
+                    editor: this
+                }, current));
 
                 content.push(this.propertyTemplate.apply({
                     label: current['label'],
