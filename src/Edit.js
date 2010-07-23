@@ -116,8 +116,53 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
     }
 });
 
+Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
+    getValue: function() {
+        return this.el.getValue().replace(/[^0-9x]/i,"");
+    },
+    bind: function(container) {
+        Sage.Platform.Mobile.Controls.PhoneField.superclass.bind.apply(this, arguments);
+        this.el.on('keyup', this.swapLettersWithKeypadNumbers, this);
+        this.el.on('keypress', this.limitPhoneFieldLength, this);
+    },
+    limitPhoneFieldLength: function(evt, el, o) {
+        //Allow the user to still delete and navigate, if the numbers are over 13 chars.
+        var ALLOWED_KEYS = {
+            "8"  : "BACKSPACE",
+            "46" : "KEY_DELETE",
+            "45" : "KEY_INSERT",
+            "37" : "KEY_LEFT",
+            "39" : "KEY_RIGHT"
+        };
+        if (typeof ALLOWED_KEYS[evt.getCharCode()] != "string" && this.el.dom.value.length > 13) {
+            evt.stopEvent();
+            return;
+        }
+    },
+    swapLettersWithKeypadNumbers: function() {
+        var phoneNumber = this.el.dom.value;
+        // All keys are mapped to numbers except "X", which is for denoting Extn 
+        var keypadLetterToNumberMap = {
+            "A": 2, "B": 2, "C": 2,
+            "D": 3, "E": 3, "F": 3,
+            "G": 4, "H": 4, "I": 4,
+            "J": 5, "K": 5, "L": 5,
+            "M": 6, "N": 6, "O": 6,
+            "P": 7, "Q": 7, "R": 7, "S": 7,
+            "T": 8, "U": 8, "V": 8,
+            "W": 9, "Y": 9, "Z": 9
+        };
+        //Ignore only 'x', replace other chars with numbers
+        phoneNumber = phoneNumber.replace(/[a-wyz]/i, function(letter) {
+            return keypadLetterToNumberMap[letter.toUpperCase()];
+        });
+        this.setValue(phoneNumber);
+    }
+});
+
 Sage.Platform.Mobile.Controls.registered = {
-    'text': Sage.Platform.Mobile.Controls.TextField
+    'text': Sage.Platform.Mobile.Controls.TextField,
+    'phone': Sage.Platform.Mobile.Controls.PhoneField
 };
 
 Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {   
