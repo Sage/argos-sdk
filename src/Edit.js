@@ -126,7 +126,7 @@ Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Contr
         this.el.on('keypress', this.limitPhoneFieldLength, this);
     },
     limitPhoneFieldLength: function(evt, el, o) {
-        //Allow the user to still delete and navigate, if the numbers are over 13 chars.
+        //Allow the user to still delete and navigate, if the numbers are over 32 chars.
         var ALLOWED_KEYS = {
             "8"  : "BACKSPACE",
             "46" : "KEY_DELETE",
@@ -134,7 +134,7 @@ Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Contr
             "37" : "KEY_LEFT",
             "39" : "KEY_RIGHT"
         };
-        if (typeof ALLOWED_KEYS[evt.getCharCode()] != "string" && this.el.dom.value.length > 13) {
+        if (typeof ALLOWED_KEYS[evt.getCharCode()] != "string" && this.el.dom.value.length > 32) {
             evt.stopEvent();
             return;
         }
@@ -156,7 +156,7 @@ Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Contr
         phoneNumber = phoneNumber.replace(/[a-wyz]/i, function(letter) {
             return keypadLetterToNumberMap[letter.toUpperCase()];
         });
-        this.setValue(phoneNumber);
+        this.el.dom.value = phoneNumber;
     }
 });
 
