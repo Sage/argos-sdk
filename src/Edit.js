@@ -9,16 +9,17 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 // todo: move to separate files
 Sage.Platform.Mobile.Controls.Field = function(o) {
-    Ext.apply(this, o, {
+    Ext.apply(this, o, {        
     });
 };
 
 Sage.Platform.Mobile.Controls.Field.prototype = {
+    selector: 'input[name="{0}"]',
     apply: function(external) {
         return this.template.apply(this);
     },
     bind: function(container) {
-        this.el = container.child(String.format('input[name="{0}"]', this.name));
+        this.el = container.child(String.format(this.selector, this.name));
     },       
     isDirty: function() {
         return true;
@@ -160,9 +161,44 @@ Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Contr
     }
 });
 
+Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
+    selector: 'div[name="{0}"]',
+    template: new Simplate([
+        '<div name="{%= name %}" class="toggle" toggled="{%= !!$.checked %}">',
+        '<span class="thumb"></span>',
+        '<span class="toggleOn">{%= $.onText %}</span>',
+        '<span class="toggleOff">{%= $.offText %}</span>',
+        '</div>'
+    ]),
+    onText: 'ON',
+    offText: 'OFF',
+    constructor: function(o) {        
+        Sage.Platform.Mobile.Controls.BooleanField.superclass.constructor.apply(this, arguments);             
+    },
+    bind: function(container) {
+        Sage.Platform.Mobile.Controls.BooleanField.superclass.bind.apply(this, arguments);        
+
+        this.el.on('click', this.onClick, this, {stopEvent: true});
+    },
+    onClick: function(evt, el, o) {
+        this.el.dom.setAttribute('toggled', this.el.getAttribute('toggled') !== 'true');
+    },
+    getValue: function() {
+        return this.el.getAttribute('toggled') === 'true';
+    },
+    setValue: function(val) {
+        this.checked = val;
+        this.el.dom.setAttribute('toggled', this.checked);
+    },
+    isDirty: function() {
+        return (!!this.checked != this.getValue());
+    }
+});
+
 Sage.Platform.Mobile.Controls.registered = {
     'text': Sage.Platform.Mobile.Controls.TextField,
-    'phone': Sage.Platform.Mobile.Controls.PhoneField
+    'phone': Sage.Platform.Mobile.Controls.PhoneField,
+    'boolean': Sage.Platform.Mobile.Controls.BooleanField
 };
 
 Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {   

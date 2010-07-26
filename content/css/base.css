@@ -381,4 +381,12 @@ input.list-selector
     float: left;
 }
 
+.row > .toggle
+{
+	position: relative;
+	right: auto;
+	top: 5px;
+	margin: 0 0 0 110px;
+}
+
 
