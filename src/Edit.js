@@ -118,27 +118,30 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
 });
 
 Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
+    template: new Simplate([
+        '<input type="text" name="{%= name %}" maxlength="32">',
+    ]),
     getValue: function() {
-        return this.el.getValue().replace(/[^0-9x]/i,"");
+        return this.el.dom.value.replace(/[^0-9x]/ig, "");
+    },
+    setValue: function(val) {
+        this.value = val;
+
+        this.el.dom.value = Mobile.SalesLogix.Format.phone(val, false);
+    },
+    onValidationTrigger : function(evt, el, o) {
+        //We don't want to validate phone field on key up. It will have letters.
+        if(evt.type == "keyup") return;
+
+        //IMPORTANT: Need to fix.
+        //This can run twice, if validation trigger is set to blur.
+        //Though there is no harm in it, it must be handled.
+        this.swapLettersWithKeypadNumbers();
+        Sage.Platform.Mobile.Controls.PhoneField.superclass.onValidationTrigger.apply(this, arguments);
     },
     bind: function(container) {
         Sage.Platform.Mobile.Controls.PhoneField.superclass.bind.apply(this, arguments);
-        this.el.on('keyup', this.swapLettersWithKeypadNumbers, this);
-        this.el.on('keypress', this.limitPhoneFieldLength, this);
-    },
-    limitPhoneFieldLength: function(evt, el, o) {
-        //Allow the user to still delete and navigate, if the numbers are over 32 chars.
-        var ALLOWED_KEYS = {
-            "8"  : "BACKSPACE",
-            "46" : "KEY_DELETE",
-            "45" : "KEY_INSERT",
-            "37" : "KEY_LEFT",
-            "39" : "KEY_RIGHT"
-        };
-        if (typeof ALLOWED_KEYS[evt.getCharCode()] != "string" && this.el.dom.value.length > 32) {
-            evt.stopEvent();
-            return;
-        }
+        this.el.on('blur', this.swapLettersWithKeypadNumbers, this);
     },
     swapLettersWithKeypadNumbers: function() {
         var phoneNumber = this.el.dom.value;
@@ -151,13 +154,30 @@ Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Contr
             "M": 6, "N": 6, "O": 6,
             "P": 7, "Q": 7, "R": 7, "S": 7,
             "T": 8, "U": 8, "V": 8,
-            "W": 9, "Y": 9, "Z": 9
+            "W": 9, "X": 9, "Y": 9, "Z": 9
         };
-        //Ignore only 'x', replace other chars with numbers
-        phoneNumber = phoneNumber.replace(/[a-wyz]/i, function(letter) {
+        //Replace chars other than "x" with numbers
+        var x_char_count = 0;
+        phoneNumber = phoneNumber.replace(/[a-z]/gi, function(letter) {
+            if (letter.toLowerCase() == "x") {
+                x_char_count++;
+                return letter;
+            }
             return keypadLetterToNumberMap[letter.toUpperCase()];
         });
-        this.el.dom.value = phoneNumber;
+
+        //Replace "x" with "9", only if it occours more than once.
+        //Else its probably an extension
+        if (x_char_count > 1) {
+            phoneNumber = phoneNumber.replace(/x/ig, keypadLetterToNumberMap["X"]);
+        }
+        //Remove formatting of Phone Number
+        phoneNumber = phoneNumber.replace(/[^0-9x]/ig, "");
+        //Reformat it again.
+        this.el.dom.value = Mobile.SalesLogix.Format.phone(phoneNumber, false);
+    },
+    isDirty: function() {
+        return (Mobile.SalesLogix.Format.phone(this.value, false) != Mobile.SalesLogix.Format.phone(this.getValue(), false));
     }
 });
 
