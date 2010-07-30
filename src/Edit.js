@@ -112,6 +112,9 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
 
         this.el.dom.value = val;
     },
+    clearValue: function() {
+        this.setValue('');
+    },
     isDirty: function() {
         return (this.value != this.getValue());
     }
@@ -119,65 +122,57 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
 
 Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
     template: new Simplate([
-        '<input type="text" name="{%= name %}" maxlength="32">',
+        '<input type="text" name="{%= name %}">',
     ]),
+    /*
+        {0}: original value
+        {1}: cleaned value
+        {2}: entire match (against clean value)
+        {3..n}: match groups (against clean value)
+    */
+    formatters: [{
+        test: /^\+.*/,
+        format: '{0}'
+    },{
+        test: /^(\d{3})(\d{3,4})$/,
+        format: '{3}-{4}'
+    },{
+        test: /^(\d{3})(\d{3})(\d{2,})(.*)$/,
+        format: '({3})-{4}-{5}{6}'
+    }],
     getValue: function() {
-        return this.el.dom.value.replace(/[^0-9x]/ig, "");
-    },
+        var value = this.el.getValue();
+        
+        if (/^\+/.test(value)) return value; 
+
+        return value.replace(/[^0-9x]/ig, "");
+    },        
     setValue: function(val) {
         this.value = val;
 
-        this.el.dom.value = Mobile.SalesLogix.Format.phone(val, false);
-    },
-    onValidationTrigger : function(evt, el, o) {
-        //We don't want to validate phone field on key up. It will have letters.
-        if(evt.type == "keyup") return;
-
-        //IMPORTANT: Need to fix.
-        //This can run twice, if validation trigger is set to blur.
-        //Though there is no harm in it, it must be handled.
-        this.swapLettersWithKeypadNumbers();
-        Sage.Platform.Mobile.Controls.PhoneField.superclass.onValidationTrigger.apply(this, arguments);
-    },
-    bind: function(container) {
-        Sage.Platform.Mobile.Controls.PhoneField.superclass.bind.apply(this, arguments);
-        this.el.on('blur', this.swapLettersWithKeypadNumbers, this);
-    },
-    swapLettersWithKeypadNumbers: function() {
-        var phoneNumber = this.el.dom.value;
-        // All keys are mapped to numbers except "X", which is for denoting Extn 
-        var keypadLetterToNumberMap = {
-            "A": 2, "B": 2, "C": 2,
-            "D": 3, "E": 3, "F": 3,
-            "G": 4, "H": 4, "I": 4,
-            "J": 5, "K": 5, "L": 5,
-            "M": 6, "N": 6, "O": 6,
-            "P": 7, "Q": 7, "R": 7, "S": 7,
-            "T": 8, "U": 8, "V": 8,
-            "W": 9, "X": 9, "Y": 9, "Z": 9
-        };
-        //Replace chars other than "x" with numbers
-        var x_char_count = 0;
-        phoneNumber = phoneNumber.replace(/[a-z]/gi, function(letter) {
-            if (letter.toLowerCase() == "x") {
-                x_char_count++;
-                return letter;
-            }
-            return keypadLetterToNumberMap[letter.toUpperCase()];
-        });
-
-        //Replace "x" with "9", only if it occours more than once.
-        //Else its probably an extension
-        if (x_char_count > 1) {
-            phoneNumber = phoneNumber.replace(/x/ig, keypadLetterToNumberMap["X"]);
+        this.el.dom.value = this.formatNumberForDisplay(val);
+    },    
+    formatNumberForDisplay: function(number, clean) {
+        if (typeof clean === 'undefined')
+            var clean = number;
+      
+        for (var i = 0; i < this.formatters.length; i++)
+        {
+            var formatter = this.formatters[i];
+            var match;       
+            if ((match = formatter.test.exec(clean)))
+                return String.format.apply(String, [formatter.format, number, clean].concat(match));
         }
-        //Remove formatting of Phone Number
-        phoneNumber = phoneNumber.replace(/[^0-9x]/ig, "");
-        //Reformat it again.
-        this.el.dom.value = Mobile.SalesLogix.Format.phone(phoneNumber, false);
+
+        return number;
+    },    
+    bind: function(container) {
+        Sage.Platform.Mobile.Controls.TextField.superclass.bind.apply(this, arguments);
+
+        this.el.on('keyup', this.onKeyUp, this);
     },
-    isDirty: function() {
-        return (Mobile.SalesLogix.Format.phone(this.value, false) != Mobile.SalesLogix.Format.phone(this.getValue(), false));
+    onKeyUp: function(evt, el, o) {
+        this.el.dom.value = this.formatNumberForDisplay(this.el.dom.value, this.getValue());
     }
 });
 
@@ -207,11 +202,14 @@ Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Con
         return this.el.getAttribute('toggled') === 'true';
     },
     setValue: function(val) {
-        this.checked = val;
+        this.value = val;
         this.el.dom.setAttribute('toggled', this.checked);
     },
+    clearValue: function() {
+        this.setValue(!!this.checked);
+    },
     isDirty: function() {
-        return (!!this.checked != this.getValue());
+        return (this.value != this.getValue());
     }
 });
 
@@ -227,7 +225,6 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         '<fieldset class="loading">',
         '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
         '</fieldset>',
-        '<div class="body" style="display: none;">',
         '</div>',           
         '</div>'
     ]),       
@@ -244,9 +241,6 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         '{%! field %}', /* apply sub-template */
         '</div>'
     ]),    
-    textFieldTemplate: new Simplate([
-        '<input type="text" name="{%= name %}">'
-    ]),
     saveText: 'Save',
     titleText: 'Edit',
     detailsText: 'Details',    
@@ -272,9 +266,6 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     },
     render: function() {
         Sage.Platform.Mobile.Edit.superclass.render.call(this);               
-
-        this.bodyEl = this.el.child('.body').setVisibilityMode(Ext.Element.DISPLAY);
-        this.loadEl = this.el.child('.loading').setVisibilityMode(Ext.Element.DISPLAY);
     },
     init: function() {  
         Sage.Platform.Mobile.Edit.superclass.init.call(this);                
@@ -282,22 +273,22 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         this.processLayout(this.layout, {title: this.detailsText});
 
         for (var name in this.fields) this.fields[name].bind(this.el);
-
-        this.loadEl.hide();
-        this.bodyEl.show();
-
-        // todo: find a better way to handle these notifications
-        if (this.canSave) App.on('save', this.onSave, this);  
-    },      
-    onSave: function() {
-        if (this.isActive())
-            this.save();
-    },
+    },          
     createRequest: function() {
-       
+        var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
+
+        if (this.entry && this.entry['$key'])
+            request.setResourceSelector(String.format("'{0}'", this.entry['$key']));
+
+        return request;
     },    
     createTemplateRequest: function() {
+        var request = new Sage.SData.Client.SDataTemplateResourceRequest(this.getService());       
 
+        if (this.resourceKind) 
+            request.setResourceKind(this.resourceKind);
+
+        return request;
     },
     processLayout: function(layout, options)
     {
@@ -347,32 +338,46 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         var request = this.createRequest();  
         if (request)      
             request.read({  
-                success: function(entry) {                   
-                },
-                failure: function(response, o) {
-                    this.requestFailure(response, o);
-                },
+                success: this.processEntry,
+                failure: this.requestFailure,
                 scope: this
             });       
     },
-    show: function(o) {
-        if (typeof o !== 'undefined') 
+    requestTemplateFailure: function() {
+
+    },
+    requestTemplateData: function() {
+        var request = this.createTemplateRequest();
+        if (request)
+            request.read({
+                success: this.processTemplateEntry,
+                failure: this.requestTemplateFailure,
+                scope: this
+            });
+    },
+    processEntry: function(entry) {
+        // not currently used
+    },
+    processTemplateEntry: function(entry) {
+        this.setValues(entry || {});
+        this.el.removeClass('panel-loading');
+    },
+    show: function(o) {        
+        if (o) 
         {
-            this.entry = o;
-            this.newContext = true;
-        }        
-        else
-        {
-            this.newContext = false;
-        }       
+            this.newContext = o;
+        }          
 
         Sage.Platform.Mobile.Edit.superclass.show.call(this);                     
     },  
     isNewContext: function() {
         return this.newContext;
-    }, 
-    beforeTransitionTo: function() {
-        Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
+    },    
+    clearValues: function() {
+        for (var name in this.fields)
+        {
+            this.fields[name].clearValue();
+        }
     },
     setValues: function(o) {
         for (var name in this.fields)
@@ -431,27 +436,62 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             '$name': this.entry['$name']           
         });
     },
-    save: function() {
-        if (this.busy) 
-            return;    
-        
-        if (this.validate() !== false) 
+    createEntryForInsert: function(values) {
+        return Ext.apply(values, {
+            '$name': this.entityName
+        });
+    },
+    isFormDisabled: function() {
+        return this.busy;
+    },
+    disableForm: function() {
+        this.busy = true;
+        this.el.addClass('view-busy');
+        if (App.bars.tbar && App.bars.tbar.el)
+            App.bars.tbar.el.addClass('toolbar-busy');
+    },
+    enableForm: function() {
+        this.busy = false;
+        this.el.removeClass('view-busy');
+        if (App.bars.tbar && App.bars.tbar.el)
+            App.bars.tbar.el.removeClass('toolbar-busy');
+    },
+    insert: function() {
+        this.disableForm();
+
+        var values = this.getValues();         
+        if (values) 
         {
-            this.el.addClass('form-error');
-            return;
-        }          
+            var entry = this.createEntryForInsert(values);
+
+            var request = this.createRequest();            
+            if (request)
+                request.create(entry, {
+                    success: function(created) {  
+                        this.enableForm()
+                                                
+                        App.fireEvent('refresh', {
+                            resourceKind: this.resourceKind                            
+                        });
+                            
+                        ReUI.back();
+                    },
+                    failure: function(response, o) {
+                        this.enableForm();
+                    },
+                    scope: this
+                });
+        }
         else
         {
-            this.el.removeClass('form-error');
-        } 
-
+            ReUI.back();
+        }
+    },
+    update: function() {
         var values = this.getValues();                        
         if (values) 
         {           
-            this.busy = true;
-            this.el.addClass('view-busy');
-            if (App.tbar)
-                App.tbar.el.addClass('toolbar-busy');
+            this.disableForm();
 
             var entry = this.createEntryForUpdate(values);
 
@@ -459,10 +499,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             if (request)
                 request.update(entry, {
                     success: function(modified) {  
-                        this.busy = false;
-                        this.el.removeClass('view-busy');
-                        if (App.tbar)
-                            App.tbar.el.removeClass('toolbar-busy');
+                        this.enableForm()
                                                 
                         App.fireEvent('refresh', {
                             resourceKind: this.resourceKind,
@@ -475,10 +512,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                         ReUI.back();
                     },
                     failure: function(response, o) {
-                        this.busy = false;
-                        this.el.removeClass('view-busy');
-                        if (App.tbar)
-                            App.tbar.el.removeClass('toolbar-busy');
+                        this.enableForm();
                     },
                     scope: this
                 });
@@ -488,19 +522,57 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             ReUI.back();
         }
     },
+    save: function() {
+        if (this.isFormDisabled())  return;    
+        
+        if (this.validate() !== false) 
+        {
+            this.el.addClass('form-error');
+            return;
+        }          
+        else
+        {
+            this.el.removeClass('form-error');
+        }        
+        
+        if (this.inserting)
+            this.insert();
+        else
+            this.update();         
+    },
+    beforeTransitionTo: function() {
+        Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
+        
+        if (this.isNewContext())
+        {
+            if (this.newContext.insert === true)
+                this.el.addClass('panel-loading');
+            else
+                this.el.removeClass('panel-loading');
+        } 
+    },
     transitionTo: function() {
         Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this); 
         
         if (this.isNewContext())
         {
-            this.setValues(this.entry);
-        }       
+            this.context = this.newContext;
+            this.newContext = false;
 
-        // todo: check to see if we are creating instead of editing and, if so, request the 'template'
-        //       from SData.
-    },
-    clear: function() {
-        // todo: add back if we are creating instead of editing.
-        // this.el.update(this.contentTemplate.apply(this));
+            this.entry = false;            
+            this.inserting = (this.context.insert === true);
+
+            this.clearValues();
+
+            if (this.inserting)
+            {
+                this.requestTemplateData();
+            }
+            else            
+            {
+                this.entry = this.context.entry;                 
+                this.setValues(this.context.entry || {});
+            }            
+        }       
     }      
 });

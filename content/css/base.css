@@ -389,4 +389,18 @@ input.list-selector
 	margin: 0 0 0 110px;
 }
 
+.panel > .loading
+{
+	display: none;
+}
+
+.panel-loading > .loading
+{
+	display: block;
+}
+
+.panel-loading > *:not(.loading)
+{
+	display: none;
+}
 

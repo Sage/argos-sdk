@@ -88,6 +88,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             if (o.data && o.data['$descriptor']) 
                 this.setTitle(o.data['$descriptor']);
 
+            this.newContext = this.context; // todo: is this the best way to handle this?
             this.clear();                
         }
     },
@@ -116,7 +117,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     navigateToEdit: function() {
         var view = App.getView(this.editor);
         if (view)
-            view.show(this.entry);
+            view.show({entry: this.entry});
     },
     navigateToRelated: function(view, o, descriptor) {    
         if (typeof o === 'string')
@@ -266,26 +267,20 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
        
     },
     processEntry: function(entry) {
-        this.el
-            .select('.loading')
-            .remove();                
-
         this.entry = entry;
                 
         if (this.entry)         
         {               
             this.processLayout(this.layout, {title: this.detailsText}, this.entry);
         }
+
+        this.el.removeClass('panel-loading');  
     },
     requestData: function() {
         var request = this.createRequest();        
         request.read({  
-            success: function(entry) {   
-                this.processEntry(entry);
-            },
-            failure: function(response, o) {
-                this.requestFailure(response, o);
-            },
+            success: this.processEntry,
+            failure: this.requestFailure,
             scope: this
         });       
     },
@@ -302,7 +297,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         Sage.Platform.Mobile.Detail.superclass.show.call(this);                     
     },  
     isNewContext: function() {
-        return (!this.context || (this.context && this.context.key != this.newContext.key));
+        return this.newContext;
     }, 
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.Detail.superclass.beforeTransitionTo.call(this);
@@ -310,7 +305,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         this.canEdit = this.editor ? true : false;
 
         if (this.isNewContext())
-        {
+        {            
             this.clear();
         } 
     },
@@ -321,13 +316,14 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         if (this.isNewContext()) 
         {
             this.context = this.newContext;
+            this.newContext = false;
                     
             this.requestData();  
         }   
     },
     clear: function() {
+        this.el.addClass('panel-loading');
         this.el.update(this.loadingTemplate.apply(this));
-
         this.context = false;
     }      
 });

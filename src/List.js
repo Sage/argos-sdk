@@ -218,6 +218,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                 key: key
             });        
     },
+    navigateToInsert: function() {
+        var view = App.getView(this.editor);
+        if (view)
+            view.show({insert: true});
+    },
     processFeed: function(feed) {
         /// <summary>
         ///     Processes the feed result from the SData request and renders out the resource feed entries.
