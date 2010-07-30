@@ -5,8 +5,8 @@
 Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
-    viewTemplate: new Simplate([            
-        '<ul id="{%= id %}" title="{%= title %}">',                       
+    viewTemplate: new Simplate([
+        '<ul id="{%= id %}" title="{%= title %}">',
         '</ul>'
     ]),
     loadingTemplate: new Simplate([
@@ -14,16 +14,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<li class="more" style="display: none;"><a href="#" target="_none" class="whiteButton moreButton"><span>{%= moreText %}</span></a></li>'
     ]),
     itemTemplate: new Simplate([
-        '<li>', 
+        '<li>',
         '{% if (this.allowSelection) { %}',
         '<input type="checkbox" m:key="{%= $["$key"] %}" class="list-selector" />',
         '{% } %}',
-        '{%! this.contentTemplate %}',       
+        '{%! this.contentTemplate %}',
         '</li>'
     ]),
-    contentTemplate: new Simplate([       
-        '<h3>{%= $["$descriptor"] %}</h3>'        
-    ]),    
+    contentTemplate: new Simplate([
+        '<h3>{%= $["$descriptor"] %}</h3>'
+    ]),
     noDataTemplate: new Simplate([
         '<li class="no-data">',
         '<h3>{%= noDataText %}</h3>',
@@ -33,7 +33,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     titleText: 'List',
     searchText: 'Search',
     noDataText: 'no records',
-    loadingText: 'loading...',    
+    loadingText: 'loading...',
+    customSearchRE: /^\#\!/,
     constructor: function(o) {
         /// <field name="resourceKind" type="String">The resource kind that is bound to this view.</field>
         /// <field name="pageSize" type="Number">The number of records to return with each request.</field>
@@ -45,37 +46,37 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         ///     before the "li.more" element.
         /// </field>
         /// <field name="noDataTemplate" type="Simplate">A template used to render the no data message.</field>
-        Sage.Platform.Mobile.List.superclass.constructor.call(this);        
-        
+        Sage.Platform.Mobile.List.superclass.constructor.call(this);
+
         Ext.apply(this, o, {
             id: 'generic_list',
             title: this.titleText,
             pageSize: 20,
             allowSelection: true,
             requestedFirstPage: false,
-            searchDialog: 'search_dialog',            
+            searchDialog: 'search_dialog',
             tools: {
                 tbar: [{
                     name: 'search',
-                    title: this.searchText,                        
-                    cls: function() { return this.query ? 'button greenButton' : 'button blueButton'; },                 
+                    title: this.searchText,
+                    cls: function() { return this.query ? 'button greenButton' : 'button blueButton'; },
                     fn: this.showSearchDialog,
-                    scope: this                
+                    scope: this
                 }]
             }
         });
-    },   
+    },
     render: function() {
         Sage.Platform.Mobile.List.superclass.render.call(this);
 
         this.clear();
-    }, 
-    init: function() {     
-        Sage.Platform.Mobile.List.superclass.init.call(this);      
+    },
+    init: function() {
+        Sage.Platform.Mobile.List.superclass.init.call(this);
 
-        this.el.on('click', this.onClick, this);                      
+        this.el.on('click', this.onClick, this);
 
-        App.on('refresh', this.onRefresh, this); 
+        App.on('refresh', this.onRefresh, this);
     },
     getSelected: function() {
         var checked = [];
@@ -86,14 +87,14 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     },
     onClick: function(evt, el, o) {
         var el = Ext.get(el);
-        if (el.is('.more') || el.up('.more'))     
-        {   
+        if (el.is('.more') || el.up('.more'))
+        {
             evt.stopEvent();
-                    
+
             this.more();
             return;
-        }        
-        
+        }
+
         var link = el;
         if (link.is('a[target="_detail"]') || (link = link.up('a[target="_detail"]')))
         {
@@ -101,12 +102,12 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
             var view = link.dom.hash.substring(1);
 
-            var key = link.getAttribute("key", "m");              
-            var descriptor = link.getAttribute("descriptor", "m");  
+            var key = link.getAttribute("key", "m");
+            var descriptor = link.getAttribute("descriptor", "m");
 
             this.navigateToDetail(view, key, descriptor);
             return;
-        }        
+        }
     },
     onRefresh: function(o) {
         if (this.resourceKind && o.resourceKind === this.resourceKind)
@@ -123,30 +124,36 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         });
     },
     search: function(searchText) {
-        /// <summary> 
-        ///     Called when a new search is activated.  This method sets up the SData query, clears the content 
+        /// <summary>
+        ///     Called when a new search is activated.  This method sets up the SData query, clears the content
         ///     of the view, and fires a request for updated data.
         /// </summary>
-        /// <param name="searchText" type="String">The search query.</param>        
+        /// <param name="searchText" type="String">The search query.</param>
         this.clear();
 
         this.queryText = searchText && searchText.length > 0
             ? searchText
             : false;
 
-        this.query = this.queryText !== false
-            ? this.formatSearchQuery(this.queryText)
-            : false;   
+        var formatQuery = function (queryText, context) {
+            if (context.customSearchRE.test(queryText)) {
+                return queryText.replace(context.customSearchRE, "");
+            }
+            return context.formatSearchQuery(queryText);
+        };
+
+        this.query = this.queryText !== false ? formatQuery(this.queryText, this)
+                                              : false;
 
         if (App.bars.tbar && App.bars.tbar.tool)
-        {                        
+        {
             if (this.query)
                 App.bars.tbar.tool.el.replaceClass('blueButton', 'greenButton');
             else
                 App.bars.tbar.tool.el.replaceClass('greenButton', 'blueButton');
         }
 
-        this.requestData(); 
+        this.requestData();
     },
     formatSearchQuery: function(query) {
         /// <summary>
@@ -154,22 +161,22 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         /// </summary>
         /// <returns type="String">An SData query compatible search expression.</returns>
         return false;
-    },        
+    },
     createRequest:function() {
         /// <summary>
-        ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.        
+        ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.
         /// </summary>
         /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest">An SDataResourceCollectionRequest instance.<returns>
         var pageSize = this.pageSize;
-        var startIndex = this.feed && this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0 
+        var startIndex = this.feed && this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0
             ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
             : 1;
 
-        var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())                         
+        var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())
             .setCount(pageSize)
-            .setStartIndex(startIndex); 
+            .setStartIndex(startIndex);
 
-        if (this.resourceKind) 
+        if (this.resourceKind)
             request.setResourceKind(this.resourceKind);
 
         if (this.resourceProperty)
@@ -183,7 +190,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         {
             var resourceKindExpr = this.expandExpression(this.context.resourceKind);
             if (resourceKindExpr)
-                request.setResourceKind(resourceKindExpr);        
+                request.setResourceKind(resourceKindExpr);
 
             var resourcePredicateExpr = this.expandExpression(this.context.resourcePredicate);
             if (resourcePredicateExpr)
@@ -194,7 +201,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             var whereExpr = this.expandExpression(this.context.where);
             if (whereExpr)
                 where.push(whereExpr);
-        }                           
+        }
 
         if (this.query)
             where.push(this.query);
@@ -202,7 +209,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         if (where.length > 0)
             request.setQueryArgs({
                 'where': where.join(' and ')
-            });  
+            });
 
         return request;
     },
@@ -216,7 +223,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             v.show({
                 descriptor: descriptor,
                 key: key
-            });        
+            });
     },
     navigateToInsert: function() {
         var view = App.getView(this.editor);
@@ -228,16 +235,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         ///     Processes the feed result from the SData request and renders out the resource feed entries.
         /// </summary>
         /// <param name="feed" type="Object">The feed object.</param>
-        if (this.requestedFirstPage == false) 
+        if (this.requestedFirstPage == false)
         {
             this.requestedFirstPage = true;
             this.el
                 .select('.loading')
-                .remove();           
+                .remove();
         }
-                       
+
         this.feed = feed;
-                
+
         if (this.feed['$totalResults'] === 0)
         {
             Ext.DomHelper.insertBefore(this.moreEl, this.noDataTemplate.apply(this));
@@ -245,14 +252,14 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         else
         {
             var o = [];
-            for (var i = 0; i < feed.$resources.length; i++)                
+            for (var i = 0; i < feed.$resources.length; i++)
                 o.push(this.itemTemplate.apply(feed.$resources[i], this));
-        
-            if (o.length > 0)                    
+
+            if (o.length > 0)
                 Ext.DomHelper.insertBefore(this.moreEl, o.join(''));
         }
 
-        this.moreEl            
+        this.moreEl
             .removeClass('more-loading');
 
         if (this.hasMoreData())
@@ -276,7 +283,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         else
         {
             return true; // no way to determine, always assume more data
-        }        
+        }
     },
     requestFailure: function(response, o) {
         /// <summary>
@@ -289,16 +296,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         /// <summary>
         ///     Initiates the SData request.
         /// </summary>
-        var request = this.createRequest();        
-        request.read({  
-            success: function(feed) {     
+        var request = this.createRequest();
+        request.read({
+            success: function(feed) {
                 this.processFeed(feed);
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);
             },
             scope: this
-        });       
+        });
     },
     more: function() {
         /// <summary>
@@ -306,7 +313,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         /// </summary>
         this.moreEl.addClass('more-loading');
         this.requestData();
-    },  
+    },
     expandExpression: function(expression) {
         /// <summary>
         ///     Expands the passed expression if it is a function.
@@ -315,19 +322,19 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         ///     1: function - Called on this object and must return a string.
         ///     2: string - Returned directly.
         /// </param>
-        if (typeof expression === 'function') 
+        if (typeof expression === 'function')
             return expression.call(this);
         else
             return expression;
     },
     hasContext: function() {
-        /// <summary> 
+        /// <summary>
         ///     Indicates whether or not the view has a context.
         /// </summary>
         /// <returns type="Boolean">True if there is a current, or new, context; False otherwise.</returns>
         return (this.context || this.newContext);
-    },         
-    isNewContext: function() {   
+    },
+    isNewContext: function() {
         /// <summary>
         ///     Indicates whether or not the view has a new context.
         /// </summary>
@@ -339,7 +346,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             if (this.expandExpression(this.context.resourcePredicate) != this.expandExpression(this.newContext.resourcePredicate)) return true;
 
             return false;
-        }        
+        }
         else
         {
             return true;
@@ -350,8 +357,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (this.hasContext() && this.isNewContext())
         {
-            this.clear();            
-        } 
+            this.clear();
+        }
     },
     transitionTo: function() {
         Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
@@ -360,26 +367,26 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         {
             this.context = this.newContext;
         }
-        
-        if (this.requestedFirstPage == false)         
-            this.requestData();                
-    },    
-    show: function(o) {
-        this.newContext = o; 
 
-        Sage.Platform.Mobile.List.superclass.show.call(this);                     
-    },  
+        if (this.requestedFirstPage == false)
+            this.requestData();
+    },
+    show: function(o) {
+        this.newContext = o;
+
+        Sage.Platform.Mobile.List.superclass.show.call(this);
+    },
     clear: function() {
         /// <summary>
         ///     Clears the view and re-applies the default content template.
         /// </summary>
         this.el.update(this.loadingTemplate.apply(this));
 
-        this.moreEl = this.el.down(".more"); 
+        this.moreEl = this.el.down(".more");
 
         this.requestedFirstPage = false;
         this.feed = false;
         this.query = false;
         this.queryText = false;
-    }  
+    }
 });
