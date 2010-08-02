@@ -32,6 +32,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     moreText: 'More',
     titleText: 'List',
     searchText: 'Search',
+    insertText: 'New',
     noDataText: 'no records',
     loadingText: 'loading...',
     customSearchRE: /^\#\!/,
@@ -57,10 +58,10 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             searchDialog: 'search_dialog',
             tools: {
                 tbar: [{
-                    name: 'search',
-                    title: this.searchText,
+                    name: 'New',
+                    title: this.insertText,
                     cls: function() { return this.query ? 'button greenButton' : 'button blueButton'; },
-                    fn: this.showSearchDialog,
+                    fn: this.navigateToInsert,
                     scope: this
                 }]
             }
