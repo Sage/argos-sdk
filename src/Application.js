@@ -335,10 +335,9 @@ Ext.onReady(function(){
         {
             if (originalTarget === el)
             {
-                ReUI.DomHelper.bind(el, 'click', touchClick, true);
+                ReUI.DomHelper.bind(el, 'click', touchClick, true);                
+                ReUI.DomHelper.dispatch(el, 'clicklong');
             }
-
-            ReUI.DomHelper.dispatch(el, 'clicklong');
         }
     };
 
