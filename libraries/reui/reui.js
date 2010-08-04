@@ -207,8 +207,13 @@ ReUI = {};
                 var previous = D.get(context.history[context.history.length - 2]);
                 if (previous && !previous.getAttribute('hideBackButton'))
                 {
-                    R.backEl.style.display = 'inline';
-                    R.backEl.innerHTML = previous.title || R.backText;
+                    if (R.legacyMode)
+                        R.backEl.style.display = 'inline';
+                    else
+                        R.backEl.style.display = '';
+
+                    if (R.updateBackButtonText)
+                        R.backEl.innerHTML = previous.title || R.backText;
 
                     var backButtonCls = previous.getAttribute('backButtonCls') || previous.getAttribute('bbclass');
 
@@ -216,7 +221,10 @@ ReUI = {};
                 }
                 else
                 {
-                    R.backEl.style.display = 'none';
+                    if (R.legacyMode)
+                        R.backEl.style.display = 'none';
+                    else
+                        R.backEl.style.display = 'none';
                 }
             }
         }
@@ -347,13 +355,15 @@ ReUI = {};
     
     D.apply(ReUI, {
         autoInit: true,
+        legacyMode: true,
         useCompatibleFx: !isWebKit,
         registeredFx: {},
         disableFx: false,
         defaultFx: 'slide',
         rootEl: false, 
         titleEl: false,      
-        backEl: false, 
+        backEl: false,
+        updateBackButtonText: true,
         hashPrefix: '#_',
         backText: 'Back',               
         checkStateEvery: 250,
