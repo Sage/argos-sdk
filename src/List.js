@@ -53,7 +53,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             id: 'generic_list',
             title: this.titleText,
             pageSize: 20,
-            allowSelection: true,
+            allowSelection: false,
             requestedFirstPage: false,
             searchDialog: 'search_dialog',
             tools: {
