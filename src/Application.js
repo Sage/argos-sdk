@@ -1,4 +1,4 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="../reui/reui.js"/>
 /// <reference path="../../../packages/sdata-client-debug.js"/>
 /// <reference path="Format.js"/>
@@ -263,12 +263,26 @@ Ext.onReady(function(){
         minLongClickTime = 1.0,
         maxLongClickLength = 5.0,
         startAt,
-        startTime;    
-    
+        startTime,
+        originalTarget,
+        preventClick = false;
+
+    var touchClick = function(evt) {
+        ReUI.DomHelper.unbind(evt.target || evt.srcElement, 'click', touchClick, true);
+
+        if (evt.preventBubble) evt.preventBubble();
+        if (evt.preventDefault) evt.preventDefault();
+        if (evt.stopPropagation) evt.stopPropagation();
+        if (evt.stopImmediatePropagation) evt.stopImmediatePropagation();
+
+        return false;
+    };
     var touchMove = function(evt, el, o) {
         /* for general swipe, we do not need mouse move */
     };  
-    var touchStart = function(evt, el, o) {        
+    var touchStart = function(evt, el, o) {
+        preventClick = false;
+        originalTarget = el;
         startAt = evt.getXY();
         startTime = (new Date()).getTime();
     };    
@@ -287,8 +301,6 @@ Ext.onReady(function(){
             var swipe;
             if (!onlyHorizontalSwipe)
             {
-                evt.stopEvent();     
-                
                 if (dotProd >= 0.71)
                     swipe = 'down';            
                 else if (dotProd <= -0.71)            
@@ -302,8 +314,6 @@ Ext.onReady(function(){
             {
                 if (dotProd < 0.71 && dotProd > -0.71)
                 {
-                    evt.stopEvent();   
-
                     if (normalized.x < 0.0)
                         swipe = 'left';
                     else
@@ -312,11 +322,21 @@ Ext.onReady(function(){
             }
 
             if (swipe)
-                ReUI.DomHelper.dispatch(el, 'swipe', {direction: swipe});        
+            {
+                if (originalTarget === el)
+                {
+                    ReUI.DomHelper.bind(el, 'click', touchClick, true);
+                }
+
+                ReUI.DomHelper.dispatch(el, 'swipe', {direction: swipe});
+            }
         }        
         else if (duration >= minLongClickTime && length <= maxLongClickLength)
         {
-            evt.stopEvent();
+            if (originalTarget === el)
+            {
+                ReUI.DomHelper.bind(el, 'click', touchClick, true);
+            }
 
             ReUI.DomHelper.dispatch(el, 'clicklong');
         }
