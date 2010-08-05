@@ -6,7 +6,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     viewTemplate: new Simplate([
-        '<ul id="{%= id %}" title="{%= title %}">',
+        '<ul id="{%= id %}" title="{%= title %}" class="List">',
         '</ul>'
     ]),
     loadingTemplate: new Simplate([
@@ -60,8 +60,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                 tbar: [{
                     name: 'New',
                     title: this.insertText,
-                    cls: function() { return this.query ? 'button greenButton' : 'button blueButton'; },
                     fn: this.navigateToInsert,
+                    cls: "button",
                     scope: this
                 }]
             }
@@ -145,15 +145,6 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         this.query = this.queryText !== false ? formatQuery(this.queryText, this)
                                               : false;
-
-        if (App.bars.tbar && App.bars.tbar.tool)
-        {
-            if (this.query)
-                App.bars.tbar.tool.el.replaceClass('blueButton', 'greenButton');
-            else
-                App.bars.tbar.tool.el.replaceClass('greenButton', 'blueButton');
-        }
-
         this.requestData();
     },
     formatSearchQuery: function(query) {
@@ -301,6 +292,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         request.read({
             success: function(feed) {
                 this.processFeed(feed);
+                App.getView(this.searchDialog).el.show();
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);
@@ -360,6 +352,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         {
             this.clear();
         }
+
     },
     transitionTo: function() {
         Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
@@ -371,11 +364,14 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (this.requestedFirstPage == false)
             this.requestData();
+
+        App.getView(this.searchDialog).el.show();
     },
     show: function(o) {
         this.newContext = o;
 
         Sage.Platform.Mobile.List.superclass.show.call(this);
+        this.showSearchDialog();
     },
     clear: function() {
         /// <summary>
