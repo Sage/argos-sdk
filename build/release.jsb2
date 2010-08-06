@@ -54,6 +54,21 @@
 			text: 'Simplate.js',
 			path: '../libraries/'
 		},{
+			text: 'sage.js',
+			path: '../libraries/sage/'
+		},{
+			text: 'class.js',
+			path: '../libraries/sage/'
+		},{
+			text: 'deferred.js',
+			path: '../libraries/sage/'
+		},{
+			text: 'event.js',
+			path: '../libraries/sage/'
+		},{
+			text: 'evented.js',
+			path: '../libraries/sage/'
+		},{
 			text: 'sdata-client-debug.js',
 			path: '../libraries/sdata/'
 		},{
@@ -80,6 +95,10 @@
 		src: '../libraries/datejs/src',
 		dest: 'src/argos-sdk/libraries/datejs',
 		filters: ".*[core\\-debug\\.js]"
+	},{
+	    src: '../libraries/sage',
+		dest: 'src/libraries/sage',
+		filters: ".*\\.js"
 	},{
 		src: '../libraries/sdata',
 		dest: 'src/argos-sdk/libraries/sdata',
