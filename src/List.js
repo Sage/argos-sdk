@@ -32,6 +32,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     moreText: 'More',
     titleText: 'List',
     searchText: 'Search',
+    contextText: 'Context',
     insertText: 'New',
     noDataText: 'no records',
     loadingText: 'loading...',
@@ -56,6 +57,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             allowSelection: false,
             requestedFirstPage: false,
             searchDialog: 'search_dialog',
+            contextDialog: 'context_dialog',
             tools: {
                 tbar: [{
                     name: 'New',
@@ -76,7 +78,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         Sage.Platform.Mobile.List.superclass.init.call(this);
 
         this.el.on('click', this.onClick, this);
-
+        this.el.on('clicklong', this.onClickLong, this);
         App.on('refresh', this.onRefresh, this);
     },
     getSelected: function() {
@@ -85,6 +87,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             checked.push(el.getAttribute("m:key"));
         }, this);
         return checked;
+    },
+    onClickLong: function(evt, el, o) {
+        App.getView(this.contextDialog).show();
     },
     onClick: function(evt, el, o) {
         var el = Ext.get(el);
@@ -124,6 +129,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             scope: this
         });
     },
+    
     search: function(searchText) {
         /// <summary>
         ///     Called when a new search is activated.  This method sets up the SData query, clears the content
