@@ -89,7 +89,12 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         return checked;
     },
     onClickLong: function(evt, el, o) {
-        App.getView(this.contextDialog).show();
+        var resourceKind = this.resourceKind;
+        if (!/^(accounts)|(contacts)|(opportunities)|(leads)|(tickets)$/.test(resourceKind)) {
+            this.onClick(evt, el, o);
+            return;
+        }
+        App.getView(this.contextDialog).show(el);
     },
     onClick: function(evt, el, o) {
         var el = Ext.get(el);
