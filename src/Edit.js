@@ -52,8 +52,8 @@ Sage.Platform.Mobile.Controls.Field.prototype = {
             if (!definition.test.test(value))
             {
                 var message = typeof definition.message === 'function'
-                    ? definition.message.call(definition.scope || this, value, field)
-                    : String.format(definition.message, value, field);
+                    ? definition.message.call(definition.scope || this, value)
+                    : String.format(definition.message, value);
 
                 return message || true;
             }             
