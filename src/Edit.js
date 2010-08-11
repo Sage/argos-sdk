@@ -1,4 +1,4 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="../Simplate.js"/>
 /// <reference path="../sdata/SDataResourceCollectionRequest.js"/>
 /// <reference path="../sdata/SDataService.js"/>
@@ -363,16 +363,24 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         this.el.removeClass('panel-loading');
     },
     show: function(o) {        
-        if (o) 
+        if (this.requiresReload(o))
         {
-            this.newContext = o;
-        }          
+            this.reload = true;
+            this.options = o || {};
+        }
 
         Sage.Platform.Mobile.Edit.superclass.show.call(this);                     
-    },  
-    isNewContext: function() {
-        return this.newContext;
-    },    
+    },
+    requiresReload: function(options) {
+        if (this.options)
+        {
+            if (options) return true;
+
+            return false;
+        }
+        else
+            return true;
+    },
     clearValues: function() {
         for (var name in this.fields)
         {
@@ -468,7 +476,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             if (request)
                 request.create(entry, {
                     success: function(created) {  
-                        this.enableForm()
+                        this.enableForm();
                                                 
                         App.fireEvent('refresh', {
                             resourceKind: this.resourceKind                            
@@ -499,7 +507,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             if (request)
                 request.update(entry, {
                     success: function(modified) {  
-                        this.enableForm()
+                        this.enableForm();
                                                 
                         App.fireEvent('refresh', {
                             resourceKind: this.resourceKind,
@@ -543,9 +551,9 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
         
-        if (this.isNewContext())
+        if (this.reload)
         {
-            if (this.newContext.insert === true)
+            if (this.options.insert === true)
                 this.el.addClass('panel-loading');
             else
                 this.el.removeClass('panel-loading');
@@ -554,13 +562,11 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     transitionTo: function() {
         Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this); 
         
-        if (this.isNewContext())
+        if (this.reload)
         {
-            this.context = this.newContext;
-            this.newContext = false;
-
+            this.reload = false;
             this.entry = false;            
-            this.inserting = (this.context.insert === true);
+            this.inserting = (this.options.insert === true);
 
             this.clearValues();
 
@@ -570,8 +576,8 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             }
             else            
             {
-                this.entry = this.context.entry;                 
-                this.setValues(this.context.entry || {});
+                this.entry = this.options.entry;
+                this.setValues(this.options.entry || {});
             }            
         }       
     }      

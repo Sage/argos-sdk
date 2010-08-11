@@ -333,9 +333,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         else
             return expression;
     },    
-    requiresReload: function(options) {
-        // occurs when both this.options and options are undefined
-        // since the default for this view is to have no options        
+    requiresReload: function(options) {        
         if (this.options)
         {
             if (options)
