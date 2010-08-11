@@ -303,7 +303,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         request.read({
             success: function(feed) {
                 this.processFeed(feed);
-                App.getView(this.searchDialog).el.show();
+                this.showSearchDialog();
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);
@@ -375,8 +375,6 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (this.requestedFirstPage == false)
             this.requestData();
-
-        App.getView(this.searchDialog).el.show();
     },
     show: function(o) {
         this.newContext = o;
