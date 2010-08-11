@@ -375,6 +375,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (this.requestedFirstPage == false)
             this.requestData();
+
+        //Wait for transition to complete.
+        this.showSearchDialog.defer(100, this);
     },
     show: function(o) {
         this.newContext = o;
