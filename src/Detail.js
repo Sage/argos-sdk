@@ -85,7 +85,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     onRefresh: function(o) {
         if (this.options && this.options.key === o.key)
         {
-            this.reload = true;
+            this.refreshRequired = true;
 
             if (o.data && o.data['$descriptor'])
                 this.setTitle(o.data['$descriptor']);
@@ -284,7 +284,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                 scope: this
             });       
     },
-    requiresReload: function(options) {
+    refreshRequiredFor: function(options) {
         if (this.options)
         {
             if (options)
@@ -298,37 +298,31 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             return true;
     },
     show: function(options) {
-        if (this.requiresReload(options))
-        {
-            this.reload = true;
-            this.options = options || {};
-
-            if (options.descriptor)
-                this.setTitle(options.descriptor);
-        }
-                
-        Sage.Platform.Mobile.Detail.superclass.show.call(this);                     
-    },     
+        if (options && options.descriptor) this.setTitle(options.descriptor);
+        
+        Sage.Platform.Mobile.Detail.superclass.show.apply(this, arguments);
+    },
+    getContext: function() {
+        return Ext.apply(Sage.Platform.Mobile.Detail.superclass.getContext.call(this), {
+            resourceKind: this.resourceKind,
+            key: this.options.key
+        });
+    },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.Detail.superclass.beforeTransitionTo.call(this);
 
         this.canEdit = this.editor ? true : false;
 
-        if (this.reload)
-        {            
+        if (this.refreshRequired)
+        {
             this.clear();
         } 
     },
+    refresh: function() {
+        this.requestData();
+    },
     transitionTo: function() {
         Sage.Platform.Mobile.Detail.superclass.transitionTo.call(this);
-
-        // if the current context has changed, re-render the view
-        if (this.reload)
-        {
-            this.reload = false;
-                    
-            this.requestData();  
-        }   
     },
     clear: function() {
         this.el.addClass('panel-loading');

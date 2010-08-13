@@ -263,10 +263,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             },
             fields: {}          
         });
-    },
-    render: function() {
-        Sage.Platform.Mobile.Edit.superclass.render.call(this);               
-    },
+    },    
     init: function() {  
         Sage.Platform.Mobile.Edit.superclass.init.call(this);                
 
@@ -361,26 +358,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     processTemplateEntry: function(entry) {
         this.setValues(entry || {});
         this.el.removeClass('panel-loading');
-    },
-    show: function(o) {        
-        if (this.requiresReload(o))
-        {
-            this.reload = true;
-            this.options = o || {};
-        }
-
-        Sage.Platform.Mobile.Edit.superclass.show.call(this);                     
-    },
-    requiresReload: function(options) {
-        if (this.options)
-        {
-            if (options) return true;
-
-            return false;
-        }
-        else
-            return true;
-    },
+    },      
     clearValues: function() {
         for (var name in this.fields)
         {
@@ -548,10 +526,17 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         else
             this.update();         
     },
+    getContext: function() {
+        return Ext.apply(Sage.Platform.Mobile.Edit.superclass.getContext.call(this), {
+            resourceKind: this.resourceKind,
+            insert: this.options.insert,
+            key: this.options.insert ? false : this.options.entry['$key']
+        });
+    },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
         
-        if (this.reload)
+        if (this.refreshRequired)
         {
             if (this.options.insert === true)
                 this.el.addClass('panel-loading');
@@ -559,26 +544,23 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                 this.el.removeClass('panel-loading');
         } 
     },
-    transitionTo: function() {
-        Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this); 
-        
-        if (this.reload)
+    refresh: function() {
+        this.entry = false;
+        this.inserting = (this.options.insert === true);
+
+        this.clearValues();
+
+        if (this.inserting)
         {
-            this.reload = false;
-            this.entry = false;            
-            this.inserting = (this.options.insert === true);
-
-            this.clearValues();
-
-            if (this.inserting)
-            {
-                this.requestTemplateData();
-            }
-            else            
-            {
-                this.entry = this.options.entry;
-                this.setValues(this.options.entry || {});
-            }            
-        }       
+            this.requestTemplateData();
+        }
+        else
+        {
+            this.entry = this.options.entry;
+            this.setValues(this.options.entry || {});
+        }
+    },
+    transitionTo: function() {
+        Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this);               
     }      
 });

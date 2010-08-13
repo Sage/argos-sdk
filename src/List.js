@@ -123,7 +123,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     onRefresh: function(o) {
         if (this.resourceKind && o.resourceKind === this.resourceKind)
         {
-            this.reload = true;
+            this.refreshRequired = true;
         }
     },
     showSearchDialog: function() {
@@ -333,7 +333,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         else
             return expression;
     },    
-    requiresReload: function(options) {        
+    refreshRequiredFor: function(options) {        
         if (this.options)
         {
             if (options)
@@ -349,38 +349,29 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         {
             return true;
         }
-    },    
+    },
+    getContext: function() {
+        return Ext.apply(Sage.Platform.Mobile.List.superclass.getContext.call(this), {
+            resourceKind: this.resourceKind
+        });
+    },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
 
-        if (this.reload)
-        {
-            this.clear();
-        }
-
+        if (this.refreshRequired) this.clear();
+    },
+    refresh: function() {
+        this.requestData();
     },
     transitionTo: function() {
         Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
 
-        if (this.reload)
-        {
-            this.reload = false;
-
-            if (this.requestedFirstPage == false)
-                this.requestData();
-        }
-
         //Wait for transition to complete.
         this.showSearchDialog.defer(100, this);
     },
-    show: function(options) {
-        if (this.requiresReload(options))
-        {
-            this.reload = true;
-            this.options = options || {};
-        }
-
-        Sage.Platform.Mobile.List.superclass.show.call(this);
+    show: function(options) {        
+        Sage.Platform.Mobile.Detail.superclass.show.apply(this, arguments);
+        
         this.showSearchDialog();
     },
     clear: function() {
