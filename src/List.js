@@ -256,34 +256,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                 .remove();
             //Insert Search bar first
             Ext.DomHelper.insertFirst(this.el, this.searchTemplate.apply(this));
-            //Set Form submit handler. Give the <form> some time to get attached to dom.
-            (function(){
-              this.el
-                  .child('form')
-                  .on('submit', function(evt, el, o) {
-                      return false;
-                  }, this, { preventDefault: true, stopPropagation: true })
-                  .dom.onsubmit = false; // fix for iui shenanigans
-              this.searchEl = this.el.child('input.query');
-              this.searchEl.dom.value = this.queryText === false ? "" : this.queryText;
-              this.setSearchLabelVisibility();
-              this.el.child('input.query')
-                  .on('keypress', function(evt, el, o) {
-                      if (evt.getKey() == 13 || evt.getKey() == 10)
-                      {
-                          evt.stopEvent();
-
-                          /* fix to hide iphone keyboard when go is pressed */
-                          if (/(iphone|ipad)/i.test(navigator.userAgent))
-                              Ext.get('backButton').focus();
-                          this.search();
-                      }
-                  }, this)
-                  .on('keyup', function(evt, el, o) {
-                      this.setSearchLabelVisibility();
-                  }, this);
-            }).defer(200, this);
-            
+            //Set up handlers. Give the <form> some time to get attached to dom.
+            this.setUpSearchBoxHandlers.defer(200, this);
         }
 
         this.feed = feed;
@@ -310,6 +284,34 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             this.moreEl.show();
         else
             this.moreEl.hide();
+    },
+    setUpSearchBoxHandlers: function() {
+      this.el
+          .child('form')
+          .on('submit', function(evt, el, o) {
+              return false;
+          }, this, { preventDefault: true, stopPropagation: true })
+          .dom.onsubmit = false; // fix for iui shenanigans
+      this.searchEl = this.el.child('input.query');
+      this.searchEl.dom.value = this.queryText === false ? "" : this.queryText;
+      
+      this.setSearchLabelVisibility();
+      
+      this.el.child('input.query')
+          .on('keypress', function(evt, el, o) {
+              if (evt.getKey() == 13 || evt.getKey() == 10)
+              {
+                  evt.stopEvent();
+
+                  /* fix to hide iphone keyboard when go is pressed */
+                  if (/(iphone|ipad)/i.test(navigator.userAgent))
+                      Ext.get('backButton').focus();
+                  this.search();
+              }
+          }, this)
+          .on('keyup', function(evt, el, o) {
+              this.setSearchLabelVisibility();
+          }, this);
     },
     setSearchLabelVisibility: function() {
       if (this.searchEl.dom.value == "") {
