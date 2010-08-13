@@ -13,7 +13,7 @@ li > a[selected="progress"] {
 
 /************************************************************************************************/
 
-body > .toolbar {
+body .toolbar {
     background: url(toolbar.png) #6d84a2 repeat-x;
 }
 

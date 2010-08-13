@@ -9,6 +9,18 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<ul id="{%= id %}" title="{%= title %}" class="List">',
         '</ul>'
     ]),
+    searchTemplate: new Simplate([
+      '<li class="search toolbar">',
+        '<form>',
+          '<fieldset>',
+            '<input type="text" name="query" class="query" />',
+            '<a type="cancel" class="dismissButton">{%= $.cancelText %}</a>',
+            '<a class="searchButton" target="_none">{%= $.searchText %}</a>',
+            '<label>{%= $.searchText %}</label>',
+          '</fieldset>',
+        '</form>',
+      '</li>'
+    ]),
     loadingTemplate: new Simplate([
         '<li class="loading"><div class="loading-indicator">{%= loadingText %}</div></li>',
         '<li class="more" style="display: none;"><a href="#" target="_none" class="whiteButton moreButton"><span>{%= moreText %}</span></a></li>'
@@ -32,7 +44,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     moreText: 'More',
     titleText: 'List',
     searchText: 'Search',
-    contextText: 'Context',
+    cancelText: 'Cancel',
     insertText: 'New',
     noDataText: 'no records',
     loadingText: 'loading...',
@@ -56,7 +68,6 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             pageSize: 20,
             allowSelection: false,
             requestedFirstPage: false,
-            searchDialog: 'search_dialog',
             contextDialog: 'context_dialog',
             tools: {
                 tbar: [{
@@ -79,6 +90,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         this.el.on('click', this.onClick, this);
         this.el.on('clicklong', this.onClickLong, this);
+        
         App.on('refresh', this.onRefresh, this);
     },
     getSelected: function() {
@@ -105,6 +117,19 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             this.more();
             return;
         }
+        else if (el.is('.dismissButton')) {
+          evt.stopEvent();
+          if (this.searchEl.dom.value != "") {
+              this.searchEl.dom.value = "";
+          }
+          Ext.get(el).hide();
+          return;
+        }
+        else if (el.is('.searchButton')) {
+          evt.stopEvent();
+          this.search();
+          return;
+        }
 
         var link = el;
         if (link.is('a[target="_detail"]') || (link = link.up('a[target="_detail"]')))
@@ -124,28 +149,14 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         if (this.resourceKind && o.resourceKind === this.resourceKind)
                 this.clear();
     },
-    showSearchDialog: function() {
-        /// <summary>
-        ///     Called when the search tool button is clicked.  This method displays the search dialog.
-        /// </summary>
-        App.getView(this.searchDialog).show({
-            query: this.queryText,
-            fn: this.search,
-            scope: this
-        });
-    },
-    
-    search: function(searchText) {
+    search: function() {
         /// <summary>
         ///     Called when a new search is activated.  This method sets up the SData query, clears the content
         ///     of the view, and fires a request for updated data.
         /// </summary>
         /// <param name="searchText" type="String">The search query.</param>
         this.clear();
-
-        this.queryText = searchText && searchText.length > 0
-            ? searchText
-            : false;
+        this.queryText = this.searchEl.dom.value.length > 0 ? this.searchEl.dom.value : false;
 
         var formatQuery = function (queryText, context) {
             if (context.customSearchRE.test(queryText)) {
@@ -153,7 +164,6 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             }
             return context.formatSearchQuery(queryText);
         };
-
         this.query = this.queryText !== false ? formatQuery(this.queryText, this)
                                               : false;
         this.requestData();
@@ -244,6 +254,36 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             this.el
                 .select('.loading')
                 .remove();
+            //Insert Search bar first
+            Ext.DomHelper.insertFirst(this.el, this.searchTemplate.apply(this));
+            //Set Form submit handler. Give the <form> some time to get attached to dom.
+            (function(){
+              this.el
+                  .child('form')
+                  .on('submit', function(evt, el, o) {
+                      return false;
+                  }, this, { preventDefault: true, stopPropagation: true })
+                  .dom.onsubmit = false; // fix for iui shenanigans
+              this.searchEl = this.el.child('input.query');
+              this.searchEl.dom.value = this.queryText === false ? "" : this.queryText;
+              this.setSearchLabelVisibility();
+              this.el.child('input.query')
+                  .on('keypress', function(evt, el, o) {
+                      if (evt.getKey() == 13 || evt.getKey() == 10)
+                      {
+                          evt.stopEvent();
+
+                          /* fix to hide iphone keyboard when go is pressed */
+                          if (/(iphone|ipad)/i.test(navigator.userAgent))
+                              Ext.get('backButton').focus();
+                          this.search();
+                      }
+                  }, this)
+                  .on('keyup', function(evt, el, o) {
+                      this.setSearchLabelVisibility();
+                  }, this);
+            }).defer(200, this);
+            
         }
 
         this.feed = feed;
@@ -255,13 +295,14 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         else
         {
             var o = [];
+            
             for (var i = 0; i < feed.$resources.length; i++)
                 o.push(this.itemTemplate.apply(feed.$resources[i], this));
 
             if (o.length > 0)
                 Ext.DomHelper.insertBefore(this.moreEl, o.join(''));
         }
-
+        
         this.moreEl
             .removeClass('more-loading');
 
@@ -269,6 +310,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             this.moreEl.show();
         else
             this.moreEl.hide();
+    },
+    setSearchLabelVisibility: function() {
+      if (this.searchEl.dom.value == "") {
+          this.el.select('.dismissButton').hide();
+          this.el.select('label').show();
+      }
+      else {
+          this.el.select('.dismissButton').show();
+          this.el.select('label').hide();
+      }
     },
     hasMoreData: function() {
         /// <summary>
@@ -303,7 +354,6 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         request.read({
             success: function(feed) {
                 this.processFeed(feed);
-                this.showSearchDialog();
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);
@@ -375,15 +425,20 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (this.requestedFirstPage == false)
             this.requestData();
-
-        //Wait for transition to complete.
-        this.showSearchDialog.defer(100, this);
     },
     show: function(o) {
         this.newContext = o;
 
         Sage.Platform.Mobile.List.superclass.show.call(this);
-        this.showSearchDialog();
+        
+        if (this.searchEl && this.searchEl.dom.value == "") {
+            this.el.select('.dismissButton').hide();
+            this.el.select('label').show();
+        }
+        else {
+            this.el.select('.dismissButton').show();
+            this.el.select('label').hide();
+         }
     },
     clear: function() {
         /// <summary>
