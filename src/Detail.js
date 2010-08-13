@@ -274,7 +274,8 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             this.processLayout(this.layout, {title: this.detailsText}, this.entry);
         }
 
-        this.el.removeClass('panel-loading');  
+        this.el.removeClass('panel-loading');
+        this.el.first('.loading').remove();
     },
     requestData: function() {
         var request = this.createRequest();        
