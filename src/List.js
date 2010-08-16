@@ -431,6 +431,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             this.el.select('.dismissButton').show();
             this.el.select('label').hide();
          }
+         }
     },
     clear: function() {
         /// <summary>
