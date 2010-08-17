@@ -41,7 +41,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<h3>{%= noDataText %}</h3>',
         '</li>'
     ]),
-    moreText: 'More',
+    moreText: 'Retrieve more records...',
     titleText: 'List',
     searchText: 'Search',
     cancelText: 'Cancel',
