@@ -1,4 +1,4 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="Application.js"/>
 /// <reference path="View.js"/>
 
@@ -147,7 +147,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     },
     onRefresh: function(o) {
         if (this.resourceKind && o.resourceKind === this.resourceKind)
-                this.clear();
+        {
+            this.refreshRequired = true;
+        }
     },
     search: function() {
         /// <summary>
@@ -382,24 +384,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             return expression.call(this);
         else
             return expression;
-    },
-    hasContext: function() {
-        /// <summary>
-        ///     Indicates whether or not the view has a context.
-        /// </summary>
-        /// <returns type="Boolean">True if there is a current, or new, context; False otherwise.</returns>
-        return (this.context || this.newContext);
-    },
-    isNewContext: function() {
-        /// <summary>
-        ///     Indicates whether or not the view has a new context.
-        /// </summary>
-        /// <returns type="Boolean">True if there is a new context; False otherwise.</returns>
-        if (this.context)
+    },    
+    refreshRequiredFor: function(options) {        
+        if (this.options)
         {
-            if (this.expandExpression(this.context.where) != this.expandExpression(this.newContext.where)) return true;
-            if (this.expandExpression(this.context.resourceKind) != this.expandExpression(this.newContext.resourceKind)) return true;
-            if (this.expandExpression(this.context.resourcePredicate) != this.expandExpression(this.newContext.resourcePredicate)) return true;
+            if (options)
+            {
+                if (this.expandExpression(this.options.where) != this.expandExpression(options.where)) return true;
+                if (this.expandExpression(this.options.resourceKind) != this.expandExpression(options.resourceKind)) return true;
+                if (this.expandExpression(this.options.resourcePredicate) != this.expandExpression(options.resourcePredicate)) return true;
+            }
 
             return false;
         }
@@ -408,39 +402,36 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             return true;
         }
     },
+    getContext: function() {
+        return Ext.apply(Sage.Platform.Mobile.List.superclass.getContext.call(this), {
+            resourceKind: this.resourceKind
+        });
+    },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
 
-        if (this.hasContext() && this.isNewContext())
-        {
-            this.clear();
-        }
-
+        if (this.refreshRequired) this.clear();
+    },
+    refresh: function() {
+        this.requestData();
     },
     transitionTo: function() {
         Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
 
-        if (this.hasContext() && this.isNewContext())
-        {
-            this.context = this.newContext;
-        }
-
-        if (this.requestedFirstPage == false)
-            this.requestData();
     },
-    show: function(o) {
-        this.newContext = o;
-
-        Sage.Platform.Mobile.List.superclass.show.call(this);
+    show: function(options) {        
+        Sage.Platform.Mobile.Detail.superclass.show.apply(this, arguments);        
         
-        if (this.searchEl && this.searchEl.dom.value == "") {
+        if (this.searchEl && this.searchEl.dom.value == "")
+        {            
             this.el.select('.dismissButton').hide();
             this.el.select('label').show();
         }
-        else {
+        else
+        {
             this.el.select('.dismissButton').show();
             this.el.select('label').hide();
-         }
+        }
     },
     clear: function() {
         /// <summary>

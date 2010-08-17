@@ -1,4 +1,4 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="../Simplate.js"/>
 /// <reference path="../sdata/SDataResourceCollectionRequest.js"/>
 /// <reference path="../sdata/SDataService.js"/>
@@ -288,10 +288,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             },
             fields: {}          
         });
-    },
-    render: function() {
-        Sage.Platform.Mobile.Edit.superclass.render.call(this);               
-    },
+    },    
     init: function() {  
         Sage.Platform.Mobile.Edit.superclass.init.call(this);                
 
@@ -386,18 +383,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     processTemplateEntry: function(entry) {
         this.setValues(entry || {});
         this.el.removeClass('panel-loading');
-    },
-    show: function(o) {        
-        if (o) 
-        {
-            this.newContext = o;
-        }          
-
-        Sage.Platform.Mobile.Edit.superclass.show.call(this);                     
-    },  
-    isNewContext: function() {
-        return this.newContext;
-    },    
+    },      
     clearValues: function() {
         for (var name in this.fields)
         {
@@ -493,7 +479,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             if (request)
                 request.create(entry, {
                     success: function(created) {  
-                        this.enableForm()
+                        this.enableForm();
                                                 
                         App.fireEvent('refresh', {
                             resourceKind: this.resourceKind                            
@@ -524,7 +510,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             if (request)
                 request.update(entry, {
                     success: function(modified) {  
-                        this.enableForm()
+                        this.enableForm();
                                                 
                         App.fireEvent('refresh', {
                             resourceKind: this.resourceKind,
@@ -565,39 +551,41 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         else
             this.update();         
     },
+    getContext: function() {
+        return Ext.apply(Sage.Platform.Mobile.Edit.superclass.getContext.call(this), {
+            resourceKind: this.resourceKind,
+            insert: this.options.insert,
+            key: this.options.insert ? false : this.options.entry['$key']
+        });
+    },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
         
-        if (this.isNewContext())
+        if (this.refreshRequired)
         {
-            if (this.newContext.insert === true)
+            if (this.options.insert === true)
                 this.el.addClass('panel-loading');
             else
                 this.el.removeClass('panel-loading');
         } 
     },
-    transitionTo: function() {
-        Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this); 
-        
-        if (this.isNewContext())
+    refresh: function() {
+        this.entry = false;
+        this.inserting = (this.options.insert === true);
+
+        this.clearValues();
+
+        if (this.inserting)
         {
-            this.context = this.newContext;
-            this.newContext = false;
-
-            this.entry = false;            
-            this.inserting = (this.context.insert === true);
-
-            this.clearValues();
-
-            if (this.inserting)
-            {
-                this.requestTemplateData();
-            }
-            else            
-            {
-                this.entry = this.context.entry;                 
-                this.setValues(this.context.entry || {});
-            }            
-        }       
+            this.requestTemplateData();
+        }
+        else
+        {
+            this.entry = this.options.entry;
+            this.setValues(this.options.entry || {});
+        }
+    },
+    transitionTo: function() {
+        Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this);               
     }      
 });

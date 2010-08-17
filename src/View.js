@@ -1,4 +1,4 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="../iui/iui-sage.js"/>
 /// <reference path="../Simplate.js"/>
 /// <reference path="Application.js"/>
@@ -25,7 +25,6 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         Ext.apply(this, o, {
             id: 'view',
             title: '',
-            canSearch: false,
             serviceName: false
         });        
 
@@ -72,10 +71,28 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         ///     Called once the first time the view is about to be transitioned to.
         /// </summary>
     },
-    show: function() {
+    refreshRequiredFor: function(options) {
+        if (this.options)
+        {
+            if (options) return true;
+
+            return false;
+        }
+        else
+            return true;
+    },
+    refresh: function() {
+    },
+    show: function(options) {
         /// <summary>
         ///     Show's the view using iUI in order to transition to the new element.
         /// </summary>
+        if (this.refreshRequiredFor(options))
+        {
+            this.refreshRequired = true;
+            this.options = options || {};
+        }
+        
         ReUI.show(this.el.dom);       
     },
     beforeTransitionTo: function() {
@@ -92,6 +109,11 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         /// <summary>
         ///     Called after the view has been transitioned (slide animation complete) to.
         /// </summary>
+        if (this.refreshRequired)
+        {
+            this.refreshRequired = false;
+            this.refresh();
+        }
     },
     transitionAway: function() {                    
         /// <summary>
@@ -104,5 +126,8 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         /// </summary>
         /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>        
         return App.getService(this.serviceName); /* if false is passed, the default service will be returned */
-    }  
+    },
+    getContext: function() {
+        return {id: this.id};
+    }
 });

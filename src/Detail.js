@@ -1,4 +1,4 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="../Simplate.js"/>
 /// <reference path="../sdata/SDataResourceCollectionRequest.js"/>
 /// <reference path="../sdata/SDataService.js"/>
@@ -83,13 +83,12 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         App.on('refresh', this.onRefresh, this);  
     },
     onRefresh: function(o) {
-        if (this.context && o.key === this.context.key)
+        if (this.options && this.options.key === o.key)
         {
-            if (o.data && o.data['$descriptor']) 
-                this.setTitle(o.data['$descriptor']);
+            this.refreshRequired = true;
 
-            this.newContext = this.context; // todo: is this the best way to handle this?
-            this.clear();                
+            if (o.data && o.data['$descriptor'])
+                this.setTitle(o.data['$descriptor']);
         }
     },
     onClick: function(evt, el, o) {
@@ -144,10 +143,10 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
 
         /* test for complex selector */
         /* todo: more robust test required? */
-        if (/(\s+)/.test(this.context.key))
-            request.setResourceSelector(this.context.key);
+        if (/(\s+)/.test(this.options.key))
+            request.setResourceSelector(this.options.key);
         else
-            request.setResourceSelector(String.format("'{0}'", this.context.key)); 
+            request.setResourceSelector(String.format("'{0}'", this.options.key)); 
 
         if (this.resourceKind) 
             request.setResourceKind(this.resourceKind);
@@ -277,49 +276,53 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         this.el.removeClass('panel-loading');  
     },
     requestData: function() {
-        var request = this.createRequest();        
-        request.read({  
-            success: this.processEntry,
-            failure: this.requestFailure,
-            scope: this
-        });       
+        var request = this.createRequest();
+        if (request)
+            request.read({
+                success: this.processEntry,
+                failure: this.requestFailure,
+                scope: this
+            });       
     },
-    show: function(o) {
-        if (o)
+    refreshRequiredFor: function(options) {
+        if (this.options)
         {
-            if (o.key) 
-                this.newContext = o;
+            if (options)
+            {
+                if (this.options.key !== options.key) return true;
+            }
 
-            if (o.descriptor)
-                this.setTitle(o.descriptor);
+            return false;
         }
-
-        Sage.Platform.Mobile.Detail.superclass.show.call(this);                     
-    },  
-    isNewContext: function() {
-        return this.newContext;
-    }, 
+        else
+            return true;
+    },
+    show: function(options) {
+        if (options && options.descriptor) this.setTitle(options.descriptor);
+        
+        Sage.Platform.Mobile.Detail.superclass.show.apply(this, arguments);
+    },
+    getContext: function() {
+        return Ext.apply(Sage.Platform.Mobile.Detail.superclass.getContext.call(this), {
+            resourceKind: this.resourceKind,
+            key: this.options.key
+        });
+    },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.Detail.superclass.beforeTransitionTo.call(this);
 
         this.canEdit = this.editor ? true : false;
 
-        if (this.isNewContext())
-        {            
+        if (this.refreshRequired)
+        {
             this.clear();
         } 
     },
+    refresh: function() {
+        this.requestData();
+    },
     transitionTo: function() {
         Sage.Platform.Mobile.Detail.superclass.transitionTo.call(this);
-
-        // if the current context has changed, re-render the view
-        if (this.isNewContext()) 
-        {
-            this.context = this.newContext;
-            this.newContext = false;
-                    
-            this.requestData();  
-        }   
     },
     clear: function() {
         this.el.addClass('panel-loading');
