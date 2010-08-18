@@ -420,7 +420,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
     },
     show: function(options) {        
-        Sage.Platform.Mobile.Detail.superclass.show.apply(this, arguments);        
+        Sage.Platform.Mobile.List.superclass.show.apply(this, arguments);        
         
         if (this.searchEl && this.searchEl.dom.value == "")
         {            
