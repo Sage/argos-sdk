@@ -68,7 +68,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             pageSize: 20,
             allowSelection: false,
             requestedFirstPage: false,
-            contextDialog: 'context_dialog',
+            contextDialog: false,
             tools: {
                 tbar: [{
                     name: 'New',
@@ -101,12 +101,18 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         return checked;
     },
     onClickLong: function(evt, el, o) {
-        var resourceKind = this.resourceKind;
-        if (!/^(accounts)|(contacts)|(opportunities)|(leads)|(tickets)$/.test(resourceKind)) {
-            this.onClick(evt, el, o);
-            return;
+        var key, descriptor, detailView, link = Ext.get(el);
+
+        if (! link.is('a[target="_detail"]'))
+            link = link.up('a[target="_detail"]');
+
+        if (this.contextDialog !== false)
+        {
+            key = link.getAttribute("key", "m");
+            descriptor = link.getAttribute("descriptor", "m");
+            detailView = link.dom.hash.substring(1);
+            this.navigateToContextDialog(key, detailView, descriptor);
         }
-        App.getView(this.contextDialog).show(el);
     },
     onClick: function(evt, el, o) {
         var el = Ext.get(el);
@@ -137,7 +143,6 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             evt.stopEvent();
 
             var view = link.dom.hash.substring(1);
-
             var key = link.getAttribute("key", "m");
             var descriptor = link.getAttribute("descriptor", "m");
 
@@ -227,6 +232,18 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             });
 
         return request;
+    },
+    navigateToContextDialog: function(key, detailView, descriptor) {
+        /// <summary>
+        ///     Shows the requested context dialog.
+        /// </summary>
+        var v = App.getView(this.contextDialog);
+        if (v)
+            v.show({
+                descriptor: descriptor,
+                key: key,
+                detailView: detailView
+            });
     },
     navigateToDetail: function(view, key, descriptor) {
         /// <summary>
