@@ -295,7 +295,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             return false;
         }
         else
-            return true;
+            return Sage.Platform.Mobile.Detail.superclass.refreshRequiredFor.call(this, options);
     },
     show: function(options) {
         if (options && options.descriptor) this.setTitle(options.descriptor);

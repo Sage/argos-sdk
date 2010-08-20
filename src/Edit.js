@@ -217,7 +217,7 @@ Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Con
         this.el.setWidth((maxSize*2));
         
         toggleOn.setStyle('visibility', 'visible');
-        toggleOff.setStyle('visibility', 'visible')
+        toggleOff.setStyle('visibility', 'visible');
         this.el.setStyle('visibility', 'visible');
         
         this.setUpDone = true;
@@ -242,24 +242,71 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
     selector: 'div[name="{0}"]',
     template: new Simplate([
         '<div name="{%= name %}" class="field-lookup">',
-        '<a href="#{%= view %}"><span>user</span></a>',
+        '<a href="#{%= view %}"><span></span></a>',
         '</div>'
     ]),
+    emptyText: '',
+    keyProperty: '$key',
+    textProperty: '$descriptor',
     bind: function(container) {
         Sage.Platform.Mobile.Controls.LookupField.superclass.bind.apply(this, arguments);
 
         this.el.on('click', this.onClick, this, {stopEvent: true});
     },
     onClick: function(evt, el, o) {
-        console.log('go %o', el);
+        // todo: limit the clicks to a specific element?
+        var el = Ext.get(el);
+
+        var link = el;
+        if (link.is('a') || (link = link.up('a')))
+        {
+            evt.stopEvent();
+
+            var id = link.dom.hash.substring(1),
+                view = App.getView(id);
+            if (view)
+            {
+                view.show({
+                    selectionOnly: true,
+                    tools: {
+                        tbar: [{
+                            name: 'select',
+                            title: 'Select',                                                              
+                            cls: 'button blueButton',
+                            fn: this.select,
+                            scope: this
+                        }]
+                    }
+                });
+            }
+            return;
+        }
+    },
+    select: function() {
     },
     isDirty: function() {
-        return false;
+        return this.value.key !== this.selected.key;
+    },
+    getValue: function() {
+        var val = {};
+
+        val[this.keyProperty] = this.selected.key;
+
+        return val;
     },
     setValue: function(val) {
-        this.el.select('a > span').item(0).dom.innerHTML = val; // todo: temporary
+        var key = val[this.keyProperty],
+            text = this.textTemplate ? this.textTemplate.apply(val, this) : (val[this.textProperty] || key || this.emptyText);                    
+
+        this.value = this.selected = {
+            key: key,
+            text: text
+        };
+        
+        this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
     },
     clearValue: function() {
+        this.setValue({});
     }
 });
 

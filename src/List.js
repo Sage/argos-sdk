@@ -4,9 +4,81 @@
 
 Ext.namespace('Sage.Platform.Mobile');
 
+Sage.Platform.Mobile.SelectionModel = Ext.apply(Ext.util.Observable, {
+    constructor: function(o) {
+        Ext.apply(o, this, {
+            selections: {},
+            count: 0
+        });
+
+        this.addEvents(
+            'select',
+            'unselect',
+            'clear'
+        );
+    },
+    extractKey: function(value) {
+        if (typeof value === 'object')
+            return typeof this.keyProperty === 'function'
+                ? this.keyProperty.call(this, value)
+                : value[this.keyProperty];        
+        else
+            return value;
+    },
+    select: function(value) {
+        var key = this.extractKey(value);
+
+        if (!this.selections.hasOwnProperty(key))
+        {
+            this.selections[key] = value;
+            this.count++;
+
+            this.fireEvent('select', this, key, value);
+        }
+    },
+    unselect: function(value) {
+        var key = this.extractKey(value);
+
+        if (this.selections.hasOwnProperty(key))
+        {
+            delete this.selections[key];
+            this.count--;
+
+            this.fireEvent('unselect', this, key, value);
+        }
+    },
+    clear: function() {
+        this.selections = {};
+        this.count = 0;
+
+        this.fireEvent('clear', this);
+    },
+    getSelectionCount: function() {
+        return this.count;
+    },
+    getSelections: function() {
+        return this.selections;
+    },
+    getSelectedKeys: function() {
+        var keys = [];
+        for (var key in this.selections)
+            if (this.selections.hasOwnProperty(key))
+                keys.push(key);
+        return keys;
+    }
+});
+
+Sage.Platform.Mobile.SingleSelectionModel = Ext.extend(Sage.Platform.Mobile.SelectionModel, {
+    select: function(value) {
+        for (var key in this.selections) this.unselect(key);
+
+        Sage.Platform.Mobile.SingleSelectionModel.superclass.select.apply(this, arguments);
+    }
+});
+
 Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     viewTemplate: new Simplate([
-        '<ul id="{%= id %}" title="{%= title %}" class="List">',
+        '<ul id="{%= id %}" title="{%= title %}" class="list">',
         '</ul>'
     ]),
     searchTemplate: new Simplate([
@@ -27,9 +99,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     itemTemplate: new Simplate([
         '<li>',
-        '{% if (this.allowSelection) { %}',
         '<input type="checkbox" m:key="{%= $["$key"] %}" class="list-selector" />',
-        '{% } %}',
         '{%! this.contentTemplate %}',
         '</li>'
     ]),
@@ -66,9 +136,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             id: 'generic_list',
             title: this.titleText,
             pageSize: 20,
-            allowSelection: false,
             requestedFirstPage: false,
             contextDialog: 'context_dialog',
+            selectionOnly: true,
             tools: {
                 tbar: [{
                     name: 'New',
@@ -79,6 +149,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                 }]
             }
         });
+
+        if (typeof this.selectionModel === 'undefined')
+            this.selectionModel = new Sage.Platform.Mobile.SelectionModel();               
     },
     render: function() {
         Sage.Platform.Mobile.List.superclass.render.call(this);
@@ -93,6 +166,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         
         App.on('refresh', this.onRefresh, this);
     },
+    getSelectionModel: function() {
+        return (this.options && this.options.selectionModel)
+            ? this.options.selectionModel
+            : this.selectionModel;
+    },
     getSelected: function() {
         var checked = [];
         this.el.select("input.list-selector:checked").each(function(el) {
@@ -101,6 +179,10 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         return checked;
     },
     onClickLong: function(evt, el, o) {
+        evt.stopEvent();
+
+        if (this.isSelectionOnly()) return;
+
         var resourceKind = this.resourceKind;
         if (!/^(accounts)|(contacts)|(opportunities)|(leads)|(tickets)$/.test(resourceKind)) {
             this.onClick(evt, el, o);
@@ -109,6 +191,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         App.getView(this.contextDialog).show(el);
     },
     onClick: function(evt, el, o) {
+        // todo: make these easily defined actions
         var el = Ext.get(el);
         if (el.is('.more') || el.up('.more'))
         {
@@ -130,7 +213,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
           this.search();
           return;
         }
-
+                
         var link = el;
         if (link.is('a[target="_detail"]') || (link = link.up('a[target="_detail"]')))
         {
@@ -141,7 +224,10 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             var key = link.getAttribute("key", "m");
             var descriptor = link.getAttribute("descriptor", "m");
 
-            this.navigateToDetail(view, key, descriptor);
+            if (this.isSelectionOnly())
+                return; // todo: add selection for clicked row 
+            else
+                this.navigateToDetail(view, key, descriptor);
             return;
         }
     },
@@ -288,42 +374,44 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             this.moreEl.hide();
     },
     setUpSearchBoxHandlers: function() {
-      this.el
-          .child('form')
-          .on('submit', function(evt, el, o) {
-              return false;
-          }, this, { preventDefault: true, stopPropagation: true })
-          .dom.onsubmit = false; // fix for iui shenanigans
-      this.searchEl = this.el.child('input.query');
-      this.searchEl.dom.value = this.queryText === false ? "" : this.queryText;
-      
-      this.setSearchLabelVisibility();
-      
-      this.el.child('input.query')
-          .on('keypress', function(evt, el, o) {
-              if (evt.getKey() == 13 || evt.getKey() == 10)
-              {
-                  evt.stopEvent();
+        this.el
+            .child('form')
+              .on('submit', function(evt, el, o) {
+                 return false;
+              }, this, { preventDefault: true, stopPropagation: true })
+              .dom.onsubmit = false; // fix for iui shenanigans
+        this.searchEl = this.el.child('input.query');
+        this.searchEl.dom.value = this.queryText === false ? "" : this.queryText;
 
-                  /* fix to hide iphone keyboard when go is pressed */
-                  if (/(iphone|ipad)/i.test(navigator.userAgent))
-                      Ext.get('backButton').focus();
-                  this.search();
-              }
+        this.setSearchLabelVisibility();
+
+        this.el.child('input.query')
+            .on('keypress', function(evt, el, o) {
+                if (evt.getKey() == 13 || evt.getKey() == 10)
+                {
+                    evt.stopEvent();
+
+                    /* fix to hide iphone keyboard when go is pressed */
+                    if (/(iphone|ipad)/i.test(navigator.userAgent))
+                        Ext.get('backButton').focus();
+                    this.search();
+                }
           }, this)
           .on('keyup', function(evt, el, o) {
-              this.setSearchLabelVisibility();
+            this.setSearchLabelVisibility();
           }, this);
     },
     setSearchLabelVisibility: function() {
-      if (this.searchEl.dom.value == "") {
-          this.el.select('.dismissButton').hide();
-          this.el.select('label').show();
-      }
-      else {
-          this.el.select('.dismissButton').show();
-          this.el.select('label').hide();
-      }
+        if (this.searchEl.dom.value == "")
+        {
+            this.el.select('.dismissButton').hide();
+            this.el.select('label').show();
+        }
+        else
+        {
+            this.el.select('.dismissButton').show();
+            this.el.select('label').hide();
+        }
     },
     hasMoreData: function() {
         /// <summary>
@@ -398,9 +486,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             return false;
         }
         else
-        {
-            return true;
-        }
+            return Sage.Platform.Mobile.List.superclass.refreshRequiredFor.call(this, options);        
     },
     getContext: function() {
         return Ext.apply(Sage.Platform.Mobile.List.superclass.getContext.call(this), {
@@ -409,6 +495,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
+
+        if (this.getSelectionModel())
+            this.el.addClass('list-show-selectors');
+        else
+            this.el.removeClass('list-show-selectors');        
 
         if (this.refreshRequired) this.clear();
     },
