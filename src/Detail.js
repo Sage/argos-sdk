@@ -32,12 +32,12 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     relatedPropertyTemplate: new Simplate([
         '<div class="row {%= $["cls"] %}">',
         '<label>{%= $["label"] %}</label>',       
-        '<a href="#{%= $["view"] %}" target="_related" m:context="{%: $["context"] %}" {% if ($["descriptor"]) { %}m:descriptor="{%: $["descriptor"] %}"{% } %}>{%= $["value"] %}</a>',
+        '<a href="#{%= $["view"] %}" target="_related" data-context="{%: $["context"] %}" {% if ($["descriptor"]) { %}data-descriptor="{%: $["descriptor"] %}"{% } %}>{%= $["value"] %}</a>',
         '</div>'
     ]),
     relatedTemplate: new Simplate([
         '<li class="{%= $["cls"] %}">',
-        '<a href="#{%= $["view"] %}" target="_related" m:context="{%: $["context"] %}">', 
+        '<a href="#{%= $["view"] %}" target="_related" data-context="{%: $["context"] %}">',
         '{% if ($["icon"]) { %}',
         '<img src="{%= $["icon"] %}" alt="icon" class="icon" />',
         '{% } %}',
@@ -101,8 +101,8 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
 
             var view = link.dom.hash.substring(1);
 
-            var value = link.getAttribute('key', 'm') || Ext.util.JSON.decode(link.getAttribute('context', 'm'));
-            var descriptor = link.getAttribute('descriptor', 'm');
+            var value = link.getAttribute('data-key') || Ext.util.JSON.decode(link.getAttribute('data-context'));
+            var descriptor = link.getAttribute('data-descriptor');
         
             this.navigateToRelated(view, value, descriptor);   
             return;

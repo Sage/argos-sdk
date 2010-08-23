@@ -73,8 +73,8 @@ Sage.Platform.Mobile.ListDetail = Ext.extend(Sage.Platform.Mobile.ListDetail, {
 
                     var el = Ext.fly(el);
                     var view = el.dom.hash.substring(1);
-                    var key = el.getAttribute('key', 'm');                       
-                    var where = el.getAttribute('where', 'm');                                    
+                    var key = el.getAttribute('data-key');
+                    var where = el.getAttribute('data-where');
 
                     this.navigateToRelated(view, key, where);   
             }, this, {delegate: 'a[target="_related"]'})        

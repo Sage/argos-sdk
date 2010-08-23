@@ -121,7 +121,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     itemTemplate: new Simplate([
         '<li>',
-        '<div m:key="{%= $["$key"] %}" class="list-item-selector"></div>',
+        '<div data-key="{%= $["$key"] %}" class="list-item-selector"></div>',
         '{%! this.contentTemplate %}',
         '</li>'
     ]),
@@ -211,8 +211,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (this.contextDialog !== false)
         {
-            key = link.getAttribute("key", "m");
-            descriptor = link.getAttribute("descriptor", "m");
+            key = link.getAttribute("data-key");
+            descriptor = link.getAttribute("data-descriptor");
             detailView = link.dom.hash.substring(1);
             this.navigateToContextDialog(key, detailView, descriptor);
         }
@@ -264,8 +264,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             evt.stopEvent();
 
             var view = link.dom.hash.substring(1);
-            var key = link.getAttribute("key", "m");
-            var descriptor = link.getAttribute("descriptor", "m");
+            var key = link.getAttribute("data-key");
+            var descriptor = link.getAttribute("data-descriptor");
 
             if (this.isNavigationDisabled())
                 this.selectionModel.toggle(key, this.entries[key], link.up('li'));
