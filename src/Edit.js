@@ -245,7 +245,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
         '<a href="#{%= view %}"><span></span></a>',
         '</div>'
     ]),
-    emptyText: '',
+    emptyText: 'empty',
     keyProperty: '$key',
     textProperty: '$descriptor',
     bind: function(container) {
@@ -268,6 +268,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
             {
                 view.show({
                     selectionOnly: true,
+                    singleSelect: true,
                     tools: {
                         tbar: [{
                             name: 'select',
@@ -283,6 +284,27 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
         }
     },
     select: function() {
+        // todo: should there be a better way?
+        var view = App.getActiveView();
+        if (view && view.selectionModel)
+        {
+            var selections = view.selectionModel.getSelections();
+            for (var key in selections)
+            {
+                var val = selections[key].data,
+                    text = this.textTemplate ? this.textTemplate.apply(val, this) : (val[this.textProperty] || key || this.emptyText);
+
+                this.selected = {
+                    key: key,
+                    text: text
+                };
+
+                this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
+                break; 
+            }
+
+            ReUI.back();
+        }
     },
     isDirty: function() {
         return this.value.key !== this.selected.key;
@@ -295,13 +317,20 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
         return val;
     },
     setValue: function(val) {
-        var key = val[this.keyProperty],
-            text = this.textTemplate ? this.textTemplate.apply(val, this) : (val[this.textProperty] || key || this.emptyText);                    
+        if (val)
+        {
+            var key = val[this.keyProperty],
+                text = this.textTemplate ? this.textTemplate.apply(val, this) : (val[this.textProperty] || key || this.emptyText);
 
-        this.value = this.selected = {
-            key: key,
-            text: text
-        };
+            this.value = this.selected = {
+                key: key,
+                text: text
+            };
+        }
+        else
+        {
+            var text = this.emptyText; 
+        }
         
         this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
     },
