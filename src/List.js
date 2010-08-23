@@ -1,4 +1,4 @@
-﻿/// <reference path="../ext/ext-core-debug.js"/>
+/// <reference path="../ext/ext-core-debug.js"/>
 /// <reference path="Application.js"/>
 /// <reference path="View.js"/>
 
@@ -41,7 +41,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<h3>{%= noDataText %}</h3>',
         '</li>'
     ]),
-    moreText: 'More',
+    moreText: 'Retrieve more records...',
     titleText: 'List',
     searchText: 'Search',
     cancelText: 'Cancel',
@@ -68,7 +68,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             pageSize: 20,
             allowSelection: false,
             requestedFirstPage: false,
-            contextDialog: 'context_dialog',
+            contextDialog: false,
             tools: {
                 tbar: [{
                     name: 'New',
@@ -101,12 +101,18 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         return checked;
     },
     onClickLong: function(evt, el, o) {
-        var resourceKind = this.resourceKind;
-        if (!/^(accounts)|(contacts)|(opportunities)|(leads)|(tickets)$/.test(resourceKind)) {
-            this.onClick(evt, el, o);
-            return;
+        var key, descriptor, detailView, link = Ext.get(el);
+
+        if (! link.is('a[target="_detail"]'))
+            link = link.up('a[target="_detail"]');
+
+        if (this.contextDialog !== false)
+        {
+            key = link.getAttribute("key", "m");
+            descriptor = link.getAttribute("descriptor", "m");
+            detailView = link.dom.hash.substring(1);
+            this.navigateToContextDialog(key, detailView, descriptor);
         }
-        App.getView(this.contextDialog).show(el);
     },
     onClick: function(evt, el, o) {
         var el = Ext.get(el);
@@ -137,7 +143,6 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             evt.stopEvent();
 
             var view = link.dom.hash.substring(1);
-
             var key = link.getAttribute("key", "m");
             var descriptor = link.getAttribute("descriptor", "m");
 
@@ -147,7 +152,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     },
     onRefresh: function(o) {
         if (this.resourceKind && o.resourceKind === this.resourceKind)
-                this.clear();
+        {
+            this.refreshRequired = true;
+        }
     },
     search: function() {
         /// <summary>
@@ -225,6 +232,18 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             });
 
         return request;
+    },
+    navigateToContextDialog: function(key, detailView, descriptor) {
+        /// <summary>
+        ///     Shows the requested context dialog.
+        /// </summary>
+        var v = App.getView(this.contextDialog);
+        if (v)
+            v.show({
+                descriptor: descriptor,
+                key: key,
+                detailView: detailView
+            });
     },
     navigateToDetail: function(view, key, descriptor) {
         /// <summary>
@@ -382,24 +401,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             return expression.call(this);
         else
             return expression;
-    },
-    hasContext: function() {
-        /// <summary>
-        ///     Indicates whether or not the view has a context.
-        /// </summary>
-        /// <returns type="Boolean">True if there is a current, or new, context; False otherwise.</returns>
-        return (this.context || this.newContext);
-    },
-    isNewContext: function() {
-        /// <summary>
-        ///     Indicates whether or not the view has a new context.
-        /// </summary>
-        /// <returns type="Boolean">True if there is a new context; False otherwise.</returns>
-        if (this.context)
+    },    
+    refreshRequiredFor: function(options) {        
+        if (this.options)
         {
-            if (this.expandExpression(this.context.where) != this.expandExpression(this.newContext.where)) return true;
-            if (this.expandExpression(this.context.resourceKind) != this.expandExpression(this.newContext.resourceKind)) return true;
-            if (this.expandExpression(this.context.resourcePredicate) != this.expandExpression(this.newContext.resourcePredicate)) return true;
+            if (options)
+            {
+                if (this.expandExpression(this.options.where) != this.expandExpression(options.where)) return true;
+                if (this.expandExpression(this.options.resourceKind) != this.expandExpression(options.resourceKind)) return true;
+                if (this.expandExpression(this.options.resourcePredicate) != this.expandExpression(options.resourcePredicate)) return true;
+            }
 
             return false;
         }
@@ -408,39 +419,36 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             return true;
         }
     },
+    getContext: function() {
+        return Ext.apply(Sage.Platform.Mobile.List.superclass.getContext.call(this), {
+            resourceKind: this.resourceKind
+        });
+    },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
 
-        if (this.hasContext() && this.isNewContext())
-        {
-            this.clear();
-        }
-
+        if (this.refreshRequired) this.clear();
+    },
+    refresh: function() {
+        this.requestData();
     },
     transitionTo: function() {
         Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
 
-        if (this.hasContext() && this.isNewContext())
-        {
-            this.context = this.newContext;
-        }
-
-        if (this.requestedFirstPage == false)
-            this.requestData();
     },
-    show: function(o) {
-        this.newContext = o;
-
-        Sage.Platform.Mobile.List.superclass.show.call(this);
+    show: function(options) {        
+        Sage.Platform.Mobile.List.superclass.show.apply(this, arguments);        
         
-        if (this.searchEl && this.searchEl.dom.value == "") {
+        if (this.searchEl && this.searchEl.dom.value == "")
+        {            
             this.el.select('.dismissButton').hide();
             this.el.select('label').show();
         }
-        else {
+        else
+        {
             this.el.select('.dismissButton').show();
             this.el.select('label').hide();
-         }
+        }
     },
     clear: function() {
         /// <summary>

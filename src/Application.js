@@ -21,7 +21,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 
         this.initialized = false;
         this.enableCaching = false;        
-        this.context = {};
+        this.context = {view: []};
         this.views = {};   
         this.services = {};
         this.defaultService = false; 
@@ -242,12 +242,17 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     viewTransitionTo: function(view) {
         this.fireEvent('viewtransitionto', view);
 
-        if (view.tools)
+        var tools = view.options ? (view.options.tools || view.tools) : (view.tools); 
+
+        if (tools)
         {
-            for (var n in view.tools)
+            for (var n in tools)
                 if (this.bars[n])
-                    this.bars[n].display(view.tools[n]);
+                    this.bars[n].display(tools[n]);
         }
+
+        if (this.context.view.unshift(view.getContext()) > 10)
+            this.context.view.pop();
 
         view.transitionTo();
     }
