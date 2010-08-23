@@ -292,7 +292,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
             for (var key in selections)
             {
                 var val = selections[key].data,
-                    text = this.textTemplate ? this.textTemplate.apply(val, this) : (val[this.textProperty] || key || this.emptyText);
+                    text = this.extractText(val, key);
 
                 this.selected = {
                     key: key,
@@ -307,20 +307,44 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
         }
     },
     isDirty: function() {
-        return this.value.key !== this.selected.key;
+        if (this.value && this.selected) return this.value.key !== this.selected.key;
+
+        return false;
     },
     getValue: function() {
-        var val = {};
+        if (this.keyProperty)
+        {
+            var value = {};
+            Sage.Platform.Mobile.Utility.setValue(value, this.keyProperty, this.selected.key);
+        }
+        else
+        {
+            var value = this.selected.key;
+        }
 
-        val[this.keyProperty] = this.selected.key;
+        return value;
+    },
+    extractKey: function(val) {        
+        return this.keyProperty
+            ? Sage.Platform.Mobile.Utility.getValue(val, this.keyProperty)
+            : val;
+    },
+    extractText: function(val, key) {
+        var key = key || this.extractKey(val),
+            text = this.textProperty
+                ? Sage.Platform.Mobile.Utility.getValue(val, this.textProperty)
+                : key;
+    
+        if (this.textTemplate) 
+            text = this.textTemplate.apply(this.textProperty ? text : val);
 
-        return val;
+        return (text || this.emptyText);
     },
     setValue: function(val) {
         if (val)
         {
-            var key = val[this.keyProperty],
-                text = this.textTemplate ? this.textTemplate.apply(val, this) : (val[this.textProperty] || key || this.emptyText);
+            var key = this.extractKey(val),
+                text = this.extractText(val, key);
 
             this.value = this.selected = {
                 key: key,
@@ -329,13 +353,14 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
         }
         else
         {
+            this.value = this.selected = false;
             var text = this.emptyText; 
         }
         
         this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
     },
     clearValue: function() {
-        this.setValue({});
+        this.setValue(false);
     }
 });
 
