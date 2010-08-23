@@ -65,7 +65,7 @@ Sage.Platform.Mobile.Controls.Field.prototype = {
 
 Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
     template: new Simplate([
-        '<input type="text" name="{%= name %}">',
+        '<input type="text" name="{%= name %}" class="field-text">',
     ]),
     bind: function(container) {
         Sage.Platform.Mobile.Controls.TextField.superclass.bind.apply(this, arguments);   
@@ -122,7 +122,7 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
 
 Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
     template: new Simplate([
-        '<input type="text" name="{%= name %}">',
+        '<input type="text" name="{%= name %}" class="field-phone">',
     ]),
     /*
         {0}: original value
@@ -179,7 +179,7 @@ Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Contr
 Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
     selector: 'div[name="{0}"]',
     template: new Simplate([
-        '<div name="{%= name %}" class="toggle" toggled="{%= !!$.checked %}">',
+        '<div name="{%= name %}" class="field-boolean toggle" toggled="{%= !!$.checked %}">',
         '<span class="thumb"></span>',
         '<span class="toggleOn">{%= $.onText %}</span>',
         '<span class="toggleOff">{%= $.offText %}</span>',
@@ -217,7 +217,7 @@ Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Con
         this.el.setWidth((maxSize*2));
         
         toggleOn.setStyle('visibility', 'visible');
-        toggleOff.setStyle('visibility', 'visible')
+        toggleOff.setStyle('visibility', 'visible');
         this.el.setStyle('visibility', 'visible');
         
         this.setUpDone = true;
@@ -238,10 +238,137 @@ Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Con
     }
 });
 
+Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
+    selector: 'div[name="{0}"]',
+    template: new Simplate([
+        '<div name="{%= name %}" class="field-lookup">',
+        '<a href="#{%= view %}"><span></span></a>',
+        '</div>'
+    ]),
+    emptyText: 'empty',
+    keyProperty: '$key',
+    textProperty: '$descriptor',
+    bind: function(container) {
+        Sage.Platform.Mobile.Controls.LookupField.superclass.bind.apply(this, arguments);
+
+        this.el.on('click', this.onClick, this, {stopEvent: true});
+    },
+    onClick: function(evt, el, o) {
+        // todo: limit the clicks to a specific element?
+        var el = Ext.get(el);
+
+        var link = el;
+        if (link.is('a') || (link = link.up('a')))
+        {
+            evt.stopEvent();
+
+            var id = link.dom.hash.substring(1),
+                view = App.getView(id);
+            if (view)
+            {
+                view.show({
+                    selectionOnly: true,
+                    singleSelect: true,
+                    tools: {
+                        tbar: [{
+                            name: 'select',
+                            title: 'Select',                                                              
+                            cls: 'button blueButton',
+                            fn: this.select,
+                            scope: this
+                        }]
+                    }
+                });
+            }
+            return;
+        }
+    },
+    select: function() {
+        // todo: should there be a better way?
+        var view = App.getActiveView();
+        if (view && view.selectionModel)
+        {
+            var selections = view.selectionModel.getSelections();
+            for (var key in selections)
+            {
+                var val = selections[key].data,
+                    text = this.extractText(val, key);
+
+                this.selected = {
+                    key: key,
+                    text: text
+                };
+
+                this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
+                break; 
+            }
+
+            ReUI.back();
+        }
+    },
+    isDirty: function() {
+        if (this.value && this.selected) return this.value.key !== this.selected.key;
+
+        return false;
+    },
+    getValue: function() {
+        if (this.keyProperty)
+        {
+            var value = {};
+            Sage.Platform.Mobile.Utility.setValue(value, this.keyProperty, this.selected.key);
+        }
+        else
+        {
+            var value = this.selected.key;
+        }
+
+        return value;
+    },
+    extractKey: function(val) {        
+        return this.keyProperty
+            ? Sage.Platform.Mobile.Utility.getValue(val, this.keyProperty)
+            : val;
+    },
+    extractText: function(val, key) {
+        var key = key || this.extractKey(val),
+            text = this.textProperty
+                ? Sage.Platform.Mobile.Utility.getValue(val, this.textProperty)
+                : key;
+    
+        if (this.textTemplate) 
+            text = this.textTemplate.apply(this.textProperty ? text : val);
+
+        return (text || this.emptyText);
+    },
+    setValue: function(val) {
+        if (val)
+        {
+            var key = this.extractKey(val),
+                text = this.extractText(val, key);
+
+            this.value = this.selected = {
+                key: key,
+                text: text
+            };
+        }
+        else
+        {
+            this.value = this.selected = false;
+            var text = this.emptyText; 
+        }
+        
+        this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
+    },
+    clearValue: function() {
+        this.setValue(false);
+    }
+});
+
 Sage.Platform.Mobile.Controls.registered = {
     'text': Sage.Platform.Mobile.Controls.TextField,
     'phone': Sage.Platform.Mobile.Controls.PhoneField,
-    'boolean': Sage.Platform.Mobile.Controls.BooleanField
+    'boolean': Sage.Platform.Mobile.Controls.BooleanField,
+    'lookup': Sage.Platform.Mobile.Controls.LookupField
 };
 
 Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {   

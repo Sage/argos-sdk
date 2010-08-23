@@ -74,7 +74,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     },
     clearSDataRequestCache: function() { 
         var check = function(k) {
-            return /^\[sdata\]/i.test(k);
+            return /^sdata\.cache/i.test(k);
         };
                 
         /* todo: find a better way to detect */
@@ -86,7 +86,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         }
     },
     createCacheKey: function(request) {
-        return "[sdata] " + request.toString();
+        return 'sdata.cache[' + request.build() + ']';
     },
     loadSDataRequest: function(request, o) {
         /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />   
