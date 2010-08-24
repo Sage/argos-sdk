@@ -221,16 +221,16 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             if (this.bars[n].setTitle)
                 this.bars[n].setTitle(title);
     },    
-    beforeViewTransitionAway: function(view) { 
+    beforeViewTransitionAway: function(view) {
         this.fireEvent('beforeviewtransitionaway', view);
-    
-        for (var n in this.bars) 
-            this.bars[n].clear();
 
         view.beforeTransitionAway();
     },
     beforeViewTransitionTo: function(view) {
         this.fireEvent('beforeviewtransitionto', view);
+
+        for (var n in this.bars)
+            this.bars[n].clear();
 
         view.beforeTransitionTo();
     },
@@ -241,6 +241,12 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     },
     viewTransitionTo: function(view) {
         this.fireEvent('viewtransitionto', view);
+
+        /*
+        // todo: should be here instead?
+        for (var n in this.bars)
+                this.bars[n].clear();
+        */
 
         var tools = view.options ? (view.options.tools || view.tools) : (view.tools); 
 

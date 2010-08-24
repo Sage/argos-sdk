@@ -104,20 +104,25 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     viewTemplate: new Simplate([
         '<ul id="{%= id %}" title="{%= title %}" class="list">',
         '</ul>'
-    ]),    
+    ]),
+    emptyTemplate: new Simplate([
+        '{%! $.loadingTemplate %}',
+        '{%! $.searchTemplate %}',
+        '{%! $.moreTemplate %}'
+    ]),
     loadingTemplate: new Simplate([
-        '<li class="loading"><div class="loading-indicator">{%= loadingText %}</div></li>',
-        '<li class="search toolbar" style="display: none;">',
-            '<form>',
-                '<fieldset>',
-                    '<input type="text" name="query" class="query" />',
-                    '<a type="cancel" class="dismissButton">{%= $.cancelText %}</a>',
-                    '<a class="searchButton" target="_none">{%= $.searchText %}</a>',
-                    '<label>{%= $.searchText %}</label>',
-                '</fieldset>',
-            '</form>',
-        '</li>',
-        '<li class="more" style="display: none;"><a href="#" target="_none" class="whiteButton moreButton"><span>{%= moreText %}</span></a></li>'
+        '<li class="loading"><div class="loading-indicator">{%= loadingText %}</div></li>'
+    ]),
+    moreTemplate: new Simplate([
+        '<li class="more" style="display: none;"><a href="#" target="_none" class="button whiteButton moreButton"><span>{%= moreText %}</span></a></li>'
+    ]),
+    searchTemplate: new Simplate([
+        '<li class="search" style="display: none;">',
+        '<input type="text" name="query" class="query" />',
+        '<div class="dismissButton">X</div>',
+        '<div class="searchButton">Search</div>',
+        '<label>{%= $.searchText %}</label>',
+        '</li>'      
     ]),
     itemTemplate: new Simplate([
         '<li>',
@@ -133,7 +138,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<h3>{%= noDataText %}</h3>',
         '</li>'
     ]),
-    moreText: 'Retrieve more records...',
+    moreText: 'Retreive More Records',
     titleText: 'List',
     searchText: 'Search',
     cancelText: 'Cancel',
@@ -582,7 +587,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         /// <summary>
         ///     Clears the view and re-applies the default content template.
         /// </summary>
-        this.el.update(this.loadingTemplate.apply(this));
+        this.el.update(this.emptyTemplate.apply(this));
 
         this.moreEl = this.el.down('.more');
         this.searchEl = this.el.child('input.query');

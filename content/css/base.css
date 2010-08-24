@@ -1,45 +1,27 @@
-﻿body
+/* list view */
+li.more .button
 {
-	height: 100%;
+    height: 40px;
+    line-height: 40px;
 }
 
-body[orient="landscape"] > form.dialog,
-body > form.dialog
+li.more-loading .whiteButton span
 {
-	height: 100%;
+    background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
+    padding: 0 0 0 20px;
+    color: #999999;
 }
 
-h3 
+li.loading
 {
-	font-size: .75em;
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+    text-align: center;
 }
 
-h4 
+li.loading .loading-indicator
 {
-	font-size: .5em;
-	margin: 0;
-	padding: 0;
-	color: #999999;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-li.more
-{
-	padding: 1em;
-}
-
-li.more-loading a.whiteButton span
-{
-	background: url('../images/loading-indicator-white-button.gif') no-repeat scroll 0 50%;	
-	padding: 0 0 0 20px;
-	color: #999999;
+    background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
+    padding: 0 0 0 20px;
+	display: inline-block;
 }
 
 li.loading
@@ -48,13 +30,14 @@ li.loading
 }
 
 li.loading .loading-indicator
-{	
+{
 	display: inline-block;
 }
 
-.loading-indicator
+/* detail veiw */
+fieldset.loading .loading-indicator
 {
-	background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
+	background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
 }
 
@@ -70,337 +53,174 @@ fieldset.loading .loading-indicator
 	display: inline-block;
 }
 
-img
+/* floating toolbar */
+body > div.toolbar-float[open],
+body[orient] > div.toolbar-float[open]
 {
-	border: none 0px black;
+	background-image: url('../images/arrow-right-black.png'), -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #e6e6e6),
+		color-stop(1, #cccccc)
+	);
+	background-image: url('../images/arrow-right-black.png'), -moz-linear-gradient(top, #e6e6e6, #cccccc);
+
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
 }
 
-img.icon
+.toolbar-float
 {
-	margin: 0 .5em 0 0;
+	background-image: url('../images/arrow-left-black.png'), -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #e6e6e6),
+		color-stop(1, #cccccc)
+	);
+	background-image: url('../images/arrow-left-black.png'), -moz-linear-gradient(top, #e6e6e6, #cccccc);
+
+	background-position: 6px center, top left;
+	background-repeat: no-repeat, no-repeat;
+
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+
+    -webkit-border-radius: 3px 0 0 3px;
+    -moz-border-radius: 3px 0 0 3px;
+    border-radius: 3px 0 0 3px;
+
+    border-style: solid;
+    border-width: 1px 0 1px 1px;
+    border-color: #000;
+    cursor: pointer;
+
+    color: #000;
+
+    text-shadow: rgba(255,255,255,1) 1px 1px 0;
+
+    -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset, rgba(255,255,255,0.6) 0px 1px 1px inset, rgba(0,0,0,0.75) 0px 0px 4px;
+    -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset, rgba(255,255,255,0.6) 0px 1px 1px inset, rgba(0,0,0,0.75) 0px 0px 4px;
 }
 
-div.row > label 
+.toolbar-float-container
 {
-	margin: 0px;
-	padding: 0;
-	position: relative;
-	float: left;
-	line-height: 40px;
-	width: 100px;
-	text-align: right;
-	color: #556382;
-	font-size: 0.9em;
+    height: 46px;
 }
 
-div.row-edit > label
+.toolbar-float-container a
 {
-	position: absolute;
+    color: #fff;
 }
 
-div.panel > ul li, 
-div.row
+.toolbar-float-container a span
 {
-	text-align: left;
-	clear: both;
-	min-height: 40px;
+    display: none;
 }
 
-div.panel > ul, 
-div.panel > fieldset
+.tool-note
 {
-	text-align: left;
-	font-size: 14px;
+    margin-bottom: 3px;
 }
 
-div.row > span,
-div.row > a
-{
-	display: block;
-	margin: 0 0 0 0px;
-	padding: 12px 12px 12px 12px;
-	position: relative;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-div.row a[target=_related]
-{
-	background:url(../../libraries/reui/themes/iui/default/listArrow.png) center right no-repeat; 	
-	font-size: inherit;
-}
-
-.no-data
-{
-	text-align: center;
-}
-
-input:not(input[type|=radio]):not(input[type|=checkbox])
-{
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-}
-
-input:focus
-{ 
-	outline: none;
-	background-color: #FDFFDD;	
-}
-
-/* removes focus outline */
-body > *
-{
-	-webkit-tap-highlight-color: rgba(255,255,255,0);
-}
-
-.dialog > fieldset
-{
-	-webkit-border-bottom-left-radius: 5px;
-	-webkit-border-bottom-right-radius: 5px;
-	-moz-border-bottom-left-radius: 5px;
-	-moz-border-bottom-right-radius: 5px;
-}
-
-.dialog > fieldset > label
-{
-	margin: 17px 0 0 6px;
-}
-
+/* busy */
 .dialog-busy .blueButton,
 .toolbar-busy .blueButton
 {
-	-webkit-border-image: url(../../libraries/reui/themes/iui/default/toolButton.png) 0 5 0 5;
-    -moz-border-image: url(../../libraries/reui/themes/iui/default/toolButton.png) 0 5 0 5;
+	
 }
 
-.dialog-busy .blueButton span,
-.toolbar-busy .blueButton span
+.dialog-busy .button.actionButton
 {
-	background: url('../images/loading-indicator-tool-button.gif') no-repeat scroll 0 50%;
+    background: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(42,101,80)),
+		color-stop(1, rgb(6,74,52))
+	);
+	background: -moz-linear-gradient(
+		center bottom,
+		rgb(42,101,80) 0%,
+		rgb(6,74,52) 100%
+	);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+}
+
+.dialog-busy .button.actionButton span,
+.toolbar-busy .button.actionButton span
+{
+	background: url('../images/loading-indicator-green.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
-	color: #CCCCCC;
+}
+
+.dialog-busy .whiteButton.actionButton
+{
+    background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, #e6e6e6),
+		color-stop(1, #cccccc)
+	);
+	background-image: -moz-linear-gradient(bottom, #e6e6e6, #cccccc);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+}
+
+.dialog-busy .whiteButton.actionButton span,
+.toolbar-busy .whiteButton.actionButton span
+{
+	background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
+	padding: 0 0 0 20px;
+}
+
+.dialog-busy .blueButton.actionButton
+{
+    background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, #2ca0d1),
+		color-stop(1, #07a)
+	);
+	background-image: -moz-linear-gradient(bottom, #2ca0d1, #07a);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+}
+
+.dialog-busy .blueButton.actionButton span,
+.toolbar-busy .blueButton.actionButton span
+{
+	background: url('../images/loading-indicator-blue.gif') no-repeat scroll 0 50%;
+	padding: 0 0 0 20px;
+}
+
+.dialog-busy .redButton.actionButton
+{
+    background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, #de6464),
+		color-stop(1, #b33737)
+	);
+	background-image: -moz-linear-gradient(bottom, #de6464, #b33737);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+}
+
+.dialog-busy .redButton.actionButton span,
+.toolbar-busy .redButton.actionButton span
+{
+	background: url('../images/loading-indicator-red.gif') no-repeat scroll 0 50%;
+	padding: 0 0 0 20px;
 }
 
 .dialog-busy input,
 .view-busy input
 {
-	background: #CCCCCC;
-}
-
-/* fix for chrome CSS3 issue - with latest chrome builds, input:not(input[...]) is not functioning */
-input:not([type|=radio]):not([type|=checkbox])  
-{
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    width: 100%;
-    margin: 8px 0 0 0;
-    padding: 6px 6px 6px 44px;
-    font-size: 16px;
-    font-weight: normal;
-    border: 1px inset gray;
-}
-
-.row > input:not([type|=radio]):not([type|=checkbox]) 
-{	
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-    margin: 0;
-    border: none 0px black;
-    padding: 12px 10px 0 110px;
-    height: 42px;
-    border: none 0px transparent;
-    background: transparent;
-}
-
-.row > input[type|=radio], .row > input[type|=checkbox] 
-{
-  margin: 7px 7px 0 0;
-  height: 25px;
-  width: 25px;
-}
-
-a 
-{
-    -webkit-touch-callout: none;
-}
-
-.button
-{
-	cursor: pointer;
-}
-
-body > :not(.dialog):not(.toolbar):not(.toolbar-float) 
-{
-	padding-bottom: 66px;
-}
-
-/* remove iUI styling from the toolbar */
-body > div.toolbar-float,
-body[orient] > div.toolbar-float
-{
-	box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-	display: block;
-	height: 50px;
-	width: 36px; /* was auto */
-	min-width: 36px;
-	position: absolute;	
-	top: 0px;
-	right: 0px;
-	left: auto;
-	min-height: 0;
-	z-index: 1;	
-	padding: 0 0 0 36px;
-}
-
-body > div.toolbar-float[open],
-body[orient] > div.toolbar-float[open]
-{
-	width: auto; 
-	background-image: url(../images/arrow-right.png), -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, rgb(44,44,44)),
-		color-stop(0.5, rgb(21,21,21)),
-		color-stop(0.5, rgb(49,49,49)),
-		color-stop(1, rgb(79,79,79))
-	);	
-	background-image: url(../images/arrow-right.png), -moz-linear-gradient(
-		center bottom,
-		rgb(44,44,44) 0%,
-		rgb(21,21,21) 50%,
-		rgb(49,49,49) 50%,
-		rgb(79,79,79) 100%
-	);
-}
-
-.toolbar-float 
-{				
-	overflow: hidden;
 	
-    -moz-border-radius-topleft: 8px;
-    -webkit-border-top-left-radius: 8px;
-    -moz-border-radius-bottomleft: 8px;
-    -webkit-border-bottom-left-radius: 8px;
-    
-	background-image: url(../images/arrow-left.png), -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, rgb(44,44,44)),
-		color-stop(0.5, rgb(21,21,21)),
-		color-stop(0.5, rgb(49,49,49)),
-		color-stop(1, rgb(79,79,79))
-	);	
-	background-image: url(../images/arrow-left.png), -moz-linear-gradient(
-		center bottom,
-		rgb(44,44,44) 0%,
-		rgb(21,21,21) 50%,
-		rgb(49,49,49) 50%,
-		rgb(79,79,79) 100%
-	);	
-	
-	background-position: 6px center, top left;
-	background-repeat: no-repeat, no-repeat;
-	
-	/* note: there is a bug with webkit with transitioning to 'auto' */
-	-webkit-transition-property: -webkit-transform; 
-	-webkit-transition-duration: 300ms;
-	-webkit-transition-delay: 0;
-	-webkit-transition-timing-function: ease-in-out;	
-	
-	-moz-transition-property: -moz-transform;
-	-moz-transition-duration: 300ms;
-	-moz-transition-delay: 0;
-	-moz-transition-timing-function: ease-in-out;	
-	
-	transition-property: transform;
-	transition-duration: 300ms;
-	transition-delay: 0;
-	transition-timing-function: ease-in-out;	
 }
-
-.toolbar-float-container
-{	
-	/* use with column-count (and width) for alternate layout method */	
-	-webkit-column-gap: 0px;
-	-moz-column-gap: 0px;
-	column-gap: 0px;
-	
-	height: 50px;	
-	
-	display: -webkit-box;
-    -webkit-box-orient: horizontal;
-    -webkit-box-pack: center;
-    -webkit-box-align: center;
- 
-    display: -moz-box;
-    -moz-box-orient: horizontal;
-    -moz-box-pack: center;
-    -moz-box-align: center;
- 
-    display: box;
-    box-orient: horizontal;
-    box-pack: center;
-    box-align: center;   
-}
-
-.toolbar-float-container a
-{	
-    color: #fff;
-    width: 48px;
-    text-align: center;
-}
-
-.toolbar-float-container a span
-{
-	display: block;
-	font-size: .6em;
-}
-
-body > ul > li > a,
-body > ul > li > * > a
-{
-    display: block;
-    margin: -8px 0 -8px -10px;
-    padding: 8px 32px 8px 10px;
-    text-decoration: none;
-    color: inherit;
-}
-
-input.list-selector 
-{
-    float: left;
-}
-
-.row > .toggle
-{
-	position: relative;
-	right: auto;
-	top: 5px;
-	margin: 0 0 0 110px;
-}
-
-.panel > .loading
-{
-	display: none;
-}
-
-.panel-loading > .loading
-{
-	display: block;
-}
-
-.panel-loading > *:not(.loading)
-{
-	display: none;
-}
-
