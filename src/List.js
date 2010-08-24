@@ -296,9 +296,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         this.clear();
 
         this.queryText = search;
-        this.query = this.customSearchRE.test(this.queryText)
-            ? this.queryText.replace(this.customSearchRE, '')
-            : this.formatSearchQuery(this.queryText);
+        this.query = this.queryText
+            ? this.customSearchRE.test(this.queryText)
+                ? this.queryText.replace(this.customSearchRE, '')
+                : this.formatSearchQuery(this.queryText)
+            : false;
 
         this.requestData();
     },
@@ -333,19 +335,19 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         var where = [];
 
-        if (this.context)
+        if (this.options)
         {
-            var resourceKindExpr = this.expandExpression(this.context.resourceKind);
+            var resourceKindExpr = this.expandExpression(this.options.resourceKind);
             if (resourceKindExpr)
                 request.setResourceKind(resourceKindExpr);
 
-            var resourcePredicateExpr = this.expandExpression(this.context.resourcePredicate);
+            var resourcePredicateExpr = this.expandExpression(this.options.resourcePredicate);
             if (resourcePredicateExpr)
                 request
                     .getUri()
                     .setCollectionPredicate(resourcePredicateExpr);
 
-            var whereExpr = this.expandExpression(this.context.where);
+            var whereExpr = this.expandExpression(this.options.where);
             if (whereExpr)
                 where.push(whereExpr);
         }
