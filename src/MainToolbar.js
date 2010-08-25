@@ -1,4 +1,4 @@
-﻿/// <reference path="../../ext/ext-core-debug.js"/>
+/// <reference path="../../ext/ext-core-debug.js"/>
 /// <reference path="../../platform/Application.js"/>
 /// <reference path="../../platform/Toolbar.js"/>
 /// <reference path="../../sdata/SDataService.js"/>
@@ -13,7 +13,7 @@ Sage.Platform.Mobile.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         '</div>'
     ]),
     toolTemplate: new Simplate([
-        '<a target="_tool" class="{%= cls %}" style="visibility: {%= $["hidden"] ? "hidden" : "visible" %}"><span>{%= title %}</span></a>'
+        '<a target="_tool" class="{%= cls || button %} actionButton" style="visibility: {%= $["hidden"] ? "hidden" : "visible" %}"><span>{%= title %}</span></a>'
     ]),
     constructor: function(o) {
         Sage.Platform.Mobile.MainToolbar.superclass.constructor.apply(this, arguments);        
