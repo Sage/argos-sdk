@@ -199,39 +199,14 @@ Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Con
         this.el.dom.setAttribute('toggled', this.el.getAttribute('toggled') !== 'true');
     },
     getValue: function() {
-        return this.el.getAttribute('toggled') === 'true' ? this.onText : this.offText;
-    },
-    setUp: function() {
-        this.el.setStyle('visibility', 'hidden');
-        
-        var toggleOn  = this.el.child('.toggleOn').setStyle('visibility', 'visible');
-        var toggleOff = this.el.child('.toggleOff').setStyle('visibility', 'visible');
-        
-        var maxSize = toggleOn.getWidth();
-        if (toggleOff.getWidth() > maxSize) maxSize = toggleOff.getWidth();
-        maxSize += 20;
-        
-        toggleOn.setWidth(maxSize);
-        toggleOff.setWidth(maxSize);
-        this.el.child('.thumb').setWidth(maxSize);
-        this.el.setWidth((maxSize*2));
-        
-        toggleOn.setStyle('visibility', 'visible');
-        toggleOff.setStyle('visibility', 'visible');
-        this.el.setStyle('visibility', 'visible');
-        
-        this.setUpDone = true;
+        return this.el.getAttribute('toggled') === 'true';
     },
     setValue: function(val) {
-        if (this.setUpDone !== true) {
-            this.setUp();
-        }
         this.value = val;
-        this.el.dom.setAttribute('toggled', val == this.onText ? 'true' : 'false');
+        this.el.dom.setAttribute('toggled', this.checked);
     },
     clearValue: function() {
-        var val = this.checked === true ? this.onText : this.offText;
-        this.setValue(val);
+        this.setValue(!!this.checked);
     },
     isDirty: function() {
         return (this.value != this.getValue());
