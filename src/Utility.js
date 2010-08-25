@@ -11,7 +11,7 @@ Sage.Platform.Mobile.Utility = (function() {
         var path = [];
         for (var i = 0; i < parts.length; i++)
         {
-            var match = parts[i].match(/([a-zA-Z0-9_]+)\[([^\]]+)\]/);
+            var match = parts[i].match(/([a-zA-Z0-9_$]+)\[([^\]]+)\]/);
             if (match)
             {
                 path.push(match[1]);
