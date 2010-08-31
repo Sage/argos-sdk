@@ -618,5 +618,9 @@ Sage.Platform.Mobile.PickList = Ext.extend(Sage.Platform.Mobile.List, {
             .setQueryArg('format', 'json');
 
         return request;
+    },
+    show: function(options) {
+        options['resourcePredicate'] = this.resourcePredicate;
+        Sage.Platform.Mobile.PickList.superclass.show.call(this, options);
     }
 });
