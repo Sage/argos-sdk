@@ -17,7 +17,7 @@ Sage.Platform.Mobile.SelectionModel = Ext.extend(Ext.util.Observable, {
             'deselect',
             'clear'
         );
-    },   
+    },
     select: function(key, data, tag) {
         if (!this.selections.hasOwnProperty(key))
         {
@@ -37,7 +37,7 @@ Sage.Platform.Mobile.SelectionModel = Ext.extend(Ext.util.Observable, {
         if (this.selections.hasOwnProperty(key))
         {
             var selection = this.selections[key];
-            
+
             delete this.selections[key];
             this.count--;
 
@@ -122,7 +122,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<div class="dismissButton">X</div>',
         '<div class="searchButton">Search</div>',
         '<label>{%= $.searchText %}</label>',
-        '</li>'      
+        '</li>'
     ]),
     itemTemplate: new Simplate([
         '<li>',
@@ -195,7 +195,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         this.el.on('click', this.onClick, this);
         this.el.on('clicklong', this.onClickLong, this);
-        
+
         App.on('refresh', this.onRefresh, this);
     },
     isNavigationDisabled: function() {
@@ -230,7 +230,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     onSelectionModelDeselect: function(key, data, tag) {
         var el = Ext.get(tag);
         if (el)
-            el.removeClass('list-item-selected'); 
+            el.removeClass('list-item-selected');
     },
     onSelectionModelClear: function() {
     },
@@ -258,11 +258,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (el.is('.searchButton')) {
             evt.stopEvent();
-            
+
             this.search();
             return;
         }
-        
+
         var link = el;
         if (link.is('a[target="_detail"]') || (link = link.up('a[target="_detail"]')))
         {
@@ -418,7 +418,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         else
         {
             var o = [];
-            
+
             for (var i = 0; i < feed.$resources.length; i++)
             {
                 var entry = feed.$resources[i];
@@ -431,7 +431,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             if (o.length > 0)
                 Ext.DomHelper.insertBefore(this.moreEl, o.join(''));
         }
-        
+
         this.moreEl
             .removeClass('more-loading');
 
@@ -530,8 +530,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             return expression.call(this);
         else
             return expression;
-    },    
-    refreshRequiredFor: function(options) {        
+    },
+    refreshRequiredFor: function(options) {
         if (this.options)
         {
             if (options)
@@ -544,7 +544,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             return false;
         }
         else
-            return Sage.Platform.Mobile.List.superclass.refreshRequiredFor.call(this, options);        
+            return Sage.Platform.Mobile.List.superclass.refreshRequiredFor.call(this, options);
     },
     getContext: function() {
         return Ext.apply(Sage.Platform.Mobile.List.superclass.getContext.call(this), {
@@ -571,11 +571,11 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
 
     },
-    show: function(options) {        
-        Sage.Platform.Mobile.List.superclass.show.apply(this, arguments);        
-        
+    show: function(options) {
+        Sage.Platform.Mobile.List.superclass.show.apply(this, arguments);
+
         if (this.searchEl && this.searchEl.dom.value == "")
-        {            
+        {
             this.el.select('.dismissButton').hide();
             this.el.select('label').show();
         }
@@ -603,5 +603,20 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         this.feed = false;
         this.query = false;
         this.queryText = false;
+    }
+});
+
+Sage.Platform.Mobile.PickList = Ext.extend(Sage.Platform.Mobile.List, {
+    resourceProperty: 'items',
+    createRequest: function() {
+        var request = Sage.Platform.Mobile.PickList.superclass.createRequest.call(this);
+
+        request
+            .setContractName('system')
+            .setDataSet('-')
+            .setResourceKind('picklists')
+            .setQueryArg('format', 'json');
+
+        return request;
     }
 });
