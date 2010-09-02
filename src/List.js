@@ -608,22 +608,3 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         this.queryText = false;
     }
 });
-
-Sage.Platform.Mobile.PickList = Ext.extend(Sage.Platform.Mobile.List, {
-    resourceProperty: 'items',
-    createRequest: function() {
-        var request = Sage.Platform.Mobile.PickList.superclass.createRequest.call(this);
-
-        request
-            .setContractName('system')
-            .setDataSet('-')
-            .setResourceKind('picklists')
-            .setQueryArg('format', 'json');
-
-        return request;
-    },
-    show: function(options) {
-        options['resourcePredicate'] = this.resourcePredicate;
-        Sage.Platform.Mobile.PickList.superclass.show.call(this, options);
-    }
-});

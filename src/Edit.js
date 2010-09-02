@@ -9,7 +9,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 // todo: move to separate files
 Sage.Platform.Mobile.Controls.Field = function(o) {
-    Ext.apply(this, o, {        
+    Ext.apply(this, o, {
     });
 };
 
@@ -20,35 +20,35 @@ Sage.Platform.Mobile.Controls.Field.prototype = {
     },
     bind: function(container) {
         this.el = container.child(String.format(this.selector, this.name));
-    },       
+    },
     isDirty: function() {
         return true;
     },
-    validate: function(value) {        
-        if (typeof this.validator === 'undefined') 
-            return false; 
+    validate: function(value) {
+        if (typeof this.validator === 'undefined')
+            return false;
 
-        if (this.validator instanceof RegExp)                      
+        if (this.validator instanceof RegExp)
             var definition = {
                 test: this.validator
             };
-        else if (typeof this.validator === 'function')        
+        else if (typeof this.validator === 'function')
             var definition = {
                 fn: this.validator
-            };            
+            };
         else
             var definition = this.validator;
-                
+
         var value = typeof value === 'undefined'
             ? this.getValue()
             : value;
-           
-        if (typeof definition.fn === 'function')      
-        {  
-            return definition.fn.call(definition.scope || this, value, this.editor);        
+
+        if (typeof definition.fn === 'function')
+        {
+            return definition.fn.call(definition.scope || this, value, this.editor);
         }
         else if (definition.test instanceof RegExp)
-        {  
+        {
             if (!definition.test.test(value))
             {
                 var message = typeof definition.message === 'function'
@@ -56,11 +56,11 @@ Sage.Platform.Mobile.Controls.Field.prototype = {
                     : String.format(definition.message, value);
 
                 return message || true;
-            }             
+            }
         }
 
         return false;
-    }       
+    }
 };
 
 Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
@@ -68,8 +68,8 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
         '<input type="text" name="{%= name %}" class="field-text">',
     ]),
     bind: function(container) {
-        Sage.Platform.Mobile.Controls.TextField.superclass.bind.apply(this, arguments);   
-        
+        Sage.Platform.Mobile.Controls.TextField.superclass.bind.apply(this, arguments);
+
         if (this.validInputOnly)
         {
             this.el.on('keypress', this.onKeyPress, this);
@@ -95,7 +95,7 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
             {
                 evt.stopEvent();
                 return;
-            }     
+            }
         }
     },
     onValidationTrigger: function(evt, el, o) {
@@ -103,7 +103,7 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
             this.el.addClass('field-error');
         else
             this.el.removeClass('field-error');
-    },    
+    },
     getValue: function() {
         return this.el.getValue();
     },
@@ -142,30 +142,30 @@ Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Contr
     }],
     getValue: function() {
         var value = this.el.getValue();
-        
-        if (/^\+/.test(value)) return value; 
+
+        if (/^\+/.test(value)) return value;
 
         return value.replace(/[^0-9x]/ig, "");
-    },        
+    },
     setValue: function(val) {
         this.value = val;
 
         this.el.dom.value = this.formatNumberForDisplay(val);
-    },    
+    },
     formatNumberForDisplay: function(number, clean) {
         if (typeof clean === 'undefined')
             var clean = number;
-      
+
         for (var i = 0; i < this.formatters.length; i++)
         {
             var formatter = this.formatters[i];
-            var match;       
+            var match;
             if ((match = formatter.test.exec(clean)))
                 return String.format.apply(String, [formatter.format, number, clean].concat(match));
         }
 
         return number;
-    },    
+    },
     bind: function(container) {
         Sage.Platform.Mobile.Controls.TextField.superclass.bind.apply(this, arguments);
 
@@ -187,11 +187,11 @@ Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Con
     ]),
     onText: 'ON',
     offText: 'OFF',
-    constructor: function(o) {        
-        Sage.Platform.Mobile.Controls.BooleanField.superclass.constructor.apply(this, arguments);             
+    constructor: function(o) {
+        Sage.Platform.Mobile.Controls.BooleanField.superclass.constructor.apply(this, arguments);
     },
     bind: function(container) {
-        Sage.Platform.Mobile.Controls.BooleanField.superclass.bind.apply(this, arguments);        
+        Sage.Platform.Mobile.Controls.BooleanField.superclass.bind.apply(this, arguments);
 
         this.el.on('click', this.onClick, this, {stopEvent: true});
     },
@@ -247,7 +247,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
                     tools: {
                         tbar: [{
                             name: 'select',
-                            title: 'Select',                                                              
+                            title: 'Select',
                             cls: 'button',
                             fn: this.select,
                             scope: this
@@ -275,7 +275,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
                 };
 
                 this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
-                break; 
+                break;
             }
 
             ReUI.back();
@@ -299,7 +299,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
 
         return value;
     },
-    extractKey: function(val) {        
+    extractKey: function(val) {
         return this.keyProperty
             ? Sage.Platform.Mobile.Utility.getValue(val, this.keyProperty)
             : val;
@@ -309,8 +309,8 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
             text = this.textProperty
                 ? Sage.Platform.Mobile.Utility.getValue(val, this.textProperty)
                 : key;
-    
-        if (this.textTemplate) 
+
+        if (this.textTemplate)
             text = this.textTemplate.apply(this.textProperty ? text : val);
 
         return (text || this.emptyText);
@@ -329,9 +329,9 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
         else
         {
             this.value = this.selected = false;
-            var text = this.emptyText; 
+            var text = this.emptyText;
         }
-        
+
         this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
     },
     clearValue: function() {
@@ -339,22 +339,59 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
     }
 });
 
+Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
+    onClick: function(evt, el, o) {
+        // todo: limit the clicks to a specific element?
+        var el = Ext.get(el);
+
+        var link = el;
+        if (link.is('a') || (link = link.up('a')))
+        {
+            evt.stopEvent();
+
+            var id = link.dom.hash.substring(1),
+                view = App.getView(id);
+            if (view)
+            {
+                view.setTitle(this.title);
+                view.show({
+                    selectionOnly: true,
+                    resourcePredicate: this.resourcePredicate,
+                    resourceProperty: 'items',
+                    singleSelect: true,
+                    tools: {
+                        tbar: [{
+                            name: 'select',
+                            title: 'Select',
+                            cls: 'button blueButton',
+                            fn: this.select,
+                            scope: this
+                        }]
+                    }
+                });
+            }
+            return;
+        }
+    }
+});
+
 Sage.Platform.Mobile.Controls.registered = {
     'text': Sage.Platform.Mobile.Controls.TextField,
     'phone': Sage.Platform.Mobile.Controls.PhoneField,
     'boolean': Sage.Platform.Mobile.Controls.BooleanField,
-    'lookup': Sage.Platform.Mobile.Controls.LookupField
+    'lookup': Sage.Platform.Mobile.Controls.LookupField,
+    'pickup': Sage.Platform.Mobile.Controls.PickupField
 };
 
-Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {   
-    viewTemplate: new Simplate([            
-        '<div id="{%= id %}" title="{%= title %}" class="panel" effect="flip">',  
+Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
+    viewTemplate: new Simplate([
+        '<div id="{%= id %}" title="{%= title %}" class="panel" effect="flip">',
         '<fieldset class="loading">',
         '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
         '</fieldset>',
-        '</div>',           
+        '</div>',
         '</div>'
-    ]),       
+    ]),
     sectionBeginTemplate: new Simplate([
         '<h2>{%= $["title"] %}</h2>',
         '{% if ($["list"]) { %}<ul>{% } else { %}<fieldset>{% } %}'
@@ -364,17 +401,17 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     propertyTemplate: new Simplate([
         '<div class="row row-edit">',
-        '<label>{%= label %}</label>',       
+        '<label>{%= label %}</label>',
         '{%! field %}', /* apply sub-template */
         '</div>'
-    ]),    
+    ]),
     saveText: 'Save',
     titleText: 'Edit',
-    detailsText: 'Details',    
+    detailsText: 'Details',
     loadingText: 'loading...',
     constructor: function(o) {
-        Sage.Platform.Mobile.Edit.superclass.constructor.call(this);        
-        
+        Sage.Platform.Mobile.Edit.superclass.constructor.call(this);
+
         Ext.apply(this, o, {
             id: 'generic_edit',
             title: this.titleText,
@@ -382,22 +419,22 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             tools: {
                 tbar: [{
                     name: 'edit',
-                    title: this.saveText,                                                              
-                    cls: 'button',                 
+                    title: this.saveText,
+                    cls: 'button',
                     fn: this.save,
-                    scope: this                
+                    scope: this
                 }]
             },
-            fields: {}          
+            fields: {}
         });
-    },    
-    init: function() {  
-        Sage.Platform.Mobile.Edit.superclass.init.call(this);                
+    },
+    init: function() {
+        Sage.Platform.Mobile.Edit.superclass.init.call(this);
 
         this.processLayout(this.layout, {title: this.detailsText});
 
         for (var name in this.fields) this.fields[name].bind(this.el);
-    },          
+    },
     createRequest: function() {
         var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
 
@@ -405,11 +442,11 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             request.setResourceSelector(String.format("'{0}'", this.entry['$key']));
 
         return request;
-    },    
+    },
     createTemplateRequest: function() {
-        var request = new Sage.SData.Client.SDataTemplateResourceRequest(this.getService());       
+        var request = new Sage.SData.Client.SDataTemplateResourceRequest(this.getService());
 
-        if (this.resourceKind) 
+        if (this.resourceKind)
             request.setResourceKind(this.resourceKind);
 
         return request;
@@ -418,8 +455,8 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     {
         var sections = [];
         var content = [];
-        
-        content.push(this.sectionBeginTemplate.apply(options));        
+
+        content.push(this.sectionBeginTemplate.apply(options));
 
         for (var i = 0; i < layout.length; i++)
         {
@@ -429,9 +466,9 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
             {
                 sections.push(current);
                 continue;
-            }            
+            }
             else
-            {   
+            {
                 var ctor = Sage.Platform.Mobile.Controls.registered[current['type']];
                 var field = this.fields[current['name']] = new ctor(Ext.apply({
                     editor: this
@@ -450,22 +487,22 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
 
         for (var i = 0; i < sections.length; i++)
         {
-            var current = sections[i];  
-            
-            this.processLayout(current['as'], current['options']);  
-        }        
-    },    
+            var current = sections[i];
+
+            this.processLayout(current['as'], current['options']);
+        }
+    },
     requestFailure: function(response, o) {
-       
+
     },
     requestData: function() {
-        var request = this.createRequest();  
-        if (request)      
-            request.read({  
+        var request = this.createRequest();
+        if (request)
+            request.read({
                 success: this.processEntry,
                 failure: this.requestFailure,
                 scope: this
-            });       
+            });
     },
     requestTemplateFailure: function() {
 
@@ -485,7 +522,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     processTemplateEntry: function(entry) {
         this.setValues(entry || {});
         this.el.removeClass('panel-loading');
-    },      
+    },
     clearValues: function() {
         for (var name in this.fields)
         {
@@ -505,11 +542,11 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         var empty = true;
 
         for (var name in this.fields)
-        {                        
+        {
             if (this.fields[name].isDirty())
             {
                 var value = this.fields[name].getValue();
-                
+
                 Sage.Platform.Mobile.Utility.setValue(o, name, value);
 
                 empty = false;
@@ -530,7 +567,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                 this.errors.push({
                     name: name,
                     message: result
-                });                
+                });
             }
             else
             {
@@ -546,7 +583,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         return Ext.apply(values, {
             '$key': this.entry['$key'],
             '$etag': this.entry['$etag'],
-            '$name': this.entry['$name']           
+            '$name': this.entry['$name']
         });
     },
     createEntryForInsert: function(values) {
@@ -572,21 +609,21 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     insert: function() {
         this.disableForm();
 
-        var values = this.getValues();         
-        if (values) 
+        var values = this.getValues();
+        if (values)
         {
             var entry = this.createEntryForInsert(values);
 
-            var request = this.createRequest();            
+            var request = this.createRequest();
             if (request)
                 request.create(entry, {
-                    success: function(created) {  
+                    success: function(created) {
                         this.enableForm();
-                                                
+
                         App.fireEvent('refresh', {
-                            resourceKind: this.resourceKind                            
+                            resourceKind: this.resourceKind
                         });
-                            
+
                         ReUI.back();
                     },
                     failure: function(response, o) {
@@ -601,19 +638,19 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         }
     },
     update: function() {
-        var values = this.getValues();                        
-        if (values) 
-        {           
+        var values = this.getValues();
+        if (values)
+        {
             this.disableForm();
 
             var entry = this.createEntryForUpdate(values);
 
-            var request = this.createRequest();            
+            var request = this.createRequest();
             if (request)
                 request.update(entry, {
-                    success: function(modified) {  
+                    success: function(modified) {
                         this.enableForm();
-                                                
+
                         App.fireEvent('refresh', {
                             resourceKind: this.resourceKind,
                             key: modified['$key'],
@@ -621,7 +658,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                                 '$descriptor': modified['$descriptor']
                             }
                         });
-                            
+
                         ReUI.back();
                     },
                     failure: function(response, o) {
@@ -629,29 +666,29 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                     },
                     scope: this
                 });
-        } 
+        }
         else
         {
             ReUI.back();
         }
     },
     save: function() {
-        if (this.isFormDisabled())  return;    
-        
-        if (this.validate() !== false) 
+        if (this.isFormDisabled())  return;
+
+        if (this.validate() !== false)
         {
             this.el.addClass('form-error');
             return;
-        }          
+        }
         else
         {
             this.el.removeClass('form-error');
-        }        
-        
+        }
+
         if (this.inserting)
             this.insert();
         else
-            this.update();         
+            this.update();
     },
     getContext: function() {
         return Ext.apply(Sage.Platform.Mobile.Edit.superclass.getContext.call(this), {
@@ -662,14 +699,14 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
     },
     beforeTransitionTo: function() {
         Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
-        
+
         if (this.refreshRequired)
         {
             if (this.options.insert === true)
                 this.el.addClass('panel-loading');
             else
                 this.el.removeClass('panel-loading');
-        } 
+        }
     },
     refresh: function() {
         this.entry = false;
@@ -688,6 +725,6 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         }
     },
     transitionTo: function() {
-        Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this);               
-    }      
+        Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this);
+    }
 });
