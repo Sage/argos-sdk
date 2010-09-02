@@ -248,7 +248,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
                         tbar: [{
                             name: 'select',
                             title: 'Select',                                                              
-                            cls: 'button blueButton',
+                            cls: 'button',
                             fn: this.select,
                             scope: this
                         }]
@@ -383,7 +383,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                 tbar: [{
                     name: 'edit',
                     title: this.saveText,                                                              
-                    cls: 'button blueButton',                 
+                    cls: 'button',                 
                     fn: this.save,
                     scope: this                
                 }]

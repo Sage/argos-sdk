@@ -5,11 +5,11 @@ li.more .button
     line-height: 40px;
 }
 
-li.more-loading .whiteButton span
+li.more-loading .lightGreenButton span
 {
     background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
     padding: 0 0 0 20px;
-    color: #999999;
+    color: #555;
 }
 
 li.loading
@@ -100,8 +100,8 @@ body[orient] > div.toolbar-float[open]
 
     text-shadow: rgba(255,255,255,1) 1px 1px 0;
 
-    -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset, rgba(255,255,255,0.6) 0px 1px 1px inset, rgba(0,0,0,0.75) 0px 0px 4px;
-    -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset, rgba(255,255,255,0.6) 0px 1px 1px inset, rgba(0,0,0,0.75) 0px 0px 4px;
+    -moz-box-shadow: rgba(255,255,255,0.25) 0px 25px 1px inset, rgba(255,255,255,1.0) 0px 0px 1px inset, rgba(255,255,255,0.6) 0px 1px 1px inset, rgba(0,0,0,0.75) 0px 0px 4px;
+    -webkit-box-shadow: rgba(255,255,255,0.25) 0px 25px 1px inset, rgba(255,255,255,0.6) 0px 1px 1px inset, rgba(0,0,0,0.75) 0px 0px 4px;
 }
 
 .toolbar-float-container

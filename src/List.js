@@ -114,7 +114,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '<li class="loading"><div class="loading-indicator">{%= loadingText %}</div></li>'
     ]),
     moreTemplate: new Simplate([
-        '<li class="more" style="display: none;"><a href="#" target="_none" class="button whiteButton moreButton"><span>{%= moreText %}</span></a></li>'
+        '<li class="more" style="display: none;"><a href="#" target="_none" class="button lightGreenButton moreButton"><span>{%= moreText %}</span></a></li>'
     ]),
     searchTemplate: new Simplate([
         '<li class="search" style="display: none;">',
@@ -593,6 +593,9 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         this.moreEl = this.el.down('.more');
         this.searchEl = this.el.child('input.query');
+
+        if (this.moreEl)
+            this.moreEl.setVisibilityMode(Ext.Element.DISPLAY);
 
         this.selectionModel.suspendEvents();
         this.selectionModel.clear();

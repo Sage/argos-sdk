@@ -62,7 +62,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                     name: 'edit',
                     title: this.editText,
                     hidden: function() { return !this.editor; },                                                                
-                    cls: 'button blueButton',                 
+                    cls: 'button',                 
                     fn: this.navigateToEdit,
                     scope: this                
                 }]
