@@ -342,7 +342,9 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
 Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
     onClick: function(evt, el, o) {
         // todo: limit the clicks to a specific element?
-        var el = Ext.get(el);
+        var el = Ext.get(el),
+            parentValue, parentValueObj, parentField,
+            resPredicate = this.resourcePredicate;
 
         var link = el;
         if (link.is('a') || (link = link.up('a')))
@@ -353,10 +355,30 @@ Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Cont
                 view = App.getView(id);
             if (view)
             {
+                if (this.dependsOn)
+                {
+                    parentField = this.editor.fields[this.dependsOn];
+                    if (parentField.selected.key)
+                    {
+                        parentValue = parentField.selected.text;
+                    }
+                    else
+                    {
+                        if (this.errMsg) alert(this.errMsg);
+                        return;
+                    }
+
+                    if (typeof this.resourcePredicate != "string")
+                    {
+                        parentValueObj = {};
+                        parentValueObj[this.dependsOn] = parentValue;
+                        resPredicate = this.resourcePredicate.apply(parentValueObj);
+                    }
+                }
                 view.setTitle(this.title);
                 view.show({
                     selectionOnly: true,
-                    resourcePredicate: this.resourcePredicate,
+                    resourcePredicate: resPredicate,
                     resourceProperty: 'items',
                     singleSelect: true,
                     tools: {
