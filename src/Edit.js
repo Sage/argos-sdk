@@ -438,12 +438,105 @@ Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Cont
     }
 });
 
+Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
+    selector: 'div[name="{0}"]',
+    template: new Simplate([
+        '<div name="{%= name %}" class="field-address">',
+        '<a href="#{%= view %}"><span></span></a>',
+        '</div>'
+    ]),
+    emptyText: 'empty',
+    bind: function(container) {
+        Sage.Platform.Mobile.Controls.AddressField.superclass.bind.apply(this, arguments);
+
+        this.el.on('click', this.onClick, this, {stopEvent: true});
+    },
+    onClick: function(evt, el, o) {
+        // todo: limit the clicks to a specific element?
+        var el = Ext.get(el), entry;
+
+        var link = el;
+        if (link.is('a') || (link = link.up('a')))
+        {
+            evt.stopEvent();
+
+            var id = link.dom.hash.substring(1),
+                view = App.getView(id);
+            if (view)
+            {
+                if (this.value)
+                {
+                    entry = { Address: this.value };
+                }
+                else
+                {
+                    entry = this.editor.entry;
+                }
+                view.setTitle(this.title);
+                view.show({
+                    tools: {
+                        tbar: [{
+                            name: 'done',
+                            title: 'Done',
+                            cls: 'button blueButton',
+                            fn: this.done,
+                            scope: this
+                        }]
+                    },
+                    'entry': entry
+                });
+            }
+        }
+    },
+    done: function() {
+        var val = this.getValue(), text;
+
+        if (val)
+        {
+            Ext.apply(this.value, val.Address); 
+            text = Mobile.SalesLogix.Format.address(this.value);
+            this.el.select('a > span').item(0).dom.innerHTML = text;
+        }
+        ReUI.back();
+    },
+    isDirty: function() {
+        return this.getValue() !== false;
+    },
+    getValue: function() {
+        var view = App.getActiveView();
+        if (view)
+        {
+            return view.getValues();
+        }
+        return false;
+    },
+    setValue: function(val) {
+        var text;
+        if (val)
+        {
+            this.value = Ext.decode(Ext.encode(val));
+            text = Mobile.SalesLogix.Format.address(this.value);
+        }
+        else
+        {
+            this.value = false;
+            text = this.emptyText;
+        }
+
+        this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
+    },
+    clearValue: function() {
+        this.setValue({});
+    }
+ });
+
 Sage.Platform.Mobile.Controls.registered = {
     'text': Sage.Platform.Mobile.Controls.TextField,
     'phone': Sage.Platform.Mobile.Controls.PhoneField,
     'boolean': Sage.Platform.Mobile.Controls.BooleanField,
     'lookup': Sage.Platform.Mobile.Controls.LookupField,
-    'pickup': Sage.Platform.Mobile.Controls.PickupField
+    'pickup': Sage.Platform.Mobile.Controls.PickupField,
+    'address': Sage.Platform.Mobile.Controls.AddressField
 };
 
 Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
