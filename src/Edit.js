@@ -340,6 +340,8 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
 });
 
 Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
+    keyProperty: false,
+    textProperty: false,
     onClick: function(evt, el, o) {
         // todo: limit the clicks to a specific element?
         var el = Ext.get(el),
@@ -393,6 +395,45 @@ Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Cont
                 });
             }
             return;
+        }
+    },
+    setValue: function(val) {
+        // todo: must revisit. This is not the right way to do.
+        if (typeof val == "string") {
+            this.value = this.selected = {
+                key: val,
+                text: val
+            };
+            this.el.select('a > span').item(0).dom.innerHTML = val;
+            return;
+        }
+        Sage.Platform.Mobile.Controls.PickupField.superclass.setValue.call(this, val);
+    },
+    select: function() {
+        if (this.keyProperty)
+        {
+            Sage.Platform.Mobile.Controls.PickupField.superclass.select.call(this);
+            return;
+        }
+
+        var view = App.getActiveView();
+        if (view && view.selectionModel)
+        {
+            var selections = view.selectionModel.getSelections();
+
+            for (var key in selections)
+            {
+                var val = selections[key].data.text;
+                this.selected = {
+                    key: val,
+                    text: val
+                };
+
+                this.el.select('a > span').item(0).dom.innerHTML = val; // todo: temporary
+                break;
+            }
+
+            ReUI.back();
         }
     }
 });
