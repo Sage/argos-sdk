@@ -466,7 +466,8 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
             {
                 if (this.value)
                 {
-                    entry = { Address: this.value };
+                    entry = {};
+                    entry[this.name] = this.value;
                 }
                 else
                 {
@@ -494,7 +495,7 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
 
         if (val)
         {
-            Ext.apply(this.value, val.Address); 
+            Ext.apply(this.value, val[this.name]); 
             text = this.renderer(this.value);
             this.el.select('a > span').item(0).dom.innerHTML = text;
         }
