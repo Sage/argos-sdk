@@ -489,12 +489,13 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
         }
     },
     done: function() {
-        var val = this.getValue(), text;
+        var val = this.getValue(),
+        text = '';
 
         if (val)
         {
             Ext.apply(this.value, val.Address); 
-            text = Mobile.SalesLogix.Format.address(this.value);
+            text = this.renderer(this.value);
             this.el.select('a > span').item(0).dom.innerHTML = text;
         }
         ReUI.back();
@@ -511,11 +512,11 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
         return false;
     },
     setValue: function(val) {
-        var text;
+        var text = '';
         if (val)
         {
             this.value = Ext.decode(Ext.encode(val));
-            text = Mobile.SalesLogix.Format.address(this.value);
+            text = this.renderer(this.value);
         }
         else
         {
