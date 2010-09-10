@@ -367,7 +367,8 @@ ReUI = {};
         hashPrefix: '#_',
         backText: 'Back',               
         checkStateEvery: 250,
-        prioritizeLocation: false,         
+        prioritizeLocation: false,
+        showInitialPage: true,
 
         init: function() {
             if (context.initialized) 
@@ -390,28 +391,31 @@ ReUI = {};
                 hashEl = getPageFromHash(location.hash);
             }           
 
-            if (R.prioritizeLocation)
+            if (R.showInitialPage)
             {
-                if (hashEl)
+                if (R.prioritizeLocation)
                 {
-                    if (selectedEl) D.unselect(selectedEl);                    
+                    if (hashEl)
+                    {
+                        if (selectedEl) D.unselect(selectedEl);
 
-                    R.show(hashEl);
+                        R.show(hashEl);
+                    }
+                    else if (selectedEl)
+                    {
+                        R.show(selectedEl);
+                    }
                 }
-                else if (selectedEl)
+                else
                 {
-                    R.show(selectedEl);
-                }
-            }
-            else
-            {
-                if (selectedEl)
-                {
-                    R.show(selectedEl);
-                }
-                else if (hashEl)
-                {
-                    R.show(hashEl);
+                    if (selectedEl)
+                    {
+                        R.show(selectedEl);
+                    }
+                    else if (hashEl)
+                    {
+                        R.show(hashEl);
+                    }
                 }
             }
             
@@ -424,7 +428,10 @@ ReUI = {};
                 D.wait(orientationChanged, 0);
             }
 
-            D.wait(checkOrientationAndLocation, 0);
+            if (R.showInitialPage)
+            {
+                D.wait(checkOrientationAndLocation, 0);
+            }
 
             context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);
 

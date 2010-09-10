@@ -27,8 +27,6 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
             title: '',
             serviceName: false
         });        
-
-        this.loaded = false;
     },
     render: function() {
         /// <summary> 
@@ -47,13 +45,30 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         /// </summary>
         this.render();
         this.el
-            .on('load', function(evt, el, o) {
-                if (this.loaded == false) 
-                {
-                    this.load(); 
-                    this.loaded = true;
-                }   
-            }, this);        
+            .on('load', this.load, this, {single: true})
+            .on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'});
+    },
+    initiateActionFromClick: function(evt, el, o) {
+        var el = Ext.get(el),
+            name = el.getAttribute('data-action'),
+            args = [],
+            match;
+        if (this.hasAction(name))
+        {
+            evt.stopEvent();
+            
+            for (var i = 0; i < el.dom.attributes.length; i++)
+                if ((match = /data-arg(\d+)/.exec(el.dom.attributes[i].name)))
+                    args[parseInt(match[1])] = el.getAttribute(el.dom.attributes[i].name);
+
+            this.invokeAction(name, args);
+        }
+    },
+    hasAction: function(name) {
+        return (typeof this[name] === 'function');
+    },
+    invokeAction: function(name, args) {
+        this[name].apply(this, args);
     },
     isActive: function() {
         return (this.el.getAttribute('selected') === 'true');
@@ -67,6 +82,7 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         this.el.dom.setAttribute('title', title);
     },
     load: function() {
+        console.log('%s load', this.id);
         /// <summary>
         ///     Called once the first time the view is about to be transitioned to.
         /// </summary>

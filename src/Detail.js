@@ -11,10 +11,13 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         '<div id="{%= id %}" title="{%= title %}" class="panel">',             
         '</div>'
     ]),
+    emptyTemplate: new Simplate([
+        '{%! $.loadingTemplate %}'
+    ]),
     loadingTemplate: new Simplate([
         '<fieldset class="loading">',
         '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
-        '</fieldset>',
+        '</fieldset>'
     ]),
     sectionBeginTemplate: new Simplate([
         '<h2>{%= $["title"] %}</h2>',
@@ -327,7 +330,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     },
     clear: function() {
         this.el.addClass('panel-loading');
-        this.el.update(this.loadingTemplate.apply(this));
+        this.el.update(this.emptyTemplate.apply(this));
         this.context = false;
     }      
 });

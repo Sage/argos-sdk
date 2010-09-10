@@ -547,26 +547,27 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         '<fieldset class="loading">',
         '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
         '</fieldset>',
-        '</div>',
+        '<div class="panel-content"></div>',
         '</div>'
     ]),
     sectionBeginTemplate: new Simplate([
-        '<h2>{%= $["title"] %}</h2>',
-        '{% if ($["list"]) { %}<ul>{% } else { %}<fieldset>{% } %}'
+        '<h2>{%= $.title %}</h2>',
+        '{% if ($.list) { %}<ul>{% } else { %}<fieldset>{% } %}'
     ]),
     sectionEndTemplate: new Simplate([
-        '{% if ($["list"]) { %}</ul>{% } else { %}</fieldset>{% } %}'
+        '{% if ($.list) { %}</ul>{% } else { %}</fieldset>{% } %}'
     ]),
     propertyTemplate: new Simplate([
         '<div class="row row-edit">',
-        '<label>{%= label %}</label>',
-        '{%! field %}', /* apply sub-template */
+        '<label>{%= $.label %}</label>',
+        '{%! $.field %}', /* apply sub-template */
         '</div>'
     ]),
     saveText: 'Save',
     titleText: 'Edit',
     detailsText: 'Details',
     loadingText: 'loading...',
+    placeContentAt: '.panel-content',
     constructor: function(o) {
         Sage.Platform.Mobile.Edit.superclass.constructor.call(this);
 
@@ -641,7 +642,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
 
         content.push(this.sectionEndTemplate.apply(options));
 
-        Ext.DomHelper.append(this.el, content.join(''));
+        Ext.DomHelper.append(this.el.child(this.placeContentAt) || this.el, content.join(''));
 
         for (var i = 0; i < sections.length; i++)
         {
