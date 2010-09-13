@@ -230,7 +230,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
     },
     onClick: function(evt, el, o) {
         // todo: limit the clicks to a specific element?
-        var el = Ext.get(el);
+        var el = Ext.get(el), options;
 
         var link = el;
         if (link.is('a') || (link = link.up('a')))
@@ -241,7 +241,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
                 view = App.getView(id);
             if (view)
             {
-                view.show({
+                options = {
                     selectionOnly: true,
                     singleSelect: true,
                     tools: {
@@ -253,7 +253,11 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
                             scope: this
                         }]
                     }
-                });
+                };
+                if (this.where) options.where = this.where;
+                //TODO: Need to find a way to figure out a Simplate Object
+                if (typeof this.where != 'string') options.where = this.where.apply(this.editor.entry);
+                view.show(options);
             }
             return;
         }
