@@ -82,7 +82,6 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         this.el.dom.setAttribute('title', title);
     },
     load: function() {
-        console.log('%s load', this.id);
         /// <summary>
         ///     Called once the first time the view is about to be transitioned to.
         /// </summary>
