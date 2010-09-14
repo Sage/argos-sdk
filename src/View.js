@@ -5,7 +5,8 @@
 
 Ext.namespace('Sage.Platform.Mobile');
 
-Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, { 
+Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
+    attachmentPoints: {},    
     viewTemplate: new Simplate([
         '<ul id="{%= id %}" title="{%= title %}" {% if (selected) { %} selected="true" {% } %}>',            
         '</ul>'
@@ -37,6 +38,10 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
             this.viewTemplate.apply(this), 
             true
         );
+
+        for (var n in this.attachmentPoints)
+            if (this.attachmentPoints.hasOwnProperty(n))                
+                this[n] = this.el.child(this.attachmentPoints[n]);
     },
     init: function() {
         /// <summary>
@@ -47,21 +52,31 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         this.el
             .on('load', this.load, this, {single: true})
             .on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'});
-    },
+    },      
     initiateActionFromClick: function(evt, el, o) {
         var el = Ext.get(el),
-            name = el.getAttribute('data-action'),
-            args = [],
+            action = el.getAttribute('data-action'),
+            parameters = {},
             match;
-        if (this.hasAction(name))
+        
+        if (this.hasAction(action))
         {
             evt.stopEvent();
             
             for (var i = 0; i < el.dom.attributes.length; i++)
-                if ((match = /data-arg(\d+)/.exec(el.dom.attributes[i].name)))
-                    args[parseInt(match[1])] = el.getAttribute(el.dom.attributes[i].name);
+            {
+                var attributeName = el.dom.attributes[i].name;
+                if (/^((?=data-action)|(?!data))/.test(attributeName)) continue;
 
-            this.invokeAction(name, args);
+                /* transform hyphenated names to pascal case, minus the data segment, to be in line with HTML5 dataset naming conventions */
+                /* see: http://dev.w3.org/html5/spec/elements.html#embedding-custom-non-visible-data */
+                /* todo: remove transformation and use dataset when browser support is there */                
+                var parameterName = attributeName.substr('data-'.length).replace(/-(\w)(\w+)/g, function($0, $1, $2) { return $1.toUpperCase() + $2; });
+
+                parameters[parameterName] = el.getAttribute(attributeName);
+            }            
+
+            this.invokeAction(action, [parameters, evt, el, o]);
         }
     },
     hasAction: function(name) {

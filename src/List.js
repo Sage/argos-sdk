@@ -101,41 +101,47 @@ Sage.Platform.Mobile.ConfigurableSelectionModel = Ext.extend(Sage.Platform.Mobil
 });
 
 Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
+    attachmentPoints: {
+        searchEl: '.list-search',
+        contentEl: '.list-content',
+        moreEl: '.list-more'
+    },
     viewTemplate: new Simplate([
-        '<ul id="{%= id %}" title="{%= title %}" class="list">',
-        '</ul>'
-    ]),
-    emptyTemplate: new Simplate([
-        '{%! $.loadingTemplate %}',
+        '<div id="{%= $.id %}" title="{%= $.title %}" class="list">',
         '{%! $.searchTemplate %}',
-        '{%! $.moreTemplate %}'
-    ]),
+        '<ul class="list-content"></ul>',
+        '{%! $.moreTemplate %}',
+        '</div>'
+    ]),    
     loadingTemplate: new Simplate([
-        '<li class="loading"><div class="loading-indicator">{%= loadingText %}</div></li>'
+        '<li class="list-loading"><div class="loading-indicator">{%= $.loadingText %}</div></li>'
     ]),
     moreTemplate: new Simplate([
-        '<li class="more" style="display: none;"><a href="#" target="_none" class="button lightGreenButton moreButton"><span>{%= moreText %}</span></a></li>'
+        '<div class="list-more" style="display: none;">',
+        '<a class="button lightGreenButton" data-action="more"><span>{%= $.moreText %}</span></a>',
+        '</div>'
     ]),
     searchTemplate: new Simplate([
-        '<li class="search" style="display: none;">',
+        '<div class="list-search">',
         '<input type="text" name="query" class="query" />',
-        '<div class="dismissButton">X</div>',
-        '<div class="searchButton">Search</div>',
+        '<div class="dismissButton" data-action="clearSearchQuery">X</div>',
+        '<div class="searchButton" data-action="search">Search</div>',
         '<label>{%= $.searchText %}</label>',
-        '</li>'
+        '</div>'
     ]),
     itemTemplate: new Simplate([
         '<li>',
-        '<div data-key="{%= $["$key"] %}" class="list-item-selector"></div>',
+        '<div data-key="{%= $.$key %}" class="list-item-selector"></div>',
         '{%! this.contentTemplate %}',
         '</li>'
     ]),
     contentTemplate: new Simplate([
-        '<h3>{%= $["$descriptor"] %}</h3>'
+        '<h3>{%= $.$descriptor %}</h3>',
+        '<h4></h4>'
     ]),
     noDataTemplate: new Simplate([
         '<li class="no-data">',
-        '<h3>{%= noDataText %}</h3>',
+        '<h3>{%= $.noDataText %}</h3>',
         '</li>'
     ]),
     moreText: 'Retreive More Records',
@@ -146,6 +152,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     noDataText: 'no records',
     loadingText: 'loading...',
     customSearchRE: /^\#\!/,
+    placeContentAt: '.list-content',   
     constructor: function(o) {
         /// <field name="resourceKind" type="String">The resource kind that is bound to this view.</field>
         /// <field name="pageSize" type="Number">The number of records to return with each request.</field>
@@ -187,14 +194,24 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     },
     render: function() {
         Sage.Platform.Mobile.List.superclass.render.call(this);
+       
+        if (this.moreEl)
+            this.moreEl.setVisibilityMode(Ext.Element.DISPLAY);
+
+        if (this.searchEl)
+            this.searchEl.setVisibilityMode(Ext.Element.DISPLAY);
+
+        if (this.contentEl)
+            this.contentEl.setVisibilityMode(Ext.Element.DISPLAY);
 
         this.clear();
     },
     init: function() {
         Sage.Platform.Mobile.List.superclass.init.call(this);
 
-        this.el.on('click', this.onClick, this);
-        this.el.on('clicklong', this.onClickLong, this);
+        this.el
+            .on('click', this.onClick, this)
+            .on('clicklong', this.onClickLong, this);
 
         App.on('refresh', this.onRefresh, this);
     },
@@ -236,6 +253,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     },
     onClick: function(evt, el, o) {
         // todo: make these easily defined actions
+        /*
         var el = Ext.get(el);
         if (el.is('.more') || el.up('.more'))
         {
@@ -278,12 +296,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                 this.navigateToDetail(view, key, descriptor);
             return;
         }
+        */
     },
     onRefresh: function(o) {
         if (this.resourceKind && o.resourceKind === this.resourceKind)
         {
             this.refreshRequired = true;
         }
+    },
+    clearSearchQuery: function() {
+        this.searchEl.dom.value = '';
     },
     search: function() {
         /// <summary>
@@ -374,16 +396,16 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
                 detailView: detailView
             });
     },
-    navigateToDetail: function(view, key, descriptor) {
+    navigateToDetail: function(o) {
         /// <summary>
         ///     Navigates to the requested detail view.
         /// </summary>
         /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
-        var v = App.getView(view);
+        var v = App.getView(this.detail);
         if (v)
             v.show({
-                descriptor: descriptor,
-                key: key
+                descriptor: o.descriptor,
+                key: o.key
             });
     },
     navigateToInsert: function() {
@@ -398,22 +420,14 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         /// <param name="feed" type="Object">The feed object.</param>
         if (!this.feed)
         {
-            this.el
-                .down('.loading')
-                .remove();
-
-            this.el
-                .down('.search')
-                .show();
-
-            this.setUpSearchBoxHandlers();
+            this.contentEl.update('');
         }
 
         this.feed = feed;
 
         if (this.feed['$totalResults'] === 0)
         {
-            Ext.DomHelper.insertBefore(this.moreEl, this.noDataTemplate.apply(this));
+            Ext.DomHelper.append(this.contentEl, this.noDataTemplate.apply(this));
         }
         else
         {
@@ -429,11 +443,8 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             }
 
             if (o.length > 0)
-                Ext.DomHelper.insertBefore(this.moreEl, o.join(''));
+                Ext.DomHelper.append(this.contentEl, o.join(''));
         }
-
-        this.moreEl
-            .removeClass('more-loading');
 
         if (this.hasMoreData())
             this.moreEl.show();
@@ -500,13 +511,18 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         /// <summary>
         ///     Initiates the SData request.
         /// </summary>
+
+        this.el.addClass('list-loading');
+
         var request = this.createRequest();
         request.read({
             success: function(feed) {
                 this.processFeed(feed);
+                this.el.removeClass('list-loading');
             },
             failure: function(response, o) {
                 this.requestFailure(response, o);
+                this.el.removeClass('list-loading');
             },
             scope: this
         });
@@ -589,13 +605,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         /// <summary>
         ///     Clears the view and re-applies the default content template.
         /// </summary>
-        this.el.update(this.emptyTemplate.apply(this));
-
-        this.moreEl = this.el.down('.more');
-        this.searchEl = this.el.child('input.query');
-
-        if (this.moreEl)
-            this.moreEl.setVisibilityMode(Ext.Element.DISPLAY);
+        this.contentEl.update(this.loadingTemplate.apply(this));  
 
         this.selectionModel.suspendEvents();
         this.selectionModel.clear();

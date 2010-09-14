@@ -1,37 +1,28 @@
 /* list view */
-li.more .button
+.list
+{
+    
+}
+
+.list-more .button
 {
     height: 40px;
     line-height: 40px;
 }
 
-li.more-loading .lightGreenButton span
+.list-loading .list-more .lightGreenButton span
 {
     background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
     padding: 0 0 0 20px;
     color: #555;
 }
 
-li.loading
-{
-    text-align: center;
-}
-
-li.loading .loading-indicator
+.list-loading .loading-indicator
 {
     background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
     padding: 0 0 0 20px;
 	display: inline-block;
-}
-
-li.loading
-{
-	text-align: center;
-}
-
-li.loading .loading-indicator
-{
-	display: inline-block;
+    text-align: center;
 }
 
 /* detail veiw */
