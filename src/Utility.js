@@ -29,13 +29,13 @@ Sage.Platform.Mobile.Utility = (function() {
     };
 
     return {
-        getValue: function(o, name) {
+        getValue: function(o, name, defaultValue) {
             var path = nameToPath(name).slice(0);
             var current = o;
             while (current && path.length > 0)
             {
                 var key = path.pop();
-                if (current[key]) current = current[key]; else return null;
+                if (typeof current[key] !== 'undefined') current = current[key]; else return null;
             }                                
             return current;
         },
