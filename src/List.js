@@ -107,7 +107,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         moreEl: '.list-more'
     },
     viewTemplate: new Simplate([
-        '<div id="{%= $.id %}" title="{%= $.title %}" class="list">',
+        '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list">',
         '{%! $.searchTemplate %}',
         '<ul class="list-content"></ul>',
         '{%! $.moreTemplate %}',
@@ -130,68 +130,37 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         '</div>'
     ]),
     itemTemplate: new Simplate([
-        '<li>',
-        '<div data-key="{%= $.$key %}" class="list-item-selector"></div>',
-        '{%! this.contentTemplate %}',
+        '<li data-action="activate" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
+        '<div data-action="select" class="list-item-selector"></div>',
+        '{%! $$.contentTemplate %}',
         '</li>'
     ]),
     contentTemplate: new Simplate([
-        '<h3>{%= $.$descriptor %}</h3>',
-        '<h4></h4>'
+        '<h3>{%: $.$descriptor %}</h3>',
+        '<h4>{%: $.$key %}</h4>'
     ]),
     noDataTemplate: new Simplate([
         '<li class="no-data">',
         '<h3>{%= $.noDataText %}</h3>',
         '</li>'
     ]),
+    id: 'generic-list',
+    resourceKind: '',
+    pageSize: 25,
+    allowSelection: false,
+    detailView: false,
+    editView: false,
+    insertView: false,
+    contextView: false,
+    customSearchRE: /^\#\!/,
+    placeContentAt: '.list-content',
     moreText: 'Retreive More Records',
     titleText: 'List',
     searchText: 'Search',
     cancelText: 'Cancel',
     insertText: 'New',
     noDataText: 'no records',
-    loadingText: 'loading...',
-    customSearchRE: /^\#\!/,
-    placeContentAt: '.list-content',   
-    constructor: function(o) {
-        /// <field name="resourceKind" type="String">The resource kind that is bound to this view.</field>
-        /// <field name="pageSize" type="Number">The number of records to return with each request.</field>
-        /// <field name="requestedFirstPage" type="Boolean">True if the first page has been request; False otherwise.<field>
-        /// <field name="noDataText" type="String">A message to display when there is no data.</field>
-        /// <field name="contentTemplate" type="Simplate">A template used to render the initial content of the view.</field>
-        /// <field name="itemTemplate" type="Simplate">
-        ///     A template used to render each resource feed entry.  This template is rendered and then applied to the DOM
-        ///     before the "li.more" element.
-        /// </field>
-        /// <field name="noDataTemplate" type="Simplate">A template used to render the no data message.</field>
-        Sage.Platform.Mobile.List.superclass.constructor.call(this);
-
-        Ext.apply(this, o, {
-            id: 'generic_list',
-            title: this.titleText,
-            entries: {},
-            pageSize: 20,
-            allowSelection: false,
-            requestedFirstPage: false,
-            contextDialog: false,
-            tools: {
-                tbar: [{
-                    name: 'New',
-                    title: this.insertText,
-                    fn: this.navigateToInsert,
-                    cls: "button",
-                    scope: this
-                }]
-            }
-        });
-
-        if (typeof this.selectionModel === 'undefined')
-            this.selectionModel = new Sage.Platform.Mobile.ConfigurableSelectionModel();
-
-        this.selectionModel.on('select', this.onSelectionModelSelect, this);
-        this.selectionModel.on('deselect', this.onSelectionModelDeselect, this);
-        this.selectionModel.on('clear', this.onSelectionModelClear, this);
-    },
+    loadingText: 'loading...',    
     render: function() {
         Sage.Platform.Mobile.List.superclass.render.call(this);
        
@@ -203,17 +172,32 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (this.contentEl)
             this.contentEl.setVisibilityMode(Ext.Element.DISPLAY);
-
-        this.clear();
-    },
+    },    
     init: function() {
         Sage.Platform.Mobile.List.superclass.init.call(this);
 
-        this.el
-            .on('click', this.onClick, this)
-            .on('clicklong', this.onClickLong, this);
-
         App.on('refresh', this.onRefresh, this);
+
+        this.el.on('clicklong', this.onClickLong, this);    
+
+        if (typeof this.selectionModel === 'undefined')
+            this.selectionModel = new Sage.Platform.Mobile.ConfigurableSelectionModel();
+
+        this.selectionModel.on('select', this.onSelectionModelSelect, this);
+        this.selectionModel.on('deselect', this.onSelectionModelDeselect, this);
+        this.selectionModel.on('clear', this.onSelectionModelClear, this);
+
+        this.tools = {
+            tbar: [{
+                name: 'New',
+                title: this.insertText,
+                fn: this.navigateToInsert,
+                cls: "button",
+                scope: this
+            }]
+        };
+
+        this.clear();
     },
     isNavigationDisabled: function() {
         return (this.options && this.options.selectionOnly);
@@ -222,22 +206,18 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
         return !((this.options && this.options.selectionOnly) || (this.allowSelection));
     },
     onClickLong: function(evt, el, o) {
-        var key, descriptor, detailView, link = Ext.get(el);
-
         evt.stopEvent();
 
-        if (! link.is('a[target="_detail"]'))
-            link = link.up('a[target="_detail"]');
+        var el = Ext.get(el),
+            row = el.is('[data-key]') ? el : el.up('[data-key]');
 
         if (this.isNavigationDisabled()) return;
 
-        if (this.contextDialog !== false)
-        {
-            key = link.getAttribute("data-key");
-            descriptor = link.getAttribute("data-descriptor");
-            detailView = link.dom.hash.substring(1);
-            this.navigateToContextDialog(key, detailView, descriptor);
-        }
+        var key = row.getAttribute('data-key'),
+            descriptor = row.getAttribute('data-descriptor');
+
+        if (this.contextView && key)
+            this.navigateToContextView(key, descriptor);        
     },
     onSelectionModelSelect: function(key, data, tag) {
         var el = Ext.get(tag);
@@ -250,59 +230,25 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             el.removeClass('list-item-selected');
     },
     onSelectionModelClear: function() {
-    },
-    onClick: function(evt, el, o) {
-        // todo: make these easily defined actions
-        /*
-        var el = Ext.get(el);
-        if (el.is('.more') || el.up('.more'))
-        {
-            evt.stopEvent();
-
-            this.more();
-            return;
-        }
-
-        if (el.is('.dismissButton')) {
-            evt.stopEvent();
-
-            if (this.searchEl.dom.value != "") {
-                this.searchEl.dom.value = "";
-            }
-
-            el.hide();
-            return;
-        }
-
-        if (el.is('.searchButton')) {
-            evt.stopEvent();
-
-            this.search();
-            return;
-        }
-
-        var link = el;
-        if (link.is('a[target="_detail"]') || (link = link.up('a[target="_detail"]')))
-        {
-            evt.stopEvent();
-
-            var view = link.dom.hash.substring(1);
-            var key = link.getAttribute("data-key");
-            var descriptor = link.getAttribute("data-descriptor");
-
-            if (this.isNavigationDisabled())
-                this.selectionModel.toggle(key, this.entries[key], link.up('li'));
-            else
-                this.navigateToDetail(view, key, descriptor);
-            return;
-        }
-        */
-    },
+    },   
     onRefresh: function(o) {
         if (this.resourceKind && o.resourceKind === this.resourceKind)
         {
             this.refreshRequired = true;
         }
+    },
+    select: function(params, evt, el) {
+        var row = Ext.get(el).up('[data-key]'),
+            key = row.getAttribute('data-key');
+
+        if (key) this.selectionModel.toggle(key, this.entries[key], row);
+    },
+    activate: function(params, evt, el) {
+        if (params.key)
+            if (this.isNavigationDisabled())
+                this.selectionModel.toggle(params.key, this.entries[params.key], Ext.get(el));
+            else
+                this.navigateToDetailView(params.key, params.descriptor);        
     },
     clearSearchQuery: function() {
         this.searchEl.dom.value = '';
@@ -384,34 +330,36 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
 
         return request;
     },
-    navigateToContextDialog: function(key, detailView, descriptor) {
+    navigateToContextView: function(key, descriptor) {
         /// <summary>
         ///     Shows the requested context dialog.
         /// </summary>
-        var v = App.getView(this.contextDialog);
+        var v = App.getView(this.contextView);
         if (v)
             v.show({
+                detailView: this.detailView,
                 descriptor: descriptor,
-                key: key,
-                detailView: detailView
+                key: key
             });
     },
-    navigateToDetail: function(o) {
+    navigateToDetailView: function(key, descriptor) {
         /// <summary>
         ///     Navigates to the requested detail view.
         /// </summary>
         /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
-        var v = App.getView(this.detail);
+        var v = App.getView(this.detailView);
         if (v)
             v.show({
-                descriptor: o.descriptor,
-                key: o.key
+                descriptor: descriptor,
+                key: key
             });
     },
-    navigateToInsert: function() {
-        var view = App.getView(this.editor);
+    navigateToInsertView: function() {
+        var view = App.getView(this.insertView || this.editView);
         if (view)
-            view.show({insert: true});
+            view.show({
+                insert: true
+            });
     },
     processFeed: function(feed) {
         /// <summary>
