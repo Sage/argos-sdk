@@ -294,6 +294,8 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
         }
     },
     isDirty: function() {
+        if (!this.value && this.selected) return true;
+
         if (this.value && this.selected) return this.value.key !== this.selected.key;
 
         return false;
@@ -448,6 +450,9 @@ Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Cont
             };
             this.el.select('a > span').item(0).dom.innerHTML = val;
             return;
+        }
+        else if (val === null) {
+            val = false;
         }
         Sage.Platform.Mobile.Controls.PickupField.superclass.setValue.call(this, val);
     },
