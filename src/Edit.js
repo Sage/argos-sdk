@@ -317,13 +317,14 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
             : val;
     },
     extractText: function(val, key) {
-        var key = key || this.extractKey(val),
+        var key = key || this.extractKey(val), textValue,
             text = this.textProperty
                 ? Sage.Platform.Mobile.Utility.getValue(val, this.textProperty)
                 : key;
 
-        if (this.textTemplate)
-            text = this.textTemplate.apply(this.textProperty ? text : val);
+        textValue = this.textProperty ? text : val;
+        if (this.textTemplate && textValue)
+            text = this.textTemplate.apply(textValue);
 
         return (text || this.emptyText);
     },
