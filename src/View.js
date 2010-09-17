@@ -46,7 +46,10 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
     initiateActionFromClick: function(evt, el, o) {
         var el = Ext.get(el),
             action = el.getAttribute('data-action'),
-            parameters = {},
+            parameters = {
+                $event: evt,
+                $source: el
+            },
             match;
         
         if (this.hasAction(action))
@@ -66,7 +69,7 @@ Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
                 parameters[parameterName] = el.getAttribute(attributeName);
             }            
 
-            this.invokeAction(action, [parameters, evt, el, o]);
+            this.invokeAction(action, [parameters, evt, el]);
         }
     },
     hasAction: function(name) {

@@ -4,10 +4,57 @@
     
 }
 
+.list-search .dismissButton
+{
+    display: none;
+}
+
+.list-more
+{
+    display: none;
+    padding: 12px;
+    border-bottom: 1px solid #DDD;
+}
+
 .list-more .button
 {
     height: 40px;
     line-height: 40px;
+}
+
+.list-more .list-remaining
+{
+    display: none;
+}
+
+.list-loading-indicator
+{
+    display: none;
+}
+
+/* list view states */
+.list-search-active label
+{
+    display: none;
+}
+
+.list-search-active .dismissButton
+{
+    display: block;
+}
+
+.list-has-more .list-more
+{
+    display: block;
+}
+
+.list-has-more .list-remaining
+{
+    display: block;
+    text-align: center;
+    padding: 0px 0 12px 0;
+    font-size: .8em;
+    font-weight: bold;
 }
 
 .list-loading .list-more .lightGreenButton span
@@ -17,7 +64,13 @@
     color: #555;
 }
 
-.list-loading .loading-indicator
+.list-loading .list-loading-indicator
+{
+    display: block;
+    text-align: center;
+}
+
+.list-loading .list-loading-indicator div
 {
     background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
     padding: 0 0 0 20px;
