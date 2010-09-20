@@ -5,11 +5,12 @@
 Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.SelectionModel = Ext.extend(Ext.util.Observable, {
+    count: 0,
+    selections: null,
+    clearAsDeselect: true,
     constructor: function(o) {
         Ext.apply(this, o, {
-            selections: {},
-            clearAsDeselect: true,
-            count: 0
+            selections: {}            
         });
 
         this.addEvents(
@@ -76,13 +77,7 @@ Sage.Platform.Mobile.SelectionModel = Ext.extend(Ext.util.Observable, {
 });
 
 Sage.Platform.Mobile.ConfigurableSelectionModel = Ext.extend(Sage.Platform.Mobile.SelectionModel, {
-    constructor: function(o) {
-        Ext.apply(this, {
-            singleSelection: false
-        });
-
-        Sage.Platform.Mobile.ConfigurableSelectionModel.superclass.constructor.apply(this, arguments);
-    },
+    singleSelection: false,    
     useSingleSelection: function(val) {
         if (this.singleSelection != !!val) //false != undefined = true, false != !!undefined = false
         {
@@ -137,7 +132,7 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
     ]),
     itemTemplate: new Simplate([
         '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
-        '<div data-action="selectEntry" data-key="{%= $.$key %}" class="list-item-selector"></div>',
+        '<div data-action="selectEntry" class="list-item-selector"></div>',
         '{%! $$.contentTemplate %}',
         '</li>'
     ]),

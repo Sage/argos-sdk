@@ -4,6 +4,11 @@
     
 }
 
+.list-content > li
+{
+    cursor: pointer;
+}
+
 .list-search .dismissButton
 {
     display: none;
@@ -20,6 +25,7 @@
 {
     height: 40px;
     line-height: 40px;
+    cursor: pointer;
 }
 
 .list-more .list-remaining
