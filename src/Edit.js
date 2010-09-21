@@ -537,26 +537,27 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
         }
     },
     done: function() {
-        var val = this.getValue(),
-        text = '';
+        var view = App.getActiveView(),
+            text = '';
 
-        if (val)
+        if (view)
         {
-            Ext.apply(this.value, val[this.name]); 
+            this.finalValue = view.getValues();
+        }
+
+        if (this.finalValue)
+        {
+            Ext.apply(this.value, this.finalValue[this.name]); 
             text = this.renderer(this.value);
             this.el.select('a > span').item(0).dom.innerHTML = text;
         }
         ReUI.back();
     },
     isDirty: function() {
-        return this.getValue() !== false;
+        return this.finalValue !== false;
     },
     getValue: function() {
-        var view = App.getActiveView();
-        if (view)
-        {
-            return view.getValues();
-        }
+        if (this.finalValue) return this.finalValue[this.name];
         return false;
     },
     setValue: function(val) {
@@ -568,7 +569,7 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
         }
         else
         {
-            this.value = false;
+            this.value = this.finalValue = false;
             text = this.emptyText;
         }
 
