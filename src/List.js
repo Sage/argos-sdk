@@ -340,6 +340,12 @@ Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
             var whereExpr = this.expandExpression(this.options.where);
             if (whereExpr)
                 where.push(whereExpr);
+
+            var orderByExpr = this.expandExpression(this.options.orderBy);
+            if (orderByExpr)
+                request.setQueryArgs({
+                    'orderby': orderByExpr
+                });
         }
 
         if (this.query)

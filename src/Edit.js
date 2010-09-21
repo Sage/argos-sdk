@@ -65,7 +65,7 @@ Sage.Platform.Mobile.Controls.Field.prototype = {
 
 Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
     template: new Simplate([
-        '<input type="text" name="{%= name %}" class="field-text">',
+        '<input type="text" name="{%= name %}" class="field-text" {% if ($.readonly) { %} readonly {% } %}>',
     ]),
     bind: function(container) {
         Sage.Platform.Mobile.Controls.TextField.superclass.bind.apply(this, arguments);
@@ -202,8 +202,12 @@ Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Con
         return this.el.getAttribute('toggled') === 'true';
     },
     setValue: function(val) {
-        this.value = val;
-        this.el.dom.setAttribute('toggled', this.checked);
+        if (val == "true") val = true;
+        if (val == "false") val = false;
+
+        this.value = !!val;
+        var checked = this.value ? 'true' : 'false';
+        this.el.dom.setAttribute('toggled', checked);
     },
     clearValue: function() {
         this.setValue(!!this.checked);
@@ -228,9 +232,29 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
 
         this.el.on('click', this.onClick, this, {stopEvent: true});
     },
+    getViewOptions: function() {
+        var options = {
+            selectionOnly: true,
+            singleSelect: true,
+            tools: {
+                tbar: [{
+                    name: 'select',
+                    title: 'Select',
+                    cls: 'button',
+                    fn: this.select,
+                    scope: this
+                }]
+            }
+        };
+        if (this.where) options.where = this.where;
+        //TODO: Need to find a way to figure out a Simplate Object
+        if (this.where && typeof this.where != 'string') options.where = this.where.apply(this.editor.entry);
+
+        return options;
+    },
     onClick: function(evt, el, o) {
         // todo: limit the clicks to a specific element?
-        var el = Ext.get(el), options;
+        var el = Ext.get(el);
 
         var link = el;
         if (link.is('a') || (link = link.up('a')))
@@ -241,23 +265,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
                 view = App.getView(id);
             if (view)
             {
-                options = {
-                    selectionOnly: true,
-                    singleSelect: true,
-                    tools: {
-                        tbar: [{
-                            name: 'select',
-                            title: 'Select',
-                            cls: 'button',
-                            fn: this.select,
-                            scope: this
-                        }]
-                    }
-                };
-                if (this.where) options.where = this.where;
-                //TODO: Need to find a way to figure out a Simplate Object
-                if (typeof this.where != 'string') options.where = this.where.apply(this.editor.entry);
-                view.show(options);
+                view.show(this.getViewOptions());
             }
             return;
         }
@@ -268,6 +276,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
         if (view && view.selectionModel)
         {
             var selections = view.selectionModel.getSelections();
+
             for (var key in selections)
             {
                 var val = selections[key].data,
@@ -281,11 +290,12 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
                 this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
                 break;
             }
-
             ReUI.back();
         }
     },
     isDirty: function() {
+        if (!this.value && this.selected) return true;
+
         if (this.value && this.selected) return this.value.key !== this.selected.key;
 
         return false;
@@ -309,13 +319,14 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
             : val;
     },
     extractText: function(val, key) {
-        var key = key || this.extractKey(val),
+        var key = key || this.extractKey(val), textValue,
             text = this.textProperty
                 ? Sage.Platform.Mobile.Utility.getValue(val, this.textProperty)
                 : key;
 
-        if (this.textTemplate)
-            text = this.textTemplate.apply(this.textProperty ? text : val);
+        textValue = this.textProperty ? text : val;
+        if (this.textTemplate && textValue)
+            text = this.textTemplate.apply(textValue);
 
         return (text || this.emptyText);
     },
@@ -343,63 +354,92 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
     }
 });
 
+Sage.Platform.Mobile.Controls.SelectField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
+    getViewOptions: function() {
+        var options = Sage.Platform.Mobile.Controls.SelectField.superclass.getViewOptions.call(this);
+
+        options.list = this.list;
+        return options;
+    },
+    setValue: function(val) {
+        // todo: must revisit. This is not the right way to do.
+        if (typeof val == "string") {
+            //Loop through the given list to find a value.
+            var selectedVal;
+            for (var i = 0, len = this.list.length; i < len; i++)
+            {
+                if (this.list[i][this.keyProperty] == val)
+                {
+                    selectedVal= this.list[i];
+                    break;
+                }
+            }
+            if (selectedVal)
+            {
+                this.value = this.selected = {
+                    key: selectedVal[this.keyProperty],
+                    text: selectedVal[this.textProperty]
+                };
+                this.el.select('a > span').item(0).dom.innerHTML = selectedVal[this.textProperty];
+                return;
+            }
+        }
+        Sage.Platform.Mobile.Controls.SelectField.superclass.setValue.call(this, val);
+    },
+    getValue: function() {
+        var value = Sage.Platform.Mobile.Controls.SelectField.superclass.getValue.call(this);
+        if (value && value[this.keyProperty])
+        {
+            return value[this.keyProperty];
+        }
+        return value;
+    }
+});
+
 Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
     keyProperty: false,
     textProperty: false,
-    onClick: function(evt, el, o) {
-        // todo: limit the clicks to a specific element?
-        var el = Ext.get(el),
-            parentValue, parentValueObj, parentField,
-            resPredicate = this.resourcePredicate;
+    getViewOptions: function() {
+        var parentValue, parentValueObj,
+            parentField, resPredicate = this.resourcePredicate,
+            options = Sage.Platform.Mobile.Controls.PickupField.superclass.getViewOptions.call(this);
 
-        var link = el;
-        if (link.is('a') || (link = link.up('a')))
+        options.resourceProperty = 'items';
+
+        if (this.dependsOn)
         {
-            evt.stopEvent();
+            parentField = this.editor.fields[this.dependsOn];
+            parentValue = parentField.getValue();
 
-            var id = link.dom.hash.substring(1),
-                view = App.getView(id);
-            if (view)
+            if (!parentValue)
             {
-                if (this.dependsOn)
-                {
-                    parentField = this.editor.fields[this.dependsOn];
-                    if (parentField.selected.key)
-                    {
-                        parentValue = parentField.selected.text;
-                    }
-                    else
-                    {
-                        if (this.errMsg) alert(this.errMsg);
-                        return;
-                    }
-
-                    if (typeof this.resourcePredicate != "string")
-                    {
-                        parentValueObj = {};
-                        parentValueObj[this.dependsOn] = parentValue;
-                        resPredicate = this.resourcePredicate.apply(parentValueObj);
-                    }
-                }
-                view.setTitle(this.title);
-                view.show({
-                    selectionOnly: true,
-                    resourcePredicate: resPredicate,
-                    resourceProperty: 'items',
-                    singleSelect: true,
-                    tools: {
-                        tbar: [{
-                            name: 'select',
-                            title: 'Select',
-                            cls: 'button blueButton',
-                            fn: this.select,
-                            scope: this
-                        }]
-                    }
-                });
+                if (this.errMsg) alert(this.errMsg);
+                return;
             }
-            return;
+
+            if (typeof this.resourcePredicate == "function")
+            {
+                resPredicate = this.resourcePredicate.call(this.editor, parentValue);
+            }
+            else if (typeof this.resourcePredicate != "string")
+            {
+                parentValueObj = {};
+                parentValueObj[this.dependsOn] = parentValue;
+                resPredicate = this.resourcePredicate.apply(parentValueObj);
+            }
         }
+
+        if (resPredicate)
+        {
+            options['resourcePredicate'] = resPredicate;
+        }
+
+        if (this.orderBy)
+        {
+            options['orderBy'] = this.orderBy;
+        }
+
+        return options;
     },
     setValue: function(val) {
         // todo: must revisit. This is not the right way to do.
@@ -410,6 +450,9 @@ Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Cont
             };
             this.el.select('a > span').item(0).dom.innerHTML = val;
             return;
+        }
+        else if (val === null) {
+            val = false;
         }
         Sage.Platform.Mobile.Controls.PickupField.superclass.setValue.call(this, val);
     },
@@ -542,6 +585,7 @@ Sage.Platform.Mobile.Controls.registered = {
     'boolean': Sage.Platform.Mobile.Controls.BooleanField,
     'lookup': Sage.Platform.Mobile.Controls.LookupField,
     'pickup': Sage.Platform.Mobile.Controls.PickupField,
+    'select': Sage.Platform.Mobile.Controls.SelectField,
     'address': Sage.Platform.Mobile.Controls.AddressField
 };
 
