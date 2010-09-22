@@ -5,7 +5,15 @@
 /// <reference path="Utility.js"/>
 
 Ext.namespace('Sage.Platform.Mobile');
+
+// todo: where to place these?
 Ext.USE_NATIVE_JSON = true;
+
+// see: http://www.sencha.com/forum/showthread.php?44422-OPEN-518-3.x-2.x-Bug-in-radiogroup-when-using-brackets-in-name
+Ext.DomQuery.matchers[2] = {
+    re: /^(?:([\[\{])(?:@)?([\w-]+)\s?(?:(=|.=)\s?(["']?)(.*?)\4)?[\]\}])/,
+    select: 'n = byAttribute(n, "{2}", "{5}", "{3}", "{1}");'
+};
 
 Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     defaultServerName: window.location.hostname,    
