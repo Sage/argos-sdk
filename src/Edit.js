@@ -283,6 +283,7 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
                 view = App.getView(id);
             if (view)
             {
+                if (this.title) view.setTitle(this.title);
                 view.show(this.getViewOptions());
             }
             return;
