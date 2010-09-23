@@ -120,6 +120,24 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
     }
 });
 
+Sage.Platform.Mobile.Controls.HiddenField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
+    template: new Simplate([
+        '<input type="hidden" class="field-text" name="{%= name %}" value="{%= value %}">',
+    ]),
+    bind: function() {
+        //Call Field's bind. We don't want event handlers for this. 
+        Sage.Platform.Mobile.Controls.Field.prototype.bind.apply(this, arguments);
+    },
+    //Lets not allow setting hidden field value, for now.
+    setValue: function(val) {
+        this.value = this.el.dom.value;
+    },
+    //Always return true, so that hidden value is passed always.
+    isDirty: function() {
+        return true;
+    }
+});
+
 Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
     template: new Simplate([
         '<input type="text" name="{%= name %}" class="field-phone">',
@@ -582,6 +600,7 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
 
 Sage.Platform.Mobile.Controls.registered = {
     'text': Sage.Platform.Mobile.Controls.TextField,
+    'hidden': Sage.Platform.Mobile.Controls.HiddenField,
     'phone': Sage.Platform.Mobile.Controls.PhoneField,
     'boolean': Sage.Platform.Mobile.Controls.BooleanField,
     'lookup': Sage.Platform.Mobile.Controls.LookupField,
@@ -611,6 +630,9 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         '<label>{%= $.label %}</label>',
         '{%! $.field %}', /* apply sub-template */
         '</div>'
+    ]),
+    hiddenPropertyTemplate: new Simplate([
+        '{%! $.field %}' /* apply sub-template */
     ]),
     saveText: 'Save',
     titleText: 'Edit',
@@ -682,10 +704,19 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
                     editor: this
                 }, current));
 
-                content.push(this.propertyTemplate.apply({
-                    label: current['label'],
-                    field: field
-                }));
+                if (current['type'] == 'hidden')
+                {
+                    content.push(this.hiddenPropertyTemplate.apply({
+                        field: field
+                    }));
+                }
+                else
+                {
+                    content.push(this.propertyTemplate.apply({
+                        label: current['label'],
+                        field: field
+                    }));
+                }
             }
         }
 
