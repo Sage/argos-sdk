@@ -122,15 +122,11 @@ Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Contro
 
 Sage.Platform.Mobile.Controls.HiddenField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
     template: new Simplate([
-        '<input type="hidden" class="field-text" name="{%= name %}" value="{%= value %}">',
+        '<input type="hidden" class="field-text" name="{%= name %}">',
     ]),
     bind: function() {
         //Call Field's bind. We don't want event handlers for this. 
         Sage.Platform.Mobile.Controls.Field.prototype.bind.apply(this, arguments);
-    },
-    //Lets not allow setting hidden field value, for now.
-    setValue: function(val) {
-        this.value = this.el.dom.value;
     },
     //Always return true, so that hidden value is passed always.
     isDirty: function() {
@@ -329,7 +325,6 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
         {
             var value = this.selected.key;
         }
-
         return value;
     },
     extractKey: function(val) {
@@ -577,6 +572,7 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
     },
     getValue: function() {
         if (this.finalValue) return this.finalValue[this.name];
+        if (this.value) return this.value;
         return false;
     },
     setValue: function(val) {
@@ -783,7 +779,7 @@ Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
 
         for (var name in this.fields)
         {
-            if (this.fields[name].isDirty())
+            if (this.fields[name].forceValue === true || this.fields[name].isDirty())
             {
                 var value = this.fields[name].getValue();
 
