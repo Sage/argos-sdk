@@ -11,11 +11,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         viewTemplate: new Simplate([
             '<div id="{%= id %}" title="{%= title %}" class="panel" effect="flip">',
-            '<fieldset class="loading">',
-            '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
-            '</fieldset>',
+            '{%! $.loadingTemplate %}',
             '<div class="panel-content"></div>',
             '</div>'
+        ]),
+        loadingTemplate: new Simplate([
+            '<fieldset class="loading">',
+            '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
+            '</fieldset>'        
         ]),
         sectionBeginTemplate: new Simplate([
             '<h2>{%= $.title %}</h2>',

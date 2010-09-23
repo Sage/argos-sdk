@@ -6,84 +6,77 @@
 
 Ext.namespace('Sage.Platform.Mobile');
 
-Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {   
+Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
+    attachmentPoints: {
+        contentEl: '.panel-content'        
+    },
     viewTemplate: new Simplate([            
-        '<div id="{%= id %}" title="{%= title %}" class="panel">',             
+        '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel">',
+        '{%! $.loadingTemplate %}',
+        '<div class="panel-content"></div>',
         '</div>'
     ]),
     emptyTemplate: new Simplate([
-        '{%! $.loadingTemplate %}'
     ]),
     loadingTemplate: new Simplate([
         '<fieldset class="loading">',
-        '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
+        '<div class="row"><div class="loading-indicator">{%: $.loadingText %}</div></div>',
         '</fieldset>'
     ]),
     sectionBeginTemplate: new Simplate([
-        '<h2>{%= $["title"] %}</h2>',
-        '{% if ($["list"]) { %}<ul>{% } else { %}<fieldset>{% } %}'
+        '<h2>{%: $.title %}</h2>',
+        '{% if ($.list) { %}<ul>{% } else { %}<fieldset>{% } %}'
     ]),
     sectionEndTemplate: new Simplate([
-        '{% if ($["list"]) { %}</ul>{% } else { %}</fieldset>{% } %}'
+        '{% if ($.list) { %}</ul>{% } else { %}</fieldset>{% } %}'
     ]),
     propertyTemplate: new Simplate([
-        '<div class="row {%= $["cls"] %}">',
-        '<label>{%= $["label"] %}</label>',       
-        '<span>{%= $["value"] %}</span>',
+        '<div class="row {%= $.cls %}">',
+        '<label>{%: $.label %}</label>',       
+        '<span>{%= $.value %}</span>',
         '</div>'
     ]),
     relatedPropertyTemplate: new Simplate([
-        '<div class="row {%= $["cls"] %}">',
-        '<label>{%= $["label"] %}</label>',       
-        '<a href="#{%= $["view"] %}" target="_related" data-context="{%: $["context"] %}" {% if ($["descriptor"]) { %}data-descriptor="{%: $["descriptor"] %}"{% } %}>{%= $["value"] %}</a>',
+        '<div class="row {%= $.cls %}">',
+        '<label>{%: $.label %}</label>',
+        '<a data-action="activateRelatedEntry" data-view="{%= $.view %}" data-context="{%: $.context %}" data-descriptor="{%: $.descriptor %}">',
+        '<span>{%= $.value %}</span>',
+        '</a>',
         '</div>'
     ]),
     relatedTemplate: new Simplate([
-        '<li class="{%= $["cls"] %}">',
-        '<a href="#{%= $["view"] %}" target="_related" data-context="{%: $["context"] %}">',
-        '{% if ($["icon"]) { %}',
-        '<img src="{%= $["icon"] %}" alt="icon" class="icon" />',
+        '<li class="{%= $.cls %}">',
+        '<a data-action="activateRelatedList" data-view="{%= $.view %}" data-context="{%: $.context %}">',
+        '{% if ($.icon) { %}',
+        '<img src="{%= $.icon %}" alt="icon" class="icon" />',
         '{% } %}',
-        '{%= $["label"] %}',
+        '<span>{%: $.label %}</span>',
         '</a>',
         '</li>'
-    ]),    
+    ]),
+    id: 'generic_detail',
+    expose: false,
     editText: 'Edit',
     titleText: 'Detail',
     detailsText: 'Details',
     loadingText: 'loading...',
-    constructor: function(o) {
-        Sage.Platform.Mobile.Detail.superclass.constructor.call(this);        
-        
-        Ext.apply(this, o, {
-            id: 'generic_detail',
-            title: this.titleText,
-            expose: false,
-            editor: false,
-            tools: {
-                tbar: [{
-                    name: 'edit',
-                    title: this.editText,
-                    hidden: function() { return !this.editor; },                                                                
-                    cls: 'button',                 
-                    fn: this.navigateToEdit,
-                    scope: this                
-                }]
-            }        
-        });        
-    },
-    render: function() {
-        Sage.Platform.Mobile.Detail.superclass.render.call(this);
-
-        this.clear();
-    },
+    requestErrorText: 'A server error occured while requesting data.',
+    editView: false,      
     init: function() {  
         Sage.Platform.Mobile.Detail.superclass.init.call(this);
-        
-        this.el.on('click', this.onClick, this);
-        
-        // todo: find a better way to handle these notifications
-        App.on('refresh', this.onRefresh, this);  
+
+        App.on('refresh', this.onRefresh, this);
+
+        this.tools.tbar = [{
+            name: 'edit',
+            title: this.editText,
+            hidden: function() { return !this.editView; },
+            cls: 'button',
+            fn: this.navigateToEdit,
+            scope: this
+        }];
+
+        this.clear();
     },
     onRefresh: function(o) {
         if (this.options && this.options.key === o.key)
@@ -94,30 +87,19 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
                 this.setTitle(o.data['$descriptor']);
         }
     },
-    onClick: function(evt, el, o) {
-        var el = Ext.get(el);
-
-        var link = el;
-        if (link.is('a[target="_related"]') || (link = link.up('a[target="_related"]')))
-        {
-            evt.stopEvent();
-
-            var view = link.dom.hash.substring(1);
-
-            var value = link.getAttribute('data-key') || Ext.util.JSON.decode(link.getAttribute('data-context'));
-            var descriptor = link.getAttribute('data-descriptor');
-        
-            this.navigateToRelated(view, value, descriptor);   
-            return;
-        }  
-    },
     formatRelatedQuery: function(entry, fmt, property) {
         var property = property || '$key';
 
         return String.format(fmt, entry[property]);        
     },
+    activateRelatedEntry: function(params) {
+        if (params.context) this.navigateToRelated(params.view, params.context, params.descriptor);
+    },
+    activateRelatedList: function(params) {
+        if (params.context) this.navigateToRelated(params.view, params.context, params.descriptor);
+    },
     navigateToEdit: function() {
-        var view = App.getView(this.editor);
+        var view = App.getView(this.editView);
         if (view)
             view.show({entry: this.entry});
     },
@@ -140,7 +122,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             if (v)
                 v.show(context);
         }                                              
-    },    
+    },
     createRequest: function() {
         var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
 
@@ -153,6 +135,15 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
 
         if (this.resourceKind) 
             request.setResourceKind(this.resourceKind);
+
+        if (this.querySelect)
+            request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, this.querySelect.join(','));
+
+        if (this.queryInclude)
+            request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, this.queryInclude.join(','));
+
+        if (this.queryOrderBy)
+            request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, this.queryOrderBy);
 
         return request;
     }, 
@@ -168,8 +159,11 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             return expression.apply(this, Array.prototype.slice.call(arguments, 1));
         else
             return expression;
-    },   
-    processLayout: function(layout, options, entry, el)
+    },
+    createLayout: function() {
+        return [];
+    },
+    processLayout: function(layout, options, entry)
     {
         var sections = [];
         var content = [];
@@ -256,35 +250,38 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
 
         content.push(this.sectionEndTemplate.apply(options));
 
-        Ext.DomHelper.append(el || this.el, content.join(''));
+        Ext.DomHelper.append(this.contentEl, content.join(''));
 
         for (var i = 0; i < sections.length; i++)
         {
             var current = sections[i];  
             
-            this.processLayout(current['as'], current['options'], entry, el);  
+            this.processLayout(current['as'], current['options'], entry);  
         }        
     },    
     requestFailure: function(response, o) {
-       
+        alert(String.format(this.requestErrorText, response, o));  
     },
     processEntry: function(entry) {
         this.entry = entry;
-                
-        if (this.entry)         
-        {               
-            this.processLayout(this.layout, {title: this.detailsText}, this.entry);
-        }
 
-        this.el.removeClass('panel-loading');
-        this.el.first('.loading').remove();
+        if (this.entry)
+            this.processLayout(this.createLayout(), {title: this.detailsText}, this.entry);
     },
     requestData: function() {
+        this.el.addClass('panel-loading');
+
         var request = this.createRequest();
         if (request)
             request.read({
-                success: this.processEntry,
-                failure: this.requestFailure,
+                success: function(entry) {
+                    this.processEntry(entry);
+                    this.el.removeClass('panel-loading');
+                },
+                failure: function(response, o) {
+                    this.requestFailure(response, o);
+                    this.el.removeClass('panel-loading');
+                },
                 scope: this
             });       
     },
@@ -328,9 +325,8 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     transitionTo: function() {
         Sage.Platform.Mobile.Detail.superclass.transitionTo.call(this);
     },
-    clear: function() {
-        this.el.addClass('panel-loading');
-        this.el.update(this.emptyTemplate.apply(this));
+    clear: function() {        
+        this.contentEl.update(this.emptyTemplate.apply(this));
         this.context = false;
     }      
 });

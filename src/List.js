@@ -164,6 +164,7 @@ Ext.namespace('Sage.Platform.Mobile');
         insertText: 'New',
         noDataText: 'no records',
         loadingText: 'loading...',
+        requestErrorText: 'A server error occured while requesting data.',
         init: function() {
             Sage.Platform.Mobile.List.superclass.init.call(this);
 
@@ -174,7 +175,6 @@ Ext.namespace('Sage.Platform.Mobile');
                 .on('keypress', this.onSearchKeyPress, this)
                 .on('keyup', this.onSearchKeyUp, this);
 
-
             if (typeof this.selectionModel === 'undefined')
                 this.selectionModel = new Sage.Platform.Mobile.ConfigurableSelectionModel();
 
@@ -182,15 +182,13 @@ Ext.namespace('Sage.Platform.Mobile');
             this.selectionModel.on('deselect', this.onSelectionModelDeselect, this);
             this.selectionModel.on('clear', this.onSelectionModelClear, this);
 
-            this.tools = {
-                tbar: [{
-                    name: 'New',
-                    title: this.insertText,
-                    fn: this.navigateToInsert,
-                    cls: "button",
-                    scope: this
-                }]
-            };
+            this.tools.tbar = [{
+                name: 'New',
+                title: this.insertText,
+                fn: this.navigateToInsert,
+                cls: "button",
+                scope: this
+            }];
 
             this.clear();
         },
@@ -455,6 +453,7 @@ Ext.namespace('Sage.Platform.Mobile');
             /// </summary>
             /// <param name="response" type="Object">The response object.</param>
             /// <param name="o" type="Object">The options that were passed to Ext when creating the Ajax request.</param>
+            alert(String.format(this.requestErrorText, response, o));
         },
         requestData: function() {
             /// <summary>
