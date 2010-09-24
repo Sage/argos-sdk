@@ -261,8 +261,17 @@ Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Cont
             }
         };
         if (this.where) options.where = this.where;
+        //If its a function, pass the editor along
+        if (this.where && typeof this.where == 'function')
+        {
+            options.where = this.where(this.editor);
+        }
         //TODO: Need to find a way to figure out a Simplate Object
-        if (this.where && typeof this.where != 'string') options.where = this.where.apply(this.editor.entry);
+        //If its a simplate, we will evaluate it with current entry.
+        else if (this.where && typeof this.where == 'object' && this.where.apply) 
+        {
+            options.where = this.where.apply(this.editor.entry);
+        }
 
         return options;
     },
