@@ -499,7 +499,7 @@ Sage.Platform.Mobile.Controls.PickupField = Ext.extend(Sage.Platform.Mobile.Cont
     }
 });
 
-Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
+Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
     selector: 'div[name="{0}"]',
     template: new Simplate([
         '<div name="{%= name %}" class="field-address">',
@@ -567,11 +567,13 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
         }
         ReUI.back();
     },
+    //TODO: Must not return true for preset values.
     isDirty: function() {
-        return this.finalValue !== false;
+        return this.getValue() !== false;
     },
     getValue: function() {
-        if (this.finalValue) return this.finalValue[this.name];
+        if (this.finalValue && this.finalValue[this.name]) return this.finalValue[this.name];
+        if (this.value && this.value["$resources"]) return false;
         if (this.value) return this.value;
         return false;
     },
