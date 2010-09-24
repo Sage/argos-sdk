@@ -98,12 +98,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }
                 else
                 {
-                    var ctor = Sage.Platform.Mobile.Controls.FieldManager.get(current['type']);
-                    var field = this.fields[current['name']] = new ctor(Ext.apply({
-                        editor: this
-                    }, current));
+                    var ctor = Sage.Platform.Mobile.Controls.FieldManager.get(current['type']),
+                        field = this.fields[current['name']] = new ctor(Ext.apply({
+                            editor: this
+                        }, current)),
+                        template = field.propertyTemplate || this.propertyTemplate;
 
-                    content.push(this.propertyTemplate.apply({
+                    content.push(template.apply({
                         label: current['label'],
                         field: field
                     }));
@@ -172,7 +173,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             for (var name in this.fields)
             {
-                if (this.fields[name].isDirty())
+                if (this.fields[name].alwaysUseValue || this.fields[name].isDirty())
                 {
                     var value = this.fields[name].getValue();
 

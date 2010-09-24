@@ -74,6 +74,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         getValue: function() {
             if (this.finalValue) return this.finalValue[this.name];
+            if (this.value) return this.value;
             return false;
         },
         setValue: function(val) {

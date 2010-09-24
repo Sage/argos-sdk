@@ -14,12 +14,14 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
 })();
 
 (function() {
-    Sage.Platform.Mobile.Controls.Field = function(o) {
-        Ext.apply(this, o);
-    };
-
-    Sage.Platform.Mobile.Controls.Field.prototype = {
+    Sage.Platform.Mobile.Controls.Field = Ext.extend(Ext.util.Observable, {
         selector: 'input[name="{0}"]',
+        alwaysUseValue: false,
+        constructor: function(o) {
+            Sage.Platform.Mobile.Controls.Field.superclass.constructor.apply(this, arguments);
+
+            Ext.apply(this, o);
+        },
         apply: function(external) {
             return this.template.apply(this);
         },
@@ -66,5 +68,5 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
 
             return false;
         }
-    };
+    });
 })();
