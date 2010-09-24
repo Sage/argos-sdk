@@ -72,7 +72,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             title: this.editText,
             hidden: function() { return !this.editView; },
             cls: 'button',
-            fn: this.navigateToEdit,
+            fn: this.navigateToEditView,
             scope: this
         }];
 
@@ -93,17 +93,17 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
         return String.format(fmt, entry[property]);        
     },
     activateRelatedEntry: function(params) {
-        if (params.context) this.navigateToRelated(params.view, params.context, params.descriptor);
+        if (params.context) this.navigateToRelatedView(params.view, Ext.decode(params.context), params.descriptor);
     },
     activateRelatedList: function(params) {
-        if (params.context) this.navigateToRelated(params.view, params.context, params.descriptor);
+        if (params.context) this.navigateToRelatedView(params.view, Ext.decode(params.context), params.descriptor);
     },
-    navigateToEdit: function() {
+    navigateToEditView: function() {
         var view = App.getView(this.editView);
         if (view)
             view.show({entry: this.entry});
     },
-    navigateToRelated: function(view, o, descriptor) {    
+    navigateToRelatedView: function(view, o, descriptor) {
         if (typeof o === 'string')
             var context = {
                 key: o,
