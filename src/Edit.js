@@ -1,7 +1,8 @@
-/// <reference path="../ext/ext-core-debug.js"/>
-/// <reference path="../Simplate.js"/>
-/// <reference path="../sdata/SDataResourceCollectionRequest.js"/>
-/// <reference path="../sdata/SDataService.js"/>
+/// <reference path="../libraries/Simplate.js"/>
+/// <reference path="../libraries/reui/reui.js"/>
+/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/sdata/sdata-client-dependencies-debug.js"/>
+/// <reference path="../libraries/sdata/sdata-client-debug.js"/>
 /// <reference path="View.js"/>
 
 Ext.namespace('Sage.Platform.Mobile');
@@ -9,19 +10,22 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
+        attachmentPoints: {
+            contentEl: '.panel-content'        
+        },
         viewTemplate: new Simplate([
-            '<div id="{%= id %}" title="{%= title %}" class="panel" effect="flip">',
+            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel" effect="{%= $.transitionEffect %}">',
             '{%! $.loadingTemplate %}',
             '<div class="panel-content"></div>',
             '</div>'
         ]),
         loadingTemplate: new Simplate([
             '<fieldset class="loading">',
-            '<div class="row"><div class="loading-indicator">{%= loadingText %}</div></div>',
+            '<div class="row"><div class="loading-indicator">{%: $.loadingText %}</div></div>',
             '</fieldset>'        
         ]),
         sectionBeginTemplate: new Simplate([
-            '<h2>{%= $.title %}</h2>',
+            '<h2>{%: $.title %}</h2>',
             '{% if ($.list) { %}<ul>{% } else { %}<fieldset>{% } %}'
         ]),
         sectionEndTemplate: new Simplate([
@@ -29,46 +33,54 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         ]),
         propertyTemplate: new Simplate([
             '<div class="row row-edit">',
-            '<label>{%= $.label %}</label>',
+            '<label>{%: $.label %}</label>',
             '{%! $.field %}', /* apply sub-template */
             '</div>'
         ]),
+        transitionEffect: 'flip',
+        id: 'generic_edit',
+        expose: false,
         saveText: 'Save',
         titleText: 'Edit',
         detailsText: 'Details',
         loadingText: 'loading...',
-        placeContentAt: '.panel-content',
         constructor: function(o) {
-            Sage.Platform.Mobile.Edit.superclass.constructor.call(this);
+            Sage.Platform.Mobile.Edit.superclass.constructor.apply(this, arguments);
 
-            Ext.apply(this, o, {
-                id: 'generic_edit',
-                title: this.titleText,
-                expose: false,
-                tools: {
-                    tbar: [{
-                        name: 'edit',
-                        title: this.saveText,
-                        cls: 'button',
-                        fn: this.save,
-                        scope: this
-                    }]
-                },
-                fields: {}
-            });
+            this.fields = {};
         },
         init: function() {
             Sage.Platform.Mobile.Edit.superclass.init.call(this);
 
-            this.processLayout(this.layout, {title: this.detailsText});
+            this.processLayout(this.createLayout(), {title: this.detailsText});
 
             for (var name in this.fields) this.fields[name].bind(this.el);
+
+            this.tools.tbar = [{
+                name: 'save',
+                title: this.saveText,
+                cls: 'button',
+                fn: this.save,
+                scope: this
+            }];
         },
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
 
             if (this.entry && this.entry['$key'])
                 request.setResourceSelector(String.format("'{0}'", this.entry['$key']));
+
+            if (this.resourceKind)
+                request.setResourceKind(this.resourceKind);
+
+            if (this.querySelect)
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, this.querySelect.join(','));
+
+            if (this.queryInclude)
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, this.queryInclude.join(','));
+
+            if (this.queryOrderBy)
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, this.queryOrderBy);
 
             return request;
         },
@@ -79,6 +91,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 request.setResourceKind(this.resourceKind);
 
             return request;
+        },
+        createLayout: function() {
+            return this.layout;
         },
         processLayout: function(layout, options)
         {
@@ -113,7 +128,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             content.push(this.sectionEndTemplate.apply(options));
 
-            Ext.DomHelper.append(this.el.child(this.placeContentAt) || this.el, content.join(''));
+            Ext.DomHelper.append(this.contentEl, content.join(''));
 
             for (var i = 0; i < sections.length; i++)
             {

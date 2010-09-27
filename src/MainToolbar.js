@@ -1,7 +1,10 @@
-/// <reference path="../../ext/ext-core-debug.js"/>
-/// <reference path="../../platform/Application.js"/>
-/// <reference path="../../platform/Toolbar.js"/>
-/// <reference path="../../sdata/SDataService.js"/>
+/// <reference path="../libraries/Simplate.js"/>
+/// <reference path="../libraries/reui/reui.js"/>
+/// <reference path="../libraries/ext/ext-core-debug.js"/>
+/// <reference path="../libraries/sdata/sdata-client-dependencies-debug.js"/>
+/// <reference path="../libraries/sdata/sdata-client-debug.js"/>
+/// <reference path="Application.js"/>
+/// <reference path="Toolbar.js"/>
 
 Ext.namespace("Sage.Platform.Mobile");
 
