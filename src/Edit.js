@@ -537,11 +537,11 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
                 if (this.value)
                 {
                     entry = {};
-                    entry[this.name] = this.value;
+                    entry = this.value;
                 }
                 else
                 {
-                    entry = this.editor.entry;
+                    entry = this.editor.entry[this.name];
                 }
                 view.setTitle(this.title);
                 view.show({
@@ -570,7 +570,7 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
 
         if (this.finalValue)
         {
-            Ext.apply(this.value, this.finalValue[this.name]); 
+            Ext.apply(this.value, this.finalValue); 
             text = this.renderer(this.value);
             this.el.select('a > span').item(0).dom.innerHTML = text;
         }
@@ -581,7 +581,7 @@ Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Con
         return this.getValue() !== false;
     },
     getValue: function() {
-        if (this.finalValue && this.finalValue[this.name]) return this.finalValue[this.name];
+        if (this.finalValue) return this.finalValue;
         if (this.value && this.value["$resources"]) return false;
         if (this.value) return this.value;
         return false;
