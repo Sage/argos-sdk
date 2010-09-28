@@ -40,7 +40,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
     relatedPropertyTemplate: new Simplate([
         '<div class="row {%= $.cls %}">',
         '<label>{%: $.label %}</label>',
-        '<a data-action="activateRelatedEntry" data-view="{%= $.view %}" data-context="{%: $.context %}" data-descriptor="{%: $.descriptor %}">',
+        '<a data-action="activateRelatedEntry" data-view="{%= $.view %}" data-context="{%: $.context %}" data-descriptor="{%: $.descriptor %}" href="#">',
         '<span>{%= $.value %}</span>',
         '</a>',
         '</div>'
