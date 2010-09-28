@@ -44,7 +44,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 .on('load', this.load, this, {single: true})
                 .on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'});
 
-            this.tools = {};
+            this.tools = this.tools || {};
         },
         initiateActionFromClick: function(evt, el, o) {
             var el = Ext.get(el),
