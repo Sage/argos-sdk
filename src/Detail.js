@@ -162,7 +162,7 @@ Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
             return expression;
     },
     createLayout: function() {
-        return [];
+        return this.layout || [];
     },
     processLayout: function(layout, options, entry)
     {

@@ -23,7 +23,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '<fieldset class="loading">',
             '<div class="row"><div class="loading-indicator">{%: $.loadingText %}</div></div>',
             '</fieldset>'        
-        ]),
+        ]),        
         sectionBeginTemplate: new Simplate([
             '<h2>{%: $.title %}</h2>',
             '{% if ($.list) { %}<ul>{% } else { %}<fieldset>{% } %}'
@@ -42,6 +42,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         expose: false,
         saveText: 'Save',
         titleText: 'Edit',
+        errorsText: 'Errors',
         detailsText: 'Details',
         loadingText: 'loading...',
         constructor: function(o) {
@@ -93,7 +94,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return request;
         },
         createLayout: function() {
-            return this.layout;
+            return this.layout || [];
         },
         processLayout: function(layout, options)
         {
