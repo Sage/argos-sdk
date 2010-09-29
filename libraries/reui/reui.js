@@ -138,14 +138,15 @@ ReUI = {};
         var evt = evt || window.event;            
         var target = evt.target || evt.srcElement;
 
-        var link = D.findAncestorByTag(target, 'a');
+        var link = D.findAncestorByTag(target, 'a'),
+            page;
         if (link) 
         {                
-            if (link.href && link.hash && link.hash != '#' && !link.target)
+            if (!link.target && (page = getPageFromHash(link.hash)))
             {
                 D.select(link);
                     
-                R.show(D.get(link.hash.substr(1)));
+                R.show(page);
 
                 D.wait(D.unselect, 500, link);
             }

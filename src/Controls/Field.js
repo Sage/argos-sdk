@@ -60,7 +60,7 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
                 {
                     var message = typeof definition.message === 'function'
                         ? definition.message.call(definition.scope || this, value)
-                        : String.format(definition.message, value);
+                        : String.format(definition.message, value, this.name, this.label);
 
                     return message || true;
                 }

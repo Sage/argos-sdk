@@ -11,19 +11,36 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 (function() {
     Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
         attachmentPoints: {
-            contentEl: '.panel-content'        
+            contentEl: '.panel-content',
+            validationContentEl: '.panel-validation-summary > ul'
         },
         viewTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel" effect="{%= $.transitionEffect %}">',
             '{%! $.loadingTemplate %}',
+            '{%! $.validationSummaryTemplate %}',
             '<div class="panel-content"></div>',
             '</div>'
         ]),
         loadingTemplate: new Simplate([
-            '<fieldset class="loading">',
-            '<div class="row"><div class="loading-indicator">{%: $.loadingText %}</div></div>',
+            '<fieldset class="panel-loading-indicator">',
+            '<div class="row"><div>{%: $.loadingText %}</div></div>',
             '</fieldset>'        
-        ]),        
+        ]),
+        validationSummaryTemplate: new Simplate([
+            '<div class="panel-validation-summary">',
+            '<h2>{%: $.validationSummaryText %}</h2>',
+            '<ul>',
+            '</ul>',
+            '</div>'
+        ]),
+        validationSummaryItemTemplate: new Simplate([
+            '<li>',
+            '<a href="#{%= $.name %}">',
+            '<h3>{%: $.message %}</h3>',
+            '<h4>{%: $$.label %}</h4>',
+            '</a>',
+            '</li>'
+        ]),
         sectionBeginTemplate: new Simplate([
             '<h2>{%: $.title %}</h2>',
             '{% if ($.list) { %}<ul>{% } else { %}<fieldset>{% } %}'
@@ -33,6 +50,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         ]),
         propertyTemplate: new Simplate([
             '<div class="row row-edit">',
+            '<a name="{%: $.field.name %}"></a>',
             '<label>{%: $.label %}</label>',
             '{%! $.field %}', /* apply sub-template */
             '</div>'
@@ -42,7 +60,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         expose: false,
         saveText: 'Save',
         titleText: 'Edit',
-        errorsText: 'Errors',
+        validationSummaryText: 'Validation Summary',
         detailsText: 'Details',
         loadingText: 'loading...',
         constructor: function(o) {
@@ -208,7 +226,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 var result;
                 if (false !== (result = this.fields[name].validate()))
                 {
-                    this.fields[name].el.addClass('field-error');
+                    this.fields[name].el.addClass('panel-field-error');
 
                     this.errors.push({
                         name: name,
@@ -217,7 +235,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }
                 else
                 {
-                    this.fields[name].el.removeClass('field-error');
+                    this.fields[name].el.removeClass('panel-field-error');
                 }
             }
 
@@ -318,17 +336,30 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 ReUI.back();
             }
         },
+        showValidationSummary: function() {
+            var content = [];                        
+
+            for (var i = 0; i < this.errors.length; i++)
+                content.push(this.validationSummaryItemTemplate.apply(this.errors[i], this.fields[this.errors[i].name]));
+
+            this.validationContentEl.update(content.join(''));
+
+            ReUI.DomHelper.wait(scrollTo, 0, 0, 1)
+        },
         save: function() {
             if (this.isFormDisabled())  return;
 
             if (this.validate() !== false)
             {
-                this.el.addClass('form-error');
+                this.el.addClass('panel-form-error');
+
+                this.showValidationSummary();
+
                 return;
             }
             else
             {
-                this.el.removeClass('form-error');
+                this.el.removeClass('panel-form-error');
             }
 
             if (this.inserting)

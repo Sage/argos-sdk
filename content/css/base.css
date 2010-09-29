@@ -85,22 +85,18 @@
 }
 
 /* detail veiw */
-fieldset.loading .loading-indicator
+.panel fieldset.panel-loading-indicator div.row > div
 {
-	background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
+	background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
+    display: inline-block;
 	padding: 0 0 0 20px;
 }
 
-fieldset.loading .row
+.panel fieldset.panel-loading-indicator div.row
 {
 	text-align: center !important;
 	padding: 1em !important;
 	min-height: 1em !important;
-}
-
-fieldset.loading .loading-indicator
-{
-	display: inline-block;
 }
 
 /* floating toolbar */
