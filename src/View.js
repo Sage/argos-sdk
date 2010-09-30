@@ -18,7 +18,9 @@ Ext.namespace('Sage.Platform.Mobile');
         titleText: 'Generic View',
         serviceName: false,
         constructor: function(options) {
-            Ext.apply(this, options);
+            Ext.apply(this, options, {
+                tools: {}
+            });
 
             Sage.Platform.Mobile.View.superclass.constructor.apply(this, arguments);
         },
@@ -44,9 +46,7 @@ Ext.namespace('Sage.Platform.Mobile');
             this.render();
             this.el
                 .on('load', this.load, this, {single: true})
-                .on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'});
-
-            this.tools = this.tools || {};
+                .on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'});            
         },
         initiateActionFromClick: function(evt, el, o) {
             var el = Ext.get(el),

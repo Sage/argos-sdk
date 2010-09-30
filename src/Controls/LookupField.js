@@ -2,10 +2,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
-        selector: 'div[name="{0}"]',
+        attachmentPoints: {
+            el: 'div[name="{0}"]'
+        },
         template: new Simplate([
             '<div name="{%= name %}" class="field-lookup">',
-            '<a href="#{%= view %}"><span></span></a>',
+            '<input type="text" />',
+            '<a href="#_{%= view %}"><span></span></a>',
             '</div>'
         ]),
         emptyText: 'empty',

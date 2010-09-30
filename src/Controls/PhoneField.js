@@ -3,7 +3,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 (function() {
     Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
         template: new Simplate([
-            '<input type="text" name="{%= name %}" class="field-phone">',
+            '<input type="text" name="{%= name %}" class="field-phone">'
         ]),
         /*
             {0}: original value
@@ -46,10 +46,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
 
             return number;
-        },
-        bind: function(container) {
-            Sage.Platform.Mobile.Controls.TextField.superclass.bind.apply(this, arguments);
-
+        },       
+        init: function() {
             this.el.on('keyup', this.onKeyUp, this);
         },
         onKeyUp: function(evt, el, o) {

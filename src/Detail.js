@@ -308,7 +308,8 @@ Ext.namespace('Sage.Platform.Mobile');
         getContext: function() {
             return Ext.apply(Sage.Platform.Mobile.Detail.superclass.getContext.call(this), {
                 resourceKind: this.resourceKind,
-                key: this.options.key
+                key: this.options.key,
+                descriptor: this.options.descriptor
             });
         },
         beforeTransitionTo: function() {

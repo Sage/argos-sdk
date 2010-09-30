@@ -15,18 +15,24 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
 
 (function() {
     Sage.Platform.Mobile.Controls.Field = Ext.extend(Ext.util.Observable, {
-        selector: 'input[name="{0}"]',
+        attachmentPoints: {},        
         alwaysUseValue: false,
         constructor: function(o) {
-            Sage.Platform.Mobile.Controls.Field.superclass.constructor.apply(this, arguments);
-
             Ext.apply(this, o);
+            
+            Sage.Platform.Mobile.Controls.Field.superclass.constructor.apply(this, arguments);
         },
-        apply: function(external) {
+        apply: function() {
             return this.template.apply(this);
         },
-        bind: function(container) {
-            this.el = container.child(String.format(this.selector, this.name));
+        attachTo: function(el) {
+            for (var n in this.attachmentPoints)
+                if (this.attachmentPoints.hasOwnProperty(n))
+                    this[n] = el.child(String.format(this.attachmentPoints[n], this.name));
+
+            this.init();
+        },
+        init: function() {
         },
         isDirty: function() {
             return true;

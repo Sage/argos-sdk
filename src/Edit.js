@@ -64,16 +64,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         detailsText: 'Details',
         loadingText: 'loading...',
         constructor: function(o) {
-            Sage.Platform.Mobile.Edit.superclass.constructor.apply(this, arguments);
-
             this.fields = {};
+            
+            Sage.Platform.Mobile.Edit.superclass.constructor.apply(this, arguments);
         },
         init: function() {
             Sage.Platform.Mobile.Edit.superclass.init.call(this);
 
             this.processLayout(this.createLayout(), {title: this.detailsText});
 
-            for (var name in this.fields) this.fields[name].bind(this.el);
+            for (var name in this.fields) this.fields[name].attachTo(this);
 
             this.tools.tbar = [{
                 name: 'save',

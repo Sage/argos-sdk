@@ -138,11 +138,11 @@ ReUI = {};
         var evt = evt || window.event;            
         var target = evt.target || evt.srcElement;
 
-        var link = D.findAncestorByTag(target, 'a'),
-            page;
+        var link = D.findAncestorByTag(target, 'a');
         if (link) 
-        {                
-            if (!link.target && (page = getPageFromHash(link.hash)))
+        {
+            var page = getPageFromHash(link.hash);
+            if (page)
             {
                 D.select(link);
                     
@@ -157,13 +157,7 @@ ReUI = {};
             else if (link.getAttribute('type') == 'cancel')
             {
                 if (context.dialog) D.unselect(context.dialog);                        
-            }          
-            else if (link.getAttribute('href', 2) === '#' ||
-                     link.getAttribute('href', 2) === null)
-            {       
-                /* do nothing */               
-                /* will not work on all browsers, as some will return the resolved url regardless */
-            }
+            }                      
             else
             {
                 return;

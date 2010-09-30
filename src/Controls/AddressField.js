@@ -2,16 +2,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
-        selector: 'div[name="{0}"]',
+        attachmentPoints: {
+            el: 'div[name="{0}"]'
+        },        
         template: new Simplate([
-            '<div name="{%= name %}" class="field-address">',
-            '<a href="#{%= view %}"><span></span></a>',
+            '<div name="{%= $.name %}" class="field-address">',
+            '<a href="#{%= $.view %}"><span></span></a>',
             '</div>'
         ]),
         emptyText: 'empty',
-        bind: function(container) {
-            Sage.Platform.Mobile.Controls.AddressField.superclass.bind.apply(this, arguments);
-
+        init: function() {
             this.el.on('click', this.onClick, this, {stopEvent: true});
         },
         onClick: function(evt, el, o) {
