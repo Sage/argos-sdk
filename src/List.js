@@ -185,7 +185,7 @@ Ext.namespace('Sage.Platform.Mobile');
             this.tools.tbar = [{
                 name: 'New',
                 title: this.insertText,
-                fn: this.navigateToInsert,
+                fn: this.navigateToInsertView,
                 cls: "button",
                 scope: this
             }];
