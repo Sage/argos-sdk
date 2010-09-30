@@ -3,18 +3,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 (function() {
     Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
         selector: 'div[name="{0}"]',
+        readonly: false,
         template: new Simplate([
-            '<div name="{%= name %}" class="field-lookup">',
+            '<div name="{%= name %}" class="field-lookup {% if ($.readonly) { %} readonly {% } %}">',
             '<a href="#{%= view %}"><span></span></a>',
             '</div>'
         ]),
         emptyText: 'empty',
         keyProperty: '$key',
         textProperty: '$descriptor',
+        onSelect: false,
         bind: function(container) {
             Sage.Platform.Mobile.Controls.LookupField.superclass.bind.apply(this, arguments);
 
-            this.el.on('click', this.onClick, this, {stopEvent: true});
+            if (!this.readonly) this.el.on('click', this.onClick, this, {stopEvent: true});
         },
         getViewOptions: function() {
             var options = {
@@ -72,6 +74,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     };
 
                     this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
+                    // Send the selected entry to select Listener
+                    if (this.onSelect && typeof this.onSelect == 'function') this.onSelect(val);
                     break;
                 }
                 ReUI.back();
