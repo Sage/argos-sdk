@@ -3,7 +3,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 (function() {
     Sage.Platform.Mobile.Controls.HiddenField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
         propertyTemplate: new Simplate([
-            '{%! $.field %}'       
+            '<div style="display: none;" data-field="{%= $.name %}">',
+            '</div>'
         ]),
         template: new Simplate([
             '<input type="hidden" class="field-text" name="{%= name %}">'

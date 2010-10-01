@@ -1,16 +1,12 @@
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
-    Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
-        attachmentPoints: {
-            el: 'input[name="{0}"]'
-        },
+    Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
         template: new Simplate([
-            '<input type="text" name="{%= $.name %}" class="field-text" {% if ($.readonly) { %} readonly {% } %}>',
-        ]),
-        attachTo: function(el) {
-            Sage.Platform.Mobile.Controls.TextField.superclass.bind.apply(this, arguments);
-
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<input type="text" name="{%= $.name %}" class="field-text" {% if ($.readonly) { %} readonly {% } %}>'
+        ]),        
+        init: function() {
             if (this.validInputOnly)
             {
                 this.el.on('keypress', this.onKeyPress, this);

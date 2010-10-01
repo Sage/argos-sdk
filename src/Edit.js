@@ -49,10 +49,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '{% if ($.list) { %}</ul>{% } else { %}</fieldset>{% } %}'
         ]),
         propertyTemplate: new Simplate([
-            '<div class="row row-edit">',
-            '<a name="{%: $.field.name %}"></a>',
-            '<label>{%: $.label %}</label>',
-            '{%! $.field %}', /* apply sub-template */
+            '<a name="{%= $.name %}"></a>',
+            '<div class="row row-edit" data-field="{%= $.name %}" data-field-type="{%= $.type %}">',            
             '</div>'
         ]),
         transitionEffect: 'flip',
@@ -68,12 +66,25 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             
             Sage.Platform.Mobile.Edit.superclass.constructor.apply(this, arguments);
         },
-        init: function() {
-            Sage.Platform.Mobile.Edit.superclass.init.call(this);
-
+        render: function() {
+            Sage.Platform.Mobile.Edit.superclass.render.apply(this, arguments);
+            
             this.processLayout(this.createLayout(), {title: this.detailsText});
 
-            for (var name in this.fields) this.fields[name].attachTo(this);
+            this.el
+                .select('div[data-field]')
+                .each(function(el) {
+                    var el = Ext.get(el),
+                        name = el.getAttribute('data-field'),
+                        field = this.fields[name];
+                    if (field)
+                        field.renderTo(el);
+                }, this);
+        },
+        init: function() {
+            Sage.Platform.Mobile.Edit.superclass.init.apply(this, arguments);
+
+            for (var name in this.fields) this.fields[name].init();
 
             this.tools.tbar = [{
                 name: 'save',
@@ -134,14 +145,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 {
                     var ctor = Sage.Platform.Mobile.Controls.FieldManager.get(current['type']),
                         field = this.fields[current['name']] = new ctor(Ext.apply({
-                            editor: this
+                            view: this
                         }, current)),
                         template = field.propertyTemplate || this.propertyTemplate;
 
-                    content.push(template.apply({
-                        label: current['label'],
-                        field: field
-                    }));
+                    content.push(template.apply(field));
                 }
             }
 
@@ -157,7 +165,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         requestFailure: function(response, o) {
-
+            
         },
         requestData: function() {
             var request = this.createRequest();

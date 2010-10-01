@@ -21,16 +21,17 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
             Ext.apply(this, o);
             
             Sage.Platform.Mobile.Controls.Field.superclass.constructor.apply(this, arguments);
-        },
-        apply: function() {
-            return this.template.apply(this);
-        },
-        attachTo: function(el) {
+        },       
+        renderTo: function(el) {
+            this.el = Ext.DomHelper.append(
+                el,
+                this.template.apply(this),
+                true
+            );
+
             for (var n in this.attachmentPoints)
                 if (this.attachmentPoints.hasOwnProperty(n))
                     this[n] = el.child(String.format(this.attachmentPoints[n], this.name));
-
-            this.init();
         },
         init: function() {
         },

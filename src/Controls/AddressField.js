@@ -12,6 +12,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         ]),
         emptyText: 'empty',
         init: function() {
+            Sage.Platform.Mobile.Controls.AddressField.superclass.init.apply(this, arguments);
+
             this.el.on('click', this.onClick, this, {stopEvent: true});
         },
         onClick: function(evt, el, o) {

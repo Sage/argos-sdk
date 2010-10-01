@@ -1,11 +1,9 @@
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
-    Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
-        attachmentPoints: {
-            el: 'div[name="{0}"]'
-        },
+    Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
         template: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<div name="{%= $.name %}" class="field-boolean toggle" toggled="{%= !!$.checked %}">',
             '<span class="thumb"></span>',
             '<span class="toggleOn">{%= $.onText %}</span>',
@@ -15,6 +13,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         onText: 'ON',
         offText: 'OFF',        
         init: function() {
+            Sage.Platform.Mobile.Controls.BooleanField.superclass.init.apply(this, arguments);
+
             this.el.on('click', this.onClick, this, {stopEvent: true});
         },
         onClick: function(evt, el, o) {

@@ -1,28 +1,43 @@
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
+    var U = Sage.Platform.Mobile.Utility;
+
     Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
         attachmentPoints: {
-            el: 'div[name="{0}"]'
+            textEl: 'input'
         },
         template: new Simplate([
-            '<div name="{%= name %}" class="field-lookup">',
-            '<input type="text" />',
-            '<a href="#_{%= view %}"><span></span></a>',
-            '</div>'
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<a data-action="navigateToListView"><span>{%: $.lookupText %}</span></a>',
+            '<input type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
-        emptyText: 'empty',
+        view: false,
+        cls: 'field-lookup',
         keyProperty: '$key',
         textProperty: '$descriptor',
-        bind: function(container) {
-            Sage.Platform.Mobile.Controls.LookupField.superclass.bind.apply(this, arguments);
+        requireSelection: true,
+        emptyText: 'empty',
+        lookupText: 'L',
+        init: function() {
+            Sage.Platform.Mobile.Controls.LookupField.superclass.init.apply(this, arguments);
 
-            this.el.on('click', this.onClick, this, {stopEvent: true});
+            this.el.on('click', this.onClick, this);
         },
-        getViewOptions: function() {
-            var options = {
+        expandExpression: function(expression) {
+            if (typeof expression === 'function')
+                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
+            else
+                return expression;
+        },
+        createNavigationOptions: function() {
+            return {
                 selectionOnly: true,
                 singleSelect: true,
+                resourceKind: this.resourceKind,
+                resourcePredicate: this.resourcePredicate,
+                where: this.where,
+                orderBy: this.orderBy,
                 tools: {
                     tbar: [{
                         name: 'select',
@@ -33,29 +48,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     }]
                 }
             };
-            if (this.where) options.where = this.where;
-            //TODO: Need to find a way to figure out a Simplate Object
-            if (this.where && typeof this.where != 'string') options.where = this.where.apply(this.editor.entry);
-
-            return options;
+        },
+        navigateToListView: function() {
+            var view = App.getView(this.view),
+                options = this.createNavigationOptions();
+            if (view && options)
+                view.show(options);
         },
         onClick: function(evt, el, o) {
-            // todo: limit the clicks to a specific element?
-            var el = Ext.get(el);
+            if (this.readOnly) this.navigateToListView();
 
-            var link = el;
-            if (link.is('a') || (link = link.up('a')))
-            {
-                evt.stopEvent();
-
-                var id = link.dom.hash.substring(1),
-                    view = App.getView(id);
-                if (view)
-                {
-                    view.show(this.getViewOptions());
-                }
-                return;
-            }
+            evt.stopEvent();
+        },
+        setDisplayText: function(text) {
+            this.textEl.dom.value = text;  
         },
         select: function() {
             // todo: should there be a better way?
@@ -74,7 +80,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                         text: text
                     };
 
-                    this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
+                    this.setDisplayText(text);
                     break;
                 }
                 ReUI.back();
@@ -91,7 +97,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (this.keyProperty)
             {
                 var value = {};
-                Sage.Platform.Mobile.Utility.setValue(value, this.keyProperty, this.selected.key);
+                U.setValue(value, this.keyProperty, this.selected.key);
             }
             else
             {
@@ -102,13 +108,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         extractKey: function(val) {
             return this.keyProperty
-                ? Sage.Platform.Mobile.Utility.getValue(val, this.keyProperty)
+                ? U.getValue(val, this.keyProperty)
                 : val;
         },
         extractText: function(val, key) {
             var key = key || this.extractKey(val), textValue,
                 text = this.textProperty
-                    ? Sage.Platform.Mobile.Utility.getValue(val, this.textProperty)
+                    ? U.getValue(val, this.textProperty)
                     : key;
 
             textValue = this.textProperty ? text : val;
@@ -134,7 +140,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 var text = this.emptyText;
             }
 
-            this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
+            this.setDisplayText(text);
         },
         clearValue: function() {
             this.setValue(false);
