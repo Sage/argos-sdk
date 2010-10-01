@@ -2,6 +2,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Controls.HiddenField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
+        alwaysUseValue: true,
         propertyTemplate: new Simplate([
             '{%! $.field %}'       
         ]),
