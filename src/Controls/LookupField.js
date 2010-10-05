@@ -51,6 +51,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     view = App.getView(id);
                 if (view)
                 {
+                    if (this.title) view.setTitle(this.title);
+
                     view.show(this.getViewOptions());
                 }
                 return;
