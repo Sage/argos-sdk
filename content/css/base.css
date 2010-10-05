@@ -270,3 +270,14 @@ body[orient] > div.toolbar-float[open]
 {
 	
 }
+
+/* fields */
+.row-edit[data-field-type="picklist"] > a,
+.row-edit[data-field-type="lookup"] > a,
+.row-edit[data-field-type="select"] > a
+{
+    margin: 0;
+    padding: 0 8px;
+    position: absolute;
+    right: 12px;
+}

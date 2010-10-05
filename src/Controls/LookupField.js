@@ -9,7 +9,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<a data-action="navigateToListView"><span>{%: $.lookupText %}</span></a>',
+            '<a class="button"><span>{%: $.lookupText %}</span></a>',
             '<input type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
         view: false,
@@ -63,6 +63,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         setDisplayText: function(text) {
             this.textEl.dom.value = text;  
         },
+        getDisplayText: function() {
+            return this.textEl.dom.value;
+        },
         select: function() {
             // todo: should there be a better way?
             var view = App.getActiveView();
@@ -101,7 +104,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
             else
             {
-                var value = this.selected.key;
+                var value = this.requireSelection
+                    ? this.selected.key
+                    : this.getDisplayText();
             }
 
             return value;

@@ -50,7 +50,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         ]),
         propertyTemplate: new Simplate([
             '<a name="{%= $.name %}"></a>',
-            '<div class="row row-edit" data-field="{%= $.name %}" data-field-type="{%= $.type %}">',            
+            '<div class="row row-edit {%= $.cls %}" data-field="{%= $.name %}" data-field-type="{%= $.type %}">',            
             '</div>'
         ]),
         transitionEffect: 'flip',

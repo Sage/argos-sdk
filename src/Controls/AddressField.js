@@ -6,6 +6,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             el: 'div[name="{0}"]'
         },        
         template: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<div name="{%= $.name %}" class="field-address">',
             '<a href="#{%= $.view %}"><span></span></a>',
             '</div>'
