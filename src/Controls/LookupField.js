@@ -15,8 +15,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         onSelect: false,
         bind: function(container) {
             Sage.Platform.Mobile.Controls.LookupField.superclass.bind.apply(this, arguments);
-
             if (!this.readonly) this.el.on('click', this.onClick, this, {stopEvent: true});
+            // Nullify <a> click if its readonly
+            if (this.readonly) this.el.child('a').on('click', function(){}, this, {stopEvent: true});
         },
         getViewOptions: function() {
             var options = {
