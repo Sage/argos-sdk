@@ -3,27 +3,25 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 (function() {
     var U = Sage.Platform.Mobile.Utility;
 
-    Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
-        attachmentPoints: {
-            textEl: 'input'
-        },
+    Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<a class="button"><span>{%: $.lookupText %}</span></a>',
+            '<a class="button whiteButton"><span>{%: $.lookupText %}</span></a>',
             '<input type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
         view: false,
         keyProperty: '$key',
         textProperty: '$descriptor',
-        resultKeyProperty: '$key',
-        resultTextProperty: '$descriptor',
+        textTemplate: false,
+        valueKeyProperty: null,
+        valueTextProperty: null,
         requireSelection: true,
         emptyText: 'empty',
-        lookupText: 'L',
+        lookupText: '...',
         init: function() {
             Sage.Platform.Mobile.Controls.LookupField.superclass.init.apply(this, arguments);
 
-            this.el.on('click', this.onClick, this);
+            this.containerEl.on('click', this.onClick, this);
         },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
@@ -65,10 +63,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         setText: function(text) {
-            this.textEl.dom.value = text;  
+            this.el.dom.value = text;
         },
         getText: function() {
-            return this.textEl.dom.value;
+            return this.el.dom.value;
         },
         select: function() {
             // todo: should there be a better way?
@@ -77,15 +75,18 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 var selections = view.selectionModel.getSelections();
 
-                for (var key in selections)
+                for (var selectionKey in selections)
                 {
-                    var val = selections[key].data,
-                        key = this.extractKey(val) || key, // if we can extract the key as requested, use it instead of the selection key
-                        text = this.extractText(val, key);
+                    var val = selections[selectionKey].data,
+                        key = U.getValue(val, this.keyProperty, val) || selectionKey, // if we can extract the key as requested, use it instead of the selection key
+                        text = U.getValue(val, this.textProperty);
+
+                    if (text && this.textTemplate)
+                        text = this.textTemplate.apply(text, this);
 
                     this.selected = {
-                        key: key,
-                        text: text
+                        key: key || text,
+                        text: text || key
                     };
 
                     this.setText(text);
@@ -100,27 +101,39 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (this.value && this.selected) return this.value.key !== this.selected.key;
 
             return false;
-        },
+        },       
         getValue: function() {
-            var value;
+            var value,
+                // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false
+                // and IS NOT defined use keyProperty or textProperty in its place.
+                keyProperty = this.valueKeyProperty !== false
+                    ? this.valueKeyProperty || this.keyProperty
+                    : false,
+                textProperty = this.valueTextProperty !== false
+                    ? this.valueTextProperty || this.textProperty
+                    : false;
 
-            if (this.resultKeyProperty || this.resultTextProperty)
+            if (keyProperty|| textProperty)
             {
                 if (this.selected)
                 {
-                    if (this.resultKeyProperty)
-                        value = U.setValue(value || {}, this.resultKeyProperty, this.selected.key);
+                    if (keyProperty)
+                        value = U.setValue(value || {}, keyProperty, this.selected.key);
 
-                    if (this.resultTextProperty)
-                        value = U.setValue(value || {}, this.resultTextProperty, this.selected.text);
+                    // if a text template has been applied there is no way to guarantee a correct
+                    // mapping back to the property
+                    if (textProperty && !this.textTemplate)
+                        value = U.setValue(value || {}, textProperty, this.selected.text);
                 }
                 else if (!this.requireSelection)
                 {
-                    if (this.resultKeyProperty)
-                        value = U.setValue(value || {}, this.resultKeyProperty, this.getText());
+                    if (keyProperty)
+                        value = U.setValue(value || {}, keyProperty, this.getText());
 
-                    if (this.resultTextProperty)
-                        value = U.setValue(value || {}, this.resultTextProperty, this.getText());
+                    // if a text template has been applied there is no way to guarantee a correct
+                    // mapping back to the property
+                    if (textProperty && !this.textTemplate)
+                        value = U.setValue(value || {}, textProperty, this.getText());
                 }
             }
             else
@@ -137,42 +150,64 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             
             return value;
         },
-        extractKey: function(val) {
-            return this.keyProperty
-                ? U.getValue(val, this.keyProperty)
-                : val;
-        },
-        extractText: function(val, key) {
-            var key = key || this.extractKey(val), textValue,
-                text = this.textProperty
-                    ? U.getValue(val, this.textProperty)
-                    : key;
-
-            textValue = this.textProperty ? text : val;
-            if (this.textTemplate && textValue)
-                text = this.textTemplate.apply(textValue);
-
-            return (text || this.emptyText);
-        },
         setValue: function(val) {
-            if (val)
+            // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false
+            // and IS NOT defined use keyProperty or textProperty in its place.
+            var keyProperty = this.valueKeyProperty !== false
+                    ? this.valueKeyProperty || this.keyProperty
+                    : false,
+                textProperty = this.valueTextProperty !== false
+                    ? this.valueTextProperty || this.textProperty
+                    : false;
+
+            if (keyProperty || textProperty)
             {
-                var key = this.extractKey(val),
-                    text = this.extractText(val, key);
+                var key,
+                    text;
 
-                this.value = this.selected = {
-                    key: key,
-                    text: text
-                };
+                if (keyProperty)
+                    key = U.getValue(val, keyProperty);
 
-                this.setText(text);
+                if (textProperty)
+                    text = U.getValue(val, textProperty);
+
+                if (text && this.textTemplate)
+                    text = this.textTemplate.apply(text, this);
+
+                if (key || text)
+                {
+                    this.value = this.selected = {
+                        key: key || text,
+                        text: text || key
+                    };
+
+                    this.setText(this.selected.text);
+                }
+                else
+                {
+                    this.value = this.selected = false;
+
+                    this.setText(this.requireSelection ? this.emptyText : '');    
+                }
             }
             else
             {
-                this.value = this.selected = false;
+                if (val)
+                {
+                    this.value = this.selected = {
+                        key: val,
+                        text: val
+                    };
 
-                this.setText(this.requireSelection ? this.emptyText : '');                
-            }
+                    this.setText(val);
+                }
+                else
+                {
+                    this.value = this.selected = false;
+
+                    this.setText(this.requireSelection ? this.emptyText : '');                
+                }
+            }        
         },
         clearValue: function() {
             this.setValue(false);

@@ -39,7 +39,10 @@ Sage.Platform.Mobile.Utility = (function() {
             while (current && path.length > 0)
             {
                 var key = path.pop();
-                if (typeof current[key] !== 'undefined') current = current[key]; else return null;
+                if (typeof current[key] !== 'undefined')
+                    current = current[key];
+                else
+                    return typeof defaultValue !== 'undefined' ? defaultValue : null;
             }                                
             return current;
         },
@@ -52,7 +55,11 @@ Sage.Platform.Mobile.Utility = (function() {
                 if (path.length > 0) 
                 {
                     var next = path[path.length - 1];                                         
-                    current = current[key] = (typeof current[key] !== "undefined") ? current[key] : (typeof next === "number") ? [] : {};
+                    current = current[key] = (typeof current[key] !== "undefined")
+                        ? current[key]
+                        : (typeof next === "number")
+                            ? []
+                            : {};
                 }
             }  
             if (typeof path[0] !== "undefined")

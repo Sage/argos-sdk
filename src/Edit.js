@@ -73,8 +73,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.el
                 .select('div[data-field]')
-                .each(function(el) {
-                    var el = Ext.get(el),
+                .each(function(value) {
+                    var el = Ext.get(value.dom),
                         name = el.getAttribute('data-field'),
                         field = this.fields[name];
                     if (field)
@@ -119,6 +119,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (this.resourceKind)
                 request.setResourceKind(this.resourceKind);
+
+            if (this.querySelect)
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, this.querySelect.join(','));
+
+            if (this.queryInclude)
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, this.queryInclude.join(','));
 
             return request;
         },

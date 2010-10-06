@@ -23,8 +23,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         orderBy: 'sort asc',
         storageMode: 'text',
         dependantErrorText: "A value for '{0}' must be selected.",
-        resultKeyProperty: false,
-        resultTextProperty: false,       
+        valueKeyProperty: false,
+        valueTextProperty: false,
         constructor: function() {
             Sage.Platform.Mobile.Controls.PicklistField.superclass.constructor.apply(this, arguments);
 
@@ -43,7 +43,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     this.textProperty = 'text';
                     break;
             }
-        },
+        },        
         getDependantValue: function() {
             if (this.dependsOn && this.owner)
             {
@@ -77,6 +77,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 );
 
             options.dependantValue = dependantValue;
+            options.title = this.title;
 
             return options;
         },

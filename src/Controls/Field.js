@@ -23,6 +23,7 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
             Sage.Platform.Mobile.Controls.Field.superclass.constructor.apply(this, arguments);
         },       
         renderTo: function(el) {
+            this.containerEl = el; // todo: should el actually be containerEl instead of last rendered node?
             this.el = Ext.DomHelper.append(
                 el,
                 this.template.apply(this),
