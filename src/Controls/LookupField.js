@@ -13,9 +13,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '<input type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
         view: false,
-        cls: 'field-lookup',
         keyProperty: '$key',
         textProperty: '$descriptor',
+        resultKeyProperty: '$key',
+        resultTextProperty: '$descriptor',
         requireSelection: true,
         emptyText: 'empty',
         lookupText: 'L',
@@ -56,14 +57,17 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 view.show(options);
         },
         onClick: function(evt, el, o) {
-            if (this.readOnly) this.navigateToListView();
-
-            evt.stopEvent();
+            if (evt.getTarget('a') || this.requireSelection)
+            {
+                evt.stopEvent();
+                
+                this.navigateToListView();
+            }
         },
-        setDisplayText: function(text) {
+        setText: function(text) {
             this.textEl.dom.value = text;  
         },
-        getDisplayText: function() {
+        getText: function() {
             return this.textEl.dom.value;
         },
         select: function() {
@@ -76,6 +80,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 for (var key in selections)
                 {
                     var val = selections[key].data,
+                        key = this.extractKey(val) || key, // if we can extract the key as requested, use it instead of the selection key
                         text = this.extractText(val, key);
 
                     this.selected = {
@@ -83,7 +88,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                         text: text
                     };
 
-                    this.setDisplayText(text);
+                    this.setText(text);
                     break;
                 }
                 ReUI.back();
@@ -97,18 +102,39 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return false;
         },
         getValue: function() {
-            if (this.keyProperty)
+            var value;
+
+            if (this.resultKeyProperty || this.resultTextProperty)
             {
-                var value = {};
-                U.setValue(value, this.keyProperty, this.selected.key);
+                if (this.selected)
+                {
+                    if (this.resultKeyProperty)
+                        value = U.setValue(value || {}, this.resultKeyProperty, this.selected.key);
+
+                    if (this.resultTextProperty)
+                        value = U.setValue(value || {}, this.resultTextProperty, this.selected.text);
+                }
+                else if (!this.requireSelection)
+                {
+                    if (this.resultKeyProperty)
+                        value = U.setValue(value || {}, this.resultKeyProperty, this.getText());
+
+                    if (this.resultTextProperty)
+                        value = U.setValue(value || {}, this.resultTextProperty, this.getText());
+                }
             }
             else
             {
-                var value = this.requireSelection
-                    ? this.selected.key
-                    : this.getDisplayText();
+                if (this.selected)
+                {
+                    value = this.selected.key;
+                }
+                else if (!this.requireSelection)
+                {
+                    value = this.getText();
+                }
             }
-
+            
             return value;
         },
         extractKey: function(val) {
@@ -138,14 +164,15 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     key: key,
                     text: text
                 };
+
+                this.setText(text);
             }
             else
             {
                 this.value = this.selected = false;
-                var text = this.emptyText;
-            }
 
-            this.setDisplayText(text);
+                this.setText(this.requireSelection ? this.emptyText : '');                
+            }
         },
         clearValue: function() {
             this.setValue(false);

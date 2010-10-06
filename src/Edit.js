@@ -145,7 +145,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 {
                     var ctor = Sage.Platform.Mobile.Controls.FieldManager.get(current['type']),
                         field = this.fields[current['name']] = new ctor(Ext.apply({
-                            view: this
+                            owner: this
                         }, current)),
                         template = field.propertyTemplate || this.propertyTemplate;
 

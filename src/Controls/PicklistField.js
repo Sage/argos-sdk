@@ -1,21 +1,60 @@
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
+    var viewsByName = {},
+        viewsByNameCount = 0;         
+
+    var getOrCreateViewFor = function(name) {
+        if (viewsByName[name])
+            return viewsByName[name];
+
+        var view = new Mobile.SalesLogix.PickList({
+            id: 'picklist_' + viewsByNameCount++,
+            expose: false
+        });
+
+        App.registerView(view);
+
+        return (viewsByName[name] = view);
+    };
+
     Sage.Platform.Mobile.Controls.PicklistField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
         picklist: false,
         orderBy: 'sort asc',
-        dependantErrorText: "A value for '{0}' must be selected.", 
-        getDependantValue: function() {
-            if (this.dependsOn)
+        storageMode: 'text',
+        dependantErrorText: "A value for '{0}' must be selected.",
+        resultKeyProperty: false,
+        resultTextProperty: false,       
+        constructor: function() {
+            Sage.Platform.Mobile.Controls.PicklistField.superclass.constructor.apply(this, arguments);
+
+            switch (this.storageMode)
             {
-                var field = this.view.fields[this.dependsOn];
+                case 'text':
+                    this.keyProperty = 'text';
+                    this.textProperty = 'text';
+                    break;
+                case 'code':
+                    this.keyProperty = 'code';
+                    this.textProperty = 'text';
+                    break;
+                case 'id':
+                    this.keyProperty = '$key';
+                    this.textProperty = 'text';
+                    break;
+            }
+        },
+        getDependantValue: function() {
+            if (this.dependsOn && this.owner)
+            {
+                var field = this.owner.fields[this.dependsOn];
                 if (field) return field.getValue();
             }
         },
         getDependantLabel: function() {
-            if (this.dependsOn)
+            if (this.dependsOn && this.owner)
             {
-                var field = this.view.fields[this.dependsOn];
+                var field = this.owner.fields[this.dependsOn];
                 if (field) return field.label;
             }
         },
@@ -26,7 +65,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             var options = Sage.Platform.Mobile.Controls.PicklistField.superclass.createNavigationOptions.apply(this, arguments),
                 dependantValue = this.getDependantValue();
 
-            if (this.dependsOn && typeof dependantValue === 'undefined')
+            if (this.dependsOn && !dependantValue)
             {
                 alert(String.format(this.dependantErrorText, this.getDependantLabel()));
                 return false;
@@ -40,6 +79,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             options.dependantValue = dependantValue;
 
             return options;
+        },
+        navigateToListView: function() {
+            var options = this.createNavigationOptions(),
+                view = App.getView(this.view) || getOrCreateViewFor(this.picklist);
+           
+            if (view && options)
+                view.show(options);
         }
     });
 
