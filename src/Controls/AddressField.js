@@ -1,104 +1,87 @@
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
-    Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
-        attachmentPoints: {
-            el: 'div[name="{0}"]'
-        },        
+    Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {           
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<div name="{%= $.name %}" class="field-address">',
-            '<a href="#{%= $.view %}"><span></span></a>',
-            '</div>'
+            '<a class="button whiteButton"><span>{%: $.lookupText %}</span></a>',
+            '<textarea readonly="readonly" rows="{%: $.rows %}" />'
         ]),
-        emptyText: 'empty',
+        rows: 4,
+        lookupText: '...',
+        emptyText: 'no address',
+        completeText: 'Ok',
+        formatter: function(val) {
+            return '';
+        },
         init: function() {
             Sage.Platform.Mobile.Controls.AddressField.superclass.init.apply(this, arguments);
 
-            this.el.on('click', this.onClick, this, {stopEvent: true});
+            this.containerEl.on('click', this.onClick, this, {stopEvent: true});
+        },
+        createNavigationOptions: function() {
+            return {
+                tools: {
+                    tbar: [{
+                        name: 'complete',
+                        title: this.completeText,
+                        cls: 'button',
+                        fn: this.complete,
+                        scope: this
+                    }]
+                },
+                entry: this.currentValue,
+                entityName: this.owner && this.owner.entityName
+            };
+        },
+        navigateToEditView: function() {
+            var view = App.getView(this.view),
+                options = this.createNavigationOptions();
+            if (view && options)
+                view.show(options);
         },
         onClick: function(evt, el, o) {
-            // todo: limit the clicks to a specific element?
-            var el = Ext.get(el), entry;
+            evt.stopEvent();
 
-            var link = el;
-            if (link.is('a') || (link = link.up('a')))
-            {
-                evt.stopEvent();
-
-                var id = link.dom.hash.substring(1),
-                    view = App.getView(id);
-                if (view)
-                {
-                    if (this.value)
-                    {
-                        entry = {};
-                        entry = this.value;
-                    }
-                    else
-                    {
-                        entry = this.editor.entry[this.name];
-                    }
-                    view.setTitle(this.title);
-                    view.show({
-                        tools: {
-                            tbar: [{
-                                name: 'done',
-                                title: 'Done',
-                                cls: 'button blueButton',
-                                fn: this.done,
-                                scope: this
-                            }]
-                        },
-                        'entry': entry
-                    });
-                }
-            }
+            this.navigateToEditView();
         },
-        done: function() {
-            var view = App.getActiveView(),
-                text = '';
-
+        complete: function() {
+            var view = App.getActiveView();
             if (view)
             {
-                this.finalValue = view.getValues();
+                this.currentValue = view.getValues();
+
+                this.setText(this.formatter(view.getValues(true), true, true));
             }
 
-            if (this.finalValue)
-            {
-                Ext.apply(this.value, this.finalValue);
-                text = this.renderer(this.value);
-                this.el.select('a > span').item(0).dom.innerHTML = text;
-            }
             ReUI.back();
         },
-        //TODO: Must not return true for preset values.
+        setText: function(text) {
+            this.el.dom.value = text;
+        },        
         isDirty: function() {
-            return this.getValue() !== false;
+            return this.originalValue !== this.currentValue;
         },
         getValue: function() {
-            if (this.finalValue) return this.finalValue;
-            if (this.value && this.value["$resources"]) return false;
-            if (this.value) return this.value;
-            return false;
+            return this.currentValue;
         },
-        setValue: function(val) {
-            var text = '';
+        setValue: function(val)
+        {            
             if (val)
             {
-                this.value = Ext.decode(Ext.encode(val));
-                text = this.renderer(this.value);
+                this.originalValue = this.currentValue = val;
+
+                this.setText(this.formatter(val, true, true));
             }
             else
             {
-                this.value = this.finalValue = false;
-                text = this.emptyText;
-            }
+                this.originalValue = this.currentValue = null;
 
-            this.el.select('a > span').item(0).dom.innerHTML = text; // todo: temporary
+                this.setText(this.emptyText);
+            }
         },
         clearValue: function() {
-            this.setValue({});
+            this.setValue(null);
         }
     });
 

@@ -45,7 +45,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return this.el.getValue();
         },
         setValue: function(val) {
-            this.value = val;
+            this.originalValue = val;
 
             this.el.dom.value = val;
         },
@@ -53,7 +53,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.setValue('');
         },
         isDirty: function() {
-            return (this.value != this.getValue());
+            return (this.originalValue != this.getValue());
         }
     });
 

@@ -215,13 +215,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.fields[name].setValue(value);
             }
         },
-        getValues: function() {
+        getValues: function(ignoreDirtyFlag) {
             var o = {};
             var empty = true;
 
             for (var name in this.fields)
             {
-                if (this.fields[name].alwaysUseValue || this.fields[name].isDirty())
+                if (ignoreDirtyFlag || this.fields[name].alwaysUseValue || this.fields[name].isDirty())
                 {
                     var value = this.fields[name].getValue();
 
@@ -385,7 +385,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return Ext.apply(Sage.Platform.Mobile.Edit.superclass.getContext.call(this), {
                 resourceKind: this.resourceKind,
                 insert: this.options.insert,
-                key: this.options.insert ? false : this.options.entry['$key']
+                key: this.options.insert ? false : this.options.entry && this.options.entry['$key']
             });
         },
         beforeTransitionTo: function() {

@@ -17,6 +17,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         valueTextProperty: null,
         requireSelection: true,
         emptyText: 'empty',
+        completeText: 'Select',
         lookupText: '...',
         init: function() {
             Sage.Platform.Mobile.Controls.LookupField.superclass.init.apply(this, arguments);
@@ -39,10 +40,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 orderBy: this.orderBy,
                 tools: {
                     tbar: [{
-                        name: 'select',
-                        title: 'Select',
+                        name: 'complete',
+                        title: this.completeText,
                         cls: 'button',
-                        fn: this.select,
+                        fn: this.complete,
                         scope: this
                     }]
                 }
@@ -68,7 +69,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         getText: function() {
             return this.el.dom.value;
         },
-        select: function() {
+        complete: function() {
             // todo: should there be a better way?
             var view = App.getActiveView();
             if (view && view.selectionModel)
@@ -84,7 +85,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     if (text && this.textTemplate)
                         text = this.textTemplate.apply(text, this);
 
-                    this.selected = {
+                    this.currentValue = {
                         key: key || text,
                         text: text || key
                     };
@@ -96,9 +97,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         isDirty: function() {
-            if (!this.value && this.selected) return true;
+            if (!this.originalValue && this.currentValue) return true;
 
-            if (this.value && this.selected) return this.value.key !== this.selected.key;
+            if (this.originalValue && this.currentValue) return this.originalValue.key !== this.currentValue.key;
 
             return false;
         },       
@@ -115,15 +116,15 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (keyProperty|| textProperty)
             {
-                if (this.selected)
+                if (this.currentValue)
                 {
                     if (keyProperty)
-                        value = U.setValue(value || {}, keyProperty, this.selected.key);
+                        value = U.setValue(value || {}, keyProperty, this.currentValue.key);
 
                     // if a text template has been applied there is no way to guarantee a correct
                     // mapping back to the property
                     if (textProperty && !this.textTemplate)
-                        value = U.setValue(value || {}, textProperty, this.selected.text);
+                        value = U.setValue(value || {}, textProperty, this.currentValue.text);
                 }
                 else if (!this.requireSelection)
                 {
@@ -138,9 +139,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
             else
             {
-                if (this.selected)
+                if (this.currentValue)
                 {
-                    value = this.selected.key;
+                    value = this.currentValue.key;
                 }
                 else if (!this.requireSelection)
                 {
@@ -176,16 +177,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                 if (key || text)
                 {
-                    this.value = this.selected = {
+                    this.originalValue = this.currentValue = {
                         key: key || text,
                         text: text || key
                     };
 
-                    this.setText(this.selected.text);
+                    this.setText(this.currentValue.text);
                 }
                 else
                 {
-                    this.value = this.selected = false;
+                    this.originalValue = this.currentValue = false;
 
                     this.setText(this.requireSelection ? this.emptyText : '');    
                 }
@@ -194,7 +195,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 if (val)
                 {
-                    this.value = this.selected = {
+                    this.originalValue = this.currentValue = {
                         key: val,
                         text: val
                     };
@@ -203,7 +204,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }
                 else
                 {
-                    this.value = this.selected = false;
+                    this.originalValue = this.currentValue = false;
 
                     this.setText(this.requireSelection ? this.emptyText : '');                
                 }

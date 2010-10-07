@@ -4,12 +4,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<div name="{%= $.name %}" class="field-boolean toggle" toggled="{%= !!$.checked %}">',
+            '<div class="field-boolean toggle" toggled="{%= !!$.checked %}">',
             '<span class="thumb"></span>',
             '<span class="toggleOn">{%= $.onText %}</span>',
             '<span class="toggleOff">{%= $.offText %}</span>',
             '</div>'
-        ]),
+        ]),        
         onText: 'ON',
         offText: 'OFF',        
         init: function() {
@@ -24,17 +24,17 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return this.el.getAttribute('toggled') === 'true';
         },
         setValue: function(val) {
-            this.value = typeof val === 'string'
+            this.originalValue = typeof val === 'string'
                 ? /^true$/i.test(val)
                 : !!val;
 
-            this.el.dom.setAttribute('toggled', this.value.toString());
+            this.el.dom.setAttribute('toggled', this.originalValue.toString());
         },
         clearValue: function() {
             this.setValue(this.checked);
         },
         isDirty: function() {
-            return (this.value != this.getValue());
+            return (this.originalValue != this.getValue());
         }
     });
 

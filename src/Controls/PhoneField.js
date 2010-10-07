@@ -4,7 +4,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<input type="text" name="{%= name %}" class="field-phone">'
+            '<input type="text" name="{%= name %}">'
         ]),
         /*
             {0}: original value
