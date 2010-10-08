@@ -20,7 +20,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             Sage.Platform.Mobile.Controls.AddressField.superclass.init.apply(this, arguments);
 
             this.containerEl.on('click', this.onClick, this, {stopEvent: true});
-        },
+        },        
         createNavigationOptions: function() {
             return {
                 tools: {
@@ -32,7 +32,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                         scope: this
                     }]
                 },
-                entry: this.currentValue,
+                entry: this.originalValue,
+                changes: this.currentValue,
                 entityName: this.owner && this.owner.entityName
             };
         },
@@ -51,7 +52,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             var view = App.getActiveView();
             if (view)
             {
-                this.currentValue = view.getValues();
+                this.currentValue = view.createEntry();
 
                 this.setText(this.formatter(view.getValues(true), true, true));
             }

@@ -124,7 +124,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     // if a text template has been applied there is no way to guarantee a correct
                     // mapping back to the property
                     if (textProperty && !this.textTemplate)
-                        value = U.setValue(value || {}, textProperty, this.currentValue.text);
+                        value = U.setValue(value || {}, textProperty, this.requireSelection ? this.currentValue.text : this.getText());
                 }
                 else if (!this.requireSelection)
                 {
@@ -134,14 +134,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     // if a text template has been applied there is no way to guarantee a correct
                     // mapping back to the property
                     if (textProperty && !this.textTemplate)
+                    {
                         value = U.setValue(value || {}, textProperty, this.getText());
+                    }
                 }
             }
             else
             {
                 if (this.currentValue)
                 {
-                    value = this.currentValue.key;
+                    value = this.requireSelection
+                        ? this.currentValue.key
+                        : this.currentValue.text != this.getText() && !this.textTemplate
+                            ? this.getText()
+                            : this.currentValue.key;
                 }
                 else if (!this.requireSelection)
                 {

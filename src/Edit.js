@@ -209,11 +209,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         setValues: function(o) {
+            var noValue = {};
+
             for (var name in this.fields)
             {
-                var value = Sage.Platform.Mobile.Utility.getValue(o, name);
-
-                this.fields[name].setValue(value);
+                // fyi: uses the fact that ({} !== {})
+                var value = Sage.Platform.Mobile.Utility.getValue(o, name, noValue);
+                if (value !== noValue) this.fields[name].setValue(value);
             }
         },
         getValues: function(ignoreDirtyFlag) {
@@ -257,6 +259,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return this.errors.length > 0
                 ? this.errors
                 : false;
+        },
+        createEntry: function() {
+            var values = this.getValues();
+
+            return this.inserting
+                ? this.createEntryForInsert(values)
+                : this.createEntryForUpdate(values);
         },
         createEntryForUpdate: function(values) {
             return Ext.apply(values, {
@@ -402,6 +411,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         refresh: function() {
             this.entry = false;
+            this.changes = false;
             this.inserting = (this.options.insert === true);
 
             this.el.removeClass('panel-form-error');
@@ -414,8 +424,17 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
             else
             {
-                this.entry = this.options.entry;
-                this.setValues(this.options.entry || {});
+                if (this.options.entry)
+                {
+                    this.entry = this.options.entry;
+                    this.setValues(this.entry);
+                }
+
+                if (this.options.changes)
+                {
+                    this.changes = this.options.changes;
+                    this.setValues(this.changes);
+                }
             }
         },
         transitionTo: function() {
