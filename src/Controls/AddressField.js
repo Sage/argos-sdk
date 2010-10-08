@@ -1,3 +1,5 @@
+// todo: move to argos-saleslogix; this does not belong here.
+
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {

@@ -15,11 +15,16 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
 
 (function() {
     Sage.Platform.Mobile.Controls.Field = Ext.extend(Ext.util.Observable, {
-        attachmentPoints: {},        
+        attachmentPoints: {},
+        owner: false,
         alwaysUseValue: false,
         constructor: function(o) {
             Ext.apply(this, o);
-            
+
+            this.addEvents(
+                'change'    
+            );
+
             Sage.Platform.Mobile.Controls.Field.superclass.constructor.apply(this, arguments);
         },       
         renderTo: function(el) {
@@ -43,34 +48,43 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
             if (typeof this.validator === 'undefined')
                 return false;
 
-            if (this.validator instanceof RegExp)
-                var definition = {
-                    test: this.validator
-                };
-            else if (typeof this.validator === 'function')
-                var definition = {
-                    fn: this.validator
-                };
-            else
-                var definition = this.validator;
+            var all = Ext.isArray(this.validator) ? this.validator : [this.validator],
+                current,
+                definition;
 
-            var value = typeof value === 'undefined'
-                ? this.getValue()
-                : value;
+            for (var i = 0; i < all.length; i++)
+            {
+                current = all[i];
 
-            if (typeof definition.fn === 'function')
-            {
-                return definition.fn.call(definition.scope || this, value, this.editor);
-            }
-            else if (definition.test instanceof RegExp)
-            {
-                if (!definition.test.test(value))
+                if (current instanceof RegExp)
+                    definition = {
+                        test: current
+                    };
+                else if (typeof current === 'function')
+                    definition = {
+                        fn: current
+                    };
+                else
+                    definition = current;
+
+                var value = typeof value === 'undefined'
+                    ? this.getValue()
+                    : value;
+
+                if (typeof definition.fn === 'function')
                 {
-                    var message = typeof definition.message === 'function'
-                        ? definition.message.call(definition.scope || this, value)
-                        : String.format(definition.message, value, this.name, this.label);
+                    return definition.fn.call(definition.scope || this, value, this, this.owner);
+                }
+                else if (definition.test instanceof RegExp)
+                {
+                    if (!definition.test.test(value))
+                    {
+                        var message = typeof definition.message === 'function'
+                            ? definition.message.call(definition.scope || this, value, this)
+                            : String.format(definition.message, value, this.name, this.label);
 
-                    return message || true;
+                        return message || true;
+                    }
                 }
             }
 

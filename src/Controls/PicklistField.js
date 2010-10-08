@@ -1,3 +1,5 @@
+// todo: move to argos-saleslogix; this does not belong here.
+
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
@@ -9,7 +11,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return viewsByName[name];
 
         var view = new Mobile.SalesLogix.PickList({
-            id: 'picklist_' + viewsByNameCount++,
+            id: 'pick_list_' + viewsByNameCount++,
             expose: false
         });
 
@@ -22,7 +24,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         picklist: false,
         orderBy: 'sort asc',
         storageMode: 'text',
-        dependantErrorText: "A value for '{0}' must be selected.",
+        dependentErrorText: "A value for '{0}' must be selected.",
         valueKeyProperty: false,
         valueTextProperty: false,
         constructor: function() {
@@ -44,14 +46,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     break;
             }
         },        
-        getDependantValue: function() {
+        getDependentValue: function() {
             if (this.dependsOn && this.owner)
             {
                 var field = this.owner.fields[this.dependsOn];
                 if (field) return field.getValue();
             }
         },
-        getDependantLabel: function() {
+        getDependentLabel: function() {
             if (this.dependsOn && this.owner)
             {
                 var field = this.owner.fields[this.dependsOn];
@@ -63,20 +65,22 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         createNavigationOptions: function() {
             var options = Sage.Platform.Mobile.Controls.PicklistField.superclass.createNavigationOptions.apply(this, arguments),
-                dependantValue = this.getDependantValue();
+                dependentValue = this.getDependentValue();
 
-            if (this.dependsOn && !dependantValue)
+            if (this.dependsOn && !dependentValue)
             {
-                alert(String.format(this.dependantErrorText, this.getDependantLabel()));
+                alert(String.format(this.dependentErrorText, this.getDependentLabel()));
                 return false;
             }
 
             if (this.picklist)
                 options.resourcePredicate = this.formatResourcePredicate(
-                    this.expandExpression(this.picklist, dependantValue)
+                    this.dependsOn // only pass dependentValue if there is a dependency
+                        ? this.expandExpression(this.picklist, dependentValue)
+                        : this.expandExpression(this.picklist)
                 );
 
-            options.dependantValue = dependantValue;
+            options.dependentValue = dependentValue;
             options.title = this.title;
 
             return options;
