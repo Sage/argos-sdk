@@ -154,6 +154,7 @@ Ext.namespace('Sage.Platform.Mobile');
         resourceKind: '',
         pageSize: 25,
         allowSelection: false,
+        hideSearch: false,
         detailView: false,
         editView: false,
         insertView: false,
@@ -545,6 +546,8 @@ Ext.namespace('Sage.Platform.Mobile');
                 this.searchEl.removeClass('list-search-active');
             else
                 this.searchEl.addClass('list-search-active');
+
+            if (this.hideSearch === true) this.searchEl.setStyle({'display':'none'});
         },
         clear: function() {
             /// <summary>
