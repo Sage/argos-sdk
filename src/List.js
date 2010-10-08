@@ -405,13 +405,13 @@ Ext.namespace('Sage.Platform.Mobile');
             {
                 Ext.DomHelper.append(this.contentEl, this.noDataTemplate.apply(this));
             }
-            else
+            else if (feed['$resources'])
             {
                 var o = [];
 
-                for (var i = 0; i < feed.$resources.length; i++)
+                for (var i = 0; i < feed['$resources'].length; i++)
                 {
-                    var entry = feed.$resources[i];
+                    var entry = feed['$resources'][i];
 
                     this.entries[entry.$key] = entry;
 
