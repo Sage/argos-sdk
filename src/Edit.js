@@ -404,6 +404,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.entry = false;
             this.inserting = (this.options.insert === true);
 
+            this.el.removeClass('panel-form-error');
+
             this.clearValues();
 
             if (this.inserting)
