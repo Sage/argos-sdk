@@ -61,6 +61,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         validationSummaryText: 'Validation Summary',
         detailsText: 'Details',
         loadingText: 'loading...',
+        requestErrorText: 'A server error occured while requesting data.',
         constructor: function(o) {
             this.fields = {};
             
@@ -171,7 +172,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         requestFailure: function(response, o) {
-            
+            alert(String.format(this.requestErrorText, response, o));
         },
         requestData: function() {
             var request = this.createRequest();
@@ -183,7 +184,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 });
         },
         requestTemplateFailure: function() {
-
+            alert(String.format(this.requestErrorText, response, o));
         },
         requestTemplateData: function() {
             var request = this.createTemplateRequest();
