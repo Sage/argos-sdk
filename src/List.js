@@ -232,7 +232,7 @@ Ext.namespace('Sage.Platform.Mobile');
             var key = row.getAttribute('data-key'),
                 descriptor = row.getAttribute('data-descriptor');
 
-            if (this.contextView && key)
+            if (this.contextView && key && this.contextItems)
                 this.navigateToContextView(key, descriptor);
         },
         onSelectionModelSelect: function(key, data, tag) {
@@ -371,7 +371,8 @@ Ext.namespace('Sage.Platform.Mobile');
                 v.show({
                     detailView: this.detailView,
                     descriptor: descriptor,
-                    key: key
+                    key: key,
+                    contextItems: this.contextItems
                 });
         },
         navigateToDetailView: function(key, descriptor) {
