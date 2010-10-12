@@ -372,7 +372,8 @@ Ext.namespace('Sage.Platform.Mobile');
                     detailView: this.detailView,
                     descriptor: descriptor,
                     key: key,
-                    contextItems: this.contextItems
+                    contextItems: this.contextItems,
+                    parentViewId: this.id
                 });
         },
         navigateToDetailView: function(key, descriptor) {
