@@ -281,11 +281,13 @@ Ext.onReady(function(){
         minSwipeLength = 100.0,
         maxSwipeTime = 0.5,
         minLongClickTime = 1.0,
+        longPressTime = 1.5,
         maxLongClickLength = 5.0,
         startAt,
         startTime,
         originalTarget,
-        preventClick = false;
+        preventClick = false,
+        longPressTimer = false;
 
     var touchClick = function(evt) {
         ReUI.DomHelper.unbind(evt.target || evt.srcElement, 'click', touchClick, true);
@@ -297,6 +299,12 @@ Ext.onReady(function(){
 
         return false;
     };
+    var longPress = function(evt, el) {
+      if (longPressTimer) clearTimeout(longPressTimer);
+
+      ReUI.DomHelper.dispatch(el, 'longpress');
+      return false;
+    };
     var touchMove = function(evt, el, o) {
         /* for general swipe, we do not need mouse move */
     };  
@@ -305,8 +313,11 @@ Ext.onReady(function(){
         originalTarget = el;
         startAt = evt.getXY();
         startTime = (new Date()).getTime();
+        longPressTimer = setTimeout(function(){ longPress(evt, el); }, (longPressTime * 1000));
     };    
-    var touchEnd = function(evt, el, o) {   
+    var touchEnd = function(evt, el, o) {
+        if (longPressTimer) clearTimeout(longPressTimer);
+
         var endAt = evt.getXY(),
             endTime = (new Date()).getTime();
 
