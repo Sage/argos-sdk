@@ -28,7 +28,7 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <summary>
             ///     Renders the view to the body of the page and stores the rendered element in the 'el' field.
             /// </summary>
-            this.el = Ext.DomHelper.insertFirst(
+            this.el = Ext.DomHelper.append(
                 Ext.getBody(),
                 this.viewTemplate.apply(this),
                 true

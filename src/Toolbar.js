@@ -24,7 +24,7 @@ Ext.namespace('Sage.Platform.Mobile');
             });
         },
         render: function() {
-            this.el = Ext.DomHelper.insertFirst(
+            this.el = Ext.DomHelper.append(
                 Ext.getBody(),
                 this.barTemplate.apply(this),
                 true
