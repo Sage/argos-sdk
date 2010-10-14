@@ -141,7 +141,8 @@ ReUI = {};
         var link = D.findAncestorByTag(target, 'a');
         if (link) 
         {
-            var page = getPageFromHash(link.hash);
+            var data = extractDataFromHash(link.hash),
+                page = data && D.get(data.page);
             if (page)
             {
                 D.select(link);
@@ -173,11 +174,15 @@ ReUI = {};
         if (o.track !== false) 
         {
             if (typeof page.id !== 'string' || page.id.length <= 0)
-                page.id = 'liui-' + (context.counter++);
+                page.id = 'reui-' + (context.counter++);
+           
+            context.hash = location.hash = formatHashForPage(page, o);
 
-            context.hash = location.hash = R.hashPrefix + page.id;
-
-            context.history.push(page.id);
+            context.history.push({
+                hash: context.hash,
+                page: page.id,
+                tag: o.tag
+            });
         }
 
         context.transitioning = false;
@@ -272,7 +277,27 @@ ReUI = {};
         var fx = resolveFx(useFx) || resolveFx(R.defaultFx);
         if (fx) 
             fx(from, to, dir, complete);
-    };       
+    };
+
+    var extractDataFromHash = function(hash) {
+        if (hash && hash.indexOf(R.hashPrefix) === 0)
+        {
+            var segments = hash.substr(R.hashPrefix.length).split(';');
+            return {
+                page: segments[0],
+                tag: segments.length <= 2 ? segments[1] : segments.slice(1)                    
+            };
+        }
+
+        return false;
+    };
+
+    var formatHashForPage = function(page, options) {
+        var segments = options && options.tag
+            ? [page.id].concat(options.tag)
+            : [page.id];
+        return R.hashPrefix + segments.join(';');       
+    };
     
     var getPageFromHash = function(hash) {
         if (hash && hash.indexOf(R.hashPrefix) === 0)
@@ -294,9 +319,10 @@ ReUI = {};
 
         if (context.hash != location.hash)
         {
-            var el = getPageFromHash(location.hash);            
-            if (el) 
-                R.show(el);                    
+            var data = extractDataFromHash(location.hash),
+                page = data && D.get(data.page);
+            if (page)
+                R.show(page);                    
         }         
     };
 
@@ -477,6 +503,13 @@ ReUI = {};
 
             if (o.track !== false)
             {
+                // do loop and trim
+
+                if (context.history.length > 1)
+                {
+
+                }
+
                 var index = context.history.indexOf(page.id);
                 if (index != -1)
                 {
