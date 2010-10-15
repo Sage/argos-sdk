@@ -22,7 +22,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
     Sage.Platform.Mobile.Controls.PicklistField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
         picklist: false,
-        orderBy: 'sort asc',
+        orderBy: 'number asc',
         storageMode: 'text',
         dependentErrorText: "A value for '{0}' must be selected.",
         valueKeyProperty: false,
