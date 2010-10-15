@@ -209,24 +209,50 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         setValues: function(o) {
-            var noValue = {};
+            var noValue = {}, field, path, value;
 
             for (var name in this.fields)
             {
-                // fyi: uses the fact that ({} !== {})
-                var value = Sage.Platform.Mobile.Utility.getValue(o, name, noValue);
-                if (value !== noValue) this.fields[name].setValue(value);
+                field = this.fields[name];
+                if (field.applyTo !== false)
+                {
+                    //TODO: Is there a better way to to this?
+                    path = field.applyTo == '' ? null : field.applyTo;
+                    value = Sage.Platform.Mobile.Utility.getValue(o, path, noValue);
+                }
+                else
+                {
+                    // fyi: uses the fact that ({} !== {})
+                    value = Sage.Platform.Mobile.Utility.getValue(o, name, noValue);
+                }
+
+                if (value !== noValue) field.setValue(value);
             }
         },
         getValues: function(ignoreDirtyFlag) {
-            var o = {};
-            var empty = true;
+            var o = {},
+                empty = true,
+                value, field;
 
             for (var name in this.fields)
             {
-                if (ignoreDirtyFlag || this.fields[name].alwaysUseValue || this.fields[name].isDirty())
+                field = this.fields[name];
+                if (ignoreDirtyFlag || field.alwaysUseValue || field.isDirty())
                 {
-                    var value = this.fields[name].getValue();
+                    if (field.applyTo !== false)
+                    {
+                        value = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo, field.getValue());
+
+                        Ext.apply(o, value);
+
+                        //since we are applying values to another path, this field name is not needed in final object.
+                        //TODO: come up with a proper way to do this.
+                        delete o[name];
+                    }
+                    else
+                    {
+                        value = this.fields[name].getValue();
+                    }
 
                     Sage.Platform.Mobile.Utility.setValue(o, name, value);
 
