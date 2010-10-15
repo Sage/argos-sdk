@@ -204,7 +204,12 @@ ReUI = {};
             /* only update back button if track is set to true, since there is no history entry for the new page */
             if (R.backEl && o.track !== false) 
             {
-                var previous = D.get(context.history[context.history.length - 2]);
+
+
+                var previous = context.history.length > 1
+                    ? D.get(context.history[context.history.length - 2].page)
+                    : false;
+                
                 if (previous && !previous.getAttribute('hideBackButton'))
                 {
                     if (R.legacyMode)
@@ -238,7 +243,7 @@ ReUI = {};
                 
             D.dispatch(from, 'aftertransition', {out: true});            
             D.dispatch(to, 'aftertransition', {out: false});
-        };
+        }
         
         context.transitioning = true;
 
@@ -371,7 +376,8 @@ ReUI = {};
         height: 0,
         check: 0,
         hasOrientationEvent: false, 
-        history: []
+        history: [],
+        temporaryOptions: false        
     };
     
     D.apply(ReUI, {
@@ -390,6 +396,7 @@ ReUI = {};
         checkStateEvery: 250,
         prioritizeLocation: false,
         showInitialPage: true,
+        context: context,
 
         init: function() {
             if (context.initialized) 
@@ -481,7 +488,11 @@ ReUI = {};
         },
 
         back: function() {
-            history.go(-1);
+            var page = context.history.length > 1
+                ? D.get(context.history[context.history.length - 2].page)
+                : false;
+
+            if (page) R.show(page);
         },
         
         /// <summary>
@@ -495,26 +506,39 @@ ReUI = {};
         show: function(page, o) {
             if (context.transitioning) return; /* todo: should we queue the transition? */
 
-            if (typeof page === 'string') page = D.get(page);          
+            if (typeof page === 'string')
+                page = D.get(page);
 
-            var o = D.apply({
-                reverse: false
-            }, o);
+            if (!page)
+                return;
+
+            var o = context.temporaryOptions || o || {};
+
+            context.temporaryOptions = false;
 
             if (o.track !== false)
             {
+                var count = context.history.length;
+
                 // do loop and trim
-
-                if (context.history.length > 1)
+                for (var position = count - 2; position >= 0; position--)
                 {
-
+                    if (context.history[position].hash == formatHashForPage(page, o))
+                    {
+                        break;
+                    }
                 }
 
-                var index = context.history.indexOf(page.id);
-                if (index != -1)
+                if (position > -1)
                 {
                     o.reverse = true;
-                    context.history.splice(index);
+
+                    context.temporaryOptions = o;
+
+                    context.history = context.history.splice(0, position);
+
+                    history.go(position - (count - 1));
+                    return;
                 }
             }
 
