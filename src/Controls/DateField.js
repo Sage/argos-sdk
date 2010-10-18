@@ -80,6 +80,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         setText: function(val) {
             this.el.dom.value = String.format('{0}-{1}-{2}', (val.getMonth()+1), val.getDate(), val.getFullYear());
         },
+        // from http://dansnetwork.com/2008/11/01/javascript-iso8601rfc3339-date-parser/
         parseDate: function(dString) {
             var regexp = /(\d\d\d\d)(-)?(\d\d)(-)?(\d\d)(T)?(\d\d)(:)?(\d\d)(:)?(\d\d)(\.\d+)?(Z|([+-])(\d\d)(:)?(\d\d))/;
             var date = new Date();
