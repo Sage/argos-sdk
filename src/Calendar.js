@@ -16,6 +16,7 @@
             '<th class="calendar-next-month"><a href="#" data-action="goToNextMonth">&#187;</a></th>',
             '</tr>'
         ]),
+        titleText: 'Calendar',
         calendarWeekHeaderStartTemplate: '<tr class="calendar-week-header">',
         calendarWeekHeaderTemplate: '<td class="calendar-weekday">{0}</td>',
         calendarWeekHeaderEndTemplate: '</tr>',
@@ -37,7 +38,7 @@
         show: function(options) {
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
             
-            if (this.options.date) this.date = Date.parse(this.options.date);
+            if (this.options.date) this.date = this.options.date;
             else this.date = new Date();
             
             this.month = this.date.getMonth();
@@ -58,8 +59,12 @@
             if (this.month == 0)
             {
                 this.year -= 1;
+                this.month = 11;
             }
-            this.month = (this.month - 1) % 12;
+            else
+            {
+                this.month = (this.month - 1) % 12;
+            }
 
             this.renderCalendar();
         },
@@ -76,13 +81,15 @@
                 startingDay = firstDay.getDay(),
                 monthLength = this.daysInMonth[mm],
                 today = new Date(),
-                day = 1, calHTML = [], dayClass = '', weekendClass = '', i = 0, j = 0,
+                day = 1, calHTML = [], dayClass = '', selectedClass = '',
+                weekendClass = '', i = 0, j = 0, selectedEl = false,
                 isCurrentMonth = this.date.between((new Date(yyyy, mm, 1)), (new Date(yyyy, mm, monthLength)));
 
             this.monthName = this.monthLabels[this.month];
             
             // compensate for leap year
-            if (this.month == 1 && Date.isLeapYear(yyyy)) {// February only!
+            if (this.month == 1 && Date.isLeapYear(yyyy)) // February only!
+            {
                 monthLength = 29;
             }
 
@@ -98,20 +105,34 @@
             calHTML.push(this.calendarWeekHeaderEndTemplate);
 
             //Weeks
-            for (i = 0; i <= 6; i++) {
+            for (i = 0; i <= 6; i++)
+            {
                 calHTML.push(this.calendarWeekStartTemplate);
                 //Days
-                for (j = 0; j <= 6; j++) {
-                    if (day <= monthLength && (i > 0 || j >= startingDay)) {
+                for (j = 0; j <= 6; j++)
+                {
+                    if (day <= monthLength && (i > 0 || j >= startingDay))
+                    {
                         //Check for today
                         dayClass = (isCurrentMonth == true && day == today.getDate()) ? 'today' : '';
 
                         //Check for weekends
                         weekendClass = (this.weekEnds.indexOf(j) !== -1) ? ' weekend' : '';
 
+                        //Check for selected date
+                        if (day == this.date.getDate() && mm == this.date.getMonth() && yyyy == this.date.getFullYear())
+                        {
+                            selectedClass = ' selected';
+                        }
+                        else
+                        {
+                            selectedClass = '';
+                        }
+                        weekendClass = (this.weekEnds.indexOf(j) !== -1) ? ' weekend' : '';
+
                         calHTML.push(String.format( this.calendarDayTemplate,
                                                     day,
-                                                    (dayClass + weekendClass),
+                                                    (dayClass + weekendClass + selectedClass),
                                                     day
                                                    )
                                     );
@@ -130,6 +151,10 @@
             calHTML.push(this.calendarEndTemplate);
 
             this.contentEl.update(calHTML.join(''));
+
+            selectedEl = Ext.DomQuery.select('.selected', 'table.calendar-table', 'td');
+            if (Ext.isArray(selectedEl) && selectedEl.length > 0) this.selectedDateEl = Ext.get(selectedEl[0]);
+            else this.selectedDateEl = false;
         }
     });
 })();
