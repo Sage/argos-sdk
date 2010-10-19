@@ -178,11 +178,12 @@ ReUI = {};
            
             context.hash = location.hash = formatHashForPage(page, o);
 
-            context.history.push({
-                hash: context.hash,
-                page: page.id,
-                tag: o.tag
-            });
+            if (o.trimmed !== true)
+                context.history.push({
+                    hash: context.hash,
+                    page: page.id,
+                    parameters: o.parameters
+                });
         }
 
         context.transitioning = false;
@@ -204,8 +205,6 @@ ReUI = {};
             /* only update back button if track is set to true, since there is no history entry for the new page */
             if (R.backEl && o.track !== false) 
             {
-
-
                 var previous = context.history.length > 1
                     ? D.get(context.history[context.history.length - 2].page)
                     : false;
@@ -289,8 +288,9 @@ ReUI = {};
         {
             var segments = hash.substr(R.hashPrefix.length).split(';');
             return {
+                hash: hash,
                 page: segments[0],
-                tag: segments.length <= 2 ? segments[1] : segments.slice(1)                    
+                parameters: segments.length <= 2 ? segments[1] : segments.slice(1)                    
             };
         }
 
@@ -298,8 +298,8 @@ ReUI = {};
     };
 
     var formatHashForPage = function(page, options) {
-        var segments = options && options.tag
-            ? [page.id].concat(options.tag)
+        var segments = options && options.parameters
+            ? [page.id].concat(options.parameters)
             : [page.id];
         return R.hashPrefix + segments.join(';');       
     };
@@ -311,7 +311,7 @@ ReUI = {};
     };                   
 
     var checkOrientationAndLocation = function() {
-        if (!context.hasOrientationEvent)
+        if (context.hasOrientationEvent !== true)
         {
             if ((window.innerHeight != context.height) || (window.innerWidth != context.width))
             {
@@ -322,12 +322,26 @@ ReUI = {};
             }
         }
 
+        if (context.transitioning) return;
+
         if (context.hash != location.hash)
         {
-            var data = extractDataFromHash(location.hash),
+            // do reverse checking here, loop-and-trim will be done by show
+            var reverse = false,
+                data = false;
+
+            for (var position = context.history.length - 2; position >= 0; position--)
+                if (context.history[position].hash == location.hash)
+                {
+                    data = context.history[position];
+                    reverse = true;
+                    break;
+                }
+
+            var data = data || extractDataFromHash(location.hash),
                 page = data && D.get(data.page);
             if (page)
-                R.show(page);                    
+                R.show(page, {reverse: reverse});                    
         }         
     };
 
@@ -369,15 +383,14 @@ ReUI = {};
     var context = {
         page: false,
         dialog: false,
-        transitioning: false,
+        transitioning: false, // todo: rename to something mroe appropriate
         initialized: false,
         counter: 0,
         width: 0,
         height: 0,
         check: 0,
         hasOrientationEvent: false, 
-        history: [],
-        temporaryOptions: false        
+        history: []      
     };
     
     D.apply(ReUI, {
@@ -393,7 +406,7 @@ ReUI = {};
         updateBackButtonText: true,
         hashPrefix: '#_',
         backText: 'Back',               
-        checkStateEvery: 250,
+        checkStateEvery: 100,
         prioritizeLocation: false,
         showInitialPage: true,
         context: context,
@@ -488,11 +501,7 @@ ReUI = {};
         },
 
         back: function() {
-            var page = context.history.length > 1
-                ? D.get(context.history[context.history.length - 2].page)
-                : false;
-
-            if (page) R.show(page);
+            history.back();
         },
         
         /// <summary>
@@ -504,41 +513,40 @@ ReUI = {};
         ///     scroll: False if the transition should not scroll to the top, True otherwise.
         /// </summary>
         show: function(page, o) {
-            if (context.transitioning) return; /* todo: should we queue the transition? */
-
-            if (typeof page === 'string')
-                page = D.get(page);
-
-            if (!page)
+            if (context.transitioning)
                 return;
 
-            var o = context.temporaryOptions || o || {};
+            context.transitioning = true;
 
-            context.temporaryOptions = false;
+            var o = o || {},
+                page = typeof page === 'string'
+                    ? D.get(page)
+                    : page;
 
+            if (!page) return;
+           
             if (o.track !== false)
             {
-                var count = context.history.length;
+                var count = context.history.length,
+                    hash = formatHashForPage(page, o);
 
                 // do loop and trim
-                for (var position = count - 2; position >= 0; position--)
-                {
-                    if (context.history[position].hash == formatHashForPage(page, o))
-                    {
+                for (var position = count - 1; position >= 0; position--)
+                    if (context.history[position].hash == hash)
                         break;
-                    }
-                }
 
                 if (position > -1)
                 {
-                    o.reverse = true;
+                    context.history = context.history.splice(0, position + 1);
+                    context.hash = hash;
 
-                    context.temporaryOptions = o;
-
-                    context.history = context.history.splice(0, position);
-
-                    history.go(position - (count - 1));
-                    return;
+                    o.trimmed = true; 
+                    
+                    // trim up the browser history
+                    // if the requested hash does not equal the current location hash, trim up history.
+                    // location hash will not match requested hash when show is called directly, but will match
+                    // for detected location changes (i.e. the back button).
+                    if (location.hash != hash) history.go(position - (count - 1));
                 }
             }
 
