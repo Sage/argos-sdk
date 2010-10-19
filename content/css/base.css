@@ -288,10 +288,57 @@ body[orient] > div.toolbar-float[open]
 .row-edit[data-field-type="picklist"] > a,
 .row-edit[data-field-type="lookup"] > a,
 .row-edit[data-field-type="select"] > a,
-.row-edit[data-field-type="address"] > a
+.row-edit[data-field-type="address"] > a,
+.row-edit[data-field-type="name"] > a,
+.row-edit[data-field-type="date"] > a
 {
     margin: 0;
     padding: 0 8px;
     position: absolute;
     right: 12px;
+}
+
+/* TODO: Move color specifics to theme folder */
+/* Calendar */
+.calendar-table
+{
+    width: 98%;
+    border: 1px solid green;
+}
+
+.calendar-table .calendar-month-header,
+.calendar-table .calendar-week-header
+{
+    font-weight: bold;
+}
+
+.calendar-table .calendar-day
+{
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.calendar-table .calendar-day:hover,
+.calendar-table .calendar-day.weekend:hover
+{
+    background-color: green;
+    color: white;
+}
+
+.calendar-table .calendar-day.today
+{
+    color: red;
+}
+
+.calendar-table .calendar-day.weekend
+{
+    background-color: lightGray;
+}
+
+.calendar-table .calendar-day.selected
+{
+    background-color: darkGray;
+    color: white;
+    font-weight: bold;
 }

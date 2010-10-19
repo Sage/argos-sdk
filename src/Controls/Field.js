@@ -17,6 +17,7 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
     Sage.Platform.Mobile.Controls.Field = Ext.extend(Ext.util.Observable, {
         attachmentPoints: {},
         owner: false,
+        applyTo: false,
         alwaysUseValue: false,
         constructor: function(o) {
             Ext.apply(this, o);
