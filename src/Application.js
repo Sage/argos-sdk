@@ -285,6 +285,8 @@ Ext.onReady(function(){
         maxLongClickLength = 5.0,
         startAt,
         startTime,
+        touchStartAtX,
+        touchStartAtY,
         originalTarget,
         preventClick = false,
         longPressTimer = false;
@@ -300,23 +302,67 @@ Ext.onReady(function(){
         return false;
     };
     var longPress = function(evt, el) {
-      if (longPressTimer) clearTimeout(longPressTimer);
+      //remove mouse out listener
+      if (!isMobile)
+          Ext.get(el).un('mouseout', dragOut);
+      else
+          Ext.get(el).un('touchmove', dragOut);
+
+      if (longPressTimer)
+      {
+          clearTimeout(longPressTimer);
+          longPressTimer = false;
+      }
 
       ReUI.DomHelper.dispatch(el, 'longpress');
       return false;
     };
     var touchMove = function(evt, el, o) {
         /* for general swipe, we do not need mouse move */
-    };  
+        var touch = evt.browserEvent.touches[0];
+        var direction = {x: touch.pageX - touchStartAtX, y: touch.pageY - touchStartAtY},
+            length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+
+        if (length > 10 && longPressTimer)
+        {
+            clearTimeout(longPressTimer);
+            longPressTimer = false;
+        }
+    };
+    var dragOut = function(evt, el, o) {
+      if (longPressTimer)
+      {
+          clearTimeout(longPressTimer);
+          longPressTimer = false;
+      }
+    };
     var touchStart = function(evt, el, o) {
         preventClick = false;
         originalTarget = el;
         startAt = evt.getXY();
+        touchStartAtX = evt.browserEvent.touches[0].pageX;
+        touchStartAtY = evt.browserEvent.touches[0].pageY;
         startTime = (new Date()).getTime();
-        longPressTimer = setTimeout(function(){ longPress(evt, el); }, (longPressTime * 1000));
+
+        longPressTimer = setTimeout(function() {
+            longPress(evt, el);
+        }, (longPressTime * 1000));
+
+        if (!isMobile)
+            Ext.get(el).on('mouseout', dragOut);
+        else
+            Ext.get(el).on('touchmove', touchMove);
     };    
     var touchEnd = function(evt, el, o) {
-        if (longPressTimer) clearTimeout(longPressTimer);
+        if (longPressTimer)
+        {
+            clearTimeout(longPressTimer);
+            longPressTimer = false;
+        }
+        if (!isMobile)
+            Ext.get(el).un('mouseout', dragOut);
+        else
+            Ext.get(el).un('touchmove', dragOut);
 
         var endAt = evt.getXY(),
             endTime = (new Date()).getTime();
