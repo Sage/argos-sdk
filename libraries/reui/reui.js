@@ -141,7 +141,7 @@ ReUI = {};
         var link = D.findAncestorByTag(target, 'a');
         if (link) 
         {
-            var data = extractDataFromHash(link.hash),
+            var data = extractInfoFromHash(link.hash),
                 page = data && D.get(data.page);
             if (page)
             {
@@ -182,7 +182,8 @@ ReUI = {};
                 context.history.push({
                     hash: context.hash,
                     page: page.id,
-                    parameters: o.parameters
+                    tag: o.tag,
+                    data: o.data
                 });
         }
 
@@ -240,16 +241,18 @@ ReUI = {};
 
             context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);                                                               
                 
-            D.dispatch(from, 'aftertransition', {out: true});            
-            D.dispatch(to, 'aftertransition', {out: false});
+            D.dispatch(from, 'aftertransition', {out: true, tag: o.tag, data: o.data});
+            D.dispatch(to, 'aftertransition', {out: false, tag: o.tag, data: o.data});
         }
+
+        console.log(JSON.stringify(o));
         
         context.transitioning = true;
 
         D.clearTimer(context.check);
 
-        D.dispatch(from, 'beforetransition', {out: true});            
-        D.dispatch(to, 'beforetransition', {out: false});
+        D.dispatch(from, 'beforetransition', {out: true, tag: o.tag, data: o.data});
+        D.dispatch(to, 'beforetransition', {out: false, tag: o.tag, data: o.data});
 
         if (R.disableFx === true)
         {
@@ -283,14 +286,14 @@ ReUI = {};
             fx(from, to, dir, complete);
     };
 
-    var extractDataFromHash = function(hash) {
+    var extractInfoFromHash = function(hash) {
         if (hash && hash.indexOf(R.hashPrefix) === 0)
         {
             var segments = hash.substr(R.hashPrefix.length).split(';');
             return {
                 hash: hash,
                 page: segments[0],
-                parameters: segments.length <= 2 ? segments[1] : segments.slice(1)                    
+                tag: segments.length <= 2 ? segments[1] : segments.slice(1)
             };
         }
 
@@ -298,8 +301,8 @@ ReUI = {};
     };
 
     var formatHashForPage = function(page, options) {
-        var segments = options && options.parameters
-            ? [page.id].concat(options.parameters)
+        var segments = options && options.tag
+            ? [page.id].concat(options.tag)
             : [page.id];
         return R.hashPrefix + segments.join(';');       
     };
@@ -328,20 +331,24 @@ ReUI = {};
         {
             // do reverse checking here, loop-and-trim will be done by show
             var reverse = false,
-                data = false;
+                info,
+                page;
 
             for (var position = context.history.length - 2; position >= 0; position--)
                 if (context.history[position].hash == location.hash)
                 {
-                    data = context.history[position];
+                    info = context.history[position];
                     reverse = true;
                     break;
                 }
 
-            var data = data || extractDataFromHash(location.hash),
-                page = data && D.get(data.page);
+            info = info || extractInfoFromHash(location.hash);
+            page = info && D.get(info.page);
+
+            // more often than not, data will only be needed when moving to a previous view (and restoring it's state).
+            
             if (page)
-                R.show(page, {reverse: reverse});                    
+                R.show(page, {reverse: reverse, tag: info && info.tag, data: info && info.data});
         }         
     };
 
@@ -540,6 +547,7 @@ ReUI = {};
                     context.history = context.history.splice(0, position + 1);
                     context.hash = hash;
 
+                    // indicate that context.history has already been taken care of (i.e. nothing needs to be pushed).
                     o.trimmed = true; 
                     
                     // trim up the browser history

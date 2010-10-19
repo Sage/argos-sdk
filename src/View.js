@@ -115,13 +115,19 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <summary>
             ///     Show's the view using iUI in order to transition to the new element.
             /// </summary>
+            if (options)
+            {
+                console.log(Ext.util.JSON.encode(options));
+                console.log(Base64.encode(Ext.util.JSON.encode(options)));
+            }
+
             if (this.refreshRequiredFor(options))
             {
                 this.refreshRequired = true;
                 this.options = options || {};
             }
 
-            ReUI.show(this.el.dom);
+            ReUI.show(this.el.dom, {tag: this.getTag(), data: this.getContext()});
         },
         beforeTransitionTo: function() {
             /// <summary>
@@ -154,6 +160,8 @@ Ext.namespace('Sage.Platform.Mobile');
             /// </summary>
             /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>
             return App.getService(this.serviceName); /* if false is passed, the default service will be returned */
+        },
+        getTag: function() {
         },
         getContext: function() {
             return {id: this.id};
