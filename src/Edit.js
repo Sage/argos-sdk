@@ -342,6 +342,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                         },
                         failure: function(response, o) {
                             this.enableForm();
+                            this.requestFailure(response, o);
                         },
                         scope: this
                     });
@@ -377,6 +378,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                         },
                         failure: function(response, o) {
                             this.enableForm();
+                            this.requestFailure(response, o);
                         },
                         scope: this
                     });
