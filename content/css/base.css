@@ -303,7 +303,7 @@ body[orient] > div.toolbar-float[open]
 .calendar-table
 {
     width: 98%;
-    border: 1px solid green;
+    margin: 0 auto;
 }
 
 .calendar-table .calendar-month-header,
@@ -317,13 +317,6 @@ body[orient] > div.toolbar-float[open]
     padding: 10px;
     text-align: center;
     cursor: pointer;
-}
-
-.calendar-table .calendar-day:hover,
-.calendar-table .calendar-day.weekend:hover
-{
-    background-color: green;
-    color: white;
 }
 
 .calendar-table .calendar-day.today
@@ -341,4 +334,17 @@ body[orient] > div.toolbar-float[open]
     background-color: darkGray;
     color: white;
     font-weight: bold;
+}
+
+.time-content
+{
+    text-align: center;
+    margin-top: 6px;
+}
+
+.time-content > input.hour-field,
+.time-content > input.minute-field
+{
+    width: 36px;
+    padding-left: 6px;
 }

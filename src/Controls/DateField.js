@@ -4,6 +4,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     var U = Sage.Platform.Mobile.Utility;
 
     Sage.Platform.Mobile.Controls.DateField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
+        //TODO: make the input a HTML5 "date" field. Webkit & Chrome, overrides our styles for that. 
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<a class="button whiteButton"><span>{%: $.lookupText %}</span></a>',
@@ -14,6 +15,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         completeText: 'Select',
         lookupText: '...',
         view: 'generic_calendar',
+        showTime: false,
         init: function() {
             Sage.Platform.Mobile.Controls.DateField.superclass.init.apply(this, arguments);
 
@@ -21,7 +23,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         complete: function() {
             var view = App.getActiveView();
-            this.currentValue = view.date;
+            this.currentValue = view.getDateTime();
             this.setText(this.currentValue);
             ReUI.back();
         },
@@ -36,7 +38,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                         scope: this
                     }]
                 },
-                date: this.originalValue
+                date: this.originalValue,
+                showTime: this.showTime
             };
         },
         navigateToDateView: function() {
@@ -78,7 +81,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         //TODO: make formatting configurable
         setText: function(val) {
-            this.el.dom.value = String.format('{0}-{1}-{2}', (val.getMonth()+1), val.getDate(), val.getFullYear());
+            var time = String.format('{0}-{1}-{2}', (val.getMonth()+1), val.getDate(), val.getFullYear());
+            if (this.showTime === true) time += String.format(' {0}:{1}', val.getHours(), val.getMinutes());
+
+            this.el.dom.value = time;
         },
         // from http://dansnetwork.com/2008/11/01/javascript-iso8601rfc3339-date-parser/
         parseDate: function(dString) {
