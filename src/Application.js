@@ -41,7 +41,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             'beforeviewtransitionaway',
             'beforeviewtransitionto',
             'viewtransitionaway',
-            'viewtransitionto'
+            'viewtransitionto',
+            'viewactivate'
         );
     },
     setup: function() {
@@ -70,7 +71,12 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
                 else
                     this.viewTransitionTo(view);
             }
-        }, this);          
+        }, this);
+        Ext.getBody().on('activate', function(evt, el, o) {
+            var view = this.getView(el);
+            if (view)
+                this.viewActivate(view, evt.browserEvent.tag, evt.browserEvent.data);
+        }, this);
                 
         if (this.enableCaching)
         {
@@ -251,12 +257,6 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     viewTransitionTo: function(view) {
         this.fireEvent('viewtransitionto', view);
 
-        /*
-        // todo: should be here instead?
-        for (var n in this.bars)
-                this.bars[n].clear();
-        */
-
         var tools = view.options ? (view.options.tools || view.tools) : (view.tools); 
 
         if (tools)
@@ -270,6 +270,26 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             this.context.view.pop();
 
         view.transitionTo();
+    },
+    viewActivate: function(view, tag, data) {
+        this.fireEvent('viewactivate', view, tag, data);
+
+        view.activate(tag, data);
+    },
+    queryNavigationContext: function(predicate, depth, scope) {
+        if (typeof depth !== 'number')
+        {
+            scope = depth;
+            depth = 0;
+        }
+
+        var list = ReUI.context.history || [],
+            depth = depth || 0;
+
+        for (var i = list.length - 2, j = 0; i >= 0 && (depth <= 0 || j < depth); i--, j++)
+            if (predicate.call(scope || this, list[i].data)) return list[i].data;
+
+        return false;
     }
 });
 

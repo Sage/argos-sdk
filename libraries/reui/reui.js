@@ -243,13 +243,15 @@ ReUI = {};
                 
             D.dispatch(from, 'aftertransition', {out: true, tag: o.tag, data: o.data});
             D.dispatch(to, 'aftertransition', {out: false, tag: o.tag, data: o.data});
-        }
-
-        console.log(JSON.stringify(o));
+        }       
         
         context.transitioning = true;
 
         D.clearTimer(context.check);
+
+        // dispatch an 'activate' event to let the page be aware that is being show as the result of an external
+        // event (i.e. browser back/forward navigation).
+        if (o.external) D.dispatch(to, 'activate', {tag: o.tag, data: o.data});
 
         D.dispatch(from, 'beforetransition', {out: true, tag: o.tag, data: o.data});
         D.dispatch(to, 'beforetransition', {out: false, tag: o.tag, data: o.data});
@@ -348,7 +350,7 @@ ReUI = {};
             // more often than not, data will only be needed when moving to a previous view (and restoring it's state).
             
             if (page)
-                R.show(page, {reverse: reverse, tag: info && info.tag, data: info && info.data});
+                R.show(page, {external: true, reverse: reverse, tag: info && info.tag, data: info && info.data});
         }         
     };
 
@@ -548,7 +550,7 @@ ReUI = {};
                     context.hash = hash;
 
                     // indicate that context.history has already been taken care of (i.e. nothing needs to be pushed).
-                    o.trimmed = true; 
+                    o.trimmed = true;
                     
                     // trim up the browser history
                     // if the requested hash does not equal the current location hash, trim up history.

@@ -300,6 +300,11 @@ Ext.namespace('Sage.Platform.Mobile');
             else
                 return Sage.Platform.Mobile.Detail.superclass.refreshRequiredFor.call(this, options);
         },
+        activate: function(tag, data) {
+            if (data && data.options && data.options.descriptor) this.setTitle(data.options.descriptor);
+
+            Sage.Platform.Mobile.Detail.superclass.activate.apply(this, arguments);
+        },
         show: function(options) {
             if (options && options.descriptor) this.setTitle(options.descriptor);
 

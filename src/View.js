@@ -111,16 +111,18 @@ Ext.namespace('Sage.Platform.Mobile');
         },
         refresh: function() {
         },
+        activate: function(tag, data) {
+            // todo: use tag only?
+            if (data && this.refreshRequiredFor(data.options))
+            {
+                this.refreshRequired = true;
+                this.options = data.options || {};
+            }
+        },
         show: function(options) {
             /// <summary>
             ///     Show's the view using iUI in order to transition to the new element.
             /// </summary>
-            if (options)
-            {
-                console.log(Ext.util.JSON.encode(options));
-                console.log(Base64.encode(Ext.util.JSON.encode(options)));
-            }
-
             if (this.refreshRequiredFor(options))
             {
                 this.refreshRequired = true;
@@ -164,7 +166,8 @@ Ext.namespace('Sage.Platform.Mobile');
         getTag: function() {
         },
         getContext: function() {
-            return {id: this.id};
+            // todo: should we track options?
+            return {id: this.id, options: this.options};
         }
     });
 })();
