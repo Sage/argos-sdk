@@ -342,3 +342,16 @@ body[orient] > div.toolbar-float[open]
     color: white;
     font-weight: bold;
 }
+
+.time-content
+{
+    text-align: center;
+    margin-top: 6px;
+}
+
+.time-content > input.hour-field,
+.time-content > input.minute-field
+{
+    width: 20%;
+    padding-left: 6px;
+}

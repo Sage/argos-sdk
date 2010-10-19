@@ -1,11 +1,22 @@
 (function() {
     Sage.Platform.Mobile.Calendar = Ext.extend(Sage.Platform.Mobile.View, {
         attachmentPoints: {
-            contentEl: '.panel-content'
+            contentEl: '.panel-content',
+            calendarEl: '.calendar-content',
+            timeEl: '.time-content',
+            hourField: '.hour-field',
+            minuteField: '.minute-field'
         },
         viewTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel">',
-            '<div class="panel-content"></div>',
+                '<div class="panel-content">',
+                    '<div class="calendar-content"></div>',
+                    '<div class="time-content">',
+                        '<input type="number" maxlength="2" min="0" max="23" class="hour-field" />',
+                        '&nbsp;:&nbsp;',
+                        '<input type="number" maxlength="2" min="0" max="59" class="minute-field" />',
+                    '</div>',
+                '</div>',
             '</div>'
         ]),
         calendarStartTemplate: '<table class="calendar-table">',
@@ -28,6 +39,7 @@
         id: 'generic_calendar',
         expose: false,
         date: false,
+        showTime: false,
         selectedDateEl: false,
         weekEnds: [0, 6],
         dayLabels : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -35,16 +47,55 @@
                      'May', 'June', 'July', 'August', 'September',
                      'October', 'November', 'December'],
         daysInMonth : [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+        init: function() {
+            Sage.Platform.Mobile.Calendar.superclass.init.call(this);
+
+            this.hourField
+                .on('keyup', this.validateHour, this)
+                .on('blur', this.validateHour, this);
+
+            this.minuteField
+                .on('keyup', this.validateMinute, this)
+                .on('blur', this.validateMinute, this);
+        },
+        validateHour: function(evt, el, o) {
+            var minimum = parseInt(this.hourField.getAttribute('min'), 10),
+                maximum = parseInt(this.hourField.getAttribute('max'), 10);
+
+            this.validate(this.hourField, minimum, maximum);
+        },
+        validateMinute: function(evt, el, o) {
+            var minimum = parseInt(this.minuteField.getAttribute('min'), 10),
+                maximum = parseInt(this.minuteField.getAttribute('max'), 10);
+
+            this.validate(this.minuteField, minimum, maximum);
+        },
+        validate: function(field, minimum, maximum) {
+            var value = parseInt(field.getValue(), 10);
+
+            if (isNaN(value) || value < minimum || value > maximum)
+                field.addClass('field-error');
+            else
+                field.removeClass('field-error');
+        },
         show: function(options) {
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
-            
+
+            if (this.options.showTime === true) this.showTime = true;
+
             if (this.options.date) this.date = this.options.date;
             else this.date = new Date();
             
             this.month = this.date.getMonth();
             this.year = this.date.getFullYear();
+
+            this.hourField.dom.value = this.date.getHours();
+            this.minuteField.dom.value = this.date.getMinutes();
             
             this.renderCalendar();
+
+            if (this.showTime) this.timeEl.show();
+            else this.timeEl.hide();
         },
         goToNextMonth: function() {
             if (this.month == 11)
@@ -73,6 +124,12 @@
             this.selectedDateEl = Ext.get(el).addClass('selected');
 
             this.date = new Date(this.year, this.month, options.date);
+        },
+        getDateTime: function() {
+            this.date.setHours(this.hourField.getValue());
+            this.date.setMinutes(this.minuteField.getValue());
+
+            return this.date;
         },
         renderCalendar: function() {
             var mm = this.month,
@@ -150,7 +207,7 @@
             }
             calHTML.push(this.calendarEndTemplate);
 
-            this.contentEl.update(calHTML.join(''));
+            this.calendarEl.update(calHTML.join(''));
 
             selectedEl = Ext.DomQuery.select('.selected', 'table.calendar-table', 'td');
             if (Ext.isArray(selectedEl) && selectedEl.length > 0) this.selectedDateEl = Ext.get(selectedEl[0]);
