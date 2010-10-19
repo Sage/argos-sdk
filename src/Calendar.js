@@ -119,7 +119,7 @@
 
             this.renderCalendar();
         },
-        selectDay: function(options, evy, el) {
+        selectDay: function(options, evt, el) {
             if (this.selectedDateEl) this.selectedDateEl.removeClass('selected');
             this.selectedDateEl = Ext.get(el).addClass('selected');
 
