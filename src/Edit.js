@@ -437,6 +437,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     this.el.removeClass('panel-loading');
             }
         },
+        refreshRequiredFor: function(options) {
+            if (this.options)
+            {
+                if (options)
+                {
+                    if (this.options.insert !== options.insert) return true;
+                    if (this.options.entry !== options.entry) return true;
+                }
+
+                return false;
+            }
+            else
+                return Sage.Platform.Mobile.Edit.superclass.refreshRequiredFor.call(this, options);
+        },
         refresh: function() {
             this.entry = false;
             this.changes = false;
