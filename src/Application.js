@@ -360,8 +360,11 @@ Ext.onReady(function(){
         preventClick = false;
         originalTarget = el;
         startAt = evt.getXY();
-        touchStartAtX = evt.browserEvent.touches[0].pageX;
-        touchStartAtY = evt.browserEvent.touches[0].pageY;
+        if (evt.browserEvent && evt.browserEvent.touches)
+        {
+            touchStartAtX = evt.browserEvent.touches[0].pageX;
+            touchStartAtY = evt.browserEvent.touches[0].pageY;
+        }
         startTime = (new Date()).getTime();
 
         longPressTimer = setTimeout(function() {
