@@ -55,6 +55,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.currentValue = view.createEntry();
 
                 this.setText(this.formatter(view.getValues(true), true, true));
+
+                this.fireEvent('change', this.currentValue, this);
             }
 
             ReUI.back();

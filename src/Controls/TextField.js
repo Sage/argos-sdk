@@ -1,40 +1,50 @@
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
-    Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
-        // todo: add notificationTrigger (keyup, blur)
+    Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
+        validationTrigger: false,
+        notificationTrigger: false,
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<input type="text" name="{%= $.name %}" class="field-text" {% if ($.readonly) { %} readonly {% } %}>'
         ]),        
         init: function() {
             if (this.validInputOnly)
-            {
                 this.el.on('keypress', this.onKeyPress, this);
-            }
-            else
-            {
-                switch (this.validationTrigger)
-                {
-                    case 'keyup':
-                        this.el.on('keyup', this.onValidationTrigger, this);
-                        break;
-                    case 'blur':
-                        this.el.on('blur', this.onValidationTrigger, this);
-                        break;
-                }
-            }
+
+            this.el
+                .on('keyup', this.onKeyUp, this)
+                .on('blur', this.onBlur, this);
         },
         onKeyPress: function(evt, el, o) {
-            if (this.validInputOnly)
+            var v = this.getValue() + String.fromCharCode(evt.getCharCode());
+            if (this.validate(v))
             {
-                var v = this.getValue() + String.fromCharCode(evt.getCharCode());
-                if (this.validate(v))
-                {
-                    evt.stopEvent();
-                    return;
-                }
-            }
+                evt.stopEvent();
+                return;
+            }            
+        },
+        onKeyUp: function(evt, el, o) {
+            if (this.validationTrigger == 'keyup')
+                this.onValidationTrigger(evt, el, o);
+
+            if (this.notificationTrigger == 'keyup')
+                this.onNotificationTrigger(evt, el, o);
+        },
+        onBlur: function(evt, el, o) {
+            if (this.validationTrigger == 'blur')
+                this.onValidationTrigger(evt, el, o);
+
+            if (this.notificationTrigger == 'blur')
+                this.onNotificationTrigger(evt, el, o);
+        },
+        onNotificationTrigger: function(evt, el, o) {            
+            var currentValue = this.getValue();
+
+            if (this.previousValue != currentValue)
+                this.fireEvent('change', currentValue, this);
+
+            this.previousValue = currentValue;
         },
         onValidationTrigger: function(evt, el, o) {
             if (this.validate())
@@ -47,6 +57,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         setValue: function(val) {
             this.originalValue = val;
+            this.previousValue = false;
 
             this.el.dom.value = val;
         },

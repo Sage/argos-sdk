@@ -94,6 +94,24 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 fn: this.save,
                 scope: this
             }];
+        },        
+        invokeAction: function(name, parameters, evt, el) {
+            var fieldEl = el.findParent('[data-field]', this.el, true),
+                field = this.fields[fieldEl && fieldEl.getAttribute('data-field')];
+
+            if (field && typeof field[name] === 'function')
+                return field[name].apply(field, [parameters, evt, el]);
+
+            return Sage.Platform.Mobile.Edit.superclass.invokeAction.apply(this, arguments);
+        },
+        hasAction: function(name, evt, el) {
+            var fieldEl = el.findParent('[data-field]', this.el, true),
+                field = this.fields[fieldEl && fieldEl.getAttribute('data-field')];
+
+            if (field && typeof field[name] === 'function')
+                return true;
+
+            return Sage.Platform.Mobile.Edit.superclass.hasAction.apply(this, arguments);
         },
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());

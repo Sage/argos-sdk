@@ -23,9 +23,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         complete: function() {
             var view = App.getActiveView();
-            this.currentValue = view.getDateTime();
-            this.setText(this.currentValue);
-            ReUI.back();
+            if (view)
+            {
+                this.currentValue = view.getDateTime();
+                
+                this.setText(this.currentValue);
+
+                this.fireEvent('change', this.currentValue, this);
+
+                ReUI.back();
+            }
         },
         createNavigationOptions: function() {
             return {

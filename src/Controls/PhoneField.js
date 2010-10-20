@@ -47,12 +47,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
 
             return number;
-        },       
-        init: function() {
-            this.el.on('keyup', this.onKeyUp, this);
-        },
+        },               
         onKeyUp: function(evt, el, o) {
             this.el.dom.value = this.formatNumberForDisplay(this.el.dom.value, this.getValue());
+
+            Sage.Platform.Mobile.Controls.PhoneField.superclass.onKeyUp.apply(this, arguments);
         }
     });
 

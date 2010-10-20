@@ -23,6 +23,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             Sage.Platform.Mobile.Controls.LookupField.superclass.init.apply(this, arguments);
 
             this.containerEl.on('click', this.onClick, this);
+
+            if (!this.requireSelection)
+                this.el
+                    .on('keyup', this.onKeyUp, this)
+                    .on('blur', this.onBlur, this);
         },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
@@ -63,8 +68,26 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.navigateToListView();
             }
         },
+        onKeyUp: function(evt, el, o) {
+            if (this.notificationTrigger == 'keyup')
+                this.onNotificationTrigger(evt, el, o);
+        },
+        onBlur: function(evt, el, o) {
+            if (this.notificationTrigger == 'blur')
+                this.onNotificationTrigger(evt, el, o);
+        },
+        onNotificationTrigger: function(evt, el, o) {
+            var currentValue = this.getText();
+
+            if (this.previousValue != currentValue)
+                this.fireEvent('change', currentValue, this);
+
+            this.previousValue = currentValue;
+        },
         setText: function(text) {
             this.el.dom.value = text;
+
+            this.previousValue = text;
         },
         getText: function() {
             return this.el.dom.value;
@@ -91,8 +114,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     };
 
                     this.setText(text);
+
+                    this.fireEvent('change', this.currentValue, this);
+
+                    // there should only be a single selection
                     break;
                 }
+                
                 ReUI.back();
             }
         },

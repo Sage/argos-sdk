@@ -18,7 +18,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.el.on('click', this.onClick, this, {stopEvent: true});
         },
         onClick: function(evt, el, o) {
-            this.el.dom.setAttribute('toggled', this.el.getAttribute('toggled') !== 'true');
+            var toggledValue = this.el.getAttribute('toggled') !== 'true';
+
+            this.el.dom.setAttribute('toggled', toggledValue);
+
+            this.fireEvent('change', toggledValue, this);
         },
         getValue: function() {
             return this.el.getAttribute('toggled') === 'true';

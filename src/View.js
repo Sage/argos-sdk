@@ -48,40 +48,45 @@ Ext.namespace('Sage.Platform.Mobile');
                 .on('load', this.load, this, {single: true})
                 .on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'});            
         },
-        initiateActionFromClick: function(evt, el, o) {
-            var el = Ext.get(el),
-                action = el.getAttribute('data-action'),
-                parameters = {
-                    $event: evt,
-                    $source: el
-                },
-                match;
+        getParametersForAction: function(name, evt, el) {
+            var parameters = {
+                $event: evt,
+                $source: el
+            };
 
-            if (this.hasAction(action))
+            for (var i = 0; i < el.dom.attributes.length; i++)
             {
+                var attributeName = el.dom.attributes[i].name;
+                if (/^((?=data-action)|(?!data))/.test(attributeName)) continue;
+
+                /* transform hyphenated names to pascal case, minus the data segment, to be in line with HTML5 dataset naming conventions */
+                /* see: http://dev.w3.org/html5/spec/elements.html#embedding-custom-non-visible-data */
+                /* todo: remove transformation and use dataset when browser support is there */
+                var parameterName = attributeName.substr('data-'.length).replace(/-(\w)(\w+)/g, function($0, $1, $2) { return $1.toUpperCase() + $2; });
+
+                parameters[parameterName] = el.getAttribute(attributeName);
+            }
+
+            return parameters;
+        },        
+        initiateActionFromClick: function(evt, el) {
+            var el = Ext.get(el),
+                action = el.getAttribute('data-action');
+
+            if (this.hasAction(action, evt, el))
+            {
+                var parameters = this.getParametersForAction(action, evt, el);
+
                 evt.stopEvent();
 
-                for (var i = 0; i < el.dom.attributes.length; i++)
-                {
-                    var attributeName = el.dom.attributes[i].name;
-                    if (/^((?=data-action)|(?!data))/.test(attributeName)) continue;
-
-                    /* transform hyphenated names to pascal case, minus the data segment, to be in line with HTML5 dataset naming conventions */
-                    /* see: http://dev.w3.org/html5/spec/elements.html#embedding-custom-non-visible-data */
-                    /* todo: remove transformation and use dataset when browser support is there */
-                    var parameterName = attributeName.substr('data-'.length).replace(/-(\w)(\w+)/g, function($0, $1, $2) { return $1.toUpperCase() + $2; });
-
-                    parameters[parameterName] = el.getAttribute(attributeName);
-                }
-
-                this.invokeAction(action, [parameters, evt, el]);
+                this.invokeAction(action, parameters, evt, el);
             }
         },
-        hasAction: function(name) {
+        hasAction: function(name, evt, el) {
             return (typeof this[name] === 'function');
         },
-        invokeAction: function(name, args) {
-            this[name].apply(this, args);
+        invokeAction: function(name, parameters, evt, el) {            
+            return this[name].apply(this, [parameters, evt, el]);
         },
         isActive: function() {
             return (this.el.getAttribute('selected') === 'true');
