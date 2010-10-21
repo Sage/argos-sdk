@@ -54,7 +54,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 $source: el
             };
 
-            for (var i = 0; i < el.dom.attributes.length; i++)
+            for (var i = 0, attrLen = el.dom.attributes.length; i < attrLen; i++)
             {
                 var attributeName = el.dom.attributes[i].name;
                 if (/^((?=data-action)|(?!data))/.test(attributeName)) continue;
