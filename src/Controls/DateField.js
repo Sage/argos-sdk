@@ -66,12 +66,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         isDirty: function() {
             if (!this.originalValue && this.currentValue) return true;
 
-            if (this.originalValue && this.currentValue) return !Date.equals(this.originalValue, this.currentValue);
+            if (this.originalValue && this.currentValue) return !this.originalValue.equals(this.currentValue);
 
             return false;
         },
         getValue: function() {
-            return this.currentValue;
+            return this.currentValue.toISOString();
         },
         //FIXME: Date.parse returns NaN for strings like '2006-12-11T00:00:00-07:00'
         setValue: function(val) {
