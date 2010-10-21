@@ -82,7 +82,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.onNotificationTrigger(evt, el, o);
         },
         onNotificationTrigger: function(evt, el, o) {
-            var currentValue = this.getText();
+            var currentValue = this.getValue();
 
             if (this.previousValue != currentValue)
                 this.fireEvent('change', currentValue, this);
@@ -113,6 +113,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     if (text && this.textTemplate)
                         text = this.textTemplate.apply(text, this);
 
+                    this.currentSelection = val;
+
                     this.currentValue = {
                         key: key || text,
                         text: text || key
@@ -135,7 +137,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (this.originalValue && this.currentValue) return this.originalValue.key !== this.currentValue.key;
 
             return false;
-        },       
+        },
+        getSelection: function() {
+            return this.currentSelection
+        },
         getValue: function() {
             var value,
                 // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false
@@ -191,6 +196,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return value;
         },
         setValue: function(val) {
+
+            this.currentSelection = val;
+
             // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false
             // and IS NOT defined use keyProperty or textProperty in its place.
             var keyProperty = this.valueKeyProperty !== false
