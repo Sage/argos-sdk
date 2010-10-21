@@ -88,7 +88,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         //TODO: make formatting configurable
         setText: function(val) {
-            var time = String.format('{0}-{1}-{2}', (val.getMonth()+1), val.getDate(), val.getFullYear());
+            var time = String.format('{0}/{1}/{2}', (val.getMonth()+1), val.getDate(), val.getFullYear());
             if (this.showTime === true) time += String.format(' {0}:{1}', val.getHours(), val.getMinutes());
 
             this.el.dom.value = time;
