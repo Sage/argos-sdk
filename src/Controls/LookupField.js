@@ -24,6 +24,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.containerEl.on('click', this.onClick, this);
 
+            if (!this.view) this.containerEl.select('a').hide();
+
             if (!this.requireSelection)
                 this.el
                     .on('keyup', this.onKeyUp, this)
