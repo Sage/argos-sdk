@@ -22,7 +22,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
     Sage.Platform.Mobile.Controls.PicklistField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
         picklist: false,
-        orderBy: 'number asc',
+        orderBy: 'sort asc',
         storageMode: 'text',
         dependentErrorText: "A value for '{0}' must be selected.",
         valueKeyProperty: false,
@@ -45,7 +45,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     this.textProperty = 'text';
                     break;
             }
-        },        
+        },
+        isReadOnly: function() {
+            return !this.picklist;
+        },
         getDependentValue: function() {
             if (this.dependsOn && this.owner)
             {

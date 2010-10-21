@@ -24,12 +24,15 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.containerEl.on('click', this.onClick, this);
 
-            if (!this.view) this.containerEl.select('a').hide();
+            if (this.isReadOnly()) this.containerEl.select('a').hide();
 
             if (!this.requireSelection)
                 this.el
                     .on('keyup', this.onKeyUp, this)
                     .on('blur', this.onBlur, this);
+        },
+        isReadOnly: function() {
+            return !this.view;
         },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
