@@ -24,12 +24,17 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.containerEl.on('click', this.onClick, this);
 
-            if (this.isReadOnly()) this.containerEl.select('a').hide();
-
-            if (!this.requireSelection)
+            if (this.isReadOnly())
+            {
+                this.containerEl.addClass('field-disabled');
+                this.el.dom.readOnly = true;
+            }
+            else if (!this.requireSelection)
+            {
                 this.el
                     .on('keyup', this.onKeyUp, this)
                     .on('blur', this.onBlur, this);
+            }
         },
         isReadOnly: function() {
             return !this.view;

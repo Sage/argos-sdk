@@ -285,6 +285,12 @@ body[orient] > div.toolbar-float[open]
 }
 
 /* fields */
+.row-edit.field-disabled > a
+{
+    opacity: 0.3;
+    cursor: default;
+}
+
 .row-edit[data-field-type="picklist"] > a,
 .row-edit[data-field-type="lookup"] > a,
 .row-edit[data-field-type="select"] > a,
