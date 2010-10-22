@@ -392,9 +392,12 @@ Ext.namespace('Sage.Platform.Mobile');
         navigateToInsertView: function() {
             var view = App.getView(this.insertView || this.editView);
             if (view)
+            {
+                view.clearValues();         //Clear previous insert values
                 view.show({
                     insert: true
                 });
+            }
         },
         processFeed: function(feed) {
             /// <summary>
