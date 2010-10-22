@@ -349,9 +349,9 @@ body[orient] > div.toolbar-float[open]
     padding-left: 6px;
 }
 
-/* Webkit browsers in Mac misbehaves. Don't know why. */
-.ext-webkit.ext-mac .time-content > input.hour-field,
-.ext-webkit.ext-mac .time-content > input.minute-field
+/* Webkit browsers misbehaves. Don't know why. */
+.ext-webkit .time-content > input.hour-field,
+.ext-webkit .time-content > input.minute-field
 {
     width: 60px;
 }
