@@ -393,7 +393,6 @@ Ext.namespace('Sage.Platform.Mobile');
             var view = App.getView(this.insertView || this.editView);
             if (view)
             {
-                view.clearValues();         //Clear previous insert values
                 view.show({
                     insert: true
                 });

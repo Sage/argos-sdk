@@ -356,6 +356,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                                 resourceKind: this.resourceKind
                             });
 
+                            this.clearValues();    //Clear values on Save
+
                             ReUI.back();
                         },
                         failure: function(response, o) {
