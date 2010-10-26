@@ -151,8 +151,24 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                 return false;
             }
-                      
-            return (this.currentValue && !this.originalValue);
+
+            if (this.originalValue)
+            {
+                if (!this.requireSelection && !this.textTemplate)
+                    if (this.originalValue.text != this.getText())
+                        return true; 
+            }
+            else
+            {
+                if (!this.requireSelection && !this.textTemplate)
+                {
+                    var text = this.getText();
+                    if (text && text.length > 0)
+                        return true;
+                }
+            }
+
+            return (this.originalValue != this.currentValue);
         },
         getSelection: function() {
             return this.currentSelection;
