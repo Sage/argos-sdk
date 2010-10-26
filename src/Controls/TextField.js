@@ -2,11 +2,19 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
-        validationTrigger: false,
+        multiline: false,
         notificationTrigger: false,
+        rows: 4,
+        validationTrigger: false,
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<input type="text" name="{%= $.name %}" class="field-text" {% if ($.readonly) { %} readonly {% } %}>'
+            '{% if ($.multiline) { %}',
+                '<textarea name="{%= $.name %}" class="field-text" ',
+                    'rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />',
+            '{% } else { %}',
+                '<input type="text" name="{%= $.name %}" class="field-text" ',
+                    '{% if ($.readonly) { %} readonly {% } %}>',
+            '{% } %}'
         ]),        
         init: function() {
             if (this.validInputOnly)
