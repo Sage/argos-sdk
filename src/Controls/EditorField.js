@@ -52,8 +52,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (view)
             {
                 this.currentValue = view.createEntry();
+                this.validationValue = view.getValues(true);
 
-                this.setText(this.formatter(view.getValues(true), true, true));
+                this.setText(this.formatter(this.validationValue, true, true));
 
                 this.fireEvent('change', this.currentValue, this);
             }
