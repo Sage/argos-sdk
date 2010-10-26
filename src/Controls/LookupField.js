@@ -15,7 +15,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         textTemplate: false,
         valueKeyProperty: null,
         valueTextProperty: null,
-        requireSelection: true,
+        requireSelection: false,
         emptyText: 'empty',
         completeText: 'Select',
         lookupText: '...',
@@ -137,14 +137,25 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         isDirty: function() {
-            if (!this.originalValue && this.currentValue) return true;
+            if (this.originalValue && this.currentValue)
+            {
+                if (this.originalValue.key != this.currentValue.key)
+                    return true;
 
-            if (this.originalValue && this.currentValue) return this.originalValue.key !== this.currentValue.key;
+                if (this.originalValue.text != this.currentValue.text)
+                    return true;
 
-            return false;
+                if (!this.requireSelection && !this.textTemplate)
+                    if (this.originalValue.text != this.getText())
+                        return true;                
+
+                return false;
+            }
+                      
+            return (this.currentValue && !this.originalValue);
         },
         getSelection: function() {
-            return this.currentSelection
+            return this.currentSelection;
         },
         getValue: function() {
             var value,
@@ -157,7 +168,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     ? this.valueTextProperty || this.textProperty
                     : false;
 
-            if (keyProperty|| textProperty)
+            if (keyProperty || textProperty)
             {
                 if (this.currentValue)
                 {
