@@ -51,8 +51,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             var view = App.getActiveView();
             if (view)
             {
-                this.currentValue = view.createEntry();
-                this.validationValue = view.getValues(true);
+                // todo: is this the appropriate way to handle this?  do not want $key, $name, etc., when applying values.
+                // difference is primarily "as component" vs. "as child".
+                this.currentValue = this.applyTo ? view.getValues() : view.createEntry();
+                this.validationValue = view.getValues(true); // store all editor values for validation, not only dirty values
 
                 this.setText(this.formatter(this.validationValue, true, true));
 
@@ -70,17 +72,22 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         getValue: function() {
             return this.currentValue;
         },
+        validate: function(value) {            
+            return typeof value === 'undefined'
+                ? Sage.Platform.Mobile.Controls.EditorField.superclass.validate.call(this, this.validationValue)
+                : Sage.Platform.Mobile.Controls.EditorField.superclass.validate.apply(this, arguments);
+        },
         setValue: function(val)
         {            
             if (val)
             {
-                this.originalValue = this.currentValue = val;
+                this.originalValue = this.validationValue = this.currentValue = val;
 
                 this.setText(this.formatter(val, true, true));
             }
             else
             {
-                this.originalValue = this.currentValue = null;
+                this.originalValue = this.validationValue = this.currentValue = null;
 
                 this.setText(this.emptyText);
             }

@@ -72,20 +72,20 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
                     ? this.getValue()
                     : value;
 
-                if (typeof definition.fn === 'function')
+                var result = typeof definition.fn === 'function'
+                    ? definition.fn.call(definition.scope || this, value, this, this.owner)
+                    : definition.test instanceof RegExp
+                        ? !definition.test.test(value)
+                        : false;
+
+                if (result)
                 {
-                    return definition.fn.call(definition.scope || this, value, this, this.owner);
-                }
-                else if (definition.test instanceof RegExp)
-                {
-                    if (!definition.test.test(value))
-                    {
-                        var message = typeof definition.message === 'function'
-                            ? definition.message.call(definition.scope || this, value, this)
+                    if (definition.message)
+                        result = typeof definition.message === 'function'
+                            ? definition.message.call(definition.scope || this, value, this, this.owner)
                             : String.format(definition.message, value, this.name, this.label);
 
-                        return message || true;
-                    }
+                    return result;
                 }
             }
 

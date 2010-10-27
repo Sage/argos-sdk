@@ -30,7 +30,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return value.replace(/[^0-9x]/ig, "");
         },
         setValue: function(val) {
-            this.value = val;
+            this.originalValue = val;
+            this.previousValue = false;
 
             this.el.dom.value = this.formatNumberForDisplay(val);
         },

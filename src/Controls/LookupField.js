@@ -174,7 +174,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return this.currentSelection;
         },
         getValue: function() {
-            var value,
+            var value = null,
+                text = this.getText() || '',
                 // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false
                 // and IS NOT defined use keyProperty or textProperty in its place.
                 keyProperty = this.valueKeyProperty !== false
@@ -194,20 +195,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     // if a text template has been applied there is no way to guarantee a correct
                     // mapping back to the property
                     if (textProperty && !this.textTemplate)
-                        value = U.setValue(value || {}, textProperty, this.requireSelection ? this.currentValue.text : this.getText());
+                        value = U.setValue(value || {}, textProperty, this.requireSelection ? this.currentValue.text : text);
                 }
                 else if (!this.requireSelection)
                 {
-                    if (keyProperty)
-                        value = U.setValue(value || {}, keyProperty, this.getText());
+                    if (keyProperty && text.length > 0)
+                        value = U.setValue(value || {}, keyProperty, text);
 
                     // if a text template has been applied there is no way to guarantee a correct
                     // mapping back to the property
-                    if (textProperty && !this.textTemplate)
+                    if (textProperty && !this.textTemplate && text.length > 0)
                     {
-                        value = U.setValue(value || {}, textProperty, this.getText());
+                        value = U.setValue(value || {}, textProperty, text);
                     }
-                }
+                }                
             }
             else
             {
@@ -215,13 +216,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 {
                     value = this.requireSelection
                         ? this.currentValue.key
-                        : this.currentValue.text != this.getText() && !this.textTemplate
-                            ? this.getText()
+                        : this.currentValue.text != text && !this.textTemplate
+                            ? text
                             : this.currentValue.key;
                 }
-                else if (!this.requireSelection)
+                else if (!this.requireSelection && text.length > 0)
                 {
-                    value = this.getText();
+                    value = text;
                 }
             }
             

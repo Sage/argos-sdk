@@ -250,29 +250,27 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         getValues: function(ignoreDirtyFlag) {
             var o = {},
                 empty = true,
-                value, field;
+                value,
+                target,
+                field;
 
             for (var name in this.fields)
             {
                 field = this.fields[name];
+
                 if (ignoreDirtyFlag || field.alwaysUseValue || field.isDirty())
                 {
+                    value = this.fields[name].getValue();
+                    
                     if (field.applyTo !== false)
                     {
-                        value = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo, field.getValue());
-
-                        Ext.apply(o, value);
-
-                        //since we are applying values to another path, this field name is not needed in final object.
-                        //TODO: come up with a proper way to do this.
-                        delete o[name];
+                        target = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo);
+                        Ext.apply(target, value);
                     }
                     else
                     {
-                        value = this.fields[name].getValue();
+                        Sage.Platform.Mobile.Utility.setValue(o, name, value);
                     }
-
-                    Sage.Platform.Mobile.Utility.setValue(o, name, value);
 
                     empty = false;
                 }
