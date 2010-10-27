@@ -9,7 +9,7 @@ Ext.namespace('Sage.Platform.Mobile');
 Sage.Platform.Mobile.Utility = (function() {
     var nameToPathCache = {};
     var nameToPath = function(name) {
-        if (typeof name !== 'string' || name === '.') return [];        
+        if (typeof name !== 'string' || name === '.' || name === '') return []; // '', for compatibility  
         if (nameToPathCache[name]) return nameToPathCache[name];
         var parts = name.split('.');
         var path = [];
