@@ -244,7 +244,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     value = Sage.Platform.Mobile.Utility.getValue(o, name, noValue);
                 }
 
-                if (value !== noValue) field.setValue(value);
+                if (value !== noValue) field.setValue(value, true);
             }
         },
         getValues: function(ignoreDirtyFlag) {

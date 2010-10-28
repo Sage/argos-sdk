@@ -74,12 +74,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return this.currentValue.toISOString();
         },
         //FIXME: Date.parse returns NaN for strings like '2006-12-11T00:00:00-07:00'
-        setValue: function(val) {
+        setValue: function(val, initial) {
             var d;
             if (typeof val == 'string') d = this.parseDate(val);
             if (!val || !d || d.constructor !== Date) return;
 
-            this.originalValue = d;
+            if (initial) this.originalValue = d;            
 
             this.setText(d);
         },

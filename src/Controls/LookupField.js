@@ -228,7 +228,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             
             return value;
         },
-        setValue: function(val) {
+        setValue: function(val, initial) {
 
             this.currentSelection = val;
 
@@ -257,16 +257,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                 if (key || text)
                 {
-                    this.originalValue = this.currentValue = {
+                    this.currentValue = {
                         key: key || text,
                         text: text || key
                     };
+
+                    if (initial) this.originalValue = this.currentValue;
 
                     this.setText(this.currentValue.text);
                 }
                 else
                 {
-                    this.originalValue = this.currentValue = false;
+                    this.currentValue = false;
+
+                    if (initial) this.originalValue = this.currentValue;
 
                     this.setText(this.requireSelection ? this.emptyText : '');    
                 }
@@ -275,23 +279,27 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 if (val)
                 {
-                    this.originalValue = this.currentValue = {
+                    this.currentValue = {
                         key: val,
                         text: val
                     };
+
+                    if (initial) this.originalValue = this.currentValue;
 
                     this.setText(val);
                 }
                 else
                 {
-                    this.originalValue = this.currentValue = false;
+                    this.currentValue = false;
+
+                    if (initial) this.originalValue = this.currentValue;
 
                     this.setText(this.requireSelection ? this.emptyText : '');                
                 }
             }        
         },
         clearValue: function() {
-            this.setValue(false);
+            this.setValue(null, true);
         }
     });
 

@@ -27,15 +27,17 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         getValue: function() {
             return this.el.getAttribute('toggled') === 'true';
         },
-        setValue: function(val) {
-            this.originalValue = typeof val === 'string'
+        setValue: function(val, initial) {
+            val = typeof val === 'string'
                 ? /^true$/i.test(val)
                 : !!val;
 
-            this.el.dom.setAttribute('toggled', this.originalValue.toString());
+            if (initial) this.originalValue = val;
+
+            this.el.dom.setAttribute('toggled', val.toString());
         },
         clearValue: function() {
-            this.setValue(this.checked);
+            this.setValue(this.checked, true);
         },
         isDirty: function() {
             return (this.originalValue != this.getValue());
