@@ -352,9 +352,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                             App.fireEvent('refresh', {
                                 resourceKind: this.resourceKind
-                            });
-
-                            this.clearValues();    //Clear values on Save
+                            });                            
 
                             ReUI.back();
                         },
@@ -455,20 +453,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     this.el.removeClass('panel-loading');
             }
         },
-        refreshRequiredFor: function(options) {
-            if (this.options)
-            {
-                if (options)
-                {
-                    if (this.options.insert !== options.insert) return true;
-                    if (this.options.entry !== options.entry) return true;
-                }
-
-                return false;
-            }
-            else
-                return Sage.Platform.Mobile.Edit.superclass.refreshRequiredFor.call(this, options);
-        },
+        activate: function() {
+            // external navigation (browser back/forward) never refreshes the edit view as it's always a terminal loop.
+            // i.e. you never move "forward" from an edit view; you navigate to child editors, from which you always return.
+        },       
         refresh: function() {
             this.entry = false;
             this.changes = false;
