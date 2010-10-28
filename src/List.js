@@ -176,7 +176,8 @@ Ext.namespace('Sage.Platform.Mobile');
 
             App.on('refresh', this.onRefresh, this);
 
-            this.el.on('clicklong', this.onClickLong, this);
+            this.el.on('longpress', this.onLongPress, this);
+
             this.searchQueryEl
                 .on('keypress', this.onSearchKeyPress, this)
                 .on('keyup', this.onSearchKeyUp, this);
@@ -222,7 +223,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 this.search();
             }
         },
-        onClickLong: function(evt, el, o) {
+        onLongPress: function(evt, el, o) {
             evt.stopEvent();
 
             var el = Ext.get(el),
@@ -363,7 +364,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
             return request;
         },
-        navigateToContextView: function(key, descriptor) {
+        navigateToContextView: function(key, descriptor, entry) {
             /// <summary>
             ///     Shows the requested context dialog.
             /// </summary>
@@ -374,7 +375,8 @@ Ext.namespace('Sage.Platform.Mobile');
                     descriptor: descriptor,
                     key: key,
                     contextItems: this.contextItems,
-                    parentViewId: this.id
+                    parentViewId: this.id,
+                    entry: this.entries[key]
                 });
         },
         navigateToDetailView: function(key, descriptor) {
