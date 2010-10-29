@@ -237,9 +237,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 field = this.fields[name];
                 if (field.applyTo !== false)
                 {
-                    //TODO: Is there a better way to to this?
-                    path = field.applyTo == '' ? null : field.applyTo;
-                    value = Sage.Platform.Mobile.Utility.getValue(o, path, noValue);
+                    value = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo, noValue);
                 }
                 else
                 {
