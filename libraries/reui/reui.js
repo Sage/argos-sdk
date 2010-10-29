@@ -578,6 +578,8 @@ ReUI = {};
                 context.dialog = page;
 
                 D.select(page);
+
+                context.transitioning = false;
             }
             else
             {
