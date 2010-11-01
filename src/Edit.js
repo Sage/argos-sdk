@@ -325,20 +325,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         isFormDisabled: function() {
             return this.busy;
         },
-        disableForm: function() {
+        disable: function() {
             this.busy = true;
             this.el.addClass('view-busy');
             if (App.bars.tbar && App.bars.tbar.el)
                 App.bars.tbar.el.addClass('toolbar-busy');
         },
-        enableForm: function() {
+        enable: function() {
             this.busy = false;
             this.el.removeClass('view-busy');
             if (App.bars.tbar && App.bars.tbar.el)
                 App.bars.tbar.el.removeClass('toolbar-busy');
         },
         insert: function() {
-            this.disableForm();
+            this.disable();
 
             var values = this.getValues();
             if (values)
@@ -349,16 +349,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 if (request)
                     request.create(entry, {
                         success: function(created) {
-                            this.enableForm();
+                            this.enable();
 
                             App.fireEvent('refresh', {
                                 resourceKind: this.resourceKind
                             });                            
 
-                            ReUI.back();
+                            this.insertCompleted(created);
                         },
                         failure: function(response, o) {
-                            this.enableForm();
+                            this.enable();
                             this.requestFailure(response, o);
                         },
                         scope: this
@@ -369,11 +369,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 ReUI.back();
             }
         },
+        insertCompleted: function(entry) {
+            ReUI.back();
+        },
         update: function() {
             var values = this.getValues();
             if (values)
             {
-                this.disableForm();
+                this.disable();
 
                 var entry = this.createEntryForUpdate(values);
 
@@ -381,7 +384,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 if (request)
                     request.update(entry, {
                         success: function(modified) {
-                            this.enableForm();
+                            this.enable();
 
                             App.fireEvent('refresh', {
                                 resourceKind: this.resourceKind,
@@ -391,10 +394,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                                 }
                             });
 
-                            ReUI.back();
+                            this.updateCompleted(modified);
                         },
                         failure: function(response, o) {
-                            this.enableForm();
+                            this.enable();
                             this.requestFailure(response, o);
                         },
                         scope: this
@@ -404,6 +407,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 ReUI.back();
             }
+        },
+        updateCompleted: function(entry) {
+            ReUI.back();
         },
         showValidationSummary: function() {
             var content = [];                        
