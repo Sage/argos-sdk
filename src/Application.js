@@ -20,6 +20,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     defaultServerName: window.location.hostname,    
     defaultPort: window.location.port && window.location.port != 80 ? window.location.port : false,
     defaultProtocol: /https/i.test(window.location.protocol) ? 'https' : false,
+    enableCaching: false,
+    initialized: false,
+    defaultService: null,
     constructor: function() {
         /// <field name="initialized" type="Boolean">True if the application has been initialized; False otherwise.</field>
         /// <field name="context" type="Object">A general store for global context data.</field>
@@ -27,13 +30,10 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// <field name="viewsById" type="Object">A map for looking up a view by its ID.</field>
 
         Sage.Platform.Mobile.Application.superclass.constructor.call(this);
-
-        this.initialized = false;
-        this.enableCaching = false;        
+     
         this.context = {view: []};
         this.views = {};   
         this.services = {};
-        this.defaultService = false; 
         this.bars = {};    
         this.addEvents(
             'resize',
@@ -46,43 +46,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         );
     },
     setup: function() {
-        /// <summary>
-        ///     Sets up the handling for transition events from iUI.
-        /// </summary>
-        Ext.EventManager.on(window, 'resize', function() {
-            this.fireEvent('resize');
-        }, this, {buffer: 250});
-        Ext.getBody().on('beforetransition', function(evt, el, o) {
-            var view = this.getView(el);
-            if (view)
-            {
-                if (evt.browserEvent.out)
-                    this.beforeViewTransitionAway(view);
-                else
-                    this.beforeViewTransitionTo(view);               
-            }
-        }, this);
-        Ext.getBody().on('aftertransition', function(evt, el, o) {
-            var view = this.getView(el);
-            if (view)
-            {
-                if (evt.browserEvent.out)
-                    this.viewTransitionAway(view);
-                else
-                    this.viewTransitionTo(view);
-            }
-        }, this);
-        Ext.getBody().on('activate', function(evt, el, o) {
-            var view = this.getView(el);
-            if (view)
-                this.viewActivate(view, evt.browserEvent.tag, evt.browserEvent.data);
-        }, this);
-                
-        if (this.enableCaching)
-        {
-            if (this.isOnline())
-                this.clearSDataRequestCache();
-        }      
+               
     },   
     isOnline: function() {
         return window.navigator.onLine;
@@ -127,7 +91,42 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     init: function() { 
         /// <summary>
         ///     Initializes this application as well as the toolbar and all currently registered views.
-        /// </summary>        
+        /// </summary>
+        Ext.EventManager.on(window, 'resize', function() {
+            this.fireEvent('resize');
+        }, this, {buffer: 250});
+        Ext.getBody().on('beforetransition', function(evt, el, o) {
+            var view = this.getView(el);
+            if (view)
+            {
+                if (evt.browserEvent.out)
+                    this.beforeViewTransitionAway(view);
+                else
+                    this.beforeViewTransitionTo(view);
+            }
+        }, this);
+        Ext.getBody().on('aftertransition', function(evt, el, o) {
+            var view = this.getView(el);
+            if (view)
+            {
+                if (evt.browserEvent.out)
+                    this.viewTransitionAway(view);
+                else
+                    this.viewTransitionTo(view);
+            }
+        }, this);
+        Ext.getBody().on('activate', function(evt, el, o) {
+            var view = this.getView(el);
+            if (view)
+                this.viewActivate(view, evt.browserEvent.tag, evt.browserEvent.data);
+        }, this);
+
+        if (this.enableCaching)
+        {
+            if (this.isOnline())
+                this.clearSDataRequestCache();
+        }
+
         this.setup();
 
         for (var n in this.bars) 
