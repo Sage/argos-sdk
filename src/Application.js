@@ -204,7 +204,10 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             return this.getView(el);
 
         return null;
-    },    
+    },
+    hasView: function(key) {
+        return !!this.getView(key);
+    },
     getView: function(key) {
         /// <returns type="Sage.Platform.Mobile.View">The requested view.</returns>
         /// <param name="key" type="String">
