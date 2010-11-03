@@ -600,9 +600,13 @@ ReUI = {};
                     D.wait(transition, 0, from, page, o);
                 }       
                 else
-                {   
+                {
+                    D.dispatch(page, 'beforetransition', {out: false, tag: o.tag, data: o.data});
+
                     D.select(page);
-                                     
+
+                    D.dispatch(page, 'aftertransition', {out: false, tag: o.tag, data: o.data});
+
                     transitionComplete(page, o);
                 }
             }
