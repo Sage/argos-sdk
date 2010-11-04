@@ -24,7 +24,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         picklist: false,
         orderBy: 'number asc',
         storageMode: 'text',
-        dependentErrorText: "A value for '{0}' must be selected.",
         valueKeyProperty: false,
         valueTextProperty: false,
         constructor: function() {
@@ -49,32 +48,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         isReadOnly: function() {
             return !this.picklist;
         },
-        getDependentValue: function() {
-            if (this.dependsOn && this.owner)
-            {
-                var field = this.owner.fields[this.dependsOn];
-                if (field) return field.getValue();
-            }
-        },
-        getDependentLabel: function() {
-            if (this.dependsOn && this.owner)
-            {
-                var field = this.owner.fields[this.dependsOn];
-                if (field) return field.label;
-            }
-        },
         formatResourcePredicate: function(name) {
             return String.format('name eq "{0}"', name);
         },
         createNavigationOptions: function() {
             var options = Sage.Platform.Mobile.Controls.PicklistField.superclass.createNavigationOptions.apply(this, arguments),
                 dependentValue = this.getDependentValue();
-
-            if (this.dependsOn && !dependentValue)
-            {
-                alert(String.format(this.dependentErrorText, this.getDependentLabel()));
-                return false;
-            }
 
             if (this.picklist)
                 options.resourcePredicate = this.formatResourcePredicate(

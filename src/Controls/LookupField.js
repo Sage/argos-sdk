@@ -9,6 +9,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '<a class="button whiteButton"><span>{%: $.lookupText %}</span></a>',
             '<input type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
+        dependentErrorText: "A value for '{0}' must be selected.",
         view: false,
         keyProperty: '$key',
         textProperty: '$descriptor',
@@ -39,6 +40,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         isReadOnly: function() {
             return !this.view;
         },
+        getDependentValue: function() {
+            if (this.dependsOn && this.owner)
+            {
+                var field = this.owner.fields[this.dependsOn];
+                if (field) return field.getValue();
+            }
+        },
+        getDependentLabel: function() {
+            if (this.dependsOn && this.owner)
+            {
+                var field = this.owner.fields[this.dependsOn];
+                if (field) return field.label;
+            }
+        },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
                 return expression.apply(this, Array.prototype.slice.call(arguments, 1));
@@ -46,7 +61,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 return expression;
         },
         createNavigationOptions: function() {
-            return {
+            var options = {
                 selectionOnly: true,
                 singleSelect: true,
                 resourceKind: this.resourceKind,
@@ -63,6 +78,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     }]
                 }
             };
+
+            var dependentValue = this.getDependentValue();
+
+            if (this.dependsOn && !dependentValue)
+            {
+                alert(String.format(this.dependentErrorText, this.getDependentLabel()));
+                return false;
+            }
+
+            return options;
         },
         navigateToListView: function() {
             var view = App.getView(this.view),
