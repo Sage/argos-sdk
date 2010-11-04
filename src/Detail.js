@@ -41,9 +41,11 @@ Ext.namespace('Sage.Platform.Mobile');
         relatedPropertyTemplate: new Simplate([
             '<div class="row {%= $.cls %}">',
             '<label>{%: $.label %}</label>',
+            '<span>',
             '<a data-action="activateRelatedEntry" data-view="{%= $.view %}" data-context="{%: $.context %}" data-descriptor="{%: $.descriptor %}" href="#">',
-            '<span>{%= $.value %}</span>',
+            '{%= $.value %}',
             '</a>',
+            '</span>',
             '</div>'
         ]),
         relatedTemplate: new Simplate([

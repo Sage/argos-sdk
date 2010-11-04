@@ -200,7 +200,7 @@ Ext.namespace('Sage.Platform.Mobile');
             this.clear();
         },
         isNavigationDisabled: function() {
-            return (this.options && this.options.selectionOnly);
+            return ((this.options && this.options.selectionOnly) || (this.selectionOnly));
         },
         isSelectionDisabled: function() {
             return !((this.options && this.options.selectionOnly) || (this.allowSelection));
