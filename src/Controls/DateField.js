@@ -88,38 +88,67 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         //TODO: make formatting configurable
         setText: function(val) {
-            var time = String.format('{0}/{1}/{2}', (val.getMonth()+1), val.getDate(), val.getFullYear());
-            if (this.showTime === true) time += String.format(' {0}:{1}', val.getHours(), val.getMinutes());
+            var time;
+            if (this.showTime === true)
+                time = val.toString('M/d/yyyy hh:ss');
+            else
+                time = val.toString('M/d/yyyy');
 
             this.el.dom.value = time;
         },
-        // from http://dansnetwork.com/2008/11/01/javascript-iso8601rfc3339-date-parser/
-        parseDate: function(dString) {
-            var regexp = /(\d\d\d\d)(-)?(\d\d)(-)?(\d\d)(T)?(\d\d)(:)?(\d\d)(:)?(\d\d)(\.\d+)?(Z|([+-])(\d\d)(:)?(\d\d))/;
-            var date = new Date();
-            if (dString.toString().match(new RegExp(regexp)))
+        // Copied over from SLX Client Date Formatter
+        parseDate: function(val) {
+            // 2007-04-12T00:00:00-07:00
+            var date = new Date(),
+                match = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(Z|(-|\+)(\d{2}):(\d{2}))/.exec(val);
+                JSONmatch = /\/Date\((\d+)(([+-])(\d{2})(\d{2}))?\)\//.exec(val);
+                toUTCDate = function(d, tz) {
+                    // new Date(year, month, date [, hour, minute, second, millisecond ])
+                    var h, m, utc = new Date(Date.UTC(
+                        parseInt(d[1]),
+                        parseInt(d[2]) - 1, // zero based
+                        parseInt(d[3]),
+                        parseInt(d[4]),
+                        parseInt(d[5]),
+                        parseInt(d[6])
+                    ));
+
+                    if (tz)  //[plusorminus, hours, minutes]
+                    {
+                        // todo: add support for minutes
+                        h = parseInt(tz[1], 10);
+                        m = parseInt(tz[2], 10);
+                        if (tz[0] === '-')
+                            utc.addMinutes((h * 60) + m);
+                        else
+                            utc.addMinutes(-1 * ((h * 60) + m));
+                    }
+
+                    return utc;
+                };
+
+            if (match)
             {
-                var d = dString.match(new RegExp(regexp));
-                var offset = 0;
-                date.setUTCDate(1);
-                date.setUTCFullYear(parseInt(d[1],10));
-                date.setUTCMonth(parseInt(d[3],10) - 1);
-                date.setUTCDate(parseInt(d[5],10));
-                date.setUTCHours(parseInt(d[7],10));
-                date.setUTCMinutes(parseInt(d[9],10));
-                date.setUTCSeconds(parseInt(d[11],10));
-
-                if (d[12])
-                    date.setUTCMilliseconds(parseFloat(d[12]) * 1000);
-                else
-                    date.setUTCMilliseconds(0);
-
-                if (d[13] != 'Z')
+                if (match[7] !== 'Z')
                 {
-                    offset = (d[15] * 60) + parseInt(d[17],10);
-                    offset *= ((d[14] == '-') ? -1 : 1);
-                    date.setTime(date.getTime() - offset * 60 * 1000);
+                    return toUTCDate(match.slice(0, 7), match.slice(8));
                 }
+
+                return toUTCDate(match.slice(0, 7));
+            }
+            else if (JSONmatch)
+            {
+                    date.setTime(JSONmatch[1]),
+                    dateArr = [val,
+                        date.getFullYear(), date.getMonth(), date.getDate(),
+                        date.getHours(), date.getMinutes(), date.getSeconds()
+                    ];
+
+                if (JSONmatch[2])
+                {
+                    return toUTCDate(dateArr, JSONmatch.slice(3));
+                }
+                return toUTCDate(dateArr);
             }
             else
             {
