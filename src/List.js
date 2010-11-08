@@ -153,7 +153,7 @@ Ext.namespace('Sage.Platform.Mobile');
         ]),
         id: 'generic_list',
         resourceKind: '',
-        pageSize: 25,
+        pageSize: 20,
         allowSelection: false,
         hideSearch: false,
         detailView: false,
@@ -364,7 +364,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
             return request;
         },
-        onBeforeContextTo: function(key, descriptor, entry)
+        showContextViewFor: function(key, descriptor, entry)
         {
             return true;
         },
@@ -373,11 +373,7 @@ Ext.namespace('Sage.Platform.Mobile');
             ///     Shows the requested context dialog.
             /// </summary>
             var v = App.getView(this.contextView);
-            if (v)
-            {
-                if (!this.onBeforeContextTo(key, descriptor, entry))
-                    return;
-
+            if (v && this.showContextViewFor(key, descriptor, entry))
                 v.show({
                     detailView: this.detailView,
                     descriptor: descriptor,
@@ -385,8 +381,7 @@ Ext.namespace('Sage.Platform.Mobile');
                     contextItems: this.contextItems,
                     parentViewId: this.id,
                     entry: this.entries[key]
-                });
-            }
+                });            
         },
         navigateToDetailView: function(key, descriptor) {
             /// <summary>

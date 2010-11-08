@@ -16,13 +16,13 @@
 			text: 'List.js',
 			path: '../src/'
 		},{
-			text: 'ListDetail.js',
-			path: '../src/'
-		},{
 			text: 'Detail.js',
 			path: '../src/'
 		},{
 			text: 'Edit.js',
+			path: '../src/'
+		},{
+			text: 'Calendar.js',
 			path: '../src/'
 		},{
 			text: 'Format.js',
@@ -39,6 +39,45 @@
 		},{
 			text: 'Utility.js',
 			path: '../src/'
+		},{
+			text: 'Field.js',
+			path: '../src/Controls/'
+		},{
+			text: 'TextField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'EditorField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'LookupField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'BooleanField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'HiddenField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'AddressField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'DateField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'NameField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'PhoneField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'PicklistField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'SelectField.js',
+			path: '../src/Controls/'
+		},{
+			text: 'DecimalField.js',
+			path: '../src/Controls/'
 		}]
 	},{
 		name: 'SData Mobile Application Framework Dependencies',
@@ -48,29 +87,11 @@
 			text: 'ext-core-debug.js',
 			path: '../libraries/ext/'
 		},{
-			text: 'Base64.js',
-			path: '../libraries/'
-		},{
-			text: 'ObjTree.js',
-			path: '../libraries/'
-		},{
 			text: 'Simplate.js',
 			path: '../libraries/'
 		},{
-			text: 'sage.js',
-			path: '../libraries/sage/'
-		},{
-			text: 'class.js',
-			path: '../libraries/sage/'
-		},{
-			text: 'deferred.js',
-			path: '../libraries/sage/'
-		},{
-			text: 'event.js',
-			path: '../libraries/sage/'
-		},{
-			text: 'evented.js',
-			path: '../libraries/sage/'
+			text: 'sdata-client-dependencies-debug.js',
+			path: '../libraries/sdata/'
 		},{
 			text: 'sdata-client-debug.js',
 			path: '../libraries/sdata/'
@@ -99,10 +120,6 @@
 		dest: 'src/argos-sdk/libraries/datejs',
 		filters: ".*[core\\-debug\\.js]"
 	},{
-	    src: '../libraries/sage',
-		dest: 'src/libraries/sage',
-		filters: ".*\\.js"
-	},{
 		src: '../libraries/sdata',
 		dest: 'src/argos-sdk/libraries/sdata',
 		filters: ".*[sdata\\-client\\-debug.js.js]"
@@ -110,10 +127,6 @@
 		src: '../src',
 		dest: 'src/argos-sdk',
 		filters: ".*\\.js"
-	},{
-		src: '../libraries/reui/themes',
-		dest: 'app/content/reui/themes',
-		filters: ".*[\\.css|\\.jpg|\\.png|\\.gif]"
 	},{
 		src: '../content/',
 		dest: 'app/content',
