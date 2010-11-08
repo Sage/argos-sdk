@@ -364,12 +364,20 @@ Ext.namespace('Sage.Platform.Mobile');
 
             return request;
         },
+        onBeforeContextTo: function(key, descriptor, entry)
+        {
+            return true;
+        },
         navigateToContextView: function(key, descriptor, entry) {
             /// <summary>
             ///     Shows the requested context dialog.
             /// </summary>
             var v = App.getView(this.contextView);
             if (v)
+            {
+                if (!this.onBeforeContextTo(key, descriptor, entry))
+                    return;
+
                 v.show({
                     detailView: this.detailView,
                     descriptor: descriptor,
@@ -378,6 +386,7 @@ Ext.namespace('Sage.Platform.Mobile');
                     parentViewId: this.id,
                     entry: this.entries[key]
                 });
+            }
         },
         navigateToDetailView: function(key, descriptor) {
             /// <summary>
