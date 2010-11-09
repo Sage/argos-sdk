@@ -71,7 +71,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return false;
         },
         getValue: function() {
-            return this.currentValue.toISOString();
+            //TODO: Need to adapt as per service payload type, and return JSONDate or ISOString 
+            var JSONDate = false;
+
+            if (this.currentValue) JSONDate = String.format("\/Date({0})\/", this.currentValue.getTime());
+
+            return JSONDate;
         },
         //FIXME: Date.parse returns NaN for strings like '2006-12-11T00:00:00-07:00'
         setValue: function(val, initial) {
@@ -79,7 +84,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (typeof val == 'string') d = this.parseDate(val);
             if (!val || !d || d.constructor !== Date) return;
 
-            if (initial) this.originalValue = d;            
+            this.currentValue = d;
+
+            if (initial) this.originalValue = this.currentValue;
 
             this.setText(d);
         },
