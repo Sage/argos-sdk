@@ -84,6 +84,9 @@
 		file: 'app/content/javascript/argos-dependencies.js',
 		isDebug: true,
 		fileIncludes: [{
+		    text: 'json2.js',
+		    path: '../libraries/'
+		},{
 			text: 'ext-core-debug.js',
 			path: '../libraries/ext/'
 		},{
@@ -110,7 +113,7 @@
 	},{
 		src: '../libraries',
 		dest: 'src/argos-sdk/libraries',
-		filters: ".*[Base64|ObjTree|Simplate]"
+		filters: ".*[Base64|ObjTree|Simplate|json2]"
 	},{
 		src: '../libraries/reui',
 		dest: 'src/argos-sdk/libraries/reui',
