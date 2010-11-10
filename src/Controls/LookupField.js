@@ -87,6 +87,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 return false;
             }
 
+            if (this.dependsOn && this.lookup && typeof this.lookup === 'function')
+                this.lookup(options, dependentValue);
+
             return options;
         },
         navigateToListView: function() {
