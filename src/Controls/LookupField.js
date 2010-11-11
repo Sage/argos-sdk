@@ -79,7 +79,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }
             };
 
-            var dependentValue = this.getDependentValue();
+            var expand = ['resourceKind', 'resourcePredicate', 'where'],
+                dependentValue = this.getDependentValue();
 
             if (this.dependsOn && !dependentValue)
             {
@@ -87,8 +88,15 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 return false;
             }
 
-            if (this.dependsOn && this.lookup && typeof this.lookup === 'function')
-                this.lookup(options, dependentValue);
+            Ext.each(expand, function(item) {
+                if (this[item])
+                    options[item] = this.dependsOn // only pass dependentValue if there is a dependency
+                        ? this.expandExpression(this[item], dependentValue)
+                        : this.expandExpression(this[item]);
+            }, this);
+
+            options.dependentValue = dependentValue;
+            options.title = this.title;
 
             return options;
         },
