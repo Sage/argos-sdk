@@ -337,6 +337,12 @@ Ext.namespace('Sage.Platform.Mobile');
                 if (resourceKindExpr)
                     request.setResourceKind(resourceKindExpr);
 
+                var resourcePropertyExpr = this.expandExpression(this.options.resourceProperty);
+                if (resourcePropertyExpr)
+                    request
+                        .getUri()
+                        .setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, resourcePropertyExpr);
+
                 var resourcePredicateExpr = this.expandExpression(this.options.resourcePredicate);
                 if (resourcePredicateExpr)
                     request
