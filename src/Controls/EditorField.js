@@ -57,11 +57,18 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.validationValue = view.getValues(true); // store all editor values for validation, not only dirty values
 
                 this.setText(this.formatter(this.validationValue, true, true));
-
-                this.fireEvent('change', this.currentValue, this);
             }
 
             ReUI.back();
+
+            // if the event is fired before the transition, any XMLHttpRequest created in an event handler and
+            // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
+            // requests created in this state (the pre-flight request is made, and the request ends with status 0).
+            // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
+            if (success) setTimeout(this.onChange.createDelegate(this), 0);
+        },
+        onChange: function() {
+            this.fireEvent('change', this.currentValue, this);
         },
         setText: function(text) {
             this.el.dom.value = text;

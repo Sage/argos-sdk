@@ -149,7 +149,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 {
                     var val = selections[selectionKey].data,
                         key = U.getValue(val, this.keyProperty, val) || selectionKey, // if we can extract the key as requested, use it instead of the selection key
-                        text = U.getValue(val, this.textProperty);
+                        text = U.getValue(val, this.textProperty),
+                        success = true;
 
                     if (text && this.textTemplate)
                         text = this.textTemplate.apply(text, this);
@@ -163,14 +164,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                     this.setText(text);
 
-                    this.fireEvent('change', this.currentValue, this);
-
-                    // there should only be a single selection
                     break;
                 }
-                
+
                 ReUI.back();
+
+                // if the event is fired before the transition, any XMLHttpRequest created in an event handler and
+                // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
+                // requests created in this state (the pre-flight request is made, and the request ends with status 0).
+                // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
+                if (success) setTimeout(this.onChange.createDelegate(this), 0);
             }
+        },
+        onChange: function() {
+            this.fireEvent('change', this.currentValue, this);
         },
         isDirty: function() {
             if (this.originalValue && this.currentValue)
