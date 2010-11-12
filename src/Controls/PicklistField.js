@@ -52,19 +52,15 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return String.format('name eq "{0}"', name);
         },
         createNavigationOptions: function() {
-            var options = Sage.Platform.Mobile.Controls.PicklistField.superclass.createNavigationOptions.apply(this, arguments),
-                dependentValue = this.getDependentValue();
+            var options = Sage.Platform.Mobile.Controls.PicklistField.superclass.createNavigationOptions.apply(this, arguments);
 
             if (this.picklist)
                 options.resourcePredicate = this.formatResourcePredicate(
                     this.dependsOn // only pass dependentValue if there is a dependency
-                        ? this.expandExpression(this.picklist, dependentValue)
+                        ? this.expandExpression(this.picklist, options.dependentValue)
                         : this.expandExpression(this.picklist)
                 );
-
-            options.dependentValue = dependentValue;
-            options.title = this.title;
-
+          
             return options;
         },
         navigateToListView: function() {
