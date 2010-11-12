@@ -233,7 +233,9 @@ Ext.namespace('Sage.Platform.Mobile');
                     if (current['where'])
                         context['where'] = this.expandExpression(current['where'], entry);
                     if (current['resourceKind'])
-                        context['resourceKind'] = this.expandExpression(current['resourceKind'], entry);
+                        context['resourceKind'] = this.expandExpression(current['resourceProperty'], entry);
+                    if (current['resourceProperty'])
+                        context['resourceProperty'] = this.expandExpression(current['resourceProperty'], entry);
                     if (current['resourcePredicate'])
                         context['resourcePredicate'] = this.expandExpression(current['resourcePredicate'], entry);
 
