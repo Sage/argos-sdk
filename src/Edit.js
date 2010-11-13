@@ -248,21 +248,24 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 if (value !== noValue) field.setValue(value, true);
             }
         },
-        getValues: function(ignoreDirtyFlag) {
+        getValues: function(all) {
             var o = {},
                 empty = true,
+                field,
                 value,
                 target,
-                field;
+                included,
+                excluded;
 
             for (var name in this.fields)
             {
                 field = this.fields[name];
+                value = field.getValue();
+                included = field.include && field.include(value, field, this),
+                excluded = field.include && !included;
 
-                if (ignoreDirtyFlag || field.alwaysUseValue || field.isDirty())
+                if (all || ((field.alwaysUseValue || field.isDirty() || included) && (!excluded)))
                 {
-                    value = this.fields[name].getValue();
-                    
                     if (field.applyTo !== false)
                     {
                         target = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo);
