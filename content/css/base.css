@@ -296,7 +296,8 @@ body[orient] > div.toolbar-float[open]
 .row-edit[data-field-type="select"] > a,
 .row-edit[data-field-type="address"] > a,
 .row-edit[data-field-type="name"] > a,
-.row-edit[data-field-type="date"] > a
+.row-edit[data-field-type="date"] > a,
+.row-edit[data-field-type="note"] > a
 {
     margin: 0;
     padding: 0 8px;
