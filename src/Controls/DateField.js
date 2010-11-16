@@ -113,7 +113,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     // new Date(year, month, date [, hour, minute, second, millisecond ])
                     var h, m, utc = new Date(Date.UTC(
                         parseInt(d[1]),
-                        parseInt(d[2]),
+                        parseInt(d[2]) - 1, // zero based, for real
                         parseInt(d[3]),
                         parseInt(d[4]),
                         parseInt(d[5]),

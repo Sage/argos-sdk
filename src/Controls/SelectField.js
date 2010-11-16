@@ -5,11 +5,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         valueKeyProperty: false,
         valueTextProperty: false,
         createNavigationOptions: function() {
-            var options = Sage.Platform.Mobile.Controls.PicklistField.superclass.createNavigationOptions.apply(this, arguments);
+            var options = Sage.Platform.Mobile.Controls.SelectField.superclass.createNavigationOptions.apply(this, arguments);
 
-            options.data = typeof this.data === 'function' ? this.data.call(this) : this.data;
-
-            options.refreshRequired = !!this.refreshRequired;
+            options.data = this.expandExpression(this.data);
 
             return options;
         }        

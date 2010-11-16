@@ -261,8 +261,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 field = this.fields[name];
                 value = field.getValue();
-                included = field.include && field.include(value, field, this),
-                excluded = field.include && !included;
+                included = typeof field.include === 'function'
+                    ? field.include(value, field, this)
+                    : field.include;
+                excluded = typeof included !== 'undefined' && !included;
+
+                //included = field.include && field.include(value, field, this),
+                //excluded = field.include && !included;
 
                 if (all || ((field.alwaysUseValue || field.isDirty() || included) && (!excluded)))
                 {
