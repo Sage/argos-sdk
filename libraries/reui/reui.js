@@ -565,7 +565,12 @@ ReUI = {};
 
             if (context.dialog)
             {
-                D.unselect(context.dialog);                
+                D.dispatch(context.dialog, 'beforetransition', {out: true});
+
+                D.unselect(context.dialog);
+
+                D.dispatch(context.dialog, 'aftertransition', {out: true});
+
                 D.dispatch(context.dialog, 'blur', false);
 
                 context.dialog = false;
@@ -573,13 +578,16 @@ ReUI = {};
 
             if (D.hasClass(page, 'dialog'))
             {
-                D.dispatch(page, 'focus', false);
-
-                context.dialog = page;
+                D.dispatch(page, 'beforetransition', {out: false});
 
                 D.select(page);
 
+                D.dispatch(page, 'aftertransition', {out: false});
+
+                D.dispatch(page, 'focus', false);
+
                 context.transitioning = false;
+                context.dialog = page;
             }
             else
             {

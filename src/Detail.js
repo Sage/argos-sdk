@@ -94,7 +94,7 @@ Ext.namespace('Sage.Platform.Mobile');
         formatRelatedQuery: function(entry, fmt, property) {
             var property = property || '$key';
 
-            return String.format(fmt, entry[property]);
+            return String.format(fmt, Sage.Platform.Mobile.Utility.getValue(entry, property));
         },
         activateRelatedEntry: function(params) {
             if (params.context) this.navigateToRelatedView(params.view, Ext.decode(params.context), params.descriptor);
@@ -167,12 +167,12 @@ Ext.namespace('Sage.Platform.Mobile');
         createLayout: function() {
             return this.layout || [];
         },
-        processLayout: function(layout, options, entry)
+        processLayout: function(layout, layoutOptions, entry)
         {
             var sections = [];
             var content = [];
 
-            content.push(this.sectionBeginTemplate.apply(options));
+            content.push(this.sectionBeginTemplate.apply(layoutOptions));
 
             for (var i = 0; i < layout.length; i++)
             {
@@ -254,7 +254,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 content.push(template.apply(options));
             }
 
-            content.push(this.sectionEndTemplate.apply(options));
+            content.push(this.sectionEndTemplate.apply(layoutOptions));
 
             Ext.DomHelper.append(this.contentEl, content.join(''));
 

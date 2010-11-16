@@ -231,11 +231,10 @@ Ext.namespace('Sage.Platform.Mobile');
 
             if (this.isNavigationDisabled()) return;
 
-            var key = row.getAttribute('data-key'),
-                descriptor = row.getAttribute('data-descriptor');
+            var key = row && row.getAttribute('data-key'),
+                descriptor = row && row.getAttribute('data-descriptor');
 
-            if (this.contextView && key && this.contextItems)
-                this.navigateToContextView(key, descriptor);
+            this.navigateToContextView(key, descriptor, key && this.entries[key]);
         },
         onSelectionModelSelect: function(key, data, tag) {
             var el = Ext.get(tag);
@@ -297,6 +296,11 @@ Ext.namespace('Sage.Platform.Mobile');
             /// </summary>
             /// <returns type="String">An SData query compatible search expression.</returns>
             return false;
+        },
+        formatRelatedQuery: function(entry, fmt, property) {
+            var property = property || '$key';
+
+            return String.format(fmt, Sage.Platform.Mobile.Utility.getValue(entry, property));
         },
         createRequest:function() {
             /// <summary>
@@ -378,25 +382,25 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <summary>
             ///     Shows the requested context dialog.
             /// </summary>
-            var v = App.getView(this.contextView);
-            if (v && this.showContextViewFor(key, descriptor, entry))
-                v.show({
-                    detailView: this.detailView,
+            var view = App.getView(this.contextView);
+            if (view && this.showContextViewFor(key, descriptor, entry))
+                view.show({
+                    returnTo: this.id,
+                    resourceKind: this.resourceKind,
                     descriptor: descriptor,
+                    entry: entry,
                     key: key,
-                    contextItems: this.contextItems,
-                    parentViewId: this.id,
-                    entry: this.entries[key]
-                });            
+                    items: this.createContextMenu()
+                });
         },
         navigateToDetailView: function(key, descriptor) {
             /// <summary>
             ///     Navigates to the requested detail view.
             /// </summary>
             /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
-            var v = App.getView(this.detailView);
-            if (v)
-                v.show({
+            var view = App.getView(this.detailView);
+            if (view)
+                view.show({
                     descriptor: descriptor,
                     key: key
                 });
@@ -565,6 +569,9 @@ Ext.namespace('Sage.Platform.Mobile');
                 this.searchEl.addClass('list-search-active');
 
             if (this.hideSearch === true) this.searchEl.setStyle({'display':'none'});
+        },
+        createContextMenu: function() {
+            return this.contextMenu || [];
         },
         clear: function() {
             /// <summary>
