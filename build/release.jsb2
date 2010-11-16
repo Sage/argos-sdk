@@ -78,6 +78,9 @@
 		},{
 			text: 'DecimalField.js',
 			path: '../src/Controls/'
+		},{
+			text: 'NoteField.js',
+			path: '../src/Controls/'
 		}]
 	},{
 		name: 'SData Mobile Application Framework Dependencies',
