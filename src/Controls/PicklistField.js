@@ -34,14 +34,17 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 case 'text':
                     this.keyProperty = 'text';
                     this.textProperty = 'text';
+                    this.requireSelection = false;
                     break;
                 case 'code':
                     this.keyProperty = 'code';
                     this.textProperty = 'text';
+                    this.requireSelection = true;
                     break;
                 case 'id':
                     this.keyProperty = '$key';
                     this.textProperty = 'text';
+                    this.requireSelection = true;
                     break;
             }
         },

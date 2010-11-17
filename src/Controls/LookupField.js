@@ -16,7 +16,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         textTemplate: false,
         valueKeyProperty: null,
         valueTextProperty: null,
-        requireSelection: false,
+        requireSelection: true,
         emptyText: 'empty',
         completeText: 'Select',
         lookupText: '...',
@@ -148,6 +148,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 for (var selectionKey in selections)
                 {
                     var val = selections[selectionKey].data,
+                        success = true;
+
+                    this.setSelection(val, selectionKey);
+
+                    /*
+                    var val = selections[selectionKey].data,
                         key = U.getValue(val, this.keyProperty, val) || selectionKey, // if we can extract the key as requested, use it instead of the selection key
                         text = U.getValue(val, this.textProperty),
                         success = true;
@@ -163,7 +169,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     };
 
                     this.setText(text);
-
+                    */
                     break;
                 }
 
@@ -271,10 +277,23 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             
             return value;
         },
-        setValue: function(val, initial) {
+        setSelection: function(val, key) {
+            var key = U.getValue(val, this.keyProperty, val) || key, // if we can extract the key as requested, use it instead of the selection key
+                text = U.getValue(val, this.textProperty);
+
+            if (text && this.textTemplate)
+                text = this.textTemplate.apply(text, this);
 
             this.currentSelection = val;
 
+            this.currentValue = {
+                key: key || text,
+                text: text || key
+            };
+
+            this.setText(text);
+        },
+        setValue: function(val, initial) {
             // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false
             // and IS NOT defined use keyProperty or textProperty in its place.
             var keyProperty = this.valueKeyProperty !== false

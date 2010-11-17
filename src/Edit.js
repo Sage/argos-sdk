@@ -216,11 +216,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         processEntry: function(entry) {
             // not currently used
         },
-        applyContext: function() {
+        applyContext: function(templateEntry) {
         },
         processTemplateEntry: function(entry) {
             this.setValues(entry || {});
-            this.applyContext();
+            this.applyContext(entry || {});
             this.el.removeClass('panel-loading');
         },
         clearValues: function() {
