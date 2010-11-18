@@ -13,11 +13,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         view: false,
         keyProperty: '$key',
         textProperty: '$descriptor',
-        textTemplate: false,
+        textTemplate: null,
+        textRenderer: null,
         valueKeyProperty: null,
         valueTextProperty: null,
         requireSelection: true,
-        emptyText: 'empty',
+        emptyText: '',
         completeText: 'Select',
         lookupText: '...',
         init: function() {
@@ -151,25 +152,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                         success = true;
 
                     this.setSelection(val, selectionKey);
-
-                    /*
-                    var val = selections[selectionKey].data,
-                        key = U.getValue(val, this.keyProperty, val) || selectionKey, // if we can extract the key as requested, use it instead of the selection key
-                        text = U.getValue(val, this.textProperty),
-                        success = true;
-
-                    if (text && this.textTemplate)
-                        text = this.textTemplate.apply(text, this);
-
-                    this.currentSelection = val;
-
-                    this.currentValue = {
-                        key: key || text,
-                        text: text || key
-                    };
-
-                    this.setText(text);
-                    */
                     break;
                 }
 
@@ -283,6 +265,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (text && this.textTemplate)
                 text = this.textTemplate.apply(text, this);
+            else if (this.textRenderer)
+                text = this.textRenderer.call(this, val);
 
             this.currentSelection = val;
 
@@ -296,7 +280,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         setValue: function(val, initial) {
             // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false
             // and IS NOT defined use keyProperty or textProperty in its place.
-            var keyProperty = this.valueKeyProperty !== false
+            var key,
+                text,
+                keyProperty = this.valueKeyProperty !== false
                     ? this.valueKeyProperty || this.keyProperty
                     : false,
                 textProperty = this.valueTextProperty !== false
@@ -305,9 +291,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (keyProperty || textProperty)
             {
-                var key,
-                    text;
-
                 if (keyProperty)
                     key = U.getValue(val, keyProperty);
 
@@ -316,6 +299,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                 if (text && this.textTemplate)
                     text = this.textTemplate.apply(text, this);
+                else if (this.textRenderer)
+                    text = this.textRenderer.call(this, val);
 
                 if (key || text)
                 {
@@ -341,14 +326,22 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 if (val)
                 {
+                    key = val;
+                    text = val;
+
+                    if (text && this.textTemplate)
+                        text = this.textTemplate.apply(text, this);
+                    else if (this.textRenderer)
+                        text = this.textRenderer.call(this, val);
+
                     this.currentValue = {
-                        key: val,
-                        text: val
+                        key: key,
+                        text: text
                     };
 
                     if (initial) this.originalValue = this.currentValue;
 
-                    this.setText(val);
+                    this.setText(text);
                 }
                 else
                 {

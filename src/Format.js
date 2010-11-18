@@ -12,7 +12,7 @@ Sage.Platform.Mobile.Format = (function() {
         if (typeof val !== 'string') return !val;
         
         return (val.length <= 0);
-    };
+    }
 
     function encode(val) {
         if (typeof val !== 'string') return val;
@@ -22,7 +22,7 @@ Sage.Platform.Mobile.Format = (function() {
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
-    };
+    }
 
     function decode(val) {
         if (typeof val !== 'string') return val;
@@ -32,8 +32,8 @@ Sage.Platform.Mobile.Format = (function() {
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
             .replace(/&quot;/g, '"');
-    };    
-
+    }
+    
     return {
         encode: encode,
         isEmpty: isEmpty,       
@@ -51,6 +51,20 @@ Sage.Platform.Mobile.Format = (function() {
         },        
         trim: function(val) {
             return val.replace(/^\s+|\s+$/g,'');
+        },
+        yesNo: function(val) {
+            if (typeof val === 'string') val = /^true$/i.test(val);
+
+            return val
+                ? Sage.Platform.Mobile.Format.yesText || 'Yes'
+                : Sage.Platform.Mobile.Format.noText || 'No';
+        },
+        bool: function(val) {
+            if (typeof val === 'string') val = /^true$/i.test(val);
+
+            return val
+                ? Sage.Platform.Mobile.Format.trueText || 'T'
+                : Sage.Platform.Mobile.Format.falseText || 'F';
         }
     };
 })();

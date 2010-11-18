@@ -24,27 +24,31 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         picklist: false,
         orderBy: 'number asc',
         storageMode: 'text',
+        requireSelection: false,
         valueKeyProperty: false,
         valueTextProperty: false,
-        constructor: function() {
+        constructor: function(options) {
             Sage.Platform.Mobile.Controls.PicklistField.superclass.constructor.apply(this, arguments);
 
             switch (this.storageMode)
             {
                 case 'text':
                     this.keyProperty = 'text';
-                    this.textProperty = 'text';
-                    this.requireSelection = false;
+                    this.textProperty = 'text';                    
                     break;
                 case 'code':
                     this.keyProperty = 'code';
                     this.textProperty = 'text';
-                    this.requireSelection = true;
+                    this.requireSelection = typeof options.requireSelection !== 'undefined'
+                        ? options.requireSelection
+                        : true;
                     break;
                 case 'id':
                     this.keyProperty = '$key';
                     this.textProperty = 'text';
-                    this.requireSelection = true;
+                    this.requireSelection = typeof options.requireSelection !== 'undefined'
+                        ? options.requireSelection
+                        : true; 
                     break;
             }
         },
