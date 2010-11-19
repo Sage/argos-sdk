@@ -71,13 +71,14 @@ Ext.namespace('Sage.Platform.Mobile');
         },        
         initiateActionFromClick: function(evt, el) {
             var el = Ext.get(el),
-                action = el.getAttribute('data-action');
+                action = el.getAttribute('data-action'),
+                stopEvent = el.getAttribute('data-stopaction');
 
             if (this.hasAction(action, evt, el))
             {
                 var parameters = this.getParametersForAction(action, evt, el);
 
-                evt.stopEvent();
+                if (stopEvent !== 'false') evt.stopEvent();
 
                 this.invokeAction(action, parameters, evt, el);
             }
