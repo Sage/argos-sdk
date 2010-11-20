@@ -213,14 +213,47 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     scope: this
                 });
         },
+        convertEntry: function(entry) {
+            // todo: should we create a deep copy?
+            // todo: do a deep conversion?
+
+            var converter = Sage.Platform.Mobile.Convert;
+
+            for (var n in entry)
+            {
+                if (converter.isDateString(entry[n]))
+                    entry[n] = converter.toDateFromString(entry[n]);                
+            }
+
+            return entry;
+        },
+        convertValues: function(values) {
+            // todo: do a deep conversion?
+
+            var converter = Sage.Platform.Mobile.Convert;
+
+            for (var n in values)
+            {
+                if (values[n] instanceof Date)
+                    values[n] = this.getService().isJsonEnabled()
+                        ? converter.toJsonStringFromDate(values[n])
+                        : converter.toIsoStringFromDate(values[n]);
+            }
+
+            return values;
+        },
         processEntry: function(entry) {
-            // not currently used
+            this.entry = this.convertEntry(entry || {});
+
+            this.el.removeClass('panel-loading');
         },
         applyContext: function(templateEntry) {
         },
-        processTemplateEntry: function(entry) {
-            this.setValues(entry || {});
-            this.applyContext(entry || {});
+        processTemplateEntry: function(templateEntry) {
+            this.templateEntry = this.convertEntry(templateEntry || {});
+
+            this.setValues(this.templateEntry);
+            this.applyContext(this.templateEntry);
             this.el.removeClass('panel-loading');
         },
         clearValues: function() {
@@ -319,6 +352,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 : this.createEntryForUpdate(values);
         },
         createEntryForUpdate: function(values) {
+            values = this.convertValues(values);
+
             return Ext.apply(values, {
                 '$key': this.entry['$key'],
                 '$etag': this.entry['$etag'],
@@ -326,6 +361,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             });
         },
         createEntryForInsert: function(values) {
+            values = this.convertValues(values);
+            
             return Ext.apply(values, {
                 '$name': this.entityName
             });
@@ -378,7 +415,19 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         insertCompleted: function(entry) {
-            ReUI.back();
+            if (this.options && this.options.returnTo)
+            {
+                var returnTo = this.options.returnTo,
+                    view = App.getView(returnTo);
+                if (view)
+                    view.show();
+                else
+                    window.location.hash = returnTo;
+            }
+            else
+            {
+                this.insertCompleted(false);
+            }
         },
         update: function() {
             var values = this.getValues();
@@ -413,11 +462,23 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
             else
             {
-                ReUI.back();
+                this.updateCompleted(false);
             }
         },
         updateCompleted: function(entry) {
-            ReUI.back();
+            if (this.options && this.options.returnTo)
+            {
+                var returnTo = this.options.returnTo,
+                    view = App.getView(returnTo);
+                if (view)
+                    view.show();
+                else
+                    window.location.hash = returnTo;
+            }
+            else
+            {
+                ReUI.back();
+            }
         },
         showValidationSummary: function() {
             var content = [];                        
@@ -489,7 +550,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 if (this.options.entry)
                 {
-                    this.entry = this.options.entry;
+                    this.processEntry(this.options.entry);                  
                     this.setValues(this.entry);
                 }
 

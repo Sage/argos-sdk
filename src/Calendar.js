@@ -39,7 +39,7 @@
         id: 'generic_calendar',
         expose: false,
         date: false,
-        showTime: false,
+        showTimePicker: false,
         selectedDateEl: false,
         weekEnds: [0, 6],
         dayLabels : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -81,7 +81,7 @@
         show: function(options) {
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
 
-            if (this.options.showTime === true) this.showTime = true;
+            if (this.options.showTimePicker === true) this.showTimePicker = true;
 
             if (this.options.date) this.date = this.options.date;
             else this.date = new Date();
@@ -94,7 +94,7 @@
             
             this.renderCalendar();
 
-            if (this.showTime) this.timeEl.show();
+            if (this.showTimePicker) this.timeEl.show();
             else this.timeEl.hide();
         },
         goToNextMonth: function() {

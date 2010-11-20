@@ -12,7 +12,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         lookupText: '...',
         emptyText: 'empty',
         completeText: 'Ok',
-        formatter: function(val) {
+        formatValue: function(val) {
             return '';
         },
         init: function() {
@@ -50,7 +50,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         getValuesFromView: function() {
             var view = App.getActiveView();
-
             if (view)
             {
                 // todo: is this the appropriate way to handle this?  do not want $key, $name, etc., when applying values.
@@ -64,7 +63,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.getValuesFromView();
 
-            this.setText(this.formatter(this.validationValue, true, true));
+            this.setText(this.formatValue(this.validationValue, true, true));
 
             ReUI.back();
 
@@ -99,7 +98,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                 if (initial) this.originalValue = this.currentValue;
 
-                this.setText(this.formatter(val, true, true));
+                this.setText(this.formatValue(val, true, true));
             }
             else
             {

@@ -266,7 +266,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (text && this.textTemplate)
                 text = this.textTemplate.apply(text, this);
             else if (this.textRenderer)
-                text = this.textRenderer.call(this, val);
+                text = this.textRenderer.call(this, val, key, text);
 
             this.currentSelection = val;
 
@@ -300,7 +300,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 if (text && this.textTemplate)
                     text = this.textTemplate.apply(text, this);
                 else if (this.textRenderer)
-                    text = this.textRenderer.call(this, val);
+                    text = this.textRenderer.call(this, val, key, text);
 
                 if (key || text)
                 {
@@ -332,7 +332,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     if (text && this.textTemplate)
                         text = this.textTemplate.apply(text, this);
                     else if (this.textRenderer)
-                        text = this.textRenderer.call(this, val);
+                        text = this.textRenderer.call(this, val, key, text);
 
                     this.currentValue = {
                         key: key,

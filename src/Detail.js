@@ -315,7 +315,7 @@ Ext.namespace('Sage.Platform.Mobile');
             Sage.Platform.Mobile.Detail.superclass.show.apply(this, arguments);
         },
         getTag: function() {
-            return this.options.key;
+            return this.options && this.options.key;
         },
         getContext: function() {
             return Ext.apply(Sage.Platform.Mobile.Detail.superclass.getContext.call(this), {

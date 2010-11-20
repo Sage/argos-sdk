@@ -52,6 +52,25 @@ Sage.Platform.Mobile.Format = (function() {
         trim: function(val) {
             return val.replace(/^\s+|\s+$/g,'');
         },
+        date: function(val, fmt) {
+            if (val instanceof Date) return val.toString(fmt || 'M/d/yyyy');
+
+            if (Sage.Platform.Mobile.Convert.isDateString(val))
+                val = Sage.Platform.Mobile.Convert.toDateFromString(val);
+            else
+                return val;
+
+            return val.toString(fmt || 'M/d/yyyy');
+        },
+        fixed: function(val, d) {
+            if (typeof d !== 'number')
+                d = 2;
+
+            var m = Math.pow(10, d),
+                v = Math.floor(parseFloat(val) * m) / m;
+
+            return v;
+        },
         yesNo: function(val) {
             if (typeof val === 'string') val = /^true$/i.test(val);
 

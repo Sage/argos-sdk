@@ -105,8 +105,8 @@
 			text: 'reui.js',
 			path: '../libraries/reui/'
 		},{
-			text: 'core-debug.js',
-			path: '../libraries/datejs/src/'
+			text: 'date.js',
+			path: '../libraries/datejs/build/'
 		}]
 	}],
 	resources: [{
@@ -122,9 +122,13 @@
 		dest: 'src/argos-sdk/libraries/reui',
 		filters: ".*[reui\\.js]"
 	},{
-		src: '../libraries/datejs/src',
+		src: '../libraries/datejs/build',
 		dest: 'src/argos-sdk/libraries/datejs',
-		filters: ".*[core\\-debug\\.js]"
+		filters: ".*[date\\.js]"
+	},{
+		src: '../libraries/datejs/src/globalization',
+		dest: 'app/content/datejs',
+		filters: ".*\\.js"
 	},{
 		src: '../libraries/sdata',
 		dest: 'src/argos-sdk/libraries/sdata',

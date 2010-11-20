@@ -25,7 +25,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             return options;
         },
-        formatter: function(val) {
+        formatValue: function(val) {
             return this.noteProperty ? val[this.noteProperty] : val;
         },
         getValue: function() {

@@ -410,6 +410,7 @@ Ext.namespace('Sage.Platform.Mobile');
             if (view)
             {
                 view.show({
+                    returnTo: this.id,
                     insert: true
                 });
             }
