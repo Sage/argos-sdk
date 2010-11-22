@@ -53,7 +53,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '<div class="row row-edit {%= $.cls %}" data-field="{%= $.name %}" data-field-type="{%= $.type %}">',            
             '</div>'
         ]),
-        transitionEffect: 'flip',
+        transitionEffect: 'slide',
         id: 'generic_edit',
         expose: false,
         saveText: 'Save',

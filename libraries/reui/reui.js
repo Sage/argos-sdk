@@ -826,7 +826,7 @@ ReUI = {};
             'webkitTransitionDuration': '0ms',
             'webkitTransitionProperty': '-webkit-transform',
             'webkitTransform': 'rotate' + toStart.axis + '(' + toStart.value + ')',
-            'webkitTransformStyle': 'preserve-3d',
+            'webkitTransformStyle': 'flat',
             'webkitBackfaceVisibility': 'hidden'
         });                   
             
@@ -839,7 +839,7 @@ ReUI = {};
         D.applyStyle(from, {
             'webkitTransitionDuration': 'inherit',
             'webkitTransitionProperty': '-webkit-transform',
-            'webkitTransformStyle': 'preserve-3d',
+            'webkitTransformStyle': 'flat',
             'webkitBackfaceVisibility': 'hidden'
         });
 

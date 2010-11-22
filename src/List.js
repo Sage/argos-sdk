@@ -545,21 +545,28 @@ Ext.namespace('Sage.Platform.Mobile');
             Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
 
             if (this.isSelectionDisabled())
+            {
                 this.el.removeClass('list-show-selectors');
+            }
             else
             {
-                this.el.addClass('list-show-selectors');
+                this.el.addClass('list-show-selectors');                
+
                 this.selectionModel.useSingleSelection(this.options.singleSelect);
             }
 
-            if (this.refreshRequired) this.clear();
+            if (this.refreshRequired)
+            {
+                this.clear();
+            }
+            else
+            {
+                // only clear selections
+                this.selectionModel.clear();
+            }
         },
         refresh: function() {
             this.requestData();
-        },
-        transitionTo: function() {
-            Sage.Platform.Mobile.List.superclass.transitionTo.call(this);
-
         },
         show: function(options) {
             Sage.Platform.Mobile.List.superclass.show.apply(this, arguments);
