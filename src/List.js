@@ -154,14 +154,14 @@ Ext.namespace('Sage.Platform.Mobile');
         id: 'generic_list',
         resourceKind: '',
         pageSize: 20,
-        allowSelection: false,
         hideSearch: false,
+        allowSelection: false,
+        autoClearSelection: true,
         detailView: false,
         editView: false,
         insertView: false,
         contextView: false,
-        customSearchRE: /^\#\!/,
-        placeContentAt: '.list-content',
+        customSearchRE: /^#!/,
         moreText: 'Retreive More Records',
         titleText: 'List',
         remainingText: '{0} records remaining',
@@ -561,8 +561,8 @@ Ext.namespace('Sage.Platform.Mobile');
             }
             else
             {
-                // only clear selections
-                this.selectionModel.clear();
+                // if enabled, clear any pre-existing selections
+                if (this.autoClearSelection) this.selectionModel.clear();
             }
         },
         refresh: function() {
