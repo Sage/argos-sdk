@@ -22,7 +22,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 options.entry = {'Notes': options.entry};
                 options.changes = {'Notes': options.changes};
             }
-
+            if (this.title) options.title = this.title;
             return options;
         },
         formatValue: function(val) {
