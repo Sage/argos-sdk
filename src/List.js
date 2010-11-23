@@ -570,14 +570,14 @@ Ext.namespace('Sage.Platform.Mobile');
             this.requestData();
         },
         show: function(options) {
-            Sage.Platform.Mobile.List.superclass.show.apply(this, arguments);
-
             if (this.searchQueryEl.dom.value == '')
                 this.searchEl.removeClass('list-search-active');
             else
                 this.searchEl.addClass('list-search-active');
 
             if (this.hideSearch === true) this.searchEl.setStyle({'display':'none'});
+
+            Sage.Platform.Mobile.List.superclass.show.apply(this, arguments);
         },
         createContextMenu: function() {
             return this.contextMenu || [];

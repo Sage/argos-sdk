@@ -122,8 +122,13 @@ Ext.namespace('Sage.Platform.Mobile');
             if (data && this.refreshRequiredFor(data.options))
             {
                 this.refreshRequired = true;
-                this.options = data.options || {};
             }
+
+            // allow option properties, such as tools, to be updated, even though refresh is not required.
+            this.options = Ext.apply(this.options || {}, data.options);
+
+            if (this.options.title)
+                this.setTitle(this.options.title);
         },
         show: function(options) {
             /// <summary>
@@ -132,8 +137,13 @@ Ext.namespace('Sage.Platform.Mobile');
             if (this.refreshRequiredFor(options))
             {
                 this.refreshRequired = true;
-                this.options = options || {};
             }
+
+            // allow option properties, such as tools, to be updated, even though refresh is not required.
+            this.options = Ext.apply(this.options || {}, options);
+
+            if (this.options.title)
+                this.setTitle(this.options.title);
 
             ReUI.show(this.el.dom, {tag: this.getTag(), data: this.getContext()});
         },
