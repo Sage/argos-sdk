@@ -65,6 +65,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             var options = {
                 selectionOnly: true,
                 singleSelect: true,
+                stateKey: this.name,
                 resourceKind: this.resourceKind,
                 resourcePredicate: this.resourcePredicate,
                 where: this.where,

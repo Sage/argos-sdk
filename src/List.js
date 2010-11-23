@@ -526,6 +526,7 @@ Ext.namespace('Sage.Platform.Mobile');
             {
                 if (options)
                 {
+                    if (this.expandExpression(this.options.stateKey) != this.expandExpression(options.stateKey)) return true;
                     if (this.expandExpression(this.options.where) != this.expandExpression(options.where)) return true;
                     if (this.expandExpression(this.options.resourceKind) != this.expandExpression(options.resourceKind)) return true;
                     if (this.expandExpression(this.options.resourcePredicate) != this.expandExpression(options.resourcePredicate)) return true;
