@@ -41,7 +41,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 options = this.createNavigationOptions();
 
             if (view && options)
+            {
+                if (options.title) view.setTitle(options.title);
                 view.show(options);
+            }
         },
         onClick: function(evt, el, o) {
             evt.stopEvent();
