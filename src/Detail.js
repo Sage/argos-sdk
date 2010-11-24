@@ -310,7 +310,9 @@ Ext.namespace('Sage.Platform.Mobile');
             Sage.Platform.Mobile.Detail.superclass.activate.apply(this, arguments);
         },
         show: function(options) {
-            if (options && options.descriptor) options.title = options.title || options.descriptor;
+            // if a descriptor is specified, and no title, use the descriptor instead.
+            if (options && options.descriptor)
+                options.title = options.title || options.descriptor;
 
             Sage.Platform.Mobile.Detail.superclass.show.apply(this, arguments);
         },
