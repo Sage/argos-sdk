@@ -110,7 +110,7 @@ Ext.namespace('Sage.Platform.Mobile');
             remainingEl: '.list-more .list-remaining span'
         },
         viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list">',
+            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list {%= $.cls %}">',
             '{%! $.searchTemplate %}',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',                
             '<ul class="list-content"></ul>',

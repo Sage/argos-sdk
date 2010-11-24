@@ -15,7 +15,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             validationContentEl: '.panel-validation-summary > ul'
         },
         viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel" effect="{%= $.transitionEffect %}">',
+            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}" effect="{%= $.transitionEffect %}">',
             '{%! $.loadingTemplate %}',
             '{%! $.validationSummaryTemplate %}',
             '<div class="panel-content"></div>',

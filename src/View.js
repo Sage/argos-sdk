@@ -11,7 +11,7 @@ Ext.namespace('Sage.Platform.Mobile');
     Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
         attachmentPoints: {},
         viewTemplate: new Simplate([
-            '<ul id="{%= $.id %}" title="{%= $.titleText %}" {% if ($.selected) { %} selected="true" {% } %}>',
+            '<ul id="{%= $.id %}" title="{%= $.titleText %}" class="{%= $.cls %}">',
             '</ul>'
         ]),
         id: 'generic_view',

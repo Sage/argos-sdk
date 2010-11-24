@@ -13,7 +13,7 @@ Ext.namespace('Sage.Platform.Mobile');
             contentEl: '.panel-content'
         },
         viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel">',
+            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
             '{%! $.loadingTemplate %}',
             '<div class="panel-content"></div>',
             '</div>'
