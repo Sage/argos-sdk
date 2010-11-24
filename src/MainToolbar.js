@@ -11,54 +11,40 @@ Ext.namespace("Sage.Platform.Mobile");
 (function() {
     Sage.Platform.Mobile.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         barTemplate: new Simplate([
-            '<div class="{%= cls %}">',
-            '<a id="backButton" class="button" href="#" style="display: none;">&lt;&lt;&nbsp;Back</a>',
-            '<h1 id="pageTitle">{%= title %}</h1>',
+            '<div class="{%= $.cls %} toolbar">',
+            '<a id="backButton" class="button" href="#" style="display: none;">{%: $.backButtonText %}</a>',
+            '<h1 id="pageTitle">{%= $.titleText %}</h1>',
             '</div>'
         ]),
         toolTemplate: new Simplate([
-            '<a target="_tool" class="{%= cls || button %} actionButton" style="visibility: {%= $["hidden"] ? "hidden" : "visible" %}"><span>{%= title %}</span></a>'
+            '<a class="{%= $.cls || "button" %} actionButton" data-tool-action="{%= $.name %}"><span>{%: $.title %}</span></a>'
         ]),
-        constructor: function(o) {
-            Sage.Platform.Mobile.MainToolbar.superclass.constructor.apply(this, arguments);
-        },
-        init: function() {
-            Sage.Platform.Mobile.MainToolbar.superclass.init.call(this);
-
-            this.el
-                .on('click', function(evt, el, o) {
-                    var source = Ext.get(el);
-                    var target;
-
-                    if (source.is('a[target="_tool"]') || (target = source.up('a[target="_tool"]')))
-                    {
-                        evt.stopEvent();
-
-                        if (this.tool && this.tool.fn)
-                            this.tool.fn.call(this.tool.scope || this);
-                    }
-                }, this);
-        },
+        titleText: 'Mobile',
+        backButtonText: '<< Back',
+  
         setTitle: function(title) {
             Ext.get('pageTitle').update(title);
         },
+        hasToolAction: function(name, evt, el) {
+            return this.tool && this.tool.fn;
+        },
+        invokeToolAction: function(name, evt, el) {
+            return this.tool.fn.call(this.tool.scope || this);
+        },
         clear: function() {
-            if (this.tool)
-            {
-                this.el.child('a[target="_tool"]').remove();
-                this.tool = false;
-            }
+            Sage.Platform.Mobile.MainToolbar.superclass.clear.apply(this, arguments);
+
+            var el = this.el.child('a[data-tool-action]');
+            if (el)
+                el.remove();
+            
+            this.tool = false;
         },
         display: function(tools) {
             /* this toolbar only supports a single action */
             if (tools.length > 0)
             {
-                this.tool = Ext.apply({}, tools[0]);
-
-                for (var p in this.tool)
-                    if (p !== 'fn' && typeof this.tool[p] === 'function')
-                        this.tool[p] = this.tool[p].call(this.tool.scope || this);
-
+                this.tool = this.expandTool(tools[0]);                
                 this.tool.el = Ext.DomHelper.append(this.el, this.toolTemplate.apply(this.tool), true);
             }
         }

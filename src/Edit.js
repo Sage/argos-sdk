@@ -15,7 +15,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             validationContentEl: '.panel-validation-summary > ul'
         },
         viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}" effect="{%= $.transitionEffect %}">',
+            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="edit panel {%= $.cls %}" data-resource-kind="{%= $.resourceKind %}">',
             '{%! $.loadingTemplate %}',
             '{%! $.validationSummaryTemplate %}',
             '<div class="panel-content"></div>',
@@ -372,15 +372,19 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         disable: function() {
             this.busy = true;
-            this.el.addClass('view-busy');
-            if (App.bars.tbar && App.bars.tbar.el)
-                App.bars.tbar.el.addClass('toolbar-busy');
+
+            if (App.bars.tbar)
+                App.bars.tbar.disable();
+
+            this.el.addClass('busy');
         },
         enable: function() {
             this.busy = false;
-            this.el.removeClass('view-busy');
-            if (App.bars.tbar && App.bars.tbar.el)
-                App.bars.tbar.el.removeClass('toolbar-busy');
+
+            if (App.bars.tbar)
+                App.bars.tbar.enable();
+
+            this.el.removeClass('busy');
         },
         insert: function() {
             this.disable();

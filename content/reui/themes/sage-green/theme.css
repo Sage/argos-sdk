@@ -362,7 +362,7 @@ div.row-edit:last-child
 
 .whiteButton
 {
-    color: #444;
+    color: #000;
     text-shadow: rgba(255, 255, 255, 1) 1px 1px 0;
 
     background-image: -webkit-gradient(

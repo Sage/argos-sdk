@@ -110,7 +110,7 @@ Ext.namespace('Sage.Platform.Mobile');
             remainingEl: '.list-more .list-remaining span'
         },
         viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list {%= $.cls %}">',
+            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list {%= $.cls %}" data-resource-kind="{%= $.resourceKind %}">',
             '{%! $.searchTemplate %}',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',                
             '<ul class="list-content"></ul>',
@@ -497,6 +497,10 @@ Ext.namespace('Sage.Platform.Mobile');
                 },
                 failure: function(response, o) {
                     this.requestFailure(response, o);
+                    this.el.removeClass('list-loading');
+                },
+                aborted: function(response, o) {
+                    this.options = false; // force a refresh
                     this.el.removeClass('list-loading');
                 },
                 scope: this

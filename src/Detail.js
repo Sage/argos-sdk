@@ -13,7 +13,7 @@ Ext.namespace('Sage.Platform.Mobile');
             contentEl: '.panel-content'
         },
         viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
+            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="detail panel {%= $.cls %}" data-resource-kind="{%= $.resourceKind %}">',
             '{%! $.loadingTemplate %}',
             '<div class="panel-content"></div>',
             '</div>'
@@ -286,6 +286,10 @@ Ext.namespace('Sage.Platform.Mobile');
                     },
                     failure: function(response, o) {
                         this.requestFailure(response, o);
+                        this.el.removeClass('panel-loading');
+                    },
+                    aborted: function(response, o) {
+                        this.options = false; // force a refresh
                         this.el.removeClass('panel-loading');
                     },
                     scope: this

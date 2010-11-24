@@ -171,6 +171,7 @@ body[orient] > div.toolbar-float[open]
 .toolbar-float-container a
 {
     color: #fff;
+    display: block;
 }
 
 .toolbar-float-container a span
@@ -178,110 +179,37 @@ body[orient] > div.toolbar-float[open]
     display: none;
 }
 
-.tool-note
-{
-    margin-bottom: 3px;
-}
-
 /* busy */
-.dialog-busy .blueButton,
-.toolbar-busy .blueButton
-{
-	
-}
-
-.dialog-busy .button.actionButton
-{
-    background: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, rgb(42,101,80)),
-		color-stop(1, rgb(6,74,52))
-	);
-	background: -moz-linear-gradient(
-		center bottom,
-		rgb(42,101,80) 0%,
-		rgb(6,74,52) 100%
-	);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
-}
-
-.dialog-busy .button.actionButton span,
-.toolbar-busy .button.actionButton span
+.dialog.busy .button.actionButton span,
+.toolbar.busy .button.actionButton span,
+.panel.busy .button.actionButton span
 {
 	background: url('../images/loading-indicator-green.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
 }
 
-.dialog-busy .whiteButton.actionButton
-{
-    background-image: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, #e6e6e6),
-		color-stop(1, #cccccc)
-	);
-	background-image: -moz-linear-gradient(bottom, #e6e6e6, #cccccc);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
-}
-
-.dialog-busy .whiteButton.actionButton span,
-.toolbar-busy .whiteButton.actionButton span
+.dialog.busy .whiteButton.actionButton span,
+.toolbar.busy .whiteButton.actionButton span,
+.panel.busy .whiteButton.actionButton span
 {
 	background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
 }
 
-.dialog-busy .blueButton.actionButton
-{
-    background-image: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, #2ca0d1),
-		color-stop(1, #07a)
-	);
-	background-image: -moz-linear-gradient(bottom, #2ca0d1, #07a);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
-}
-
-.dialog-busy .blueButton.actionButton span,
-.toolbar-busy .blueButton.actionButton span
+.dialog.busy .blueButton.actionButton span,
+.toolbar.busy .blueButton.actionButton span,
+.panel.busy .blueButton.actionButton span
 {
 	background: url('../images/loading-indicator-blue.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
 }
 
-.dialog-busy .redButton.actionButton
-{
-    background-image: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, #de6464),
-		color-stop(1, #b33737)
-	);
-	background-image: -moz-linear-gradient(bottom, #de6464, #b33737);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
-}
-
-.dialog-busy .redButton.actionButton span,
-.toolbar-busy .redButton.actionButton span
+.dialog.busy .redButton.actionButton span,
+.toolbar.busy .redButton.actionButton span,
+.panel.busy .redButton.actionButton span
 {
 	background: url('../images/loading-indicator-red.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
-}
-
-.dialog-busy input,
-.view-busy input
-{
-	
 }
 
 /* fields */
@@ -303,6 +231,7 @@ body[orient] > div.toolbar-float[open]
     padding: 0 8px;
     position: absolute;
     right: 12px;
+    width: 24px;
 }
 
 /* TODO: Move color specifics to theme folder */
