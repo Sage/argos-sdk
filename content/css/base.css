@@ -231,7 +231,6 @@ body[orient] > div.toolbar-float[open]
     padding: 0 8px;
     position: absolute;
     right: 12px;
-    width: 24px;
 }
 
 /* TODO: Move color specifics to theme folder */
