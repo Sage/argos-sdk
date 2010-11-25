@@ -365,6 +365,7 @@ textarea:focus
 .blueButton
 {
     color: #fff;
+    text-shadow: #000 1px 1px 0px;
     border-color: #000;
     background-color: #2ca0d1;
     background-image: linear-gradient(top, #2ca0d1, #07a);
@@ -395,6 +396,7 @@ textarea:focus
 .redButton
 {
     color: #fff;
+    text-shadow: #000 1px 1px 0px;
     border-color: #000;
     background-color: #de6464;
     background-image: linear-gradient(top, #de6464, #b33737);
@@ -425,6 +427,7 @@ textarea:focus
 .whiteButton
 {
     color: #000;
+    text-shadow: #fff 1px 1px 0px;
     border-color: #000;
     background-color: #e6e6e6;
     background-image: linear-gradient(top, #e6e6e6, #cccccc);
@@ -459,6 +462,7 @@ textarea:focus
 .lightGreenButton
 {
     color: #000;
+    text-shadow: #fff 1px 1px 0px;
     border-color: #000;
     background-color: rgb(218,237,190);
     background-image: linear-gradient(
