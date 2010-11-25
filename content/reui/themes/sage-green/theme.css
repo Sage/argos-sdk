@@ -3,7 +3,7 @@
 body
 {
 	font-family: Helvetica, Arial;
-	background: #eaf1df;
+	background: #fbfdf0;
 	color: #000;
 }
 
@@ -42,28 +42,48 @@ ul.list-content > li span
 
 
 body > .toolbar {
-    border-bottom: 1px solid black;
-    border-top: 1px transparent black;  
+    border-bottom: 1px solid #3c4f18;
+    border-top: 1px transparent #3c4f18;
+    background-color: rgb(141,163,91);
+    background-image: linear-gradient(
+        center top,
+        rgb(172,187,132) 0%,
+        rgb(141,163,91) 39%,
+        rgb(108,129,64) 39%,
+        rgb(142,162,91) 100%
+    );
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, rgb(3,84,57)),
-        color-stop(1, rgb(2,54,37))
+        color-stop(0, rgb(172,187,132)),
+        color-stop(0.39, rgb(141,163,91)),
+        color-stop(0.39, rgb(108,129,64)),
+        color-stop(1, rgb(142,162,91))
     );
     background-image: -moz-linear-gradient(
         center top,
-        rgb(3,84,57) 0%,
-        rgb(2,54,37) 100%
+        rgb(172,187,132) 0%,
+        rgb(141,163,91) 39%,
+        rgb(108,129,64) 39%,
+        rgb(142,162,91) 100%
     );
-    -moz-box-shadow: rgba(255,255,255,0.05) 0px 22px 0px inset, rgba(0,0,0,0.5) 0px 2px 3px;
-    -webkit-box-shadow: rgba(255,255,255,0.05) 0px 22px 0px inset, rgba(0,0,0,0.5) 0px 2px 3px;
+    box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
 }
 
 .toolbar > h1
 {
 	color: #fff;
 	text-shadow: rgba(0, 0, 0, 1) 1px 1px 0;
+}
+
+.toolbar > .button
+{
+    border-radius: 0px;
+	-webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
 }
 
 body > ul,
@@ -116,6 +136,8 @@ body > div.list
 {
     border-bottom: 1px solid #000;
     border-top: 1px solid #000;
+    background-color: #e6e6e6;
+    background-image: linear-gradient(top, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
         linear,
         left top,
@@ -124,8 +146,9 @@ body > div.list
         color-stop(1, #cccccc)
     );
     background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
-    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px, rgba(255,255,255,0.25) 0px 16px 0px inset;
-    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px, rgba(255,255,255,0.25) 0px 16px 0px inset;
+    box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     color: #000;
     text-shadow: rgba(255, 255, 255, 1) 1px 1px 0px;
     font-weight: bold;
@@ -135,6 +158,8 @@ body > div.list
 {
     border-bottom: 1px solid #000;
     border-top: 1px solid #000;
+    background-color: #de6464;
+    background-image: linear-gradient(top, #de6464, #b33737);
     background-image: -webkit-gradient(
 		linear,
 		left top,
@@ -143,8 +168,9 @@ body > div.list
 		color-stop(1, #b33737)
 	);
 	background-image: -moz-linear-gradient(top, #de6464, #b33737);
-    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px, rgba(255,255,255,0.25) 0px 16px 0px inset;
-    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px, rgba(255,255,255,0.25) 0px 16px 0px inset;
+    box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     color: #fff;
     text-shadow: rgba(0, 0, 0, 1) 1px 1px 0px;
     font-weight: bold;
@@ -255,50 +281,76 @@ div.row-edit:last-child
 	font-weight: bold;
 	font-size: .8em;
 
+    border-radius: 3px;
 	-webkit-border-radius: 3px;
     -moz-border-radius: 3px;
-    border-radius: 3px;
 
     border-style: solid;
     border-width: 1px;
-    border-color: #000;
+    border-color: #3c4f18;
 
     cursor: pointer;
 
     text-shadow: rgba(0, 0, 0, 1) 1px 1px 0;
 
+    background-color: rgb(114,133,69);
+    background-image: linear-gradient(
+        center top,
+        rgb(135,157,93) 0%,
+        rgb(114,133,69) 32%,
+        rgb(81,97,52) 32%,
+        rgb(103,128,63) 100%
+    );
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, rgb(18,99,72)),
-        color-stop(1, rgb(17,69,52))
+        color-stop(0, rgb(135,157,93)),
+        color-stop(0.32, rgb(114,133,69)),
+        color-stop(0.32, rgb(81,97,52)),
+        color-stop(1, rgb(103,128,63))
     );
     background-image: -moz-linear-gradient(
         center top,
-        rgb(18,99,72) 0%,
-        rgb(17,69,52) 100%
+        rgb(135,157,93) 0%,
+        rgb(114,133,69) 32%,
+        rgb(81,97,52) 32%,
+        rgb(103,128,63) 100%
     );
-    -moz-box-shadow: rgba(255,255,255,0.05) 0px 15px 0px inset, rgba(255,255,255,1.0) 0px 0px 1px inset;
-    -webkit-box-shadow: rgba(255,255,255,0.05) 0px 15px 0px inset, rgba(255,255,255,1.0) 0px 0px 1px inset;
-    
+    box-shadow: rgba(255,255,255,0.5) 0px 0px 1px inset;
+    -moz-box-shadow: rgba(255,255,255,0.5) 0px 0px 1px inset;
+    -webkit-box-shadow: rgba(255,255,255,0.5) 0px 0px 1px inset;
+
+    background-clip: padding-box;
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
 }
 
 .button:active
 {
+    background-color: rgb(81,97,52);
+    background-image: linear-gradient(
+        center top,
+        rgb(135,157,93) 0%,
+        rgb(114,133,69) 0%,
+        rgb(81,97,52) 100%,
+        rgb(103,128,63) 100%
+    );
     background-image: -webkit-gradient(
         linear,
-        left bottom,
         left top,
-        color-stop(0, rgb(18,99,72)),
-        color-stop(1, rgb(17,69,52))
+        left bottom,
+        color-stop(0, rgb(135,157,93)),
+        color-stop(0, rgb(114,133,69)),
+        color-stop(1, rgb(81,97,52)),
+        color-stop(1, rgb(103,128,63))
     );
     background-image: -moz-linear-gradient(
-        center bottom,
-        rgb(18,99,72) 0%,
-        rgb(17,69,52) 100%
+        center top,
+        rgb(135,157,93) 0%,
+        rgb(114,133,69) 0%,
+        rgb(81,97,52) 100%,
+        rgb(103,128,63) 100%
     );
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
@@ -306,6 +358,8 @@ div.row-edit:last-child
 
 .blueButton
 {
+    background-color: #2ca0d1;
+    background-image: linear-gradient(top, #2ca0d1, #07a);
     background-image: -webkit-gradient(
 		linear,
 		left top,
@@ -314,12 +368,12 @@ div.row-edit:last-child
 		color-stop(1, #07a)
 	);
 	background-image: -moz-linear-gradient(top, #2ca0d1, #07a);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
 }
 
 .blueButton:active
 {
+    background-color: #07a;
+    background-image: linear-gradient(bottom, #2ca0d1, #07a);
     background-image: -webkit-gradient(
 		linear,
 		left bottom,
@@ -328,12 +382,12 @@ div.row-edit:last-child
 		color-stop(1, #07a)
 	);
 	background-image: -moz-linear-gradient(bottom, #2ca0d1, #07a);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
 }
 
 .redButton
 {
+    background-color: #de6464;
+    background-image: linear-gradient(top, #de6464, #b33737);
     background-image: -webkit-gradient(
 		linear,
 		left top,
@@ -342,12 +396,12 @@ div.row-edit:last-child
 		color-stop(1, #b33737)
 	);
 	background-image: -moz-linear-gradient(top, #de6464, #b33737);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
 }
 
 .redButton:active
 {
+    background-color: #b33737;
+    background-image: linear-gradient(bottom, #de6464, #b33737);
     background-image: -webkit-gradient(
 		linear,
 		left bottom,
@@ -356,8 +410,6 @@ div.row-edit:last-child
 		color-stop(1, #b33737)
 	);
 	background-image: -moz-linear-gradient(bottom, #de6464, #b33737);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
 }
 
 .whiteButton
@@ -365,6 +417,8 @@ div.row-edit:last-child
     color: #000;
     text-shadow: rgba(255, 255, 255, 1) 1px 1px 0;
 
+    background-color: #e6e6e6;
+    background-image: linear-gradient(top, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
 		linear,
 		left top,
@@ -374,15 +428,15 @@ div.row-edit:last-child
 	);
 	background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
 
-    -moz-box-shadow: rgba(255,255,255,0.25) 0px 15px 0px inset, rgba(255,255,255,1.0) 0px 0px 1px inset;
-    -webkit-box-shadow: rgba(255,255,255,0.25) 0px 15px 0px inset, rgba(255,255,255,1.0) 0px 0px 1px inset;
-
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
+    box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
+    -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
+    -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
 }
 
 .whiteButton:active
 {
+    background-color: #cccccc;
+    background-image: linear-gradient(bottom, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
 		linear,
 		left bottom,
@@ -391,15 +445,19 @@ div.row-edit:last-child
 		color-stop(1, #cccccc)
 	);
 	background-image: -moz-linear-gradient(bottom, #e6e6e6, #cccccc);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
 }
 
 .lightGreenButton
 {
     color: #000;
     text-shadow: rgba(255, 255, 255, 1) 1px 1px 0;
-    
+
+    background-color: rgb(218,237,190);
+    background-image: linear-gradient(
+        center top,
+        rgb(218,237,190) 0%,
+        rgb(190,207,166) 100%
+    );
     background-image: -webkit-gradient(
         linear,
         left top,
@@ -413,15 +471,18 @@ div.row-edit:last-child
         rgb(190,207,166) 100%
     );
 
-    -moz-box-shadow: rgba(255,255,255,0.25) 0px 15px 0px inset, rgba(255,255,255,1.0) 0px 0px 1px inset;
-    -webkit-box-shadow: rgba(255,255,255,0.25) 0px 15px 0px inset, rgba(255,255,255,1.0) 0px 0px 1px inset;
-
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
+    -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
+    -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
 }
 
 .lightGreenButton:active
 {
+    background-color: rgb(190,207,166);
+    background-image: linear-gradient(
+        center bottom,
+        rgb(218,237,190) 0%,
+        rgb(190,207,166) 100%
+    );
     background-image: -webkit-gradient(
         linear,
         left bottom,
