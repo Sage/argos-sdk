@@ -131,11 +131,10 @@ body > div.list
     color: #999999;
 }
 
-.panel > h2,
 .panel-content > h2
 {
-    border-bottom: 1px solid #000;
-    border-top: 1px solid #000;
+    border-bottom: 1px solid #777;
+    border-top: 1px solid #aaa;
     background-color: #e6e6e6;
     background-image: linear-gradient(top, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
@@ -156,8 +155,8 @@ body > div.list
 
 .panel-validation-summary > h2
 {
-    border-bottom: 1px solid #000;
-    border-top: 1px solid #000;
+    border-bottom: 1px solid #777;
+    border-top: 1px solid #aaa;
     background-color: #de6464;
     background-image: linear-gradient(top, #de6464, #b33737);
     background-image: -webkit-gradient(
@@ -176,7 +175,6 @@ body > div.list
     font-weight: bold;
 }
 
-.panel > h2:first-child,
 .panel-content > h2:first-child,
 .panel-validation-summary > h2:first-child    
 {
@@ -192,10 +190,27 @@ body > div.list
 .panel-content > fieldset,
 .panel-validation-summary > fieldset
 {
-    border-style: none solid solid solid;
-    border-color: #024731;
-    border-width: 0 2px 2px 2px;
-    background: #fff;    
+    border: none 0px black;
+    background-color: #fff;
+    background-image: linear-gradient(
+        center top,
+        #fff 0%,
+        #fff 50%,
+        #fbfdf0 100%,
+    );
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #fff),
+        color-stop(0.5, #fff),
+        color-stop(1, #fbfdf0)
+    );
+    background-image: -moz-linear-gradient(
+        center top,
+        #fff 0%,
+        #fbfdf0 100%,
+    );  
 }
 
 input:focus,
@@ -205,21 +220,32 @@ textarea:focus
 	background-color: #fff; /* #FDFFDD */;
 }
 
-.panel > ul,
 .panel-content > ul,
 .panel-validation-summary > ul
 {
-    border-style: none solid solid solid;
-    border-color: #024731;
-    border-width: 0 2px 2px 2px;
-    background: #fff;
-    -moz-border-radius-bottomleft: 8px;
-    -webkit-border-bottom-left-radius: 8px;
-    -moz-border-radius-bottomright: 8px;
-    -webkit-border-bottom-right-radius: 8px;
+    border: none 0px black;
+    background-color: #fff;
+    background-image: linear-gradient(
+        center top,
+        #fff 0%,
+        #fff 50%,
+        #fbfdf0 100%,
+    );
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #fff),
+        color-stop(0.5, #fff),
+        color-stop(1, #fbfdf0)
+    );
+    background-image: -moz-linear-gradient(
+        center top,
+        #fff 0%,
+        #fbfdf0 100%,
+    );  
 }
 
-.panel > ul > li,
 .panel-content > ul > li,
 .panel-validation-summary > ul > li
 {
@@ -227,45 +253,56 @@ textarea:focus
     cursor: pointer;
 }
 
-.panel > ul > li:last-child,
 .panel-content > ul > li:last-child,
 .panel-validation-summary > ul > li:last-child
 {
     border-bottom: none 0 black;
 }
 
-.panel > ul > * > a,
-.panel-content > ul > * > a,
-.panel-validation-summary > ul > * > a
+.panel-content > ul a,
+.panel-validation-summary > ul a
 {
     color: inherit;
     text-decoration: none;
 }
 
-div.row > label
+.panel-content > fieldset > .row
 {
+    padding: .25em;
+    min-height: 1.5em;
+    border-bottom: solid 1px #dadad8;
+}
+
+.panel-content > fieldset > .row:last-child
+{
+    border-bottom: none 0px black;
+}
+
+.panel-content > fieldset > .row > label
+{
+    font-weight: bold;    
     color: #00338D;
 }
 
-div.row-edit > textarea
+.panel-content > fieldset > .row-edit > textarea
 {
     font-family: Helvetica, Arial;
     font-size: 16px;
 }
 
-div.row-edit > input:focus,
-div.row-edit > textarea:focus
+.panel-content > fieldset >.row-edit > input:focus,
+.panel-content > fieldset >.row-edit > textarea:focus
 {    
     -webkit-box-shadow: 0 0 5px #f0ac55 !important;
     -moz-box-shadow: 0 0 5px #f0ac55 !important;
 }
 
-div.row-edit
+.panel-content > fieldset > .row-edit
 {
     border-bottom: solid 1px #ddd;
 }
 
-div.row-edit:last-child
+.panel-content > fieldset > .row-edit:last-child
 {
     border-bottom: none 0 black;
 }
