@@ -410,6 +410,23 @@ input.field-error
     right: 4px;
 }
 
+.row-edit[data-field-type="picklist"] > input,
+.row-edit[data-field-type="lookup"] > input,
+.row-edit[data-field-type="select"] > input,
+.row-edit[data-field-type="address"] > input,
+.row-edit[data-field-type="name"] > input,
+.row-edit[data-field-type="date"] > input,
+.row-edit[data-field-type="note"] > input
+{
+    padding: 8px 34px 8px 110px !important;
+}
+
+.row-edit[data-field-type="address"] > textarea,
+.row-edit[data-field-type="note"] > textarea
+{
+    padding: 8px 34px 8px 110px !important;
+}
+
 /* TODO: Move color specifics to theme folder */
 /* Calendar */
 .calendar-table
