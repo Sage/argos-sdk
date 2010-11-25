@@ -44,39 +44,39 @@ ul.list-content > li span
 body > .toolbar {
     border-bottom: 1px solid #3c4f18;
     border-top: 1px transparent #3c4f18;
-    background-color: rgb(141,163,91);
+    background-color: #c0d298;
     background-image: linear-gradient(
         center top,
-        rgb(172,187,132) 0%,
-        rgb(141,163,91) 39%,
-        rgb(108,129,64) 39%,
-        rgb(142,162,91) 100%
+        #dee8c5 0%,
+        #c0d298 39%,
+        #a7b97d 39%,
+        #c3cfa1 100%
     );
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, rgb(172,187,132)),
-        color-stop(0.39, rgb(141,163,91)),
-        color-stop(0.39, rgb(108,129,64)),
-        color-stop(1, rgb(142,162,91))
+        color-stop(0, #dee8c5),
+        color-stop(0.39, #c0d298),
+        color-stop(0.39, #a7b97d),
+        color-stop(1, #c3cfa1)
     );
     background-image: -moz-linear-gradient(
         center top,
-        rgb(172,187,132) 0%,
-        rgb(141,163,91) 39%,
-        rgb(108,129,64) 39%,
-        rgb(142,162,91) 100%
+        #dee8c5 0%,
+        #c0d298 39%,
+        #a7b97d 39%,
+        #c3cfa1 100%
     );
     box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
-    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;    
 }
 
 .toolbar > h1
 {
-	color: #fff;
-	text-shadow: rgba(0, 0, 0, 1) 1px 1px 0;
+	color: #000;
+    text-shadow: #e2ecca 1px 1px 0px;
 }
 
 .toolbar > .button
@@ -101,15 +101,17 @@ body > div.list
 .dialog > fieldset
 {
 	border-bottom: 1px solid #2d3642;
-    border-top: 1px solid #6d84a2;  
-    background: -webkit-gradient(
+    border-top: 1px solid #6d84a2;
+    background-color: #e6e6e6;
+    background-image: linear-gradient(top, #e6e6e6, #aaaaaa);
+    background-image: -webkit-gradient(
 		linear,
 		left top,
 		left bottom,
 		color-stop(0, #e6e6e6),
 		color-stop(1, #aaaaaa)
 	);  
-	background: -moz-linear-gradient(top, #e6e6e6, #aaaaaa);
+	background-image: -moz-linear-gradient(top, #e6e6e6, #aaaaaa);
     -moz-border-radius-bottomleft: 8px;
     -webkit-border-bottom-left-radius: 8px;
     -moz-border-radius-bottomright: 8px;
@@ -131,10 +133,15 @@ body > div.list
     color: #999999;
 }
 
+.panel
+{
+    border-bottom: solid 1px #ddd;
+}
+
 .panel-content > h2
 {
-    border-bottom: 1px solid #777;
-    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #000;
+    border-top: 1px solid #000;
     background-color: #e6e6e6;
     background-image: linear-gradient(top, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
@@ -149,14 +156,14 @@ body > div.list
     -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     color: #000;
-    text-shadow: rgba(255, 255, 255, 1) 1px 1px 0px;
+    text-shadow: #fff 1px 1px 0px;
     font-weight: bold;
 }
 
 .panel-validation-summary > h2
 {
-    border-bottom: 1px solid #777;
-    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #000;
+    border-top: 1px solid #000;
     background-color: #de6464;
     background-image: linear-gradient(top, #de6464, #b33737);
     background-image: -webkit-gradient(
@@ -171,7 +178,7 @@ body > div.list
     -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     color: #fff;
-    text-shadow: rgba(0, 0, 0, 1) 1px 1px 0px;
+    text-shadow: #000 1px 1px 0px;
     font-weight: bold;
 }
 
@@ -191,26 +198,7 @@ body > div.list
 .panel-validation-summary > fieldset
 {
     border: none 0px black;
-    background-color: #fff;
-    background-image: linear-gradient(
-        center top,
-        #fff 0%,
-        #fff 50%,
-        #fbfdf0 100%,
-    );
-    background-image: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        color-stop(0, #fff),
-        color-stop(0.5, #fff),
-        color-stop(1, #fbfdf0)
-    );
-    background-image: -moz-linear-gradient(
-        center top,
-        #fff 0%,
-        #fbfdf0 100%,
-    );  
+    background-color: #fff;  
 }
 
 input:focus,
@@ -224,26 +212,7 @@ textarea:focus
 .panel-validation-summary > ul
 {
     border: none 0px black;
-    background-color: #fff;
-    background-image: linear-gradient(
-        center top,
-        #fff 0%,
-        #fff 50%,
-        #fbfdf0 100%,
-    );
-    background-image: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        color-stop(0, #fff),
-        color-stop(0.5, #fff),
-        color-stop(1, #fbfdf0)
-    );
-    background-image: -moz-linear-gradient(
-        center top,
-        #fff 0%,
-        #fbfdf0 100%,
-    );  
+    background-color: #fff;    
 }
 
 .panel-content > ul > li,
@@ -270,7 +239,7 @@ textarea:focus
 {
     padding: .25em;
     min-height: 1.5em;
-    border-bottom: solid 1px #dadad8;
+    border-bottom: solid 1px #ddd;
 }
 
 .panel-content > fieldset > .row:last-child
@@ -292,7 +261,8 @@ textarea:focus
 
 .panel-content > fieldset >.row-edit > input:focus,
 .panel-content > fieldset >.row-edit > textarea:focus
-{    
+{
+    box-shadow: 0 0 5px #f0ac55 !important;
     -webkit-box-shadow: 0 0 5px #f0ac55 !important;
     -moz-box-shadow: 0 0 5px #f0ac55 !important;
 }
@@ -311,9 +281,10 @@ textarea:focus
 {
     display: block;
     
-	color: #fff;
+	color: #000;
 	text-align: center;
 	text-decoration: none;
+    text-shadow: #e2ecca 1px 1px 0px;
 
 	font-weight: bold;
 	font-size: .8em;
@@ -324,39 +295,37 @@ textarea:focus
 
     border-style: solid;
     border-width: 1px;
-    border-color: #3c4f18;
+    border-color: #a5b183;
 
     cursor: pointer;
 
-    text-shadow: rgba(0, 0, 0, 1) 1px 1px 0;
-
-    background-color: rgb(114,133,69);
+    background-color: #dbe7b7;
     background-image: linear-gradient(
         center top,
-        rgb(135,157,93) 0%,
-        rgb(114,133,69) 32%,
-        rgb(81,97,52) 32%,
-        rgb(103,128,63) 100%
+        #e2edc2 0%,
+        #dbe7b7 32%,
+        #c0cd98 32%,
+        #d5e3b0 100%
     );
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, rgb(135,157,93)),
-        color-stop(0.32, rgb(114,133,69)),
-        color-stop(0.32, rgb(81,97,52)),
-        color-stop(1, rgb(103,128,63))
+        color-stop(0, #e2edc2),
+        color-stop(0.32, #dbe7b7),
+        color-stop(0.32, #c0cd98),
+        color-stop(1, #d5e3b0)
     );
     background-image: -moz-linear-gradient(
         center top,
-        rgb(135,157,93) 0%,
-        rgb(114,133,69) 32%,
-        rgb(81,97,52) 32%,
-        rgb(103,128,63) 100%
+        #e2edc2 0%,
+        #dbe7b7 32%,
+        #c0cd98 32%,
+        #d5e3b0 100%
     );
-    box-shadow: rgba(255,255,255,0.5) 0px 0px 1px inset;
-    -moz-box-shadow: rgba(255,255,255,0.5) 0px 0px 1px inset;
-    -webkit-box-shadow: rgba(255,255,255,0.5) 0px 0px 1px inset;
+    box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
+    -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
+    -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
 
     background-clip: padding-box;
     -webkit-background-clip: padding-box;
@@ -365,29 +334,29 @@ textarea:focus
 
 .button:active
 {
-    background-color: rgb(81,97,52);
+    background-color: #c0cd98;
     background-image: linear-gradient(
         center top,
-        rgb(135,157,93) 0%,
-        rgb(114,133,69) 0%,
-        rgb(81,97,52) 100%,
-        rgb(103,128,63) 100%
+        #e2edc2 0%,
+        #dbe7b7 0%,
+        #c0cd98 100%,
+        #d5e3b0 100%
     );
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, rgb(135,157,93)),
-        color-stop(0, rgb(114,133,69)),
-        color-stop(1, rgb(81,97,52)),
-        color-stop(1, rgb(103,128,63))
+        color-stop(0, #e2edc2),
+        color-stop(0, #dbe7b7),
+        color-stop(1, #c0cd98),
+        color-stop(1, #d5e3b0)
     );
     background-image: -moz-linear-gradient(
         center top,
-        rgb(135,157,93) 0%,
-        rgb(114,133,69) 0%,
-        rgb(81,97,52) 100%,
-        rgb(103,128,63) 100%
+        #e2edc2 0%,
+        #dbe7b7 0%,
+        #c0cd98 100%,
+        #d5e3b0 100%
     );
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
@@ -395,6 +364,8 @@ textarea:focus
 
 .blueButton
 {
+    color: #fff;
+    border-color: #000;
     background-color: #2ca0d1;
     background-image: linear-gradient(top, #2ca0d1, #07a);
     background-image: -webkit-gradient(
@@ -408,7 +379,7 @@ textarea:focus
 }
 
 .blueButton:active
-{
+{    
     background-color: #07a;
     background-image: linear-gradient(bottom, #2ca0d1, #07a);
     background-image: -webkit-gradient(
@@ -423,6 +394,8 @@ textarea:focus
 
 .redButton
 {
+    color: #fff;
+    border-color: #000;
     background-color: #de6464;
     background-image: linear-gradient(top, #de6464, #b33737);
     background-image: -webkit-gradient(
@@ -452,8 +425,7 @@ textarea:focus
 .whiteButton
 {
     color: #000;
-    text-shadow: rgba(255, 255, 255, 1) 1px 1px 0;
-
+    border-color: #000;
     background-color: #e6e6e6;
     background-image: linear-gradient(top, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
@@ -487,8 +459,7 @@ textarea:focus
 .lightGreenButton
 {
     color: #000;
-    text-shadow: rgba(255, 255, 255, 1) 1px 1px 0;
-
+    border-color: #000;
     background-color: rgb(218,237,190);
     background-image: linear-gradient(
         center top,
