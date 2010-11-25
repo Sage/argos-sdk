@@ -464,23 +464,24 @@ textarea:focus
     color: #000;
     text-shadow: #fff 1px 1px 0px;
     border-color: #000;
-    background-color: rgb(218,237,190);
+
+    background-color: #e2edc2;
     background-image: linear-gradient(
         center top,
-        rgb(218,237,190) 0%,
-        rgb(190,207,166) 100%
+        #e2edc2 0%,
+        #d5e3b0 100%
     );
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, rgb(218,237,190)),
-        color-stop(1, rgb(190,207,166))
+        color-stop(0, #e2edc2),
+        color-stop(1, #d5e3b0)
     );
     background-image: -moz-linear-gradient(
         center top,
-        rgb(218,237,190) 0%,
-        rgb(190,207,166) 100%
+        #e2edc2 0%,
+        #d5e3b0 100%
     );
 
     -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
@@ -489,22 +490,22 @@ textarea:focus
 
 .lightGreenButton:active
 {
-    background-color: rgb(190,207,166);
+    background-color: #d5e3b0;
     background-image: linear-gradient(
         center bottom,
-        rgb(218,237,190) 0%,
-        rgb(190,207,166) 100%
+        #e2edc2 0%,
+        #d5e3b0 100%
     );
     background-image: -webkit-gradient(
         linear,
         left bottom,
         left top,
-        color-stop(0, rgb(218,237,190)),
-        color-stop(1, rgb(190,207,166))
+        color-stop(0, #e2edc2),
+        color-stop(1, #d5e3b0)
     );
     background-image: -moz-linear-gradient(
         center bottom,
-        rgb(218,237,190) 0%,
-        rgb(190,207,166) 100%
+        #e2edc2 0%,
+        #d5e3b0 100%
     );
 }

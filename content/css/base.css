@@ -150,23 +150,23 @@ ul.list-content > li > .item
 
 .list-search .searchButton
 {
-    background-color: rgb(218,237,190);
-    background-image: -linear-gradient(
+    background-color: #e2edc2;
+    background-image: linear-gradient(
         center top,
-        rgb(218,237,190) 0%,
-        rgb(190,207,166) 100%
+        #e2edc2 0%,
+        #d5e3b0 100%
     );
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, rgb(218,237,190)),
-        color-stop(1, rgb(190,207,166))
+        color-stop(0, #e2edc2),
+        color-stop(1, #d5e3b0)
     );
     background-image: -moz-linear-gradient(
         center top,
-        rgb(218,237,190) 0%,
-        rgb(190,207,166) 100%
+        #e2edc2 0%,
+        #d5e3b0 100%
     );
     cursor: pointer;
     -moz-border-radius: 0px 3px 3px 0px;
@@ -185,23 +185,23 @@ ul.list-content > li > .item
 
 .list-search .dismissButton
 {
-    background-color: rgb(218,237,190);
+    background-color: #e2edc2;
     background-image: linear-gradient(
         center top,
-        rgb(218,237,190) 0%,
-        rgb(190,207,166) 100%
+        #e2edc2 0%,
+        #d5e3b0 100%
     );
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, rgb(218,237,190)),
-        color-stop(1, rgb(190,207,166))
+        color-stop(0, #e2edc2),
+        color-stop(1, #d5e3b0)
     );
     background-image: -moz-linear-gradient(
         center top,
-        rgb(218,237,190) 0%,
-        rgb(190,207,166) 100%
+        #e2edc2 0%,
+        #d5e3b0 100%
     );
     cursor: pointer;
     color: #000;
