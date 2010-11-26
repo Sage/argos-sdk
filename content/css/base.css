@@ -555,3 +555,27 @@ input.field-error
 {
     width: 60px;
 }
+
+.collapsed
+{
+    margin-bottom: -1px !important;
+}
+
+h2 > .collapsed-indicator
+{
+    height: 32px;
+    width: 24px;
+    float: right;
+    margin: 0 4px 0 0;
+}
+
+.collapsed > .collapsed-indicator
+{
+    
+}
+
+.collapsed + ul,
+.collapsed + fieldset
+{
+    display: none;
+}

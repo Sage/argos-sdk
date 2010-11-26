@@ -26,7 +26,7 @@ Ext.namespace('Sage.Platform.Mobile');
             '</fieldset>'
         ]),     
         sectionBeginTemplate: new Simplate([
-            '<h2>{%: $.title %}</h2>',
+            '<h2 data-action="toggleSection" {% if ($.collapsed) { %}class="collapsed"{% } %}>{%: $.title %}<span class="collapsed-indicator"></span></h2>',
             '{% if ($.list) { %}<ul>{% } else { %}<fieldset>{% } %}'
         ]),
         sectionEndTemplate: new Simplate([
@@ -95,6 +95,11 @@ Ext.namespace('Sage.Platform.Mobile');
             var property = property || '$key';
 
             return String.format(fmt, Sage.Platform.Mobile.Utility.getValue(entry, property));
+        },
+        toggleSection: function(params) {
+            var el = Ext.get(params.$source);
+            if (el)
+                el.toggleClass('collapsed');
         },
         activateRelatedEntry: function(params) {
             if (params.context) this.navigateToRelatedView(params.view, Ext.decode(params.context), params.descriptor);
