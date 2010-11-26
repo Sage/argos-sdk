@@ -22,9 +22,9 @@
         calendarStartTemplate: '<table class="calendar-table">',
         calendarMonthHeaderTemplate: new Simplate([
             '<tr class="calendar-month-header">',
-            '<th class="calendar-prev-month"><a href="#" data-action="goToPreviousMonth">&#171;</a></th>',
+            '<th class="calendar-prev-month"><a href="#" data-action="goToPreviousMonth"><span>&lt;&lt;</span></a></th>',
             '<th class="calendar-month-name" colspan="5">{%= $.monthName %} &nbsp; {%=$.year %}</th>',
-            '<th class="calendar-next-month"><a href="#" data-action="goToNextMonth">&#187;</a></th>',
+            '<th class="calendar-next-month"><a href="#" data-action="goToNextMonth"><span>&gt;&gt;</span></a></th>',
             '</tr>'
         ]),
         titleText: 'Calendar',
@@ -50,6 +50,8 @@
         init: function() {
             Sage.Platform.Mobile.Calendar.superclass.init.call(this);
 
+            this.el.on('swipe', this.onSwipe, this);
+
             this.hourField
                 .on('keyup', this.validateHour, this)
                 .on('blur', this.validateHour, this);
@@ -57,6 +59,16 @@
             this.minuteField
                 .on('keyup', this.validateMinute, this)
                 .on('blur', this.validateMinute, this);
+        },
+        onSwipe: function(evt, el, o) {            
+            switch (evt.browserEvent.direction) {
+                case 'right':
+                    this.goToPreviousMonth();
+                    break;
+                case 'left':
+                    this.goToNextMonth();
+                    break;
+            }
         },
         validateHour: function(evt, el, o) {
             var minimum = parseInt(this.hourField.getAttribute('min'), 10),

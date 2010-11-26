@@ -45,11 +45,12 @@ body > .toolbar {
     border-bottom: 1px solid #3c4f18;
     border-top: 1px transparent #3c4f18;
     background-color: #c0d298;
+    /* was 0,39,39,100 */
     background-image: linear-gradient(
         center top,
         #dee8c5 0%,
-        #c0d298 39%,
-        #a7b97d 39%,
+        #c0d298 50%,
+        #a7b97d 50%,
         #c3cfa1 100%
     );
     background-image: -webkit-gradient(
@@ -57,15 +58,15 @@ body > .toolbar {
         left top,
         left bottom,
         color-stop(0, #dee8c5),
-        color-stop(0.39, #c0d298),
-        color-stop(0.39, #a7b97d),
+        color-stop(0.50, #c0d298),
+        color-stop(0.50, #a7b97d),
         color-stop(1, #c3cfa1)
     );
     background-image: -moz-linear-gradient(
         center top,
         #dee8c5 0%,
-        #c0d298 39%,
-        #a7b97d 39%,
+        #c0d298 50%,
+        #a7b97d 50%,
         #c3cfa1 100%
     );
     box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
@@ -76,7 +77,7 @@ body > .toolbar {
 .toolbar > h1
 {
 	color: #000;
-    text-shadow: #e2ecca 1px 1px 0px;
+    text-shadow: #dee8c5 1px 1px 0px;
 }
 
 .toolbar > .button
@@ -284,7 +285,7 @@ textarea:focus
 	color: #000;
 	text-align: center;
 	text-decoration: none;
-    text-shadow: #e2ecca 1px 1px 0px;
+    text-shadow: #dee8c5 1px 1px 0px;
 
 	font-weight: bold;
 	font-size: .8em;
@@ -300,11 +301,12 @@ textarea:focus
     cursor: pointer;
 
     background-color: #dbe7b7;
+    /* was 0,32,32,100 */
     background-image: linear-gradient(
         center top,
         #e2edc2 0%,
-        #dbe7b7 32%,
-        #c0cd98 32%,
+        #dbe7b7 50%,
+        #c0cd98 50%,
         #d5e3b0 100%
     );
     background-image: -webkit-gradient(
@@ -312,15 +314,15 @@ textarea:focus
         left top,
         left bottom,
         color-stop(0, #e2edc2),
-        color-stop(0.32, #dbe7b7),
-        color-stop(0.32, #c0cd98),
+        color-stop(0.50, #dbe7b7),
+        color-stop(0.50, #c0cd98),
         color-stop(1, #d5e3b0)
     );
     background-image: -moz-linear-gradient(
         center top,
         #e2edc2 0%,
-        #dbe7b7 32%,
-        #c0cd98 32%,
+        #dbe7b7 50%,
+        #c0cd98 50%,
         #d5e3b0 100%
     );
     box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;

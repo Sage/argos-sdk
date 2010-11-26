@@ -602,8 +602,8 @@ body[orient] > div.toolbar-float[open]
 
 .row > textarea
 {
-    box-sizing: border-box;
     -webkit-appearance: none;
+    box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-shadow: none;

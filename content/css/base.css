@@ -429,40 +429,111 @@ input.field-error
 
 /* TODO: Move color specifics to theme folder */
 /* Calendar */
+
+.calendar-content
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    padding: 4px;
+}
+
 .calendar-table
 {
-    width: 98%;
-    margin: 0 auto;
+    width: 100%;
 }
 
-.calendar-table .calendar-month-header,
-.calendar-table .calendar-week-header
+.calendar-month-header
 {
     font-weight: bold;
+    text-align: center;
+    font-size: 1.1em;
+    height: 2em;
 }
 
-.calendar-table .calendar-day
+.calendar-prev-month
+{
+    text-align: left;
+    font-weight: normal;
+}
+
+.calendar-next-month
+{
+    text-align: right;
+    font-weight: normal;
+}
+
+.calendar-week-header
+{
+    font-size: .9em;
+    text-align: center;
+}
+
+.calendar-day
 {
     padding: 10px;
     text-align: center;
     cursor: pointer;
-}
-
-.calendar-table .calendar-day.today
-{
-    color: red;
-}
-
-.calendar-table .calendar-day.weekend
-{
-    background-color: lightGray;
-}
-
-.calendar-table .calendar-day.selected
-{
-    background-color: darkGray;
-    color: white;
+    color: #000;
+    height: 30px;
+    font-size: .9em;
     font-weight: bold;
+
+    background-color: #e9eed7;
+    background-image: linear-gradient(top, #e9eed7, #dae2bb);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #e9eed7),
+		color-stop(1, #dae2bb)
+	);
+	background-image: -moz-linear-gradient(top, #e9eed7, #dae2bb);
+}
+
+.calendar-day.today
+{
+    color: #fff;
+
+    background-color: #4e5b2f;
+    background-image: linear-gradient(top, #4e5b2f, #8a9e57);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #4e5b2f),
+		color-stop(1, #8a9e57)
+	);
+	background-image: -moz-linear-gradient(top, #4e5b2f, #8a9e57);
+
+}
+
+.calendar-day.weekend
+{
+    background-color: #dedede;
+    background-image: linear-gradient(top, #dedede, #aeaeae);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #dedede),
+		color-stop(1, #aeaeae)
+	);
+	background-image: -moz-linear-gradient(top, #dedede, #aeaeae);
+}
+
+.calendar-day.selected
+{
+    background-color: #c4cfa5;
+    background-image: linear-gradient(top, #c4cfa5, #a6b979);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #c4cfa5),
+		color-stop(1, #a6b979)
+	);
+	background-image: -moz-linear-gradient(top, #c4cfa5, #a6b979);
 }
 
 .time-content
