@@ -68,8 +68,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         return 'sdata.cache[' + request.build() + ']';
     },
     loadSDataRequest: function(request, o) {
-        /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />   
-        if (this.isOnline()) return;
+        /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />
+        // todo: find a better way of indicating that a request can prefer cache
+        if (this.isOnline() && (request.allowCacheUse !== true)) return;
         
         var key = this.createCacheKey(request); 
         var feed = window.localStorage.getItem(key);   

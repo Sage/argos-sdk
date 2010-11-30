@@ -260,6 +260,13 @@ ul.list-content > li > .item
 	min-height: 1em !important;
 }
 
+.content-loading > span
+{
+    padding-left: 32px;
+    font-size: 0.7em;
+    background: url('../images/content-loading-light-green.gif') no-repeat scroll 12px 50%;
+}
+
 /* floating toolbar */
 body > div.toolbar-float[open],
 body[orient] > div.toolbar-float[open]

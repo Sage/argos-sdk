@@ -33,7 +33,7 @@ Ext.namespace('Sage.Platform.Mobile');
             '{% if ($.list) { %}</ul>{% } else { %}</fieldset>{% } %}'
         ]),
         propertyTemplate: new Simplate([
-            '<div class="row {%= $.cls %}">',
+            '<div class="row {%= $.cls %}" data-property="{%= $.name %}">',
             '<label>{%: $.label %}</label>',
             '<span>{%= $.value %}</span>',
             '</div>'
@@ -190,11 +190,11 @@ Ext.namespace('Sage.Platform.Mobile');
                 }
 
                 var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue;
-                var value = provider(entry, current['name']);
+                var value = current['value'] || provider(entry, current['name']);
 
                 if (current['tpl'])
                 {
-                    var rendered = current['tpl'].apply(value);
+                    var rendered = current['tpl'].apply(value, this);
                     var formatted = current['encode'] === true
                         ? Sage.Platform.Mobile.Format.encode(rendered)
                         : rendered;
