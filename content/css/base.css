@@ -337,7 +337,7 @@ body[orient] > div.toolbar-float[open]
 .toolbar.busy .button.actionButton span,
 .panel.busy .button.actionButton span
 {
-	background: url('../images/loading-indicator-green.gif') no-repeat scroll 0 50%;
+	background: url('../images/loading-indicator-light-green.gif') no-repeat scroll 0 50%;
 	padding: 0 0 0 20px;
 }
 
