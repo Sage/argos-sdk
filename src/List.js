@@ -162,7 +162,7 @@ Ext.namespace('Sage.Platform.Mobile');
         insertView: false,
         contextView: false,
         customSearchRE: /^#!/,
-        moreText: 'Retreive More Records',
+        moreText: 'Retrieve More Records',
         titleText: 'List',
         remainingText: '{0} records remaining',
         searchText: 'Search',
