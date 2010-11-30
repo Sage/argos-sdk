@@ -93,7 +93,8 @@ Ext.namespace("Sage.Platform.Mobile");
             return this.tools[name] && this.tools[name].fn;
         },
         invokeToolAction: function(name, evt, el) {
-            return this.tools[name].fn.call(this.tool.scope || this);
+            var tool = this.tools[name];
+            if (tool) return tool.fn.call(tool.scope || this);
         },
         open: function() {
             this.el.dom.setAttribute('open', 'open');
