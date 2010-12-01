@@ -430,7 +430,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
             else
             {
-                this.insertCompleted(false);
+                ReUI.back();
             }
         },
         update: function() {

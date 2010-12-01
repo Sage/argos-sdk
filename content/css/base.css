@@ -570,7 +570,7 @@ input.field-error
 
 h2 > .collapsed-indicator
 {
-    height: 32px;
+    height: 30px;
     width: 24px;
     float: right;
     margin: 0 4px 0 0;
@@ -585,4 +585,37 @@ h2 > .collapsed-indicator
 .collapsed + fieldset
 {
     display: none;
+}
+
+.action-list > ul > li > a
+{
+    text-overflow: ellipsis;
+}
+
+.action-list > li
+{
+    line-height: 1em !important;
+}
+
+.action-list > li > a > label
+{
+    display: block;
+    line-height: inherit;    
+    padding: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.action-list > li > a > span
+{
+    display: block;
+    font-size: 0.75em;
+    min-height: 1em;
+    line-height: inherit;
+    padding: 2px 0 0 0;
+    color: #777;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }

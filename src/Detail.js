@@ -26,8 +26,8 @@ Ext.namespace('Sage.Platform.Mobile');
             '</fieldset>'
         ]),     
         sectionBeginTemplate: new Simplate([
-            '<h2 data-action="toggleSection" {% if ($.collapsed) { %}class="collapsed"{% } %}>{%: $.title %}<span class="collapsed-indicator"></span></h2>',
-            '{% if ($.list) { %}<ul>{% } else { %}<fieldset>{% } %}'
+            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<span class="collapsed-indicator"></span></h2>',
+            '{% if ($.list) { %}<ul class="{%= $.cls %}">{% } else { %}<fieldset class="{%= $.cls %}">{% } %}'
         ]),
         sectionEndTemplate: new Simplate([
             '{% if ($.list) { %}</ul>{% } else { %}</fieldset>{% } %}'
@@ -55,6 +55,27 @@ Ext.namespace('Sage.Platform.Mobile');
             '<img src="{%= $.icon %}" alt="icon" class="icon" />',
             '{% } %}',
             '<span>{%: $.label %}</span>',
+            '</a>',
+            '</li>'
+        ]),
+        actionPropertyTemplate: new Simplate([
+            '<div class="row {%= $.cls %}">',
+            '<label>{%: $.label %}</label>',
+            '<span>',
+            '<a data-action="{%= $.action %}">',
+            '{%= $.value %}',
+            '</a>',
+            '</span>',
+            '</div>'
+        ]),
+        actionTemplate: new Simplate([
+            '<li class="{%= $.cls %}">',
+            '<a data-action="{%= $.action %}">',
+            '{% if ($.icon) { %}',
+            '<img src="{%= $.icon %}" alt="icon" class="icon" />',
+            '{% } %}',
+            '<label>{%: $.label %}</label>',
+            '<span>{%= $.value %}</span>',
             '</a>',
             '</li>'
         ]),
@@ -174,10 +195,9 @@ Ext.namespace('Sage.Platform.Mobile');
         },
         processLayout: function(layout, layoutOptions, entry)
         {
-            var sections = [];
-            var content = [];
-
-            content.push(this.sectionBeginTemplate.apply(layoutOptions));
+            var sectionQueue = [],
+                sectionStarted = false,
+                content = [];
 
             for (var i = 0; i < layout.length; i++)
             {
@@ -185,26 +205,38 @@ Ext.namespace('Sage.Platform.Mobile');
 
                 if (current['as'])
                 {
-                    sections.push(current);
+                    if (sectionStarted)
+                        sectionQueue.push(current);
+                    else
+                        this.processLayout(current['as'], current['options'], entry);
+
                     continue;
                 }
 
-                var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue;
-                var value = current['value'] || provider(entry, current['name']);
+                if (!sectionStarted)
+                {
+                    sectionStarted = true;
+                    content.push(this.sectionBeginTemplate.apply(layoutOptions, this));
+                }
+
+                var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue,
+                    value = typeof current['value'] === 'undefined'
+                        ? provider(entry, current['name'])
+                        : current['value'];
 
                 if (current['tpl'])
                 {
-                    var rendered = current['tpl'].apply(value, this);
-                    var formatted = current['encode'] === true
-                        ? Sage.Platform.Mobile.Format.encode(rendered)
-                        : rendered;
+                    var rendered = current['tpl'].apply(value, this),
+                        formatted = current['encode'] === true
+                            ? Sage.Platform.Mobile.Format.encode(rendered)
+                            : rendered;
                 }
                 else if (current['renderer'] && typeof current['renderer'] === 'function')
                 {
-                    var rendered = current['renderer'].call(this, value);
-                    var formatted = current['encode'] === true
-                        ? Sage.Platform.Mobile.Format.encode(rendered)
-                        : rendered;
+                    var rendered = current['renderer'].call(this, value),
+                        formatted = current['encode'] === true
+                            ? Sage.Platform.Mobile.Format.encode(rendered)
+                            : rendered;
                 }
                 else
                 {
@@ -228,6 +260,9 @@ Ext.namespace('Sage.Platform.Mobile');
                         ? this.expandExpression(current['descriptor'], entry)
                         : provider(entry, current['descriptor']);
 
+                if (current['action'])
+                    options['action'] = this.expandExpression(current['action'], entry);
+
                 if (current['view'])
                 {
                     var context = {};
@@ -248,24 +283,29 @@ Ext.namespace('Sage.Platform.Mobile');
                     options['context'] = Ext.util.JSON.encode(context);
                 }
 
+                // priority: wrap > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
                 var template = current['wrap']
                     ? current['wrap']
                     : current['view']
                         ? current['property'] === true
                             ? this.relatedPropertyTemplate
                             : this.relatedTemplate
-                        : this.propertyTemplate;
+                        : current['action']
+                            ? current['property'] === true
+                                ? this.actionPropertyTemplate
+                                : this.actionTemplate
+                            : this.propertyTemplate;
 
-                content.push(template.apply(options));
+                content.push(template.apply(options, this));
             }
 
-            content.push(this.sectionEndTemplate.apply(layoutOptions));
+            if (sectionStarted) content.push(this.sectionEndTemplate.apply(layoutOptions, this));
 
             Ext.DomHelper.append(this.contentEl, content.join(''));
 
-            for (var i = 0; i < sections.length; i++)
+            for (var i = 0; i < sectionQueue.length; i++)
             {
-                var current = sections[i];
+                var current = sectionQueue[i];
 
                 this.processLayout(current['as'], current['options'], entry);
             }

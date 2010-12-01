@@ -19,8 +19,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             test: /^(\d{3})(\d{3,4})$/,
             format: '{3}-{4}'
         },{
-            test: /^(\d{3})(\d{3})(\d{2,})(.*)$/,
+            test: /^(\d{3})(\d{3})(\d{2,4})$/, // 555 555 5555
+            format: '({3})-{4}-{5}'
+        },{
+            test: /^(\d{3})(\d{3})(\d{2,4})([^0-9]{1,}.*)$/, // 555 555 5555x
             format: '({3})-{4}-{5}{6}'
+        },{
+            test: /^(\d{11,})(.*)$/,
+            format: '{1}'
         }],
         getValue: function() {
             var value = this.el.getValue();
@@ -37,15 +43,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.el.dom.value = this.formatNumberForDisplay(val);
         },
         formatNumberForDisplay: function(number, clean) {
-            if (typeof clean === 'undefined')
-                var clean = number;
+            if (typeof clean === 'undefined') clean = number;
 
             for (var i = 0; i < this.formatters.length; i++)
             {
-                var formatter = this.formatters[i];
-                var match;
+                var formatter = this.formatters[i],
+                    match;
                 if ((match = formatter.test.exec(clean)))
+                {                    
                     return String.format.apply(String, [formatter.format, number, clean].concat(match));
+                }
             }
 
             return number;

@@ -186,7 +186,7 @@ body > div.list
 .panel-content > h2:first-child,
 .panel-validation-summary > h2:first-child    
 {
-    border-top: none 0 black;
+    border-top: solid 1px #e6e6e6;
 }
 
 .panel-form-error > .panel-content > h2:first-child
