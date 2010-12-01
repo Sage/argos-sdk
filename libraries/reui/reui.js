@@ -537,10 +537,11 @@ ReUI = {};
             if (o.track !== false)
             {
                 var count = context.history.length,
-                    hash = formatHashForPage(page, o);
+                    hash = formatHashForPage(page, o),
+                    position = -1;
 
                 // do loop and trim
-                for (var position = count - 1; position >= 0; position--)
+                for (position = count - 1; position >= 0; position--)
                     if (context.history[position].hash == hash)
                         break;
 
@@ -557,6 +558,28 @@ ReUI = {};
                     // location hash will not match requested hash when show is called directly, but will match
                     // for detected location changes (i.e. the back button).
                     if (location.hash != hash) history.go(position - (count - 1));
+                }
+                else if (o.returnTo)
+                {
+                    if (typeof o.returnTo === 'function')
+                    {
+                        for (position = count - 1; position >= 0; position--)
+                            if (o.returnTo(context.history[position]))
+                                break;
+                    }
+                    else if (o.returnTo < 0)
+                    {
+                        position = (count - 1) + o.returnTo;
+                    }
+
+                    if (position > -1)
+                    {
+                        // we fix up the history, but do not flag as trimmed, since we do want the new view to be pushed.
+                        context.history = context.history.splice(0, position + 1);
+                        context.hash = context.history[context.history.length - 1] && context.history[context.history.length - 1].hash;
+
+                        if (location.hash != hash) history.go(position - (count - 1));
+                    }
                 }
             }
 

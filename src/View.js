@@ -128,7 +128,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
             if (this.options.title) this.setTitle(this.options.title);
         },
-        show: function(options) {
+        show: function(options, transitionOptions) {
             /// <summary>
             ///     Show's the view using iUI in order to transition to the new element.
             /// </summary>
@@ -141,7 +141,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
             if (this.options.title) this.setTitle(this.options.title);
 
-            ReUI.show(this.el.dom, {tag: this.getTag(), data: this.getContext()});
+            ReUI.show(this.el.dom, Ext.apply(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
         },
         beforeTransitionTo: function() {
             /// <summary>
