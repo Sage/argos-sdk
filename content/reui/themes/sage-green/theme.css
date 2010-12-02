@@ -28,20 +28,23 @@ h5
     font-weight: normal;
 }
 
-body > ul > li,
-ul.list-content > li
+.list-content
+{
+    background-color: #fff;
+}
+
+.list-content > li
 {
     font-weight: normal;
 }
 
-body > ul > li span,
-ul.list-content > li span
+.list-content > li span
 {
     /* font-size: .8em; */
 }
 
-
-body > .toolbar {
+body > .toolbar
+{
     border-bottom: 1px solid #3c4f18;
     border-top: 1px transparent #3c4f18;
     background-color: #c0d298;
@@ -87,12 +90,6 @@ body > .toolbar {
     -webkit-box-shadow: rgba(255,255,255,0.75) 0px 0px 3px inset;
 }
 
-body > ul,
-body > div.list
-{
-    background: #fff;
-}
-
 .dialog .toolbar > h1
 {
     color: #000;
@@ -134,8 +131,11 @@ body > div.list
     color: #999999;
 }
 
-.panel
+.panel-content,
+.panel-loading-indicator
 {
+    background-color: #fff;
+    border: none 0px black;
     border-bottom: solid 1px #ddd;
 }
 
@@ -194,12 +194,10 @@ body > div.list
     border-top: 1px solid #000;
 }
 
-.panel > fieldset,
 .panel-content > fieldset,
 .panel-validation-summary > fieldset
 {
     border: none 0px black;
-    background-color: #fff;  
 }
 
 input:focus,

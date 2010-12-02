@@ -5,40 +5,43 @@ body
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 	-webkit-user-select: none;
 	-webkit-text-size-adjust: none;
-    -webkit-perspective: 2000px;
 }
 
 body > *
 {
     display: none;
-    position: absolute;
+    position: absolute;        
     margin: 0;
     padding : 0;
 }
 
-body > ul,
-body > div.panel,
-body > div.list
+body > .panel,
+body > .list
 {
     left: 0;
     top: 45px;
     width: 100%;
     height: auto;
+    min-height: 416px;
     -webkit-transform: translateX(0%);
     -webkit-transition-duration: 300ms;
     -webkit-transition-property: -webkit-transform;
 }
 
-body[orient="landscape"] > *:not(.toolbar) {
-    height: auto;   
+body[orient="landscape"] > .panel,
+body[orient="landscape"] > .list
+{
+    height: auto;
+    min-height: 268px;
 }
 
-body > *[selected="true"] {
+body > [selected="true"]
+{
     display: block;
 }
 
-body > .toolbar,
-.dialog > fieldset > .toolbar {
+.toolbar
+{
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -51,7 +54,6 @@ body > .toolbar,
     display: block;
     z-index: 10;
 }
-
 
 .h-stack
 {
@@ -192,14 +194,13 @@ input:not([type|=radio]):not([type|=checkbox]) {
     border: 1px solid #000;
 }
 
-ul.list-content
+.list-content
 {
     margin: 0;
     padding: 0;
 }
 
-body > ul > li,
-ul.list-content > li
+.list-content > li
 {
     font-size: 1.25em;
     font-weight: bold;
@@ -210,24 +211,13 @@ ul.list-content > li
     border-bottom: solid 1px #ddd;
 }
 
-ul.list-content > li
+.list-content > li
 {
     padding: 8px 32px 8px 36px;
 }
 
-body > ul > * > a
-{
-    color: inherit;
-    padding: 8px 32px 8px 36px;
-    margin: -8px 0px -8px -10px;
-    display: block;
-    text-decoration: none;
-}
-
-body > ul > li > img.icon,
-body > ul > li > * > img.icon,
-ul.list-content > li > img.icon,
-ul.list-content > li > * > img.icon
+.list-content > li > img.icon,
+.list-content > li > * > img.icon
 {
     border: none 0 black;
     margin: 0 .5em 0 0;
@@ -236,8 +226,7 @@ ul.list-content > li > * > img.icon
     float: left;
 }
 
-body > ul > li > input.list-selector,
-ul.list-content > li > input.list-selector
+.list-content > li > input.list-selector
 {
     float: left;
     margin: 2px 0 0 0px;
@@ -261,18 +250,6 @@ h4
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-}
-
-fieldset.loading .row
-{
-	text-align: center !important;
-	padding: 1em !important;
-	min-height: 1em !important;
-}
-
-fieldset.loading .loading-indicator
-{
-	display: inline-block;
 }
 
 img
@@ -304,7 +281,6 @@ body[orient] > div.toolbar-float[open]
 {
 	width: auto;
 }
-
 
 .toolbar-float
 {

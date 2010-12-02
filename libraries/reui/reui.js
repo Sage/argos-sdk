@@ -188,9 +188,7 @@ ReUI = {};
         }
 
         context.transitioning = false;
-
-        if (o.scroll !== false) D.wait(scrollTo, 0, 0, 1); 
-          
+  
         if (o.update !== false) 
         {
             if (R.titleEl)
@@ -232,7 +230,7 @@ ReUI = {};
                         R.backEl.style.display = 'none';
                 }
             }
-        }
+        }        
     };  
     
     var transition = function(from, to, o) {            
@@ -255,6 +253,8 @@ ReUI = {};
 
         D.dispatch(from, 'beforetransition', {out: true, tag: o.tag, data: o.data});
         D.dispatch(to, 'beforetransition', {out: false, tag: o.tag, data: o.data});
+
+        scrollTo(0, 1);
 
         if (R.disableFx === true)
         {
@@ -635,8 +635,8 @@ ReUI = {};
                     D.dispatch(page, 'beforetransition', {out: false, tag: o.tag, data: o.data});
 
                     D.select(page);
-
-                    D.dispatch(page, 'aftertransition', {out: false, tag: o.tag, data: o.data});
+                    
+                    D.dispatch(page, 'aftertransition', {out: false, tag: o.tag, data: o.data});                    
 
                     transitionComplete(page, o);
                 }
