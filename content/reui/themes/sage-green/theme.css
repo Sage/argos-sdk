@@ -97,23 +97,23 @@ body > .toolbar
 }
 
 .dialog > fieldset
-{
-	border-bottom: 1px solid #2d3642;
-    border-top: 1px solid #6d84a2;
+{	
     background-color: #e6e6e6;
-    background-image: linear-gradient(top, #e6e6e6, #aaaaaa);
+    background-image: linear-gradient(top, #e6e6e6, #b3b3b3);
     background-image: -webkit-gradient(
 		linear,
 		left top,
 		left bottom,
 		color-stop(0, #e6e6e6),
-		color-stop(1, #aaaaaa)
+		color-stop(1, #b3b3b3)
 	);  
-	background-image: -moz-linear-gradient(top, #e6e6e6, #aaaaaa);
+	background-image: -moz-linear-gradient(top, #e6e6e6, #b3b3b3);
     -moz-border-radius-bottomleft: 8px;
     -webkit-border-bottom-left-radius: 8px;
     -moz-border-radius-bottomright: 8px;
     -webkit-border-bottom-right-radius: 8px;
+
+    background-clip: padding-box;
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
 }
@@ -249,7 +249,7 @@ textarea:focus
 .panel-content > fieldset > .row > label
 {
     font-weight: bold;    
-    color: #00338D;
+    color: #0079A7;
 }
 
 .panel-content > fieldset > .row-edit > textarea
@@ -276,7 +276,7 @@ textarea:focus
     border-bottom: none 0 black;
 }
 
-.button 
+.button
 {
     display: block;
     
@@ -294,7 +294,7 @@ textarea:focus
 
     border-style: solid;
     border-width: 1px;
-    border-color: #a5b183;
+    border-color: #a4bf7d;
 
     cursor: pointer;
 
@@ -358,154 +358,294 @@ textarea:focus
         #c1d59f 100%,
         #d6e3bf 100%
     );
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
 }
 
+.taskButton,
 .blueButton
 {
     color: #fff;
     text-shadow: #000 0px 1px 0px;
-    border-color: #000;
-    background-color: #2ca0d1;
-    background-image: linear-gradient(top, #2ca0d1, #07a);
+
+    border-color: #002838;
+
+    background-color: #00a1de;
+    background-image: linear-gradient(
+        center top,
+        #00a1de 0%,
+        #0079a7 50%,
+        #00516f 50%,
+        #0079a7 100%
+    );
     background-image: -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #2ca0d1),
-		color-stop(1, #07a)
-	);
-	background-image: -moz-linear-gradient(top, #2ca0d1, #07a);
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #00a1de),
+        color-stop(0.50, #0079a7),
+        color-stop(0.50, #00516f),
+        color-stop(1, #0079a7)
+    );
+    background-image: -moz-linear-gradient(
+        center top,
+        #00a1de 0%,
+        #0079a7 50%,
+        #00516f 50%,
+        #0079a7 100%
+    );
 }
 
+.taskButton:active,
 .blueButton:active
 {    
-    background-color: #07a;
-    background-image: linear-gradient(bottom, #2ca0d1, #07a);
+    background-color: #0079a7;
+    background-image: linear-gradient(
+        center top,
+        #00a1de 0%,
+        #0079a7 100%,
+        #00516f 100%,
+        #0079a7 100%
+    );
     background-image: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, #2ca0d1),
-		color-stop(1, #07a)
-	);
-	background-image: -moz-linear-gradient(bottom, #2ca0d1, #07a);
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #00a1de),
+        color-stop(1, #0079a7),
+        color-stop(1, #00516f),
+        color-stop(1, #0079a7)
+    );
+    background-image: -moz-linear-gradient(
+        center top,
+        #00a1de 0%,
+        #0079a7 100%,
+        #00516f 100%,
+        #0079a7 100%
+    );
 }
 
-.redButton
+.cancelButton,
+.purpleButton
 {
     color: #fff;
     text-shadow: #000 0px 1px 0px;
-    border-color: #000;
-    background-color: #de6464;
-    background-image: linear-gradient(top, #de6464, #b33737);
+
+    border-color: #421f34;
+
+    background-color: #a44e81;
+    background-image: linear-gradient(
+        center top,
+        #a44e81 0%,
+        #833f67 50%,
+        #632f4e 50%,
+        #833f67 100%
+    );
     background-image: -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #de6464),
-		color-stop(1, #b33737)
-	);
-	background-image: -moz-linear-gradient(top, #de6464, #b33737);
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #a44e81),
+        color-stop(0.50, #833f67),
+        color-stop(0.50, #632f4e),
+        color-stop(1, #833f67)
+    );
+    background-image: -moz-linear-gradient(
+        center top,
+        #a44e81 0%,
+        #833f67 50%,
+        #632f4e 50%,
+        #833f67 100%
+    );
 }
 
-.redButton:active
+.cancelButton:active,
+.purpleButton:active
 {
-    background-color: #b33737;
-    background-image: linear-gradient(bottom, #de6464, #b33737);
+    background-color: #833f67;
+    background-image: linear-gradient(
+        center top,
+        #a44e81 0%,
+        #833f67 100%,
+        #632f4e 100%,
+        #833f67 100%
+    );
     background-image: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, #de6464),
-		color-stop(1, #b33737)
-	);
-	background-image: -moz-linear-gradient(bottom, #de6464, #b33737);
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #a44e81),
+        color-stop(1, #833f67),
+        color-stop(1, #632f4e),
+        color-stop(1, #833f67)
+    );
+    background-image: -moz-linear-gradient(
+        center top,
+        #a44e81 0%,
+        #833f67 100%,
+        #632f4e 100%,
+        #833f67 100%
+    );
 }
 
+.subHeaderButton,
 .whiteButton
 {
     color: #000;
     text-shadow: #fff 0px 1px 0px;
-    border-color: #000;
-    background-color: #e6e6e6;
-    background-image: linear-gradient(top, #e6e6e6, #cccccc);
-    background-image: -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #e6e6e6),
-		color-stop(1, #cccccc)
-	);
-	background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
 
-    box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
-    -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
-    -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
+    border-color: #b3b3b3;
+
+    background-color: #f2f2f2;
+    background-image: linear-gradient(
+        center top,
+        #f2f2f2 0%,
+        #e6e6e6 50%,
+        #cccccc 50%,
+        #e6e6e6 100%
+    );
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #f2f2f2),
+        color-stop(0.50, #e6e6e6),
+        color-stop(0.50, #cccccc),
+        color-stop(1, #e6e6e6)
+    );
+    background-image: -moz-linear-gradient(
+        center top,
+        #f2f2f2 0%,
+        #e6e6e6 50%,
+        #cccccc 50%,
+        #e6e6e6 100%
+    );
 }
 
+.subHeaderButton:active,
 .whiteButton:active
 {
-    background-color: #cccccc;
-    background-image: linear-gradient(bottom, #e6e6e6, #cccccc);
+    background-color: #e6e6e6;
+    background-image: linear-gradient(
+        center top,
+        #f2f2f2 0%,
+        #e6e6e6 100%,
+        #cccccc 100%,
+        #e6e6e6 100%
+    );
     background-image: -webkit-gradient(
-		linear,
-		left bottom,
-		left top,
-		color-stop(0, #e6e6e6),
-		color-stop(1, #cccccc)
-	);
-	background-image: -moz-linear-gradient(bottom, #e6e6e6, #cccccc);
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #f2f2f2),
+        color-stop(1, #e6e6e6),
+        color-stop(1, #cccccc),
+        color-stop(1, #e6e6e6)
+    );
+    background-image: -moz-linear-gradient(
+        center top,
+        #f2f2f2 0%,
+        #e6e6e6 100%,
+        #cccccc 100%,
+        #e6e6e6 100%
+    );
 }
 
+.headerButton,
 .lightGreenButton
 {
     color: #000;
     text-shadow: #fff 0px 1px 0px;
-    border-color: #000;
 
-    background-color: #d6e3bf;
+    border-color: #a4bf7d;
+
+    background-color: #eaf1df;
     background-image: linear-gradient(
         center top,
-        #d6e3bf 0%,
-        #c1d59f 100%
+        #eaf1df 0%,
+        #d6e3bf 50%,
+        #c1d59f 50%,
+        #d6e3bf 100%
     );
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, #d6e3bf),
-        color-stop(1, #c1d59f)
+        color-stop(0, #eaf1df),
+        color-stop(0.50, #d6e3bf),
+        color-stop(0.50, #c1d59f),
+        color-stop(1, #d6e3bf)
     );
     background-image: -moz-linear-gradient(
         center top,
-        #d6e3bf 0%,
-        #c1d59f 100%
+        #eaf1df 0%,
+        #d6e3bf 50%,
+        #c1d59f 50%,
+        #d6e3bf 100%
     );
 
     -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
     -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
 }
 
+.headerButton:active,
 .lightGreenButton:active
 {
-    background-color: #c1d59f;
+    background-color: #d6e3bf;
     background-image: linear-gradient(
-        center bottom,
-        #d6e3bf 0%,
-        #c1d59f 100%
+        center top,
+        #eaf1df 0%,
+        #d6e3bf 100%,
+        #c1d59f 100%,
+        #d6e3bf 100%
     );
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #eaf1df),
+        color-stop(1, #d6e3bf),
+        color-stop(1, #c1d59f),
+        color-stop(1, #d6e3bf)
+    );
+    background-image: -moz-linear-gradient(
+        center top,
+        #eaf1df 0%,
+        #d6e3bf 100%,
+        #c1d59f 100%,
+        #d6e3bf 100%
+    );
+}
+
+.simpleSubHeaderButton,
+.nonGlossWhiteButton
+{
+    color: #000;
+    text-shadow: #fff 0px 1px 0px;
+
+    border-color: #b3b3b3;
+    
+    background-color: #e6e6e6;
+    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(1, #cccccc)
+    );
+    background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+}
+
+.simpleSubHeaderButton:active,
+.nonGlossWhiteButton:active
+{
+    background-color: #cccccc;
+    background-image: linear-gradient(bottom, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
         linear,
         left bottom,
         left top,
-        color-stop(0, #d6e3bf),
-        color-stop(1, #c1d59f)
+        color-stop(0, #e6e6e6),
+        color-stop(1, #cccccc)
     );
-    background-image: -moz-linear-gradient(
-        center bottom,
-        #d6e3bf 0%,
-        #c1d59f 100%
-    );
+    background-image: -moz-linear-gradient(bottom, #e6e6e6, #cccccc);
 }

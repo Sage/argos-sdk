@@ -96,7 +96,6 @@ Ext.namespace('Sage.Platform.Mobile');
                 name: 'edit',
                 title: this.editText,
                 hidden: function() { return !this.editView; },
-                cls: 'button',
                 fn: this.navigateToEditView,
                 scope: this
             }];

@@ -123,7 +123,7 @@ Ext.namespace('Sage.Platform.Mobile');
         moreTemplate: new Simplate([
             '<div class="list-more">',
             '<div class="list-remaining"><span></span></div>',
-            '<a class="button lightGreenButton" data-action="more">',
+            '<a class="button" data-action="more">',
             '<span>{%= $.moreText %}</span>',
             '</a>',
             '</div>'
@@ -131,8 +131,8 @@ Ext.namespace('Sage.Platform.Mobile');
         searchTemplate: new Simplate([
             '<div class="list-search">',
             '<input type="text" name="query" class="query" />',
-            '<div class="dismissButton" data-action="clearSearchQuery">X</div>',
-            '<div class="searchButton" data-action="search">Search</div>',
+            '<div class="subHeaderButton dismissButton" data-action="clearSearchQuery">X</div>',
+            '<div class="subHeaderButton searchButton" data-action="search">Search</div>',
             '<label>{%= $.searchText %}</label>',
             '</div>'
         ]),
@@ -193,7 +193,6 @@ Ext.namespace('Sage.Platform.Mobile');
                 name: 'New',
                 title: this.insertText,
                 fn: this.navigateToInsertView,
-                cls: "button",
                 scope: this
             }];
 

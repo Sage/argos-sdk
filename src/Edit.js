@@ -90,7 +90,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.tools.tbar = [{
                 name: 'save',
                 title: this.saveText,
-                cls: 'button',
                 fn: this.save,
                 scope: this
             }];

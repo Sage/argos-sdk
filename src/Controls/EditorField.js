@@ -6,7 +6,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     Sage.Platform.Mobile.Controls.EditorField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<a class="button whiteButton"><span>{%: $.lookupText %}</span></a>',
+            '<a class="button simpleSubHeaderButton"><span>{%: $.lookupText %}</span></a>',
             '<input type="text" />'
         ]),
         lookupText: '...',
@@ -26,7 +26,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     tbar: [{
                         name: 'complete',
                         title: this.completeText,
-                        cls: 'button',
                         fn: this.complete,
                         scope: this
                     }]

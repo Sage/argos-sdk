@@ -12,12 +12,12 @@ Ext.namespace("Sage.Platform.Mobile");
     Sage.Platform.Mobile.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
         barTemplate: new Simplate([
             '<div class="{%= $.cls %} toolbar">',
-            '<a id="backButton" class="button" href="#" style="display: none;">{%: $.backButtonText %}</a>',
+            '<a id="backButton" class="button headerButton" href="#" style="display: none;">{%: $.backButtonText %}</a>',
             '<h1 id="pageTitle">{%= $.titleText %}</h1>',
             '</div>'
         ]),
         toolTemplate: new Simplate([
-            '<a class="{%= $.cls || "button" %} actionButton" data-tool-action="{%= $.name %}"><span>{%: $.title %}</span></a>'
+            '<a class="button headerButton actionButton {%= $.cls %}" data-tool-action="{%= $.name %}"><span>{%: $.title %}</span></a>'
         ]),
         titleText: 'Mobile',
         backButtonText: '<< Back',
