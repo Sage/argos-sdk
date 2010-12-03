@@ -38,6 +38,11 @@ h5
     font-weight: normal;
 }
 
+.list-content > li:active
+{
+    background-color: #D5EFFA;
+}
+
 .list-content > li span
 {
     /* font-size: .8em; */
