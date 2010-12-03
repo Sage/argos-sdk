@@ -43,7 +43,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         ]),
         sectionBeginTemplate: new Simplate([
             '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<span class="collapsed-indicator"></span></h2>',
-            '{% if ($.list) { %}<ul>{% } else { %}<fieldset>{% } %}'
+            '{% if ($.list) { %}<ul class="{%= $.cls %}">{% } else { %}<fieldset class="{%= $.cls %}">{% } %}'
         ]),
         sectionEndTemplate: new Simplate([
             '{% if ($.list) { %}</ul>{% } else { %}</fieldset>{% } %}'
@@ -154,41 +154,48 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         createLayout: function() {
             return this.layout || [];
         },
-        processLayout: function(layout, options)
+        processLayout: function(layout, layoutOptions)
         {
-            var sections = [];
-            var content = [];
-
-            content.push(this.sectionBeginTemplate.apply(options));
-
+            var sectionQueue = [],
+                sectionStarted = false,
+                content = [];
+            
             for (var i = 0; i < layout.length; i++)
             {
                 var current = layout[i];
 
                 if (current['as'])
                 {
-                    sections.push(current);
+                    if (sectionStarted)
+                        sectionQueue.push(current);
+                    else
+                        this.processLayout(current['as'], current['options']);
+
                     continue;
                 }
-                else
-                {
-                    var ctor = Sage.Platform.Mobile.Controls.FieldManager.get(current['type']),
-                        field = this.fields[current['name']] = new ctor(Ext.apply({
-                            owner: this
-                        }, current)),
-                        template = field.propertyTemplate || this.propertyTemplate;
 
-                    content.push(template.apply(field));
-                }
+                if (!sectionStarted)
+                {
+                    sectionStarted = true;
+                    content.push(this.sectionBeginTemplate.apply(layoutOptions, this));
+                }                    
+                
+                var ctor = Sage.Platform.Mobile.Controls.FieldManager.get(current['type']),
+                    field = this.fields[current['name']] = new ctor(Ext.apply({
+                        owner: this
+                    }, current)),
+                    template = field.propertyTemplate || this.propertyTemplate;
+
+                content.push(template.apply(field, this));
             }
 
-            content.push(this.sectionEndTemplate.apply(options));
+            content.push(this.sectionEndTemplate.apply(layoutOptions, this));
 
             Ext.DomHelper.append(this.contentEl, content.join(''));
 
-            for (var i = 0; i < sections.length; i++)
+            for (var i = 0; i < sectionQueue.length; i++)
             {
-                var current = sections[i];
+                var current = sectionQueue[i];
 
                 this.processLayout(current['as'], current['options']);
             }
