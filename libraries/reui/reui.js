@@ -209,7 +209,7 @@ ReUI = {};
                     ? D.get(context.history[context.history.length - 2].page)
                     : false;
                 
-                if (previous && !previous.getAttribute('hideBackButton'))
+                if (previous && previous.getAttribute('hideBackButton') != 'true')
                 {
                     if (R.legacyMode)
                         R.backEl.style.display = 'inline';
