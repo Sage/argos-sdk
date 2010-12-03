@@ -502,8 +502,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 content.push(this.validationSummaryItemTemplate.apply(this.errors[i], this.fields[this.errors[i].name]));
 
             this.validationContentEl.update(content.join(''));
-
-            ReUI.DomHelper.wait(scrollTo, 0, 0, 1)
         },
         save: function() {
             if (this.isFormDisabled())  return;
@@ -559,7 +557,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (this.inserting)
             {
-                this.requestTemplateData();
+                if (this.options.template)
+                    this.processTemplateEntry(this.options.template);
+                else
+                    this.requestTemplateData();                
             }
             else
             {
