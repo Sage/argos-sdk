@@ -126,7 +126,8 @@ ReUI = {};
 (function() {  
     var R = ReUI,
         D = ReUI.DomHelper,
-        isWebKit = /webkit/i.test(navigator.userAgent);         
+        isWebKit = /webkit/i.test(navigator.userAgent),
+        originalBackButtonCls;
        
     var resolveFx = function(name) {
         return R.useCompatibleFx 
@@ -218,9 +219,11 @@ ReUI = {};
                     if (R.updateBackButtonText)
                         R.backEl.innerHTML = previous.title || R.backText;
 
+                    if (!originalBackButtonCls) originalBackButtonCls = R.backEl.className;
+
                     var backButtonCls = previous.getAttribute('backButtonCls') || previous.getAttribute('bbclass');
 
-                    R.backEl.className = backButtonCls ? 'button ' + backButtonCls : 'button';
+                    R.backEl.className = backButtonCls ? originalBackButtonCls + ' ' + backButtonCls : originalBackButtonCls;
                 }
                 else
                 {
@@ -392,7 +395,7 @@ ReUI = {};
     var context = {
         page: false,
         dialog: false,
-        transitioning: false, // todo: rename to something mroe appropriate
+        transitioning: false, // todo: rename to something more appropriate
         initialized: false,
         counter: 0,
         width: 0,
