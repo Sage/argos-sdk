@@ -238,7 +238,7 @@ ReUI = {};
     
     var transition = function(from, to, o) {            
         function complete() {            
-            D.wait(transitionComplete, 0, to, o);
+            transitionComplete(to, o); //D.wait(transitionComplete, 0, to, o);
 
             context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);                                                               
                 
