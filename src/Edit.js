@@ -42,7 +42,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '</li>'
         ]),
         sectionBeginTemplate: new Simplate([
-            '<h2>{%: $.title %}</h2>',
+            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<span class="collapsed-indicator"></span></h2>',
             '{% if ($.list) { %}<ul>{% } else { %}<fieldset>{% } %}'
         ]),
         sectionEndTemplate: new Simplate([
@@ -111,6 +111,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 return true;
 
             return Sage.Platform.Mobile.Edit.superclass.hasAction.apply(this, arguments);
+        },
+        toggleSection: function(params) {
+            var el = Ext.get(params.$source);
+            if (el)
+                el.toggleClass('collapsed');
         },
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
