@@ -1,6 +1,9 @@
-Copyright (c) 2010, Sage Software, Inc. All rights reserved. 
+   Copyright (c) 2010, Sage Software, Inc. All rights reserved. 
    
-The gobi-sdk software and sample code, developed by Sage, is licensed under the Apache License, v2.0. Other software included in this distribution is licensed as listed in the additional license files in the root folder for this project.
+   The gobi-sdk software and sample code, developed by Sage, 
+   is licensed under the Apache License, v2.0. 
+   Other software included in this distribution is licensed separately,
+   as listed in the additional license files in the root folder.
 
                                  Apache License
                            Version 2.0, January 2004
