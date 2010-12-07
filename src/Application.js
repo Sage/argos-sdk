@@ -368,6 +368,9 @@ Ext.onReady(function(){
       }
     };
     var touchStart = function(evt, el, o) {
+        //Ignore if its mouse right click
+        if (!isMobile && evt.browserEvent && evt.browserEvent.button === 2) return;
+
         preventClick = false;
         originalTarget = el;
         startAt = evt.getXY();
@@ -388,6 +391,9 @@ Ext.onReady(function(){
             Ext.get(el).on('touchmove', touchMove);
     };    
     var touchEnd = function(evt, el, o) {
+        //Ignore if its mouse right click
+        if (!isMobile && evt.browserEvent && evt.browserEvent.button === 2) return;
+
         if (longPressTimer)
         {
             clearTimeout(longPressTimer);
