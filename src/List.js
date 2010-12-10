@@ -167,7 +167,6 @@ Ext.namespace('Sage.Platform.Mobile');
         detailView: false,
         editView: false,
         insertView: false,
-        contextView: false,
         customSearchRE: /^#!/,
         moreText: 'Retrieve More Records',
         titleText: 'List',
@@ -182,8 +181,6 @@ Ext.namespace('Sage.Platform.Mobile');
             Sage.Platform.Mobile.List.superclass.init.call(this);
 
             App.on('refresh', this.onRefresh, this);
-
-            this.el.on('longpress', this.onLongPress, this);
 
             this.searchQueryEl
                 .on('keypress', this.onSearchKeyPress, this)
@@ -228,19 +225,6 @@ Ext.namespace('Sage.Platform.Mobile');
 
                 this.search();
             }
-        },
-        onLongPress: function(evt, el, o) {
-            evt.stopEvent();
-
-            var el = Ext.get(el),
-                row = el.is('[data-key]') ? el : el.up('[data-key]');
-
-            if (this.isNavigationDisabled()) return;
-
-            var key = row && row.getAttribute('data-key'),
-                descriptor = row && row.getAttribute('data-descriptor');
-
-            this.navigateToContextView(key, descriptor, key && this.entries[key]);
         },
         onSelectionModelSelect: function(key, data, tag) {
             var el = Ext.get(tag);
@@ -379,25 +363,6 @@ Ext.namespace('Sage.Platform.Mobile');
                 });
 
             return request;
-        },
-        showContextViewFor: function(key, descriptor, entry)
-        {
-            return true;
-        },
-        navigateToContextView: function(key, descriptor, entry) {
-            /// <summary>
-            ///     Shows the requested context dialog.
-            /// </summary>
-            var view = App.getView(this.contextView);
-            if (view && this.showContextViewFor(key, descriptor, entry))
-                view.show({
-                    returnTo: this.id,
-                    resourceKind: this.resourceKind,
-                    descriptor: descriptor,
-                    entry: entry,
-                    key: key,
-                    items: this.createContextMenu()
-                });
         },
         navigateToDetailView: function(key, descriptor) {
             /// <summary>
