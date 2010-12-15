@@ -204,6 +204,70 @@ ul.list-content > li > .item
     visibility: visible;
 }
 
+/* grouped list */
+.group-content > h2
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 32px;
+    line-height: 32px;
+    margin: 0;
+    padding: 0 0 0 6px;
+    font-size: 1em;
+    z-index: 5;
+    position: relative;
+}
+
+.group-content > h2
+{
+    border-bottom: 1px solid #000;
+    border-top: 1px solid #000;
+    background-color: #e6e6e6;
+    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(1, #cccccc)
+    );
+    background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+    box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    color: #000;
+    text-shadow: #fff 0px 1px 0px;
+    font-weight: bold;
+}
+
+.group-content > h2:first-child  
+{
+    border-top: solid 1px #e6e6e6;
+}
+
+.group-content > ul
+{
+    margin: 0;
+    padding: 0 0 1.5em 0;
+}
+
+.group-content > ul:last-child
+{
+    margin: 0;
+    padding: 0 0 0 0;
+}
+
+.group-content > ul > li:last-child
+{
+    border-bottom: none 0 black;
+}
+
+.group-content
+{
+    border-bottom: 1px solid #DDD;
+}
+
 /* detail veiw */
 .panel fieldset.panel-loading-indicator div.row > div
 {
@@ -224,78 +288,6 @@ ul.list-content > li > .item
     padding-left: 32px;
     font-size: 0.7em;
     background: url('../images/content-loading-light-green.gif') no-repeat scroll 12px 50%;
-}
-
-/* floating toolbar */
-body > div.toolbar-float[open],
-body[orient] > div.toolbar-float[open]
-{
-    background-color: #e6e6e6;
-    background-image: url('../images/arrow-right-black.png'), linear-gradient(top, #e6e6e6, #cccccc);
-	background-image: url('../images/arrow-right-black.png'), -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #e6e6e6),
-		color-stop(1, #cccccc)
-	);
-	background-image: url('../images/arrow-right-black.png'), -moz-linear-gradient(top, #e6e6e6, #cccccc);
-
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
-}
-
-.toolbar-float
-{
-    background-color: #e6e6e6;
-    background-image: url('../images/arrow-left-black.png'), linear-gradient(top, #e6e6e6, #cccccc);
-	background-image: url('../images/arrow-left-black.png'), -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #e6e6e6),
-		color-stop(1, #cccccc)
-	);
-	background-image: url('../images/arrow-left-black.png'), -moz-linear-gradient(top, #e6e6e6, #cccccc);
-
-	background-position: 6px center, top left;
-	background-repeat: no-repeat, no-repeat;
-
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
-
-    -webkit-border-radius: 3px 0 0 3px;
-    -moz-border-radius: 3px 0 0 3px;
-    border-radius: 3px 0 0 3px;
-
-    border-style: solid;
-    border-width: 1px 0 1px 1px;
-    border-color: #000;
-    cursor: pointer;
-
-    color: #000;
-
-    text-shadow: rgba(255,255,255,1) 1px 1px 0;
-
-    box-shadow: rgba(255,255,255,0.6) 0px 1px 1px inset, rgba(0,0,0,0.75) 0px 0px 4px;
-    -moz-box-shadow: rgba(255,255,255,0.6) 0px 1px 1px inset, rgba(0,0,0,0.75) 0px 0px 4px;
-    -webkit-box-shadow: rgba(255,255,255,0.6) 0px 1px 1px inset, rgba(0,0,0,0.75) 0px 0px 4px;
-}
-
-.toolbar-float-container
-{
-    height: 46px;
-}
-
-.toolbar-float-container a
-{
-    color: #fff;
-    display: block;
-}
-
-.toolbar-float-container a span
-{
-    display: none;
 }
 
 /* busy */

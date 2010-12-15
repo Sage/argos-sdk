@@ -16,6 +16,9 @@
 			text: 'List.js',
 			path: '../src/'
 		},{
+			text: 'GroupedList.js',
+			path: '../src/'
+		},{
 			text: 'Detail.js',
 			path: '../src/'
 		},{
