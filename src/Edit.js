@@ -271,8 +271,17 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         processTemplateEntry: function(templateEntry) {
             this.templateEntry = this.convertEntry(templateEntry || {});
 
-            this.setValues(this.templateEntry);
+            this.setValues(this.templateEntry, true);
             this.applyContext(this.templateEntry);
+
+            // if an entry has been passed through options, apply it here, now that the template has been applied.
+            // in this case, since we are doing an insert (only time template is used), the entry is applied as modified data.
+            if (this.options.entry)
+            {
+                this.processEntry(this.options.entry);
+                this.setValues(this.entry);
+            }
+
             this.el.removeClass('panel-loading');
         },
         clearValues: function() {
@@ -281,23 +290,26 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.fields[name].clearValue();
             }
         },
-        setValues: function(o) {
-            var noValue = {}, field, path, value;
+        setValues: function(values, initial) {
+            var noValue = {},
+                field,
+                path,
+                value;
 
             for (var name in this.fields)
             {
                 field = this.fields[name];
                 if (field.applyTo !== false)
                 {
-                    value = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo, noValue);
+                    value = Sage.Platform.Mobile.Utility.getValue(values, field.applyTo, noValue);
                 }
                 else
                 {
                     // fyi: uses the fact that ({} !== {})
-                    value = Sage.Platform.Mobile.Utility.getValue(o, name, noValue);
+                    value = Sage.Platform.Mobile.Utility.getValue(values, name, noValue);
                 }
 
-                if (value !== noValue) field.setValue(value, true);
+                if (value !== noValue) field.setValue(value, initial);
             }
         },
         getValues: function(all) {
@@ -565,19 +577,22 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (this.inserting)
             {
-                if (this.options.template)
+                if (this.options.template)                
                     this.processTemplateEntry(this.options.template);
                 else
                     this.requestTemplateData();                
             }
             else
             {
+                // apply entry as non-modified data
                 if (this.options.entry)
                 {
                     this.processEntry(this.options.entry);                  
-                    this.setValues(this.entry);
+                    this.setValues(this.entry, true);
                 }
 
+                // apply changes as modified data, since we want this to feed-back through
+                // the changes option is primarily used by editor fields
                 if (this.options.changes)
                 {
                     this.changes = this.options.changes;
