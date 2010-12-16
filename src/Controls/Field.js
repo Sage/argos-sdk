@@ -33,7 +33,8 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
         attachmentPoints: {},
         owner: false,
         applyTo: false,
-        alwaysUseValue: false,        
+        alwaysUseValue: false,
+        disabled: false,
         constructor: function(o) {
             Ext.apply(this, o);
 
@@ -59,6 +60,13 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
         },
         isDirty: function() {
             return true;
+        },
+        enable: function() {
+        },
+        disable: function() {
+        },
+        isDisabled: function() {
+            return this.disabled;
         },
         getValue: function() {
         },
