@@ -53,14 +53,9 @@ a.android-6059-fix
 }
 
 /* list view states */
-.list-search-active label
+.list-hide-search .list-search
 {
     display: none;
-}
-
-.list-search-active .dismissButton
-{
-    display: block;
 }
 
 .list-has-more .list-more
@@ -102,12 +97,12 @@ a.android-6059-fix
     text-align: center;
 }
 
-ul.list-content > li > a
+.list-content > li > a
 {
     padding: 8px 32px 8px 36px;
 }
 
-ul.list-content > li > .item
+.list-content > li > .item
 {
     font-weight: normal;
 }
@@ -185,6 +180,16 @@ ul.list-content > li > .item
     line-height: 32px;
     padding: 0 8px 0 6px;
     font-weight: normal;
+}
+
+.list-search-active label
+{
+    display: none;
+}
+
+.list-search-active .dismissButton
+{
+    display: block;
 }
 
 /* list selection */

@@ -568,6 +568,16 @@ Ext.namespace('Sage.Platform.Mobile');
         beforeTransitionTo: function() {
             Sage.Platform.Mobile.List.superclass.beforeTransitionTo.call(this);
 
+            if (this.hideSearch)
+                this.el.addClass('list-hide-search');
+            else
+                this.el.removeClass('list-hide-search');
+
+            if (this.searchQueryEl.dom.value == '')
+                this.searchEl.removeClass('list-search-active');
+            else
+                this.searchEl.addClass('list-search-active');
+
             if (this.isSelectionDisabled())
             {
                 this.el.removeClass('list-show-selectors');
@@ -592,14 +602,7 @@ Ext.namespace('Sage.Platform.Mobile');
         refresh: function() {
             this.requestData();
         },
-        show: function(options) {
-            if (this.searchQueryEl.dom.value == '')
-                this.searchEl.removeClass('list-search-active');
-            else
-                this.searchEl.addClass('list-search-active');
-
-            if (this.hideSearch === true) this.searchEl.setStyle({'display':'none'});
-
+        show: function(options) {            
             Sage.Platform.Mobile.List.superclass.show.apply(this, arguments);
         },
         createContextMenu: function() {
