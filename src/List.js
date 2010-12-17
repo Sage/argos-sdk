@@ -189,7 +189,9 @@ Ext.namespace('Sage.Platform.Mobile');
 
             this.searchQueryEl
                 .on('keypress', this.onSearchKeyPress, this)
-                .on('keyup', this.onSearchKeyUp, this);
+                .on('focus', this.onSearchFocus, this)
+                .on('blur', this.onSearchBlur, this);
+
 
             if (typeof this.selectionModel === 'undefined')
                 this.selectionModel = new Sage.Platform.Mobile.ConfigurableSelectionModel();
@@ -212,12 +214,13 @@ Ext.namespace('Sage.Platform.Mobile');
         },
         isSelectionDisabled: function() {
             return !((this.options && this.options.selectionOnly) || (this.allowSelection));
-        },
-        onSearchKeyUp: function(evt, el, o) {
+        },        
+        onSearchBlur: function(evt, el, o) {
             if (this.searchQueryEl.dom.value == '')
                 this.searchEl.removeClass('list-search-active');
-            else
-                this.searchEl.addClass('list-search-active');
+        },
+        onSearchFocus: function(evt, el, o) {
+            this.searchEl.addClass('list-search-active');
         },
         onSearchKeyPress: function(evt, el, o) {
             if (evt.getKey() == 13 || evt.getKey() == 10)
