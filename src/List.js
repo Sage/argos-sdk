@@ -168,7 +168,9 @@ Ext.namespace('Sage.Platform.Mobile');
         editView: false,
         insertView: false,
         contextView: false,
+        hashTagQueries: null,
         customSearchRE: /^#!/,
+        hashTagSearchRE: /^(?:#|;|,|\.)(\w+)/,
         moreText: 'Retrieve More Records',
         titleText: 'List',
         remainingText: '{0} records remaining',
@@ -283,16 +285,27 @@ Ext.namespace('Sage.Platform.Mobile');
             ///     of the view, and fires a request for updated data.
             /// </summary>
             /// <param name="searchText" type="String">The search query.</param>
-            var search = this.searchQueryEl.dom.value.length > 0 ? this.searchQueryEl.dom.value : false;
+            var search = this.searchQueryEl.dom.value.length > 0 ? this.searchQueryEl.dom.value : false,
+                customMatch = search && this.customSearchRE.exec(search),
+                hashTagMatch = search && this.hashTagSearchRE.exec(search);
 
             this.clear();
 
             this.queryText = search;
-            this.query = this.queryText
-                ? this.customSearchRE.test(this.queryText)
-                    ? this.queryText.replace(this.customSearchRE, '')
-                    : this.formatSearchQuery(this.queryText)
-                : false;
+            this.query = false;
+
+            if (customMatch)
+            {
+                this.query = search.replace(this.customSearchRE, '');
+            }
+            else if (hashTagMatch && this.hashTagQueries && this.hashTagQueries[hashTagMatch[1]])
+            {
+                this.query = this.expandExpression(this.hashTagQueries[hashTagMatch[1]], hashTagMatch);
+            }
+            else if (search)
+            {
+                this.query = this.formatSearchQuery(search);
+            }
 
             this.requestData();
         },
@@ -527,7 +540,7 @@ Ext.namespace('Sage.Platform.Mobile');
             ///     2: string - Returned directly.
             /// </param>
             if (typeof expression === 'function')
-                return expression.call(this);
+                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
             else
                 return expression;
         },
