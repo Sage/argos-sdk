@@ -28,6 +28,9 @@
 			text: 'Calendar.js',
 			path: '../src/'
 		},{
+			text: 'Convert.js',
+			path: '../src/'
+		},{
 			text: 'Format.js',
 			path: '../src/'
 		},{
