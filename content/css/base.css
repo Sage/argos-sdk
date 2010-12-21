@@ -1,6 +1,6 @@
 /* fixes */
 /* http://code.google.com/p/android/issues/detail?id=6059 */
-a.android-6059-fix
+.android-6059-fix
 {
     text-decoration: none;
     display: block;
@@ -274,14 +274,14 @@ a.android-6059-fix
 }
 
 /* detail veiw */
-.panel fieldset.panel-loading-indicator div.row > div
+.panel .panel-loading-indicator div.row > div
 {
 	background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
     display: inline-block;
 	padding: 0 0 0 20px;
 }
 
-.panel fieldset.panel-loading-indicator div.row
+.panel .panel-loading-indicator div.row
 {
 	text-align: center !important;
 	padding: 1em !important;

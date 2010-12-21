@@ -188,10 +188,14 @@ body > .toolbar
     font-weight: bold;
 }
 
-.panel-content > h2:first-child,
-.panel-validation-summary > h2:first-child    
+.panel-content > h2:first-child
 {
     border-top: solid 1px #e6e6e6;
+}
+
+.panel-validation-summary > h2:first-child
+{
+    border-top: solid 1px #de6464;
 }
 
 .panel-form-error > .panel-content > h2:first-child

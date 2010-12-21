@@ -23,7 +23,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             validationContentEl: '.panel-validation-summary > ul'
         },
         viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="edit panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
+            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="edit panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',            
             '{%! $.loadingTemplate %}',
             '{%! $.validationSummaryTemplate %}',
             '<div class="panel-content"></div>',
@@ -51,10 +51,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         ]),
         sectionBeginTemplate: new Simplate([
             '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<span class="collapsed-indicator"></span></h2>',
-            '{% if ($.list) { %}<ul class="{%= $.cls %}">{% } else { %}<fieldset class="{%= $.cls %}">{% } %}'
+            '<fieldset class="{%= $.cls %}">',
+            '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'
         ]),
         sectionEndTemplate: new Simplate([
-            '{% if ($.list) { %}</ul>{% } else { %}</fieldset>{% } %}'
+            '</fieldset>'
         ]),
         propertyTemplate: new Simplate([
             '<a name="{%= $.name %}"></a>',
