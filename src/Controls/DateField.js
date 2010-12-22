@@ -39,6 +39,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             return options;
         },
+        isDirty: function() {
+            try
+            {
+                return !this.originalValue.equals(this.currentValue);
+            }
+            catch(e)
+            {
+                return this.originalValue !== this.currentValue;
+            }
+        },
+        setOrigValue: function(value) {
+            if (value && value.clone) this.originalValue = value.clone();
+            else this.originalValue = value;
+        },
         getValuesFromView: function() {
             var view = App.getActiveView();
             if (view)
