@@ -375,10 +375,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
             else
             {
-                // Falsy values are 0, -0, null, undefined, NaN, empty string, false
-                // But '0' is evaluated to true.
-                // We will allow 0 to pass through
-                val = val === 0 ? '0' : val;
                 if (val)
                 {
                     key = val;
