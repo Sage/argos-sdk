@@ -107,16 +107,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 ? Sage.Platform.Mobile.Controls.EditorField.superclass.validate.call(this, this.validationValue)
                 : Sage.Platform.Mobile.Controls.EditorField.superclass.validate.apply(this, arguments);
         },
-        setOrigValue: function(value) {
-            this.originalValue = value;
-        },
         setValue: function(val, initial)
         {            
             if (val)
             {
                 this.validationValue = this.currentValue = val;
 
-                if (initial) this.setOrigValue(this.currentValue);
+                if (initial) this.originalValue = this.currentValue;
 
                 this.setText(this.formatValue(val, true, true));
             }
@@ -124,7 +121,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 this.validationValue = this.currentValue = null;
 
-                if (initial) this.setOrigValue(this.currentValue);
+                if (initial) this.originalValue = this.currentValue;
 
                 this.setText(this.emptyText);
             }
