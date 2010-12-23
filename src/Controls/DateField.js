@@ -45,6 +45,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 this.currentValue = this.validationValue = view.getDateTime();
             }
+        },
+        isDirty: function() {
+            return this.originalValue instanceof Date && this.currentValue instanceof Date
+                ? this.originalValue.getTime() != this.currentValue.getTime()
+                : this.originalValue !== this.currentValue;
         }
     });
 

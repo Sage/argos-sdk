@@ -108,21 +108,21 @@
         show: function(options) {
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
 
-            if (this.options.showTimePicker === true) this.showTimePicker = true;
+            this.showTimePicker = this.options && this.options.showTimePicker;
 
-            if (this.options.date) this.date = this.options.date;
-            else this.date = new Date();
-            
-            this.month = this.date.getMonth();
+            this.date = (this.options && this.options.date) || new Date();
             this.year = this.date.getFullYear();
+            this.month = this.date.getMonth();
 
             this.hourField.dom.value = this.date.getHours();
             this.minuteField.dom.value = this.date.getMinutes();
             
             this.renderCalendar();
 
-            if (this.showTimePicker) this.timeEl.show();
-            else this.timeEl.hide();
+            if (this.showTimePicker)
+                this.timeEl.show();
+            else
+                this.timeEl.hide();
         },
         goToNextMonth: function() {
             if (this.month == 11)
@@ -153,10 +153,12 @@
             this.date = new Date(this.year, this.month, options.date);
         },
         getDateTime: function() {
-            this.date.setHours(this.hourField.getValue());
-            this.date.setMinutes(this.minuteField.getValue());
+            var result = new Date(this.date.getTime());
 
-            return this.date;
+            result.setHours(this.hourField.getValue());
+            result.setMinutes(this.minuteField.getValue());
+
+            return result;
         },
         renderCalendar: function() {
             var mm = this.month,

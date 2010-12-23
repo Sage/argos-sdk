@@ -16,7 +16,7 @@
 Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.Convert = (function() {
-    var isoDate = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(Z|(-|\+)(\d{2}):(\d{2}))/,
+    var isoDate = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|(-|\+)(\d{2}):(\d{2}))/,
         jsonDate = /\/Date\((\d+)(?:(-|\+)(\d{2})(\d{2}))?\)\//,
         pad = function(n) { return n < 10 ? '0' + n : n };
 
@@ -78,12 +78,12 @@ Sage.Platform.Mobile.Convert = (function() {
                     parseInt(match[6])
                 ));
 
-                if (match[7] !== 'Z')
+                if (match[8] !== 'Z')
                 {
-                    h = parseInt(match[9]);
-                    m = parseInt(match[10]);
+                    h = parseInt(match[10]);
+                    m = parseInt(match[11]);
                     
-                    if (match[8] === '-')
+                    if (match[9] === '-')
                         utc.addMinutes((h * 60) + m);
                     else
                         utc.addMinutes(-1 * ((h * 60) + m));
