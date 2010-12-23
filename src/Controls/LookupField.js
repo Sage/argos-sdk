@@ -375,7 +375,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
             else
             {
-                if (val)
+                if (val !== undefined && val !== null)
                 {
                     key = val;
                     text = val;
