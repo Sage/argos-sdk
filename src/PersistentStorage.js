@@ -122,7 +122,7 @@ Ext.namespace('Sage.Platform.Mobile');
                         else
                         {
                             encoded = window.localStorage.getItem(this.name);
-                            store = Ext.decode(encoded);
+                            store = (encoded && Ext.decode(encoded)) || {};
 
                             if (this.allowCacheUse) sosCache[this.name] = store;
                         }
