@@ -39,8 +39,10 @@ Ext.namespace('Sage.Platform.Mobile');
                     ? value.toString()
                     : value;
         },
-        deserializeValue: function(value) {
+        deserializeValue: function(value) {            
             if (value && value.indexOf('{') === 0 && value.lastIndexOf('}') === (value.length - 1))
+                return Ext.decode(value);
+            if (value && value.indexOf('[') === 0 && value.lastIndexOf(']') === (value.length - 1))
                 return Ext.decode(value);
             if (Sage.Platform.Mobile.Convert.isDateString(value))
                 return Sage.Platform.Mobile.Convert.toDateFromString(value);
@@ -53,6 +55,8 @@ Ext.namespace('Sage.Platform.Mobile');
             return value;
         },
         getItem: function(key, options) {
+            options = options || {};
+            
             try
             {
                 if (window.localStorage)
@@ -76,7 +80,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
                         var value = Sage.Platform.Mobile.Utility.getValue(store, key);
 
-                        if (options && options.success)
+                        if (options.success)
                             options.success.call(options.scope || this, value);
 
                         return value;
@@ -85,9 +89,11 @@ Ext.namespace('Sage.Platform.Mobile');
                     {
                         var fqKey = this.formatQualifiedKey(this.name, key),
                             serialized = window.localStorage.getItem(fqKey),
-                            value = this.serializeValues ? this.deserializeValue(serialized) : serialized;
+                            value = this.serializeValues && options.serialize !== false
+                                ? this.deserializeValue(serialized)
+                                : serialized;                         
 
-                        if (options && options.success)
+                        if (options.success)
                             options.success.call(options.scope || this, value);
 
                         return value;
@@ -95,7 +101,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 }
                 else
                 {
-                    if (options && options.failure)
+                    if (options.failure)
                         options.failure.call(options.scope || this, false);
                 }
             }
@@ -106,6 +112,8 @@ Ext.namespace('Sage.Platform.Mobile');
             }
         },
         setItem: function(key, value, options) {
+            options = options || {};
+
             try
             {
                 if (window.localStorage)
@@ -133,7 +141,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
                         window.localStorage.setItem(this.name, encoded);
 
-                        if (options && options.success)
+                        if (options.success)
                             options.success.call(options.scope || this);
 
                         return true;
@@ -141,11 +149,13 @@ Ext.namespace('Sage.Platform.Mobile');
                     else
                     {
                         var fqKey = this.formatQualifiedKey(this.name, key),
-                            serialized = this.serializeValues ? this.serializeValue(value) : value;
+                            serialized = this.serializeValues && options.serialize !== false 
+                                ? this.serializeValue(value)
+                                : value;
 
                         window.localStorage.setItem(fqKey, serialized);
 
-                        if (options && options.success)
+                        if (options.success)
                             options.success.call(options.scope || this);
 
                         return true;
@@ -153,7 +163,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 }
                 else
                 {
-                    if (options && options.failure)
+                    if (options.failure)
                         options.failure.call(options.scope || this, false);
 
                     return false;
