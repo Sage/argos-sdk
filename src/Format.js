@@ -92,6 +92,11 @@ Sage.Platform.Mobile.Format = (function() {
             return val
                 ? Sage.Platform.Mobile.Format.trueText || 'T'
                 : Sage.Platform.Mobile.Format.falseText || 'F';
+        },
+        nl2br: function(val) {
+            if (typeof val !== 'string') return val;
+
+            return val.replace(/\n/g, '<br />');
         }
     };
 })();
