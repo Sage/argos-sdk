@@ -21,13 +21,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         notificationTrigger: false,
         rows: 4,
         validationTrigger: false,
+        mask: false,
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '{% if ($.multiline) { %}',
                 '<textarea name="{%= $.name %}" class="field-text" ',
                     'rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />',
             '{% } else { %}',
-                '<input type="text" name="{%= $.name %}" class="field-text" ',
+                '<input type="{%: $.mask ? "password" : "text" %}" name="{%= $.name %}" class="field-text" ',
                     '{% if ($.readonly) { %} readonly {% } %}>',
             '{% } %}'
         ]),        
