@@ -307,24 +307,22 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 Ext.onReady(function(){
     var isApple = /(iphone|ipad|ipod)/i.test(navigator.userAgent),
         isMobile = (typeof window.orientation !== 'undefined'),
+        rootEl = Ext.get(document.documentElement),
         onlyHorizontalSwipe = true,
-        root = Ext.get(document.documentElement),
         minSwipeLength = 100.0,
         maxSwipeTime = 0.5,
-        minLongClickTime = 1.0,
-        longPressTime = 1.5,
-        maxLongClickLength = 5.0,
-        startAt,
-        startTime,
-        touchStartAtX,
-        touchStartAtY,
-        originalTarget,
+        minLongPressTime = 1.5,
+        maxLongPressLength = 5.0,
+        preventOther = false,
         preventClick = false,
-        longPressTimer = false;
+        startEl = null,
+        startAt = null,
+        startTime = null,      
+        longPressTimer = null;
 
-    var touchClick = function(evt) {
-        ReUI.DomHelper.unbind(evt.target || evt.srcElement, 'click', touchClick, true);
+    // states => 
 
+    var stopEvent = function(evt) {
         if (evt.preventBubble) evt.preventBubble();
         if (evt.preventDefault) evt.preventDefault();
         if (evt.stopPropagation) evt.stopPropagation();
@@ -332,86 +330,86 @@ Ext.onReady(function(){
 
         return false;
     };
-    var longPress = function(evt, el) {
-      //remove mouse out listener
-      if (!isMobile)
-          Ext.get(el).un('mouseout', dragOut);
-      else
-          Ext.get(el).un('touchmove', dragOut);
 
-      if (longPressTimer)
-      {
-          clearTimeout(longPressTimer);
-          longPressTimer = false;
-      }
-
-      ReUI.DomHelper.dispatch(el, 'longpress');
-      return false;
-    };
-    var touchMove = function(evt, el, o) {
-        /* for general swipe, we do not need mouse move */
-        var touch = evt.browserEvent.touches[0];
-        var direction = {x: touch.pageX - touchStartAtX, y: touch.pageY - touchStartAtY},
-            length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
-
-        if (length > 10 && longPressTimer)
+    var onRootClickCapture = function(evt) {
+        if (preventClick)
         {
-            clearTimeout(longPressTimer);
-            longPressTimer = false;
+            preventClick = false;
+            return stopEvent(evt);
         }
     };
-    var dragOut = function(evt, el, o) {
-      if (longPressTimer)
-      {
-          clearTimeout(longPressTimer);
-          longPressTimer = false;
-      }
-    };
-    var touchStart = function(evt, el, o) {
-        //Ignore if its mouse right click
-        if (!isMobile && evt.browserEvent && evt.browserEvent.button === 2) return;
 
-        preventClick = false;
-        originalTarget = el;
-        startAt = evt.getXY();
-        if (evt.browserEvent && evt.browserEvent.touches)
-        {
-            touchStartAtX = evt.browserEvent.touches[0].pageX;
-            touchStartAtY = evt.browserEvent.touches[0].pageY;
-        }
+    var onLongPress = function() {
+        ReUI.DomHelper.dispatch(startEl, 'longpress');
+
+        stopTouchTracking();
+
+        preventOther = true;
+    };
+
+    var onTouchStart = function(evt, el) {
+        if (evt.browserEvent && evt.browserEvent.button == 2) return;
+        
+        var touch = evt.touches && evt.touches[0];
+
+        startEl = el;
+        startAt = touch ? [touch.pageX, touch.pageY] : evt.getXY();
         startTime = (new Date()).getTime();
 
-        longPressTimer = setTimeout(function() {
-            longPress(evt, el);
-        }, (longPressTime * 1000));
+        rootEl.on(isMobile ? 'touchmove' : 'mousemove', onTouchMove);
 
-        if (!isMobile)
-            Ext.get(el).on('mouseout', dragOut);
-        else
-            Ext.get(el).on('touchmove', touchMove);
-    };    
-    var touchEnd = function(evt, el, o) {
-        //Ignore if its mouse right click
-        if (!isMobile && evt.browserEvent && evt.browserEvent.button === 2) return;
+        longPressTimer = setTimeout(onLongPress, (minLongPressTime * 1000));
 
-        if (longPressTimer)
+        //return stopEvent(evt);
+    };
+
+    var stopTouchTracking = function() {
+        clearTimeout(longPressTimer);
+
+        longPressTimer = null;
+
+        rootEl.un(isMobile ? 'touchmove' : 'mousemove', onTouchMove);
+    };
+
+    // only occurs when the touch lifecycle is cancelled (by the browser).
+    var onTouchCancel = function() {
+        stopTouchTracking();
+        
+        preventClick = false,       
+        preventOther = false;
+    };
+
+    var onTouchMove = function(evt, el) {
+        var touch = evt.touches && evt.touches[0],
+            at = touch ? [touch.pageX, touch.pageY] : evt.getXY(),
+            direction = {x: at[0] - startAt[0], y: at[1] - startAt[1]},
+            length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+
+        if (length > maxLongPressLength)
         {
             clearTimeout(longPressTimer);
-            longPressTimer = false;
+
+            longPressTimer = null;
         }
-        if (!isMobile)
-            Ext.get(el).un('mouseout', dragOut);
-        else
-            Ext.get(el).un('touchmove', dragOut);
+    };
+
+    var onTouchEnd = function(evt, el) {
+        if (preventOther)
+        {            
+            if (el == startEl)
+                preventClick = true;
+
+            onTouchCancel();
+            return;
+        }
 
         var endAt = evt.getXY(),
-            endTime = (new Date()).getTime();
-
-        var duration = (endTime - startTime) / 1000.0,
+            endTime = (new Date()).getTime(),
+            duration = (endTime - startTime) / 1000.0,
             direction = {x: endAt[0] - startAt[0], y: endAt[1] - startAt[1]},
-            length = Math.sqrt(direction.x * direction.x + direction.y * direction.y),        
+            length = Math.sqrt(direction.x * direction.x + direction.y * direction.y),
             normalized = {x: direction.x / length, y: direction.y / length},
-            dotProd = normalized.x * 0.0 + normalized.y * 1.0;            
+            dotProd = normalized.x * 0.0 + normalized.y * 1.0;
 
         if (duration <= maxSwipeTime && length >= minSwipeLength)
         {
@@ -419,14 +417,14 @@ Ext.onReady(function(){
             if (!onlyHorizontalSwipe)
             {
                 if (dotProd >= 0.71)
-                    swipe = 'down';            
-                else if (dotProd <= -0.71)            
-                    swipe = 'up';            
+                    swipe = 'down';
+                else if (dotProd <= -0.71)
+                    swipe = 'up';
                 else if (normalized.x < 0.0)
                     swipe = 'left';
                 else
                     swipe = 'right';
-            } 
+            }
             else
             {
                 if (dotProd < 0.71 && dotProd > -0.71)
@@ -440,32 +438,19 @@ Ext.onReady(function(){
 
             if (swipe)
             {
-                if (originalTarget === el)
-                {
-                    ReUI.DomHelper.bind(el, 'click', touchClick, true);
-                }
+                if (el == startEl)
+                    preventClick = true;
 
-                ReUI.DomHelper.dispatch(el, 'swipe', {direction: swipe});
-            }
-        }        
-        else if (duration >= minLongClickTime && length <= maxLongClickLength)
-        {
-            if (originalTarget === el)
-            {
-                ReUI.DomHelper.bind(el, 'click', touchClick, true);                
-                ReUI.DomHelper.dispatch(el, 'clicklong');
+                ReUI.DomHelper.dispatch(startEl, 'swipe', {direction: swipe});
             }
         }
+
+        // clean-up
+        onTouchCancel();
     };
 
-    if (!isMobile)
-    {    
-        root.on('mousedown', touchStart);
-        root.on('mouseup', touchEnd);
-    } 
-    else
-    {
-        root.on('touchstart', touchStart);
-        root.on('touchend', touchEnd);
-    }
+    rootEl.on(isMobile ? 'touchstart' : 'mousedown', onTouchStart);
+    rootEl.on(isMobile ? 'touchend' : 'mouseup', onTouchEnd);
+
+    ReUI.DomHelper.bind(rootEl.dom, 'click', onRootClickCapture, true);  
 });
