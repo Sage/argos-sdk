@@ -274,11 +274,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         {
             for (var n in tools)
                 if (this.bars[n])
-                    this.bars[n].display(tools[n]);
+                    this.bars[n].showTools(tools[n]);
         }
-
-        if (this.context.view.unshift(view.getContext()) > 10)
-            this.context.view.pop();
 
         view.transitionTo();
     },
@@ -394,6 +391,8 @@ Ext.onReady(function(){
     };
 
     var onTouchEnd = function(evt, el) {
+        if (evt.browserEvent && evt.browserEvent.button == 2) return;
+        
         if (preventOther)
         {            
             if (el == startEl)

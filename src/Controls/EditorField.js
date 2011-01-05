@@ -40,9 +40,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 tools: {
                     tbar: [{
                         name: 'complete',
-                        title: this.completeText,
                         fn: this.complete,
                         scope: this
+                    },{
+                        id: 'cancel',
+                        side: 'left',
+                        fn: ReUI.back,
+                        scope: ReUI
                     }]
                 },
                 entry: this.originalValue,

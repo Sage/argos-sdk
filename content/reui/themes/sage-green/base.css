@@ -44,21 +44,6 @@ body > [selected="true"]
     display: block;
 }
 
-.toolbar
-{
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-        
-    height: 45px;
-    width: 100%;
-    position: relative;
-    padding: 6px;
-
-    display: block;
-    z-index: 10;
-}
-
 .h-stack
 {
     display: -webkit-box;
@@ -84,70 +69,81 @@ body > [selected="true"]
     box-flex: 1;
 }
 
+.button
+{
+	height: 30px;
+	line-height: 30px;
+	padding: 0 2px 0 2px;
+}
+
+.toolbar
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+
+    height: 45px;
+    width: 100%;
+    position: relative;
+    padding: 4px 4px;
+
+    display: block;
+    z-index: 10;
+}
+
 .toolbar > h1 {
     overflow: hidden; 
     display: block;
     margin: 0;
     padding: 0;    
-    font-size: 1.2em;
-    line-height: 30px;
-    font-weight: bold;    
+    font-size: 1em;
+    line-height: 34px;
+    font-weight: normal;    
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
     color: #FFFFFF;
 
     position: absolute;
-    left: 25%;
-    right: 25%;
-
-    -webkit-box-flex: 2;	
-	-moz-box-flex: 2;
-	box-flex: 2;    
+    left: 100px;
+    right: 100px;
+    z-index: 0;
 }
 
-.toolbar > .button
-{	    
-	display: inline-block;
-    position: absolute;
-	max-width: 200px;
-	overflow: hidden;
-    width: 20%;
-	text-overflow: ellipsis;
-	
-	-webkit-box-flex: 1;	
-	-moz-box-flex: 1;
-	box-flex: 1;
-
-    margin: 0 6px;
-    z-index: 15;
-}
-
-.dialog > fieldset > .toolbar > .button
+.toolButton
 {
-    margin: 0px;
+    position: relative;
+    width: 40px;
+    height: 34px;
+    padding: 0px;
+    z-index: 100;
 }
 
-.toolbar > .button
+.toolButton > img
 {
-    
+    margin: 4px;
 }
 
-.toolbar > .button:first-child
+.toolButton > span
 {
-    left: 0;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center center;
+    margin: 4px;
+    width: 24px;
+    height: 24px;
 }
 
-.toolbar > .button:last-child
+.toolButton-left
 {
-    right: 0;
+    float: left;
+    margin-right: 10px;
 }
 
-.button
+.toolButton-right
 {
-	height: 30px;
-	line-height: 30px;		
-	padding: 0px 2px 0px 2px;
+    float: right;
+    margin-left: 10px;
 }
 
 body > .dialog {

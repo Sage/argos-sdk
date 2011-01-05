@@ -494,6 +494,7 @@ textarea:focus
     );
 }
 
+.toolButton,
 .headerButton,
 .lightGreenButton
 {
@@ -531,6 +532,7 @@ textarea:focus
     -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
 }
 
+.toolButton:active,
 .headerButton:active,
 .lightGreenButton:active
 {

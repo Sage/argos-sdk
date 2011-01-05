@@ -63,7 +63,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '</div>'
         ]),
         transitionEffect: 'slide',
-        id: 'generic_edit',
+        id: 'generic_edit',        
         expose: false,
         saveText: 'Save',
         titleText: 'Edit',
@@ -97,10 +97,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             for (var name in this.fields) this.fields[name].init();
 
             this.tools.tbar = [{
-                name: 'save',
-                title: this.saveText,
-                fn: this.save,
-                scope: this
+                id: 'save',
+                action: 'save'
+            },{
+                id: 'cancel',
+                side: 'left',
+                fn: ReUI.back,
+                scope: ReUI
             }];
         },        
         invokeAction: function(name, parameters, evt, el) {

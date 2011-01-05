@@ -101,11 +101,8 @@ Ext.namespace('Sage.Platform.Mobile');
             App.on('refresh', this.onRefresh, this);
 
             this.tools.tbar = [{
-                name: 'edit',
-                title: this.editText,
-                hidden: function() { return !this.editView; },
-                fn: this.navigateToEditView,
-                scope: this
+                id: 'edit',
+                action: 'navigateToEditView'
             }];
 
             this.clear();

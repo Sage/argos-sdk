@@ -117,10 +117,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 orderBy: this.orderBy,
                 tools: {
                     tbar: [{
-                        name: 'complete',
-                        title: this.completeText,
+                        id: 'complete',                       
                         fn: this.complete,
                         scope: this
+                    },{
+                        id: 'cancel',
+                        side: 'left',
+                        fn: ReUI.back,
+                        scope: ReUI
                     }]
                 }
             };

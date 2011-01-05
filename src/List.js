@@ -201,10 +201,8 @@ Ext.namespace('Sage.Platform.Mobile');
             this.selectionModel.on('clear', this.onSelectionModelClear, this);
 
             this.tools.tbar = [{
-                name: 'New',
-                title: this.insertText,
-                fn: this.navigateToInsertView,
-                scope: this
+                id: 'new',
+                action: 'navigateToInsertView'
             }];
 
             this.clear();
