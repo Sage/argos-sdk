@@ -116,7 +116,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return Sage.Platform.Mobile.Edit.superclass.invokeAction.apply(this, arguments);
         },
         hasAction: function(name, evt, el) {
-            var fieldEl = el.findParent('[data-field]', this.el, true),
+            var fieldEl = el && el.findParent('[data-field]', this.el, true),
                 field = this.fields[fieldEl && fieldEl.getAttribute('data-field')];
 
             if (field && typeof field[name] === 'function')
