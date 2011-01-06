@@ -40,7 +40,7 @@ Ext.namespace('Sage.Platform.Mobile');
             this.el.on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'}); 
         },
         render: function() {
-            this.el = Ext.DomHelper.append(
+            this.el = Ext.DomHelper.insertFirst(
                 Ext.getBody(),
                 this.barTemplate.apply(this),
                 true

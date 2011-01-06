@@ -268,15 +268,11 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     viewTransitionTo: function(view) {
         this.fireEvent('viewtransitionto', view);
 
-        var tools = view.options ? (view.options.tools || view.tools) : (view.tools); 
+        var tools = (view.options && view.options.tools) || view.tools || {};
 
-        if (tools)
-        {
-            for (var n in tools)
-                if (this.bars[n])
-                    this.bars[n].showTools(tools[n]);
-        }
-
+        for (var n in this.bars)
+            this.bars[n].showTools(tools[n]);
+   
         view.transitionTo();
     },
     viewActivate: function(view, tag, data) {

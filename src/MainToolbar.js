@@ -21,7 +21,7 @@ Ext.namespace("Sage.Platform.Mobile");
             titleEl: '.toolbar-title'
         },
         barTemplate: new Simplate([
-            '<div class="{%= $.cls %} toolbar">',            
+            '<div class="toolbar {%= $.cls %}">',            
             '<h1 id="pageTitle" class="toolbar-title">{%= $.titleText %}</h1>',
             '</div>'
         ]),

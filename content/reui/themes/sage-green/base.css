@@ -7,14 +7,20 @@
 
 body
 {
-	margin: 0;
+	margin: 45px 0 0 0;
 	overflow-x: hidden;
+    min-height: 416px;
+}
+
+body[orient="landscape"]
+{
+    min-height: 268px;
 }
 
 body > *
 {
     display: none;
-    position: absolute;        
+    position: relative;
     margin: 0;
     padding : 0;
 }
@@ -22,11 +28,8 @@ body > *
 body > .panel,
 body > .list
 {
-    left: 0;
-    top: 45px;
     width: 100%;
     height: auto;
-    min-height: 416px;
     -webkit-transform: translateX(0%);
     -webkit-transition-duration: 300ms;
     -webkit-transition-property: -webkit-transform;
@@ -36,7 +39,6 @@ body[orient="landscape"] > .panel,
 body[orient="landscape"] > .list
 {
     height: auto;
-    min-height: 268px;
 }
 
 body > [selected="true"]
@@ -78,13 +80,16 @@ body > [selected="true"]
 
 .toolbar
 {
+    position: absolute;
+    top: 0;
+    left: 0;
+
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
 
     height: 45px;
     width: 100%;
-    position: relative;
     padding: 4px 4px;
 
     display: block;
