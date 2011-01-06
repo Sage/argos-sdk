@@ -36,7 +36,8 @@ Ext.namespace('Sage.Platform.Mobile');
         },
         init: function() {
             this.render();
-            
+
+            this.el.setVisibilityMode(Ext.Element.DISPLAY);
             this.el.on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'}); 
         },
         render: function() {
@@ -106,7 +107,13 @@ Ext.namespace('Sage.Platform.Mobile');
                         view.invokeAction(source.action, Ext.apply(parameters, {'$tool': source}), evt, el);
                 }
             }
-        },        
+        },
+        show: function() {
+            this.el.show();
+        },
+        hide: function() {
+            this.el.hide();
+        },
         clear: function() {
             this.tools = {};
             this.el.removeClass('toolbar-disabled');

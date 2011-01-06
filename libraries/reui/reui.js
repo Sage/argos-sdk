@@ -111,6 +111,9 @@ ReUI = {};
                 node = node.parentNode;
             return node;
         },
+        isSelected: function(el) {
+            return (el.getAttribute('selected') == 'true');
+        },
         select: function(el) {
             el.setAttribute('selected', 'true');
         },
@@ -240,6 +243,8 @@ ReUI = {};
         function complete() {            
             transitionComplete(to, o); //D.wait(transitionComplete, 0, to, o);
 
+            D.removeClass(R.rootEl, 'transition');
+
             context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);                                                               
                 
             D.dispatch(from, 'aftertransition', {out: true, tag: o.tag, data: o.data});
@@ -250,14 +255,16 @@ ReUI = {};
 
         D.clearTimer(context.check);
 
+        scrollTo(0, 1);
+
+        D.addClass(R.rootEl, 'transition');
+
         // dispatch an 'activate' event to let the page be aware that is being show as the result of an external
         // event (i.e. browser back/forward navigation).
         if (o.external) D.dispatch(to, 'activate', {tag: o.tag, data: o.data});
 
         D.dispatch(from, 'beforetransition', {out: true, tag: o.tag, data: o.data});
         D.dispatch(to, 'beforetransition', {out: false, tag: o.tag, data: o.data});
-
-        scrollTo(0, 1);
 
         if (R.disableFx === true)
         {
@@ -528,14 +535,16 @@ ReUI = {};
             if (context.transitioning)
                 return;
 
-            context.transitioning = true;
-
             var o = o || {},
                 page = typeof page === 'string'
                     ? D.get(page)
                     : page;
 
             if (!page) return;
+
+            if (D.isSelected(page)) return;
+
+            context.transitioning = true;
            
             if (o.track !== false)
             {

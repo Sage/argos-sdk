@@ -47,9 +47,12 @@ Ext.namespace("Sage.Platform.Mobile");
         showTools: function(tools) {
             Sage.Platform.Mobile.MainToolbar.superclass.showTools.apply(this, arguments);
 
-            for (var i = 0; i < tools.length; i++)
+            if (tools)
             {
-                Ext.DomHelper.append(this.el, this.toolTemplate.apply(tools[i]));
+                for (var i = 0; i < tools.length; i++)
+                {
+                    Ext.DomHelper.append(this.el, this.toolTemplate.apply(tools[i]));
+                }
             }
         }
     });
