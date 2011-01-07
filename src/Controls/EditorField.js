@@ -39,7 +39,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return {
                 tools: {
                     tbar: [{
-                        name: 'complete',
+                        id: 'complete',
                         fn: this.complete,
                         scope: this
                     },{
