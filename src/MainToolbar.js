@@ -30,7 +30,7 @@ Ext.namespace("Sage.Platform.Mobile");
             '{% if ($.icon) { %}',
             '<img src="{%= $.icon %}" alt="{%= $.id %}" />',
             '{% } else { %}',
-            '<span>{%: $.title %}</span>',
+            '<span>{%: $.title %}</span>', // todo: if there is no text, click event will not fire on android 2.1 (galaxy s)
             '{% } %}',
             '</a>'
         ]),
