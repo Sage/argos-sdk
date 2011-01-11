@@ -25,24 +25,22 @@ Ext.DomQuery.matchers[2] = {
 };
 
 Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
-    defaultServerName: window.location.hostname,    
-    defaultPort: window.location.port && window.location.port != 80 ? window.location.port : false,
-    defaultProtocol: /https/i.test(window.location.protocol) ? 'https' : false,
+    environment: 'production',
+    started: false,
     enableCaching: false,
-    initialized: false,
     defaultService: null,
-    constructor: function() {
-        /// <field name="initialized" type="Boolean">True if the application has been initialized; False otherwise.</field>
-        /// <field name="context" type="Object">A general store for global context data.</field>
-        /// <field name="views" elementType="Sage.Platform.Mobile.View">A list of registered views.</field>
-        /// <field name="viewsById" type="Object">A map for looking up a view by its ID.</field>
-
-        Sage.Platform.Mobile.Application.superclass.constructor.call(this);
-     
-        this.context = {view: []};
-        this.views = {};   
+    services: null,
+    modules: null,
+    views: null,
+    bars: null,
+    constructor: function(options) {
         this.services = {};
-        this.bars = {};    
+        this.modules = [];
+        this.views = {};
+        this.bars = {};
+
+        this.context = {};
+
         this.addEvents(
             'resize',
             'registered',
@@ -52,125 +50,141 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             'viewtransitionto',
             'viewactivate'
         );
+
+        Ext.apply(this, options);
+
+        Sage.Platform.Mobile.Application.superclass.constructor.apply(this, arguments);
     },
-    setup: function() {
-               
-    },   
+    initConfiguration: function() {
+        var config = window['Configuration'] && window['Configuration'][this.environment];
+        if (config)
+        {
+            if (config.modules)
+            {
+                this.modules = this.modules.concat(config.modules);
+            }
+
+            if (config.connections)
+            {
+                for (var n in config.connections)
+                    if (config.connections.hasOwnProperty(n))
+                        this.registerService(n, config.connections[n]);
+            }
+        }
+    },
+    initReUI: function() {
+        // prevent ReUI from attempting to load the URLs view as we handle that ourselves.
+        // todo: add support for handling the URL?
+        window.location.hash = '';
+
+        ReUI.init();
+    },
+    initCaching: function() {
+        if (this.enableCaching)
+        {
+            if (this.isOnline())
+                this._clearSDataRequestCache();
+        }
+    },
+    initEvents: function() {
+        Ext.EventManager.on(window, 'resize', this._onResize, this, {buffer: 250});
+        Ext.getBody().on('beforetransition', this._onBeforeTransition, this);
+        Ext.getBody().on('aftertransition', this._onAfterTransition, this);
+        Ext.getBody().on('activate', this._onActivate, this);
+    },
+    initModules: function() {
+        for (var i = 0; i < this.modules.length; i++)
+            this.modules[i].init(this);
+    },
+    initViews: function() {
+        for (var n in this.views) this.views[n].init();
+    },
+    initToolbars: function() {
+        for (var n in this.bars) this.bars[n].init();
+    },
+    activate: function() {
+        window.App = this;
+    },
+    init: function() {
+        /// <summary>
+        ///     Initializes this application as well as the toolbar and all currently registered views.
+        /// </summary>
+        this.initConfiguration();
+        this.initEvents();
+        this.initCaching();
+        this.initModules();
+
+        this.initToolbars();
+        this.initViews();
+
+        this.initReUI();
+    },
+    run: function() {
+        this.started = true;
+    },       
     isOnline: function() {
         return window.navigator.onLine;
     },
-    clearSDataRequestCache: function() { 
+    _clearSDataRequestCache: function() {
         var check = function(k) {
             return /^sdata\.cache/i.test(k);
         };
-                
+
         /* todo: find a better way to detect */
-        for (var i = window.localStorage.length - 1; i >= 0 ; i--) 
+        for (var i = window.localStorage.length - 1; i >= 0 ; i--)
         {
             var key = window.localStorage.key(i);
             if (check(key))
                 window.localStorage.removeItem(key);
         }
     },
-    createCacheKey: function(request) {
+    _createCacheKey: function(request) {
         return 'sdata.cache[' + request.build() + ']';
     },
-    loadSDataRequest: function(request, o) {
+    _loadSDataRequest: function(request, o) {
         /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />
         // todo: find a better way of indicating that a request can prefer cache
         if (this.isOnline() && (request.allowCacheUse !== true)) return;
-        
-        var key = this.createCacheKey(request); 
-        var feed = window.localStorage.getItem(key);   
+
+        var key = this.createCacheKey(request);
+        var feed = window.localStorage.getItem(key);
         if (feed)
         {
             o.result = Ext.decode(feed);
-        }                    
+        }
     },
-    cacheSDataRequest: function(request, o, feed) {        
+    _cacheSDataRequest: function(request, o, feed) {
         /* todo: decide how to handle PUT/POST/DELETE */
         if (/get/i.test(o.method) && typeof feed === 'object')
         {
             var key = this.createCacheKey(request);
 
             window.localStorage.removeItem(key);
-            window.localStorage.setItem(key, Ext.encode(feed));            
+            window.localStorage.setItem(key, Ext.encode(feed));
         }
     },
-    init: function() { 
-        /// <summary>
-        ///     Initializes this application as well as the toolbar and all currently registered views.
-        /// </summary>
-        Ext.EventManager.on(window, 'resize', function() {
-            this.fireEvent('resize');
-        }, this, {buffer: 250});
-        Ext.getBody().on('beforetransition', function(evt, el, o) {
-            var view = this.getView(el);
-            if (view)
-            {
-                if (evt.browserEvent.out)
-                    this.beforeViewTransitionAway(view);
-                else
-                    this.beforeViewTransitionTo(view);
-            }
-        }, this);
-        Ext.getBody().on('aftertransition', function(evt, el, o) {
-            var view = this.getView(el);
-            if (view)
-            {
-                if (evt.browserEvent.out)
-                    this.viewTransitionAway(view);
-                else
-                    this.viewTransitionTo(view);
-            }
-        }, this);
-        Ext.getBody().on('activate', function(evt, el, o) {
-            var view = this.getView(el);
-            if (view)
-                this.viewActivate(view, evt.browserEvent.tag, evt.browserEvent.data);
-        }, this);
+    registerService: function(name, service, options) {
+        options = options || {};
 
-        if (this.enableCaching)
-        {
-            if (this.isOnline())
-                this.clearSDataRequestCache();
-        }
-
-        this.setup();
-
-        for (var n in this.bars) 
-            this.bars[n].init();
-
-        for (var n in this.views)
-            this.views[n].init();        
-
-        this.initialized = true;
-    },
-    registerService: function(name, s, o) {
-        var o = o || {};
-
-        if (s instanceof Sage.SData.Client.SDataService)        
-            var service = s;
-        else        
-            var service = new Sage.SData.Client.SDataService(s);                
-
+        service = service instanceof Sage.SData.Client.SDataService
+            ? service
+            : new Sage.SData.Client.SDataService(service);
+      
         this.services[name] = service;
         
-        if (this.enableCaching && o.offline)
+        if (this.enableCaching && (options.offline || service.offline))
         {
-            service.on('beforerequest', this.loadSDataRequest, this);
-            service.on('requestcomplete', this.cacheSDataRequest, this);
+            service.on('beforerequest', this._loadSDataRequest, this);
+            service.on('requestcomplete', this._cacheSDataRequest, this);
         }        
 
-        if (o.isDefault || !this.defaultService)
-        {
-            this.defaultService = service;
-        }
+        if ((options.isDefault || service.isDefault) || !this.defaultService)
+            this.defaultService = service;        
 
         return this;
     },  
     hasService: function(name) {
-        return (typeof this.services[name] !== 'undefined');
+        return !!this.services[name];
     },  
     registerView: function(view) {
         /// <summary>
@@ -180,7 +194,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// <param name="view" type="Sage.Platform.Mobile.View">The view to be registered.</param>
         this.views[view.id] = view;
 
-        if (this.initialized) view.init();
+        if (this.started) view.init();
 
         this.fireEvent('registered', view);
 
@@ -196,7 +210,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 
         this.bars[name] = tbar;
 
-        if (this.initialized) tbar.init();
+        if (this.started) tbar.init();
 
         return this;
     },
@@ -246,13 +260,40 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         for (var n in this.bars)
             if (this.bars[n].setTitle)
                 this.bars[n].setTitle(title);
-    },    
-    beforeViewTransitionAway: function(view) {
+    },
+    _onResize: function(evt, el) {
+        this.fireEvent('resize');
+    },
+    _onBeforeTransition: function(evt, el) {
+        var view = this.getView(el);
+        if (view)
+        {
+            if (evt.browserEvent.out)
+                this._beforeViewTransitionAway(view);
+            else
+                this._beforeViewTransitionTo(view);
+        }
+    },
+    _onAfterTransition: function(evt, el) {
+        var view = this.getView(el);
+        if (view)
+        {
+            if (evt.browserEvent.out)
+                this._viewTransitionAway(view);
+            else
+                this._viewTransitionTo(view);
+        }
+    },
+    _onActivate: function(evt, el) {
+        var view = this.getView(el);
+        if (view) this._viewActivate(view, evt.browserEvent.tag, evt.browserEvent.data);
+    },
+    _beforeViewTransitionAway: function(view) {
         this.fireEvent('beforeviewtransitionaway', view);
 
         view.beforeTransitionAway();
     },
-    beforeViewTransitionTo: function(view) {
+    _beforeViewTransitionTo: function(view) {
         this.fireEvent('beforeviewtransitionto', view);
 
         for (var n in this.bars)
@@ -260,12 +301,12 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 
         view.beforeTransitionTo();
     },
-    viewTransitionAway: function(view) {
+    _viewTransitionAway: function(view) {
         this.fireEvent('viewtransitionaway', view);
 
         view.transitionAway();
     },
-    viewTransitionTo: function(view) {
+    _viewTransitionTo: function(view) {
         this.fireEvent('viewtransitionto', view);
 
         var tools = (view.options && view.options.tools) || view.tools || {};
@@ -275,7 +316,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
    
         view.transitionTo();
     },
-    viewActivate: function(view, tag, data) {
+    _viewActivate: function(view, tag, data) {
         this.fireEvent('viewactivate', view, tag, data);
 
         view.activate(tag, data);

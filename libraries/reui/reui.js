@@ -411,8 +411,10 @@ ReUI = {};
         hasOrientationEvent: false, 
         history: []      
     };
+
+    var config = window['reConfig'] || {};
     
-    D.apply(ReUI, {
+    D.apply(ReUI, config, {
         autoInit: true,
         legacyMode: true,
         useCompatibleFx: !isWebKit,
