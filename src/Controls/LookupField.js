@@ -21,7 +21,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<a class="button simpleSubHeaderButton"><span>{%: $.lookupText %}</span></a>',
+            '<button class="button simpleSubHeaderButton"><span>{%: $.lookupText %}</span></button>',
             '<input type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
         dependentErrorText: "A value for '{0}' must be selected.",
@@ -157,9 +157,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 view.show(options);
         },
         onClick: function(evt, el, o) {
-            if (evt.getTarget('a') || this.requireSelection)
+            if (evt.getTarget('.button') || this.requireSelection)
             {
-                evt.stopEvent();
+                evt.stopEvent();                
                 
                 this.navigateToListView();
             }

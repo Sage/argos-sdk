@@ -21,7 +21,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     Sage.Platform.Mobile.Controls.DateField = Ext.extend(Sage.Platform.Mobile.Controls.EditorField, {
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<a class="button whiteButton"><span>{%: $.lookupText %}</span></a>',
+            '<button class="button whiteButton"><span>{%: $.lookupText %}</span></button>',
             '<input type="text" />'
         ]),
         view: 'generic_calendar',

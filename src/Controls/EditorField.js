@@ -21,7 +21,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     Sage.Platform.Mobile.Controls.EditorField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<a class="button simpleSubHeaderButton"><span>{%: $.lookupText %}</span></a>',
+            '<button class="button simpleSubHeaderButton"><span>{%: $.lookupText %}</span></button>',
             '<input type="text" />'
         ]),
         lookupText: '...',

@@ -26,13 +26,13 @@ Ext.namespace("Sage.Platform.Mobile");
             '</div>'
         ]),
         toolTemplate: new Simplate([
-            '<a class="button toolButton toolButton-{%= $.side || "right" %} {%= $.cls %}" data-action="invokeTool" data-tool="{%= $.id %}">',
+            '<button class="button toolButton toolButton-{%= $.side || "right" %} {%= $.cls %}" data-action="invokeTool" data-tool="{%= $.id %}">',
             '{% if ($.icon) { %}',
             '<img src="{%= $.icon %}" alt="{%= $.id %}" />',
             '{% } else { %}',
-            '<span>{%: $.title %}</span>', // todo: if there is no text, click event will not fire on android 2.1 (galaxy s)
+            '<span>{%: $.title %}</span>', 
             '{% } %}',
-            '</a>'
+            '</button>'
         ]),
         titleText: 'Mobile',
         

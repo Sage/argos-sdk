@@ -130,9 +130,9 @@ Ext.namespace('Sage.Platform.Mobile');
         moreTemplate: new Simplate([
             '<div class="list-more">',
             '<div class="list-remaining"><span></span></div>',
-            '<a class="button" data-action="more">',
+            '<button class="button" data-action="more">',
             '<span>{%= $.moreText %}</span>',
-            '</a>',
+            '</button>',
             '</div>'
         ]),
         searchTemplate: new Simplate([

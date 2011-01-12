@@ -64,6 +64,11 @@
     background-color: #fff;
 }
 
+.list-has-more .list-more .button
+{
+    width: 100%;
+}
+
 .list-has-more .list-remaining
 {
     display: block;
@@ -341,13 +346,13 @@ input.field-error
     cursor: default;
 }
 
-.row-edit[data-field-type="picklist"] > a,
-.row-edit[data-field-type="lookup"] > a,
-.row-edit[data-field-type="select"] > a,
-.row-edit[data-field-type="address"] > a,
-.row-edit[data-field-type="name"] > a,
-.row-edit[data-field-type="date"] > a,
-.row-edit[data-field-type="note"] > a
+.row-edit[data-field-type="picklist"] > .button,
+.row-edit[data-field-type="lookup"] > .button,
+.row-edit[data-field-type="select"] > .button,
+.row-edit[data-field-type="address"] > .button,
+.row-edit[data-field-type="name"] > .button,
+.row-edit[data-field-type="date"] > .button,
+.row-edit[data-field-type="note"] > .button
 {
     margin: 0;
     padding: 0 8px;
