@@ -63,7 +63,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '</div>'
         ]),
         transitionEffect: 'slide',
-        id: 'generic_edit',        
+        id: 'generic_edit',
+        layout: null,
+        layoutCompiled: null,
+        layoutCompiledFrom: null,
+        enableCustomizations: true,
+        customizationSet: 'edit',
         expose: false,
         saveText: 'Save',
         titleText: 'Edit',
@@ -79,7 +84,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         render: function() {
             Sage.Platform.Mobile.Edit.superclass.render.apply(this, arguments);
             
-            this.processLayout(this.createLayout(), {title: this.detailsText});
+            this.processLayout(this.compileLayout(), {title: this.detailsText});
 
             this.el
                 .select('div[data-field]')
@@ -210,6 +215,91 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 var current = sectionQueue[i];
 
                 this.processLayout(current['as'], current['options']);
+            }
+        },
+        compileLayout: function() {
+            var layout = this.createLayout(),
+                source = layout;
+            if (source === this.layoutCompiledFrom && this.layoutCompiled)
+                return this.layoutCompiled; // same layout, no changes
+
+            if (this.enableCustomizations)
+            {
+                var customizations = App.getCustomizationsFor(this.customizationSet, this.id);
+                if (customizations && customizations.length > 0)
+                {
+                    layout = [];
+                    this.applyCustomizationsToLayout(source, customizations, layout);
+                }
+            }
+
+            this.layoutCompiled = layout;
+            this.layoutCompiledFrom = source;
+
+            return layout;
+        },
+        applyCustomizationsToLayout: function(layout, customizations, output) {
+            for (var i = 0; i < layout.length; i++)
+            {
+                var row = layout[i],
+                    insertRowsBefore = [],
+                    insertRowsAfter = [];
+
+                for (var j = 0; j < customizations.length; j++)
+                {
+                    var customization = customizations[j],
+                        stop = false;
+
+                    if (customization.at(row))
+                    {
+                        switch (customization.type)
+                        {
+                            case 'remove':
+                                // full stop
+                                stop = true;
+                                row = null;
+                                break;
+                            case 'replace':
+                                // full stop
+                                stop = true;
+                                row = this.expandExpression(customization.value, row);
+                                break;
+                            case 'modify':
+                                // make a shallow copy if we haven't already
+                                if (row === layout[i])
+                                    row = Ext.apply({}, row);
+                                row = Ext.apply(row, this.expandExpression(customization.value, row));
+                                break;
+                            case 'insert':
+                                (customization.where !== 'before'
+                                    ? insertRowsAfter
+                                    : insertRowsBefore
+                                ).push(this.expandExpression(customization.value, row));
+                                break;
+                        }
+                    }
+
+                    if (stop) break;
+                }
+
+                output.push.apply(output, insertRowsBefore);
+                if (row)
+                {
+                    if (row['as'])
+                    {
+                        // make a shallow copy if we haven't already
+                        if (row === layout[i])
+                            row = Ext.apply({}, row);
+
+                        var subLayout = row['as'],
+                            subLayoutOutput = (row['as'] = []);
+
+                        this.applyCustomizationsToLayout(subLayout, customizations, subLayoutOutput);
+                    }
+
+                    output.push(row);
+                }
+                output.push.apply(output, insertRowsAfter);
             }
         },
         requestFailure: function(response, o) {

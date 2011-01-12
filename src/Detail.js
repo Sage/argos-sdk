@@ -88,6 +88,11 @@ Ext.namespace('Sage.Platform.Mobile');
             '</li>'
         ]),
         id: 'generic_detail',
+        layout: null,
+        layoutCompiled: null,
+        layoutCompiledFrom: null,
+        enableCustomizations: true,
+        customizationSet: 'detail',
         expose: false,
         editText: 'Edit',
         titleText: 'Detail',
@@ -98,8 +103,6 @@ Ext.namespace('Sage.Platform.Mobile');
         init: function() {
             Sage.Platform.Mobile.Detail.superclass.init.call(this);
 
-            App.on('refresh', this.onRefresh, this);
-
             this.tools.tbar = [{
                 id: 'edit',
                 action: 'navigateToEditView'
@@ -107,7 +110,12 @@ Ext.namespace('Sage.Platform.Mobile');
 
             this.clear();
         },
-        onRefresh: function(o) {
+        initEvents: function() {
+            Sage.Platform.Mobile.Detail.superclass.initEvents.call(this);
+
+            App.on('refresh', this._onRefresh, this);
+        },
+        _onRefresh: function(o) {
             if (this.options && this.options.key === o.key)
             {
                 this.refreshRequired = true;
@@ -314,6 +322,91 @@ Ext.namespace('Sage.Platform.Mobile');
                 this.processLayout(current['as'], current['options'], entry);
             }
         },
+        compileLayout: function() {
+            var layout = this.createLayout(),
+                source = layout;
+            if (source === this.layoutCompiledFrom && this.layoutCompiled)
+                return this.layoutCompiled; // same layout, no changes
+      
+            if (this.enableCustomizations)
+            {
+                var customizations = App.getCustomizationsFor(this.customizationSet, this.id);
+                if (customizations && customizations.length > 0)
+                {
+                    layout = [];
+                    this.applyCustomizationsToLayout(source, customizations, layout);
+                }
+            }
+
+            this.layoutCompiled = layout;
+            this.layoutCompiledFrom = source;
+
+            return layout;
+        },
+        applyCustomizationsToLayout: function(layout, customizations, output) {
+            for (var i = 0; i < layout.length; i++)
+            {
+                var row = layout[i],
+                    insertRowsBefore = [],
+                    insertRowsAfter = [];
+
+                for (var j = 0; j < customizations.length; j++)
+                {
+                    var customization = customizations[j],
+                        stop = false;
+
+                    if (customization.at(row))
+                    {
+                        switch (customization.type)
+                        {
+                            case 'remove':
+                                // full stop
+                                stop = true;
+                                row = null;
+                                break;
+                            case 'replace':
+                                // full stop
+                                stop = true;
+                                row = this.expandExpression(customization.value, row);
+                                break;
+                            case 'modify':
+                                // make a shallow copy if we haven't already
+                                if (row === layout[i])
+                                    row = Ext.apply({}, row);
+                                row = Ext.apply(row, this.expandExpression(customization.value, row));
+                                break;
+                            case 'insert':
+                                (customization.where !== 'before'
+                                    ? insertRowsAfter
+                                    : insertRowsBefore
+                                ).push(this.expandExpression(customization.value, row));
+                                break;
+                        }
+                    }
+
+                    if (stop) break;
+                }
+
+                output.push.apply(output, insertRowsBefore);
+                if (row)
+                {
+                    if (row['as'])
+                    {
+                        // make a shallow copy if we haven't already
+                        if (row === layout[i])
+                            row = Ext.apply({}, row);
+
+                        var subLayout = row['as'],
+                            subLayoutOutput = (row['as'] = []);
+
+                        this.applyCustomizationsToLayout(subLayout, customizations, subLayoutOutput);
+                    }
+
+                    output.push(row);
+                }
+                output.push.apply(output, insertRowsAfter);
+            }
+        },
         requestFailure: function(response, o) {
             alert(String.format(this.requestErrorText, response, o));
         },
@@ -321,8 +414,10 @@ Ext.namespace('Sage.Platform.Mobile');
             this.entry = entry;
 
             if (this.entry)
-                this.processLayout(this.createLayout(), {title: this.detailsText}, this.entry);
-        },
+            {
+                this.processLayout(this.compileLayout(), {title: this.detailsText}, this.entry);
+            }
+        },        
         requestData: function() {
             this.el.addClass('panel-loading');
 

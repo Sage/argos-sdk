@@ -52,11 +52,28 @@ Ext.namespace('Sage.Platform.Mobile');
             ///     view's main element.
             /// </summary>
             this.render();
-            this.el
-                .on('load', this.load, this, {single: true})
-                .on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'});            
+
+            this.initEvents();
         },
-        getParametersForAction: function(name, evt, el) {
+        initEvents: function() {
+            this.el.on('load', this._onLoad, this, {single: true});
+            this.el.on('click', this._initiateActionFromClick,  this, {delegate: '[data-action]'});
+        },
+        _onLoad: function(evt, el, o) {
+            this.load(evt, el, o);
+        },
+        _initiateActionFromClick: function(evt, el) {
+            var el = Ext.get(el),
+                action = el.getAttribute('data-action');
+
+            if (this.hasAction(action, evt, el))
+            {
+                var parameters = this._getParametersForAction(action, evt, el);
+
+                this.invokeAction(action, parameters, evt, el);
+            }
+        },
+        _getParametersForAction: function(name, evt, el) {
             var parameters = {
                 $event: evt,
                 $source: el
@@ -76,17 +93,6 @@ Ext.namespace('Sage.Platform.Mobile');
             }
 
             return parameters;
-        },        
-        initiateActionFromClick: function(evt, el) {
-            var el = Ext.get(el),
-                action = el.getAttribute('data-action');
-
-            if (this.hasAction(action, evt, el))
-            {
-                var parameters = this.getParametersForAction(action, evt, el);                
-
-                this.invokeAction(action, parameters, evt, el);
-            }
         },
         hasAction: function(name, evt, el) {
             return (typeof this[name] === 'function');

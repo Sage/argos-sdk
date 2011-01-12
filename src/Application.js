@@ -29,11 +29,15 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     started: false,
     enableCaching: false,
     defaultService: null,
+    customizationsForSet: null,
+    customizationsForId: null,
     services: null,
     modules: null,
     views: null,
     bars: null,
     constructor: function(options) {
+        this.customizationsForSet = {};
+        this.customizationsForId = {};
         this.services = {};
         this.modules = [];
         this.views = {};
@@ -335,6 +339,22 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             if (predicate.call(scope || this, list[i].data)) return list[i].data;
 
         return false;
+    },
+    registerCustomization: function(set, id, spec) {
+        var key = id || set,
+            container = id ? this.customizationsForId : this.customizationsForSet,            
+            list = container[key] || (container[key] = []);
+
+        if (list)
+            list.push(spec);
+    },
+    getCustomizationsFor: function(set, id) {
+        // { action: 'remove|modify|insert|replace', at: (index|fn), where: 'before|after', value: {} }
+        
+        var forSet = (set && this.customizationsForSet[set]) || [];
+        var forId = (id && this.customizationsForId[id]) || [];
+
+        return forSet.concat(forId);
     }
 });
 

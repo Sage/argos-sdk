@@ -160,6 +160,10 @@ Ext.namespace('Sage.Platform.Mobile');
         ]),
         id: 'generic_list',
         resourceKind: '',
+        querySelect: null,
+        queryInclude: null,
+        queryOrderBy: null,
+        resourceProperty: null,
         pageSize: 20,
         hideSearch: false,
         allowSelection: false,
@@ -183,22 +187,8 @@ Ext.namespace('Sage.Platform.Mobile');
         init: function() {
             Sage.Platform.Mobile.List.superclass.init.call(this);
 
-            App.on('refresh', this.onRefresh, this);
-
-            this.el.on('longpress', this.onLongPress, this);
-
-            this.searchQueryEl
-                .on('keypress', this.onSearchKeyPress, this)
-                .on('focus', this.onSearchFocus, this)
-                .on('blur', this.onSearchBlur, this);
-
-
-            if (typeof this.selectionModel === 'undefined')
-                this.selectionModel = new Sage.Platform.Mobile.ConfigurableSelectionModel();
-
-            this.selectionModel.on('select', this.onSelectionModelSelect, this);
-            this.selectionModel.on('deselect', this.onSelectionModelDeselect, this);
-            this.selectionModel.on('clear', this.onSelectionModelClear, this);
+            if (!this.selectionModel)
+                this.useSelectionModel(new Sage.Platform.Mobile.ConfigurableSelectionModel());
 
             this.tools.tbar = [{
                 id: 'new',
@@ -207,20 +197,42 @@ Ext.namespace('Sage.Platform.Mobile');
 
             this.clear();
         },
+        initEvents: function() {
+            Sage.Platform.Mobile.List.superclass.initEvents.call(this);
+
+            App.on('refresh', this._onRefresh, this);
+
+            this.searchQueryEl.on('keypress', this._onSearchKeyPress, this);
+            this.searchQueryEl.on('focus', this._onSearchFocus, this);
+            this.searchQueryEl.on('blur', this._onSearchBlur, this);
+        },
+        useSelectionModel: function(model) {
+            if (this.selectionModel)
+            {
+                this.selectionModel.un('select', this._onSelectionModelSelect, this);
+                this.selectionModel.un('deselect', this._onSelectionModelDeselect, this);
+                this.selectionModel.un('clear', this._onSelectionModelClear, this);
+            }
+
+            this.selectionModel = model;
+            this.selectionModel.on('select', this._onSelectionModelSelect, this);
+            this.selectionModel.on('deselect', this._onSelectionModelDeselect, this);
+            this.selectionModel.on('clear', this._onSelectionModelClear, this);
+        },
         isNavigationDisabled: function() {
             return ((this.options && this.options.selectionOnly) || (this.selectionOnly));
         },
         isSelectionDisabled: function() {
             return !((this.options && this.options.selectionOnly) || (this.allowSelection));
         },        
-        onSearchBlur: function(evt, el, o) {
+        _onSearchBlur: function(evt, el, o) {
             if (this.searchQueryEl.dom.value == '')
                 this.searchEl.removeClass('list-search-active');
         },
-        onSearchFocus: function(evt, el, o) {
+        _onSearchFocus: function(evt, el, o) {
             this.searchEl.addClass('list-search-active');
         },
-        onSearchKeyPress: function(evt, el, o) {
+        _onSearchKeyPress: function(evt, el, o) {
             if (evt.getKey() == 13 || evt.getKey() == 10)
             {
                 evt.stopEvent();
@@ -232,7 +244,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 this.search();
             }
         },
-        onLongPress: function(evt, el, o) {
+        _onLongPress: function(evt, el, o) {
             evt.stopEvent();
 
             var el = Ext.get(el),
@@ -245,19 +257,19 @@ Ext.namespace('Sage.Platform.Mobile');
 
             this.navigateToContextView(key, descriptor, key && this.entries[key]);
         },
-        onSelectionModelSelect: function(key, data, tag) {
+        _onSelectionModelSelect: function(key, data, tag) {
             var el = Ext.get(tag);
             if (el)
                 el.addClass('list-item-selected');
         },
-        onSelectionModelDeselect: function(key, data, tag) {
+        _onSelectionModelDeselect: function(key, data, tag) {
             var el = Ext.get(tag);
             if (el)
                 el.removeClass('list-item-selected');
         },
-        onSelectionModelClear: function() {
+        _onSelectionModelClear: function() {
         },
-        onRefresh: function(o) {
+        _onRefresh: function(o) {
             if (this.resourceKind && o.resourceKind === this.resourceKind)
             {
                 this.refreshRequired = true;
