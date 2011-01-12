@@ -138,6 +138,7 @@
 {
     font-size: 0.9em;
     line-height: 30px;
+    z-index: 5;
 
     /* these are marked !important due to Chrome CSS fix */
     /* todo: needed still? */
@@ -164,6 +165,7 @@
     padding: 0 8px 0 6px;
     border: solid 1px #000;
     text-align: center;
+    z-index: 100;
 }
 
 .list-search .dismissButton
@@ -177,6 +179,7 @@
     border-style: solid;
     border-color: #000;
     border-width: 1px 0 1px 1px;
+    z-index: 100;
 }
 
 .list-search label
