@@ -80,7 +80,24 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         complete: function() {
+            var view = App.getActiveView();
             var success = true;
+
+            if (view)
+            {
+                if (view.validate() !== false)
+                {
+                    view.el.addClass('panel-form-error');
+
+                    view.showValidationSummary();
+
+                    return;
+                }
+                else
+                {
+                    view.el.removeClass('panel-form-error');
+                }
+            }
 
             this.getValuesFromView();
 
