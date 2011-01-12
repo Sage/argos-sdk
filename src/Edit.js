@@ -50,7 +50,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '</li>'
         ]),
         sectionBeginTemplate: new Simplate([
-            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<span class="collapsed-indicator"></span></h2>',
+            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<button class="collapsed-indicator"></button></h2>',
             '<fieldset class="{%= $.cls %}">',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'
         ]),

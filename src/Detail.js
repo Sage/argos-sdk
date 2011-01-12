@@ -34,7 +34,7 @@ Ext.namespace('Sage.Platform.Mobile');
             '</fieldset>'
         ]),     
         sectionBeginTemplate: new Simplate([
-            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<span class="collapsed-indicator"></span></h2>',
+            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<button class="collapsed-indicator"></button></h2>',
             '{% if ($.list) { %}<ul class="{%= $.cls %}">{% } else { %}<fieldset class="{%= $.cls %}">{% } %}'
         ]),
         sectionEndTemplate: new Simplate([

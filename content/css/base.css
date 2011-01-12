@@ -514,7 +514,7 @@ input.field-error
 h2 > .collapsed-indicator
 {
     height: 30px;
-    width: 24px;
+    width: 30px;
     float: right;
     margin: 0 4px 0 0;
 }
