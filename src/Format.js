@@ -97,6 +97,21 @@ Sage.Platform.Mobile.Format = (function() {
             if (typeof val !== 'string') return val;
 
             return val.replace(/\n/g, '<br />');
+        },
+        timespan: function(val) {
+            var v = Sage.Platform.Mobile.Format.fixed(val);
+            if (isNaN(v)) return '';
+
+            var hrs = Math.floor(v / 60);
+            var mins  = v % 60;
+
+            if (hrs)
+                hrs = hrs > 1 ? hrs + ' hours ' : hrs + ' hour ';
+            if (mins)
+                mins = mins > 1 ? mins + ' minutes' : mins + ' minute';
+
+            return (hrs && mins) ? hrs + mins
+                                 : hrs === 0 ? mins : hrs;
         }
     };
 })();
