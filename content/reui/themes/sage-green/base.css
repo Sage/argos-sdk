@@ -37,6 +37,9 @@ body.transition > .list
 body > .panel,
 body > .list
 {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
     width: 100%;
     height: auto;
     -webkit-transform: translateX(0%);

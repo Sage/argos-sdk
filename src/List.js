@@ -130,16 +130,16 @@ Ext.namespace('Sage.Platform.Mobile');
         moreTemplate: new Simplate([
             '<div class="list-more">',
             '<div class="list-remaining"><span></span></div>',
-            '<a class="button" data-action="more">',
+            '<button class="button" data-action="more">',
             '<span>{%= $.moreText %}</span>',
-            '</a>',
+            '</button>',
             '</div>'
         ]),
         searchTemplate: new Simplate([
             '<div class="list-search">',
             '<input type="text" name="query" class="query" />',
-            '<div class="subHeaderButton dismissButton" data-action="clearSearchQuery">X</div>',
-            '<div class="subHeaderButton searchButton" data-action="search">Search</div>',
+            '<button class="subHeaderButton dismissButton" data-action="clearSearchQuery">X</button>',
+            '<button class="subHeaderButton searchButton" data-action="search">Search</button>',
             '<label>{%= $.searchText %}</label>',
             '</div>'
         ]),
@@ -237,9 +237,7 @@ Ext.namespace('Sage.Platform.Mobile');
             {
                 evt.stopEvent();
 
-                /* fix to hide iphone keyboard when go is pressed */
-                if (/(iphone|ipad)/i.test(navigator.userAgent))
-                    Ext.get('backButton').focus();
+                this.searchQueryEl.blur();
 
                 this.search();
             }

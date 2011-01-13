@@ -64,6 +64,11 @@
     background-color: #fff;
 }
 
+.list-has-more .list-more .button
+{
+    width: 100%;
+}
+
 .list-has-more .list-remaining
 {
     display: block;
@@ -133,6 +138,7 @@
 {
     font-size: 0.9em;
     line-height: 30px;
+    z-index: 5;
 
     /* these are marked !important due to Chrome CSS fix */
     /* todo: needed still? */
@@ -159,6 +165,7 @@
     padding: 0 8px 0 6px;
     border: solid 1px #000;
     text-align: center;
+    z-index: 100;
 }
 
 .list-search .dismissButton
@@ -172,6 +179,7 @@
     border-style: solid;
     border-color: #000;
     border-width: 1px 0 1px 1px;
+    z-index: 100;
 }
 
 .list-search label
@@ -341,13 +349,13 @@ input.field-error
     cursor: default;
 }
 
-.row-edit[data-field-type="picklist"] > a,
-.row-edit[data-field-type="lookup"] > a,
-.row-edit[data-field-type="select"] > a,
-.row-edit[data-field-type="address"] > a,
-.row-edit[data-field-type="name"] > a,
-.row-edit[data-field-type="date"] > a,
-.row-edit[data-field-type="note"] > a
+.row-edit[data-field-type="picklist"] > .button,
+.row-edit[data-field-type="lookup"] > .button,
+.row-edit[data-field-type="select"] > .button,
+.row-edit[data-field-type="address"] > .button,
+.row-edit[data-field-type="name"] > .button,
+.row-edit[data-field-type="date"] > .button,
+.row-edit[data-field-type="note"] > .button
 {
     margin: 0;
     padding: 0 8px;
@@ -509,7 +517,7 @@ input.field-error
 h2 > .collapsed-indicator
 {
     height: 30px;
-    width: 24px;
+    width: 30px;
     float: right;
     margin: 0 4px 0 0;
 }

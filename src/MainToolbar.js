@@ -26,13 +26,13 @@ Ext.namespace("Sage.Platform.Mobile");
             '</div>'
         ]),
         toolTemplate: new Simplate([
-            '<a class="button toolButton toolButton-{%= $.side || "right" %} {%= $.cls %}" data-action="invokeTool" data-tool="{%= $.id %}">',
+            '<button class="button toolButton toolButton-{%= $.side || "right" %} {%= $.cls %}" data-action="invokeTool" data-tool="{%= $.id %}">',
             '{% if ($.icon) { %}',
             '<img src="{%= $.icon %}" alt="{%= $.id %}" />',
             '{% } else { %}',
-            '<span>{%: $.title %}</span>',
+            '<span>{%: $.title %}</span>', 
             '{% } %}',
-            '</a>'
+            '</button>'
         ]),
         titleText: 'Mobile',
         

@@ -40,9 +40,6 @@
 			text: 'MainToolbar.js',
 			path: '../src/'
 		},{
-			text: 'FloatToolbar.js',
-			path: '../src/'
-		},{
 			text: 'Utility.js',
 			path: '../src/'
 		},{
@@ -96,9 +93,6 @@
 		    text: 'json2.js',
 		    path: '../libraries/'
 		},{
-			text: 'ext-core-debug.js',
-			path: '../libraries/ext/'
-		},{
 			text: 'Simplate.js',
 			path: '../libraries/'
 		},{
@@ -117,35 +111,15 @@
 	}],
 	resources: [{
 		src: '../libraries/ext',
-		dest: 'src/argos-sdk/libraries/ext',
-		filters: ".*[ext\\-core\\-debug\\.js]"
-	},{
-		src: '../libraries',
-		dest: 'src/argos-sdk/libraries',
-		filters: ".*[Base64|ObjTree|Simplate|json2]"
-	},{
-		src: '../libraries/reui',
-		dest: 'src/argos-sdk/libraries/reui',
-		filters: ".*[reui\\.js]"
-	},{
-		src: '../libraries/datejs/build',
-		dest: 'src/argos-sdk/libraries/datejs',
-		filters: ".*[date\\.js]"
+		dest: 'app/content/ext',
+		filters: ".*\\.js"
 	},{
 		src: '../libraries/datejs/src/globalization',
 		dest: 'app/content/datejs',
 		filters: ".*\\.js"
 	},{
-		src: '../libraries/sdata',
-		dest: 'src/argos-sdk/libraries/sdata',
-		filters: ".*[sdata\\-client\\-debug.js.js]"
-	},{
-		src: '../src',
-		dest: 'src/argos-sdk',
-		filters: ".*\\.js"
-	},{
 		src: '../content/',
 		dest: 'app/content',
-		filters: ".*[\\.css|\\.jpg|\\.png|\\.gif]"
+		filters: ".*(\\.css|\\.jpg|\\.png|\\.gif)"
 	}]
 }
