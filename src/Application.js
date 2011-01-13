@@ -117,10 +117,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.initEvents();
         this.initCaching();
         this.initModules();
-
         this.initToolbars();
         this.initViews();
-
         this.initReUI();
     },
     run: function() {

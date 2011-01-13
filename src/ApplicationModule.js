@@ -19,13 +19,16 @@ Sage.Platform.Mobile.ApplicationModule = Ext.extend(Ext.util.Observable, {
     application: null,
     init: function(application) {
         this.application = application;
-
-        this.initViews();
-        this.initToolbars();
+      
+        this.loadCustomizations();
+        this.loadToolbars();
+        this.loadViews();
     },
-    initViews: function() {
+    loadCustomizations: function() {
     },
-    initToolbars: function() {
+    loadViews: function() {
+    },
+    loadToolbars: function() {
     },
     registerView: function(view) {
         if (this.application)
@@ -34,5 +37,9 @@ Sage.Platform.Mobile.ApplicationModule = Ext.extend(Ext.util.Observable, {
     registerToolbar: function(name, toolbar) {
         if (this.application)
             this.application.registerToolbar(name, toolbar);
+    },
+    registerCustomization: function(set, id, spec) {
+        if (this.application)
+            this.application.registerCustomization(set, id, spec);
     }
 });
