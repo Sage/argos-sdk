@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// todo: move to argos-saleslogix; this does not belong here.
-
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
@@ -83,19 +81,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             var view = App.getActiveView();
             var success = true;
 
-            if (view)
+            if (view instanceof Sage.Platform.Mobile.Edit)
             {
+                view.hideValidationSummary();
+
                 if (view.validate() !== false)
                 {
-                    view.el.addClass('panel-form-error');
-
                     view.showValidationSummary();
-
                     return;
-                }
-                else
-                {
-                    view.el.removeClass('panel-form-error');
                 }
             }
 
