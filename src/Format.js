@@ -100,7 +100,7 @@ Sage.Platform.Mobile.Format = (function() {
         },
         timespan: function(val) {
             var v = Sage.Platform.Mobile.Format.fixed(val);
-            var Format = Sage.Platform.Mobile.Format;
+            var format = Sage.Platform.Mobile.Format;
 
             if (isNaN(v)) return '';
 
@@ -108,11 +108,11 @@ Sage.Platform.Mobile.Format = (function() {
             var mins  = v % 60;
 
             if (hrs)
-                hrs = hrs > 1 ? String.format('{0} {1} ', hrs, (Format.hoursText || 'hours')) 
-                              : String.format('{0} {1} ', hrs, (Format.hourText || 'hour'));
+                hrs = hrs > 1 ? String.format('{0} {1} ', hrs, (format.hoursText || 'hours')) 
+                              : String.format('{0} {1} ', hrs, (format.hourText || 'hour'));
             if (mins)
-                mins = mins > 1 ? String.format('{0} {1}', mins, (Format.minutesText || 'minutes'))
-                                : String.format('{0} {1}', mins, (Format.minuteText || 'minute'));
+                mins = mins > 1 ? String.format('{0} {1}', mins, (format.minutesText || 'minutes'))
+                                : String.format('{0} {1}', mins, (format.minuteText || 'minute'));
 
             return (hrs && mins) ? hrs + mins
                                  : hrs === 0 ? mins : hrs;
