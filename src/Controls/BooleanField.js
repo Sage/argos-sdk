@@ -26,13 +26,26 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '</div>'
         ]),        
         onText: 'ON',
-        offText: 'OFF',        
+        offText: 'OFF',
+        disabledValue: false,
         init: function() {
             Sage.Platform.Mobile.Controls.BooleanField.superclass.init.apply(this, arguments);
 
             this.el.on('click', this.onClick, this, {stopEvent: true});
         },
+        enable: function() {
+            this.containerEl.removeClass('field-disabled');
+        },
+        disable: function() {
+            this.containerEl.addClass('field-disabled');
+            this.clearValue(true);
+        },
+        isDisabled: function() {
+            return this.containerEl.hasClass('field-disabled');
+        },
         onClick: function(evt, el, o) {
+            if (this.isDisabled()) return; 
+
             var toggledValue = this.el.getAttribute('toggled') !== 'true';
 
             this.el.dom.setAttribute('toggled', toggledValue);
@@ -40,6 +53,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.fireEvent('change', toggledValue, this);
         },
         getValue: function() {
+            if (this.isDisabled()) return this.disabledValue;
+
             return this.el.getAttribute('toggled') === 'true';
         },
         setValue: function(val, initial) {
@@ -51,8 +66,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.el.dom.setAttribute('toggled', val.toString());
         },
-        clearValue: function() {
-            this.setValue(this.checked, true);
+        clearValue: function(flag) {
+            var initial = flag !== true;
+
+            this.setValue(this.checked, initial);
         },
         isDirty: function() {
             return (this.originalValue != this.getValue());

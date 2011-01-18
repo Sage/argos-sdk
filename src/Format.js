@@ -102,7 +102,7 @@ Sage.Platform.Mobile.Format = (function() {
             var v = Sage.Platform.Mobile.Format.fixed(val);
             var format = Sage.Platform.Mobile.Format;
 
-            if (isNaN(v)) return '';
+            if (isNaN(v) || !v) return '';
 
             var hrs = Math.floor(v / 60);
             var mins  = v % 60;

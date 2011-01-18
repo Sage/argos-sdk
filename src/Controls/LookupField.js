@@ -25,8 +25,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '<input type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
         dependentErrorText: "A value for '{0}' must be selected.",
-        disabled: false,
-        dirty: false,
         view: false,
         keyProperty: '$key',
         textProperty: '$descriptor',
@@ -55,34 +53,15 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     .on('blur', this.onBlur, this);
             }
         },
-        enable: function(options) {
-            if (this.disabled)
-            {
-                this.containerEl.removeClass('field-disabled');
-                this.el
-                    .on('keyup', this.onKeyUp, this)
-                    .on('blur', this.onBlur, this);
-                this.containerEl.on('click', this.onClick, this);
-                this.disabled = false;
-                if (!options || (options && options.throughUserAction !== false))
-                    this.dirty = !this.dirty;
-            }
+        enable: function() {
+            this.containerEl.removeClass('field-disabled');
         },
-        disable: function(options) {
-            if (!this.disabled)
-            {
-                this.containerEl.addClass('field-disabled');
-                this.el
-                    .un('keyup', this.onKeyUp, this)
-                    .un('blur', this.onBlur, this);
-                this.containerEl.un('click', this.onClick, this);
-                this.disabled = true;
-                if (!options || (options && options.throughUserAction !== false))
-                    this.dirty = !this.dirty;
-            }
+        disable: function() {
+            this.containerEl.addClass('field-disabled');
+            this.clearValue(true);
         },
         isDisabled: function() {
-            return this.disabled;
+            return this.containerEl.hasClass('field-disabled');
         },
         isReadOnly: function() {
             return !this.view;
@@ -157,7 +136,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 view.show(options);
         },
         onClick: function(evt, el, o) {
-            if (evt.getTarget('.button') || this.requireSelection)
+            if (!this.isDisabled() && (evt.getTarget('.button') || this.requireSelection))
             {
                 evt.stopEvent();                
                 
@@ -165,11 +144,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         onKeyUp: function(evt, el, o) {
-            if (this.notificationTrigger == 'keyup')
+            if (!this.isDisabled() && this.notificationTrigger == 'keyup')
                 this.onNotificationTrigger(evt, el, o);
         },
         onBlur: function(evt, el, o) {
-            if (this.notificationTrigger == 'blur')
+            if (!this.isDisabled() && this.notificationTrigger == 'blur')
                 this.onNotificationTrigger(evt, el, o);
         },
         onNotificationTrigger: function(evt, el, o) {
@@ -217,8 +196,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.fireEvent('change', this.currentValue, this);
         },
         isDirty: function() {
-            if (this.dirty) return true;
-
             if (this.originalValue && this.currentValue)
             {
                 if (this.originalValue.key != this.currentValue.key)
@@ -256,7 +233,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return this.currentSelection;
         },
         getValue: function() {
-            if (this.disabled) return false;
+            if (this.isDisabled()) return false;
 
             var value = null,
                 text = this.getText() || '',
@@ -331,8 +308,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.setText(text);
         },
         setValue: function(val, initial) {
-            if (this.disabled) return;
-
             // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false
             // and IS NOT defined use keyProperty or textProperty in its place.
             var key,
@@ -408,9 +383,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }
             }        
         },
-        clearValue: function() {
-            this.setValue(null, true);
-            this.dirty = false;
+        clearValue: function(flag) {
+            var initial = flag !== true;
+
+            this.setValue(null, initial);
         }
     });
 

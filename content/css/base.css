@@ -342,8 +342,9 @@ input.field-error
 }
 
 /* fields */
-.row-edit.field-disabled > a,
-.row-edit.field-disabled > input
+.row-edit.field-disabled > button,
+.row-edit.field-disabled > input,
+.row-edit.field-disabled > .field-boolean
 {
     opacity: 0.3;
     cursor: default;
