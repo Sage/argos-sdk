@@ -356,15 +356,13 @@ img
     padding: 0 0 1.5em 0;
 }
 
-.panel-content > fieldset:last-child,
-.panel-validation-summary > fieldset:last-child
+.panel-content > fieldset:last-child
 {
     margin: 0;
     padding: 0 0 0 0;
 }
 
-.panel-content > ul:last-child,
-.panel-validation-summary > ul:last-child
+.panel-content > ul:last-child
 {
     margin: 0;
     padding: 0 0 0 0;

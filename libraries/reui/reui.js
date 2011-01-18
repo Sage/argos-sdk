@@ -249,6 +249,9 @@ ReUI = {};
                 
             D.dispatch(from, 'aftertransition', {out: true, tag: o.tag, data: o.data});
             D.dispatch(to, 'aftertransition', {out: false, tag: o.tag, data: o.data});
+
+            if (o.complete)
+                o.complete(from, to, o);
         }       
         
         context.transitioning = true;

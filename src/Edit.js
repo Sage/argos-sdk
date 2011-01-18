@@ -616,21 +616,21 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 content.push(this.validationSummaryItemTemplate.apply(this.errors[i], this.fields[this.errors[i].name]));
 
             this.validationContentEl.update(content.join(''));
+            this.el.addClass('panel-form-error');
+        },
+        hideValidationSummary: function() {
+            this.el.removeClass('panel-form-error');
+            this.validationContentEl.update('');
         },
         save: function() {
             if (this.isFormDisabled())  return;
 
+            this.hideValidationSummary();
+
             if (this.validate() !== false)
             {
-                this.el.addClass('panel-form-error');
-
                 this.showValidationSummary();
-
                 return;
-            }
-            else
-            {
-                this.el.removeClass('panel-form-error');
             }
 
             if (this.inserting)
