@@ -1,6 +1,5 @@
 # Visual Studio
 *.obj
-*.exe
 *.pdb
 *.user
 *.aps
