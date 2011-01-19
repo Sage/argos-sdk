@@ -19,6 +19,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     var U = Sage.Platform.Mobile.Utility;
 
     Sage.Platform.Mobile.Controls.DateField = Ext.extend(Sage.Platform.Mobile.Controls.EditorField, {
+        attachmentPoints: {
+            'triggerBtn': '.button'
+        },
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button whiteButton"><span>{%: $.lookupText %}</span></button>',
@@ -30,6 +33,30 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         showTimePicker: false,
         formatValue: function(value) {
             return Sage.Platform.Mobile.Format.date(value, this.formatString);
+        },
+        init: function() {
+            Sage.Platform.Mobile.Controls.EditorField.superclass.init.apply(this, arguments);
+
+            this.el.on('change', this.onChange, this, {stopEvent: true});
+            this.triggerBtn.on('click', this.onClick, this, {stopEvent: true});
+        },
+        onChange: function(evt, el, o) {
+            if (!el) return;
+
+            if (el.value.trim() === '')
+            {
+                this.validationValue = this.currentValue = null;
+                return;
+            }
+
+            var val = Date.parse(el.value, this.formatString);
+            if (val)
+            {
+                this.validationValue = this.currentValue = val;
+                this.el.removeClass('field-error');
+            }
+            else
+                this.el.addClass('field-error');
         },
         createNavigationOptions: function() {
             var options = Sage.Platform.Mobile.Controls.DateField.superclass.createNavigationOptions.apply(this, arguments);
@@ -44,6 +71,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (view)
             {
                 this.currentValue = this.validationValue = view.getDateTime();
+                this.el.removeClass('field-error');
             }
         },
         isDirty: function() {
