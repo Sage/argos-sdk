@@ -1096,6 +1096,35 @@
 
             return xml.parseXML(text);
         },
+        isIncludedReference: function(ns, name, value) {
+            return value.hasOwnProperty('@sdata:key');
+        },
+        isIncludedCollection: function(ns, name, value) {
+            if (value.hasOwnProperty('@sdata:key')) return false;
+            if (value.hasOwnProperty('@sdata:uri') || value.hasOwnProperty('@sdata:url')) return true;
+
+            // attempt to detect if we are dealing with an included relationship collection
+            var firstChild,
+                firstValue;
+
+            for (var fqPropertyName in value)
+            {
+                firstChild = value[fqPropertyName];
+                break; // will always ever be one property, either an entity, or an array of
+            }
+
+            if (firstChild)
+            {
+                if (S.isArray(firstChild))
+                    firstValue = firstChild[0];
+                else
+                    firstValue = firstChild;
+                
+                if (firstValue && firstValue.hasOwnProperty('@sdata:key')) return true;
+            }
+
+            return false;
+        },
         convertEntity: function(ns, name, entity, applyTo) {
             applyTo = applyTo || {};
 
@@ -1108,6 +1137,8 @@
 
             for (var fqPropertyName in entity)
             {
+                if (fqPropertyName[0] === '@') continue;
+
                 if (!prefix || fqPropertyName.indexOf(prefix) === 0)
                 {
                     var propertyName = prefix ? fqPropertyName.substring(prefix.length) : fqPropertyName,
@@ -1119,11 +1150,11 @@
                         {
                             var converted = null;
                         }
-                        else if (value.hasOwnProperty('@sdata:key')) // included reference
+                        else if (this.isIncludedReference(ns, propertyName, value)) // included reference
                         {
                             var converted = this.convertEntity(ns, propertyName, value);
                         }
-                        else if (value.hasOwnProperty('@sdata:uri')) // included collection
+                        else if (this.isIncludedCollection(ns, propertyName, value)) // included collection
                         {
                             var converted = this.convertEntityCollection(ns, propertyName, value);
                         }
@@ -1190,7 +1221,7 @@
 
             for (var propertyName in entity)
             {
-                if (/^\$/.test(propertyName)) continue;
+                if (propertyName[0] === '$') continue;
 
                 var value = entity[propertyName];
 
