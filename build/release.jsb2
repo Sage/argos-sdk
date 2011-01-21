@@ -4,10 +4,13 @@
 	deployDir: 'deploy/',
 	pkgs: [{
 		name: 'SData Mobile Application Framework',
-		file: 'app/content/javascript/argos-sdk.js',
+		file: 'content/javascript/argos-sdk.js',
 		isDebug: true,
 		fileIncludes: [{
 			text: 'Application.js',
+			path: '../src/'
+		},{
+			text: 'ApplicationModule.js',
 			path: '../src/'
 		},{
 			text: 'View.js',
@@ -87,7 +90,7 @@
 		}]
 	},{
 		name: 'SData Mobile Application Framework Dependencies',
-		file: 'app/content/javascript/argos-dependencies.js',
+		file: 'content/javascript/argos-dependencies.js',
 		isDebug: true,
 		fileIncludes: [{
 		    text: 'json2.js',
@@ -111,15 +114,15 @@
 	}],
 	resources: [{
 		src: '../libraries/ext',
-		dest: 'app/content/ext',
+		dest: 'content/ext',
 		filters: ".*\\.js"
 	},{
 		src: '../libraries/datejs/src/globalization',
-		dest: 'app/content/datejs',
+		dest: 'content/datejs',
 		filters: ".*\\.js"
 	},{
 		src: '../content/',
-		dest: 'app/content',
+		dest: 'content',
 		filters: ".*(\\.css|\\.jpg|\\.png|\\.gif)"
 	}]
 }
