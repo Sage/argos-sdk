@@ -56,7 +56,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.el.removeClass('field-error');
             }
             else
+            {
+                this.validationValue = this.currentValue = null;
                 this.el.addClass('field-error');
+            }
         },
         createNavigationOptions: function() {
             var options = Sage.Platform.Mobile.Controls.DateField.superclass.createNavigationOptions.apply(this, arguments);
@@ -78,6 +81,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return this.originalValue instanceof Date && this.currentValue instanceof Date
                 ? this.originalValue.getTime() != this.currentValue.getTime()
                 : this.originalValue !== this.currentValue;
+        },
+        clearValue: function() {
+            Sage.Platform.Mobile.Controls.DateField.superclass.clearValue.apply(this, arguments);
+            this.el.removeClass('field-error');
         }
     });
 
