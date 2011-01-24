@@ -652,10 +652,10 @@ ReUI = {};
                     D.dispatch(page, 'beforetransition', {out: false, tag: o.tag, data: o.data});
 
                     D.select(page);
-                    
-                    D.dispatch(page, 'aftertransition', {out: false, tag: o.tag, data: o.data});                    
 
                     transitionComplete(page, o);
+                    
+                    D.dispatch(page, 'aftertransition', {out: false, tag: o.tag, data: o.data});
                 }
             }
         }                    
