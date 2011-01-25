@@ -21,10 +21,17 @@ body[orient="landscape"]
 
 body > *
 {
-    display: none;
+    /* display: none; */
     position: relative;
     margin: 0;
     padding : 0;
+}
+
+body > .list,
+body > .panel,
+body > .dialog
+{
+    display: none;
 }
 
 body.transition > .panel,
