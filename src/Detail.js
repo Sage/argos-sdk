@@ -77,7 +77,7 @@ Ext.namespace('Sage.Platform.Mobile');
             '</div>'
         ]),
         actionTemplate: new Simplate([
-            '<li class="{%= $.cls %}">',
+            '<li class="{%= $.cls %} {% if ($.disabled) { %} disabled {% } else { %} {% } %}">',
             '<a data-action="{%= $.action %}">',
             '{% if ($.icon) { %}',
             '<img src="{%= $.icon %}" alt="icon" class="icon" />',
@@ -257,11 +257,29 @@ Ext.namespace('Sage.Platform.Mobile');
                         : value;
                 }
 
+                var disabled = false,
+                    disableFn = false;
+
+                if (typeof current['disabled'] === 'function')
+                    disableFn = current['disabled'];
+                else if (current['disabled'] && current['disabled'].fn && typeof current['disabled'].fn === 'function')
+                    disableFn = current['disabled'].fn;
+
+                if (disableFn)
+                {
+                    disabled = disableFn.call(this, value);
+                }
+                else
+                {
+                    disabled = current['disabled'] !== true ? false : true;
+                }
+
                 var options = {
                     cls: current['cls'],
                     icon: current['icon'],
                     name: current['name'],
                     label: current['label'],
+                    disabled: disabled,
                     entry: entry,
                     value: formatted,
                     raw: value
@@ -272,7 +290,7 @@ Ext.namespace('Sage.Platform.Mobile');
                         ? this.expandExpression(current['descriptor'], entry)
                         : provider(entry, current['descriptor']);
 
-                if (current['action'])
+                if (current['action'] && !current['disabled'])
                     options['action'] = this.expandExpression(current['action'], entry);
 
                 if (current['view'])

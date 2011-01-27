@@ -544,6 +544,17 @@ h2 > .collapsed-indicator
     line-height: 1em !important;
 }
 
+.action-list > li.disabled > a
+{
+    opacity: 0.3;
+}
+
+.action-list li.disabled > a,
+.action-list li.disabled > a > span
+{
+    cursor: default !important;
+}
+
 .action-list > li > a > label
 {
     display: block;
