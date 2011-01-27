@@ -58,7 +58,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         disable: function() {
             this.containerEl.addClass('field-disabled');
-            this.clearValue(true);
         },
         isDisabled: function() {
             return this.containerEl.hasClass('field-disabled');
@@ -196,6 +195,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.fireEvent('change', this.currentValue, this);
         },
         isDirty: function() {
+            if (this.isDisabled()) return true;
+
             if (this.originalValue && this.currentValue)
             {
                 if (this.originalValue.key != this.currentValue.key)
