@@ -417,7 +417,7 @@ ReUI = {};
 
     var config = window['reConfig'] || {};
     
-    D.apply(ReUI, config, {
+    D.apply(ReUI, {
         autoInit: true,
         legacyMode: true,
         useCompatibleFx: !isWebKit,
@@ -659,7 +659,7 @@ ReUI = {};
                 }
             }
         }                    
-    });
+    }, config);
 
     D.bind(window, 'load', function(evt) {
         if (R.autoInit)
