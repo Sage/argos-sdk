@@ -132,12 +132,15 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             return /^sdata\.cache/i.test(k);
         };
 
-        /* todo: find a better way to detect */
-        for (var i = window.localStorage.length - 1; i >= 0 ; i--)
+        if (window.localStorage)
         {
-            var key = window.localStorage.key(i);
-            if (check(key))
-                window.localStorage.removeItem(key);
+            /* todo: find a better way to detect */
+            for (var i = window.localStorage.length - 1; i >= 0 ; i--)
+            {
+                var key = window.localStorage.key(i);
+                if (check(key))
+                    window.localStorage.removeItem(key);
+            }
         }
     },
     _createCacheKey: function(request) {
@@ -146,42 +149,48 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     _loadSDataRequest: function(request, o) {
         /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />
         // todo: find a better way of indicating that a request can prefer cache
-        if (this.isOnline() && (request.allowCacheUse !== true)) return;
-
-        var key = this.createCacheKey(request);
-        var feed = window.localStorage.getItem(key);
-        if (feed)
+        if (window.localStorage)
         {
-            o.result = Ext.decode(feed);
+            if (this.isOnline() && (request.allowCacheUse !== true)) return;
+
+            var key = this._createCacheKey(request);
+            var feed = window.localStorage.getItem(key);
+            if (feed)
+            {
+                o.result = Ext.decode(feed);
+            }
         }
     },
     _cacheSDataRequest: function(request, o, feed) {
         /* todo: decide how to handle PUT/POST/DELETE */
-        if (/get/i.test(o.method) && typeof feed === 'object')
+        if (window.localStorage)
         {
-            var key = this.createCacheKey(request);
+            if (/get/i.test(o.method) && typeof feed === 'object')
+            {
+                var key = this._createCacheKey(request);
 
-            window.localStorage.removeItem(key);
-            window.localStorage.setItem(key, Ext.encode(feed));
+                window.localStorage.removeItem(key);
+                window.localStorage.setItem(key, Ext.encode(feed));
+            }
         }
     },
     registerService: function(name, service, options) {
         options = options || {};
 
-        service = service instanceof Sage.SData.Client.SDataService
+        var instance = service instanceof Sage.SData.Client.SDataService
             ? service
             : new Sage.SData.Client.SDataService(service);
       
-        this.services[name] = service;
+        this.services[name] = instance;
         
         if (this.enableCaching && (options.offline || service.offline))
         {
-            service.on('beforerequest', this._loadSDataRequest, this);
-            service.on('requestcomplete', this._cacheSDataRequest, this);
+            instance.on('beforerequest', this._loadSDataRequest, this);
+            instance.on('requestcomplete', this._cacheSDataRequest, this);
         }        
 
-        if ((options.isDefault || service.isDefault) || !this.defaultService)
-            this.defaultService = service;        
+        if ((options.isDefault || instance.isDefault) || !this.defaultService)
+            this.defaultService = instance;
 
         return this;
     },  
