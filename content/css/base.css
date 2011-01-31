@@ -534,6 +534,17 @@ h2 > .collapsed-indicator
     display: none;
 }
 
+.action-list > li.disabled > a
+{
+    opacity: 0.3;
+}
+
+.action-list li.disabled > a,
+.action-list li.disabled > a > span
+{
+    cursor: default !important;
+}
+
 .action-list > ul > li > a
 {
     text-overflow: ellipsis;
