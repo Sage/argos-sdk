@@ -70,15 +70,15 @@ Ext.namespace('Sage.Platform.Mobile');
             '<div class="row {%= $.cls %}">',
             '<label>{%: $.label %}</label>',
             '<span>',
-            '<a data-action="{%= $.action %}">',
+            '<a data-action="{%= $.action %}" {% if ($.disabled) { %}data-disable-action="true"{% } %} class="{% if ($.disabled) { %}disabled{% } %}">',
             '{%= $.value %}',
             '</a>',
             '</span>',
             '</div>'
         ]),
         actionTemplate: new Simplate([
-            '<li class="{%= $.cls %} {% if ($.disabled) { %} disabled {% } else { %} {% } %}">',
-            '<a data-action="{%= $.action %}">',
+            '<li class="{%= $.cls %}">',
+            '<a data-action="{%= $.action %}" {% if ($.disabled) { %}data-disable-action="true"{% } %} class="{% if ($.disabled) { %}disabled{% } %}">',
             '{% if ($.icon) { %}',
             '<img src="{%= $.icon %}" alt="icon" class="icon" />',
             '{% } %}',
@@ -114,6 +114,12 @@ Ext.namespace('Sage.Platform.Mobile');
             Sage.Platform.Mobile.Detail.superclass.initEvents.call(this);
 
             App.on('refresh', this._onRefresh, this);
+        },
+        invokeAction: function(name, parameters, evt, el) {
+            if (parameters && /true/i.test(parameters['disableAction']))
+                return;
+
+            return Sage.Platform.Mobile.Detail.superclass.invokeAction.apply(this, arguments);
         },
         _onRefresh: function(o) {
             if (this.options && this.options.key === o.key)
@@ -267,26 +273,17 @@ Ext.namespace('Sage.Platform.Mobile');
                     value: formatted,
                     raw: value
                 };
-
-                if (typeof current['disabled'] !== 'undefined')
-                {
-                    if (typeof current['disabled'] === 'function')
-                        options['disabled'] = this.expandExpression(current['disabled'], value) === false ? false : true;
-                    else if (current['disabled'] && current['disabled'].fn && typeof current['disabled'].fn === 'function')
-                        options['disabled'] = this.expandExpression(current['disabled'].fn, value) === false ? false : true;
-                    else
-                        options['disabled'] = current['disabled'];
-
-                    options['disabled'] = options['disabled'] !== true ? false : true;
-                }
-
+              
                 if (current['descriptor'])
                     options['descriptor'] = typeof current['descriptor'] === 'function'
-                        ? this.expandExpression(current['descriptor'], entry)
+                        ? this.expandExpression(current['descriptor'], entry, value)
                         : provider(entry, current['descriptor']);
 
-                if (current['action'] && !options['disabled'])
-                    options['action'] = this.expandExpression(current['action'], entry);
+                if (current['action'])
+                    options['action'] = this.expandExpression(current['action'], entry, value);
+
+                if (current['disabled'])
+                    options['disabled'] = this.expandExpression(current['disabled'], entry, value);
 
                 if (current['view'])
                 {

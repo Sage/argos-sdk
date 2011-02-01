@@ -534,15 +534,9 @@ h2 > .collapsed-indicator
     display: none;
 }
 
-.action-list > li.disabled > a
+.action-list > li > a.disabled
 {
     opacity: 0.3;
-}
-
-.action-list li.disabled > a,
-.action-list li.disabled > a > span
-{
-    cursor: default !important;
 }
 
 .action-list > ul > li > a
@@ -553,10 +547,12 @@ h2 > .collapsed-indicator
 .action-list > li
 {
     line-height: 1em !important;
+    cursor: pointer !important;
 }
 
 .action-list > li > a > label
 {
+    cursor: pointer !important;
     display: block;
     line-height: inherit;    
     padding: 0;
