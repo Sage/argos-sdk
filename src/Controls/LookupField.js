@@ -195,8 +195,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.fireEvent('change', this.currentValue, this);
         },
         isDirty: function() {
-            if (this.isDisabled()) return true;
-
             if (this.originalValue && this.currentValue)
             {
                 if (this.originalValue.key != this.currentValue.key)
@@ -234,8 +232,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return this.currentSelection;
         },
         getValue: function() {
-            if (this.isDisabled()) return false;
-
             var value = null,
                 text = this.getText() || '',
                 // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false

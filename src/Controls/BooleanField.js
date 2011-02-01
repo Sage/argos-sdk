@@ -27,7 +27,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         ]),        
         onText: 'ON',
         offText: 'OFF',
-        disabledValue: false,
         init: function() {
             Sage.Platform.Mobile.Controls.BooleanField.superclass.init.apply(this, arguments);
 
@@ -38,13 +37,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         disable: function() {
             this.containerEl.addClass('field-disabled');
-            this.clearValue(true);
         },
         isDisabled: function() {
             return this.containerEl.hasClass('field-disabled');
         },
         onClick: function(evt, el, o) {
-            if (this.isDisabled()) return; 
+            if (this.isDisabled()) return;
 
             var toggledValue = this.el.getAttribute('toggled') !== 'true';
 
@@ -53,8 +51,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.fireEvent('change', toggledValue, this);
         },
         getValue: function() {
-            if (this.isDisabled()) return this.disabledValue;
-
             return this.el.getAttribute('toggled') === 'true';
         },
         setValue: function(val, initial) {
