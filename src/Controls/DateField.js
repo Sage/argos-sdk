@@ -89,7 +89,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         validate: function() {
             if (this.el.dom.value !== '' && !this.currentValue)
-                return String.format(this.invalidDateFormatError, this.name);
+                return String.format(this.invalidDateFormatError, this.label);
 
             return Sage.Platform.Mobile.Controls.DateField.superclass.validate.apply(this, arguments);
         }
