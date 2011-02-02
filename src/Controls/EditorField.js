@@ -49,7 +49,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 },
                 entry: this.originalValue,
                 changes: this.currentValue,
-                entityName: this.owner && this.owner.entityName
+                entityName: this.entityName || (this.owner && this.owner.entityName)
             };
         },
         navigateToEditView: function() {
