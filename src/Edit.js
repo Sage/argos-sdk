@@ -575,9 +575,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                             App.fireEvent('refresh', {
                                 resourceKind: this.resourceKind,
                                 key: modified['$key'],
-                                data: {
-                                    '$descriptor': modified['$descriptor']
-                                }
+                                data: modified
                             });
 
                             this.updateCompleted(modified);

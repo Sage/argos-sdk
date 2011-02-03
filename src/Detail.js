@@ -126,8 +126,12 @@ Ext.namespace('Sage.Platform.Mobile');
             {
                 this.refreshRequired = true;
 
-                if (o.data && o.data['$descriptor'])
-                    this.setTitle(o.data['$descriptor']);
+                var descriptor = o.data && o.data['$descriptor'];
+                if (descriptor)
+                {
+                    this.options.title = descriptor;
+                    this.setTitle(descriptor);
+                }
             }
         },
         formatRelatedQuery: function(entry, fmt, property) {
@@ -463,7 +467,9 @@ Ext.namespace('Sage.Platform.Mobile');
                 return Sage.Platform.Mobile.Detail.superclass.refreshRequiredFor.call(this, options);
         },
         activate: function(tag, data) {
-            if (data && data.options && data.options.descriptor) this.setTitle(data.options.descriptor);
+            var options = data && data.options;
+            if (options && options.descriptor)
+                options.title = options.title || options.descriptor;
 
             Sage.Platform.Mobile.Detail.superclass.activate.apply(this, arguments);
         },
