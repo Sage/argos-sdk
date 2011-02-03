@@ -43,6 +43,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             test: /^(\d{11,})(.*)$/,
             format: '{1}'
         }],
+        onBlur: function() {
+            Sage.Platform.Mobile.Controls.PhoneField.superclass.onBlur.apply(this, arguments);
+
+            // temporarily added: http://code.google.com/p/android/issues/detail?id=14519
+            this.el.dom.value = this.formatNumberForDisplay(this.el.dom.value, this.getValue());
+        },
         getValue: function() {
             var value = this.el.getValue();
 
@@ -73,8 +79,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return number;
         },               
         onKeyUp: function(evt, el, o) {
+            /*
+            // temporarily removed: http://code.google.com/p/android/issues/detail?id=14519
             this.el.dom.value = this.formatNumberForDisplay(this.el.dom.value, this.getValue());
-
+            */
             Sage.Platform.Mobile.Controls.PhoneField.superclass.onKeyUp.apply(this, arguments);
         }
     });
