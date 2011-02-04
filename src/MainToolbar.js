@@ -34,6 +34,8 @@ Ext.namespace("Sage.Platform.Mobile");
             '{% } %}',
             '</button>'
         ]),
+        size: 0,
+
         titleText: 'Mobile',
         
         setTitle: function(title) {
@@ -47,12 +49,21 @@ Ext.namespace("Sage.Platform.Mobile");
         showTools: function(tools) {
             Sage.Platform.Mobile.MainToolbar.superclass.showTools.apply(this, arguments);
 
+            this.el.removeClass('toolbar-size-' + this.size);
+            
             if (tools)
             {
+                var count = {left: 0, right: 0};
+
                 for (var i = 0; i < tools.length; i++)
                 {
+                    count[tools[i].side || 'right'] += 1;
+
                     Ext.DomHelper.append(this.el, this.toolTemplate.apply(tools[i]));
                 }
+
+                this.size = Math.max(count.left, count.right);
+                this.el.addClass('toolbar-size-' + this.size);
             }
         }
     });

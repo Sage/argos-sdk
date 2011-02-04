@@ -129,9 +129,21 @@ body > [selected="true"]
     color: #FFFFFF;
 
     position: absolute;
+    left: 0px;
+    right: 0px;
+    z-index: 0;
+}
+
+.toolbar-size-1 > h1
+{
+    left: 50px;
+    right: 50px;
+}
+
+.toolbar-size-2 > h1
+{
     left: 100px;
     right: 100px;
-    z-index: 0;
 }
 
 .toolButton
