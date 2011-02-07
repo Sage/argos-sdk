@@ -379,6 +379,8 @@ input.field-error
 .row-edit[data-field-type="note"] > textarea
 {
     padding: 8px 34px 8px 110px !important;
+    height: 5em;
+    overflow: hidden;
 }
 
 /* TODO: Move color specifics to theme folder */
