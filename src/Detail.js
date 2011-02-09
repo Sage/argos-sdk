@@ -50,7 +50,7 @@ Ext.namespace('Sage.Platform.Mobile');
             '<div class="row {%= $.cls %}">',
             '<label>{%: $.label %}</label>',
             '<span>',
-            '<a data-action="activateRelatedEntry" data-view="{%= $.view %}" data-context="{%: $.context %}" data-descriptor="{%: $.descriptor %}" href="#">',
+            '<a data-action="activateRelatedEntry" data-view="{%= $.view %}" data-context="{%: $.context %}" data-descriptor="{%: $.descriptor %}">',
             '{%= $.value %}',
             '</a>',
             '</span>',
