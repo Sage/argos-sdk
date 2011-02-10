@@ -68,12 +68,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.navigateToEditView();
         },
         getValuesFromView: function() {
-            var view = App.getActiveView();
-            if (view)
+            var view = App.getActiveView(),
+                values = view && view.getValues();
+
+            if (view && values)
             {
                 // todo: is this the appropriate way to handle this?  do not want $key, $name, etc., when applying values.
                 // difference is primarily "as component" vs. "as child".
-                this.currentValue = this.applyTo ? view.getValues() : view.createEntry();
+                this.currentValue = this.applyTo ? values : view.createEntry();
                 this.validationValue = view.getValues(true); // store all editor values for validation, not only dirty values
             }
         },
