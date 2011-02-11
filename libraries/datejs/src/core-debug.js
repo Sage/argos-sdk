@@ -602,9 +602,9 @@ Date.prototype.toString = function (format) {
     function (format) {
         switch (format) {
         case "hh":
-            return p(self.getHours() < 13 ? self.getHours() : (self.getHours() - 12));
+            return p(self.getHours() < 13 ? (self.getHours() == 0 ? 12 : self.getHours()) : (self.getHours() - 12));
         case "h":
-            return self.getHours() < 13 ? self.getHours() : (self.getHours() - 12);
+            return self.getHours() < 13 ? (self.getHours() == 0 ? 12 : self.getHours()) : (self.getHours() - 12);
         case "HH":
             return p(self.getHours());
         case "H":
