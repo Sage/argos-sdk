@@ -121,7 +121,7 @@
 		dest: 'content/datejs',
 		filters: ".*\\.js"
 	},{
-		src: '../content/',
+		src: '../content',
 		dest: 'content',
 		filters: ".*(\\.css|\\.jpg|\\.png|\\.gif)"
 	}]
