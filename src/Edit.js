@@ -134,6 +134,19 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (el)
                 el.toggleClass('collapsed');
         },
+        expandExpression: function(expression) {
+            /// <summary>
+            ///     Expands the passed expression if it is a function.
+            /// </summary>
+            /// <param name="expression" type="String">
+            ///     1: function - Called on this object and must return a string.
+            ///     2: string - Returned directly.
+            /// </param>
+            if (typeof expression === 'function')
+                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
+            else
+                return expression;
+        },
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
 
