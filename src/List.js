@@ -107,7 +107,16 @@ Ext.namespace('Sage.Platform.Mobile');
         }
     });
 
+    /**
+     * A base list view.
+     * @constructor
+     * @extends Sage.Platform.Mobile.View
+     * @param {Object} options The options for the view
+     */
     Sage.Platform.Mobile.List = Ext.extend(Sage.Platform.Mobile.View, {
+        /**
+         * A set of selectors to automatically map properties to child elements.
+         */
         attachmentPoints: {
             contentEl: '.list-content',
             searchEl: '.list-search',
@@ -116,6 +125,10 @@ Ext.namespace('Sage.Platform.Mobile');
             moreEl: '.list-more',
             remainingEl: '.list-more .list-remaining span'
         },
+        /**
+         * The template used to render the view's main DOM element when the view is initialized.
+         * This template includes {@link #searchTemplate} and {@link #moreTemplate}.
+         */
         viewTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
             '{%! $.searchTemplate %}',
@@ -124,9 +137,32 @@ Ext.namespace('Sage.Platform.Mobile');
             '{%! $.moreTemplate %}',
             '</div>'
         ]),
+        /**
+         * The template used to render the loading message when the view is requesting more data.
+         *
+         * The default template uses the following properties:
+         *
+         *      name                description
+         *      ----------------------------------------------------------------
+         *      loadingText         The text to display while loading.
+         */
         loadingTemplate: new Simplate([
             '<li class="list-loading-indicator"><div>{%= $.loadingText %}</div></li>'
         ]),
+        /**
+         * The template used to render the pager at the bottom of the view.  This template is not directly rendered, but is
+         * included in {@link #viewTemplate}.
+         *
+         * The default template uses the following properties:
+         *
+         *      name                description
+         *      ----------------------------------------------------------------
+         *      moreText            The text to display on the more button.
+         *
+         * The default template exposes the following actions:
+         *
+         * * more
+         */
         moreTemplate: new Simplate([
             '<div class="list-more">',
             '<div class="list-remaining"><span></span></div>',
@@ -135,6 +171,21 @@ Ext.namespace('Sage.Platform.Mobile');
             '</button>',
             '</div>'
         ]),
+        /**
+         * The template used to render the search bar at the top of the view.  This template is not directly rendered, but is
+         * included in {@link #searchTemplate}
+         *
+         * The default template uses the following properties:
+         *
+         *      name                description
+         *      ----------------------------------------------------------------
+         *      searchText          The text to display in the search box.
+         *
+         * The default template invokes the following actions:
+         *
+         * * search
+         * * clearSearchQuery
+         */
         searchTemplate: new Simplate([
             '<div class="list-search">',
             '<input type="text" name="query" class="query" />',
@@ -143,47 +194,175 @@ Ext.namespace('Sage.Platform.Mobile');
             '<label>{%= $.searchText %}</label>',
             '</div>'
         ]),
+        /**
+         * The template used to render a row in the view.  This template includes {@link #contentTemplate}.
+         */
         itemTemplate: new Simplate([
             '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
             '<div data-action="selectEntry" class="list-item-selector"></div>',
             '{%! $$.contentTemplate %}',
             '</li>'
         ]),
+        /**
+         * The template used to render the content of a row.  This template is not directly rendered, but is
+         * included in {@link #itemTemplate}.
+         *
+         * This property should be overridden in the derived class.
+         */
         contentTemplate: new Simplate([
             '<h3>{%: $.$descriptor %}</h3>',
             '<h4>{%: $.$key %}</h4>'
         ]),
+        /**
+         * The template used to render a message if there is no data available.
+         * The default template uses the following properties:
+         *
+         *      name                description
+         *      ----------------------------------------------------------------
+         *      noDataText          The text to display if there is no data.
+         */
         noDataTemplate: new Simplate([
             '<li class="no-data">',
             '<h3>{%= $.noDataText %}</h3>',
             '</li>'
         ]),
+        /**
+         * @cfg {String} id
+         * The id for the view, and it's main DOM element.
+         */
         id: 'generic_list',
+        /**
+         * @cfg {String} resourceKind
+         * The SData resource kind the view is responsible for.  This will be used as the default resource kind
+         * for all SData requests.
+         * @type {String}
+         */
         resourceKind: '',
+        /**
+         * A list of fields to be selected in an SData request.
+         * @type {Array.<String>}
+         */
         querySelect: null,
+        /**
+         * A list of child properties to be included in an SData request.
+         * @type {Array.<String>}
+         */
         queryInclude: null,
+        /**
+         * The order by expression for an SData request.
+         * @type {String}
+         */
         queryOrderBy: null,
+        /**
+         * The default resource property for an SData request.
+         * @type {String}
+         */
         resourceProperty: null,
+        /**
+         * The page size (defaults to 20).
+         * @type {Number}
+         */
         pageSize: 20,
+        /**
+         * True to hide the search bar (defaults to false).
+         * @type {Boolean}
+         */
         hideSearch: false,
+        /**
+         * True to allow selection in the view (defaults to false).
+         * @type {Boolean}
+         */
         allowSelection: false,
+        /**
+         * True to clear the selection when the view is shown (defaults to true).
+         * @type {Boolean}
+         */
         autoClearSelection: true,
+        /**
+         * The id of the detail view to show when a row is clicked.
+         * @type {?String}
+         */
         detailView: false,
+        /**
+         * The view to show, either an id or an instance, if there is no {@link #insertView} specified, when
+         * the {@link #navigateToInsertView} action is invoked.
+         * @type {?(String|Sage.Platform.Mobile.View)}
+         */
         editView: false,
+        /**
+         * The view to show, either an id or an instance, when the {@link #navigateToInsertView} action is invoked.
+         * @type {?(String|Sage.Platform.Mobile.View)}
+         */
         insertView: false,
+        /**
+         * The view to show, either an id or an instance, when the {@link #navigateToContextView} action is invoked.
+         * @type {?(String|Sage.Platform.Mobile.View)}
+         */
         contextView: false,
+        /**
+         * A dictionary of hash tag search queries.  The key is the hash tag, without the symbol, and the value is
+         * either a query string, or a function that returns a query string.
+         * @type {?Object}
+         */
         hashTagQueries: null,
+        /**
+         * The regular expression used to determine if a search query is a custom search expression.  A custom search
+         * expression is not processed, and directly passed to SData.
+         * @type {Object}
+         */
         customSearchRE: /^#!/,
+        /**
+         * The regular expression used to determine if a search query is a hash tag search.
+         * @type {Object}
+         */
         hashTagSearchRE: /^(?:#|;|,|\.)(\w+)/,
+        /**
+         * The text displayed in the more button.
+         * @type {String}
+         */
         moreText: 'Retrieve More Records',
+        /**
+         * The text displayed as the default title.
+         * @type {String}
+         */
         titleText: 'List',
+        /**
+         * The format string for the text displayed for the remaining record count.  This is used in a {@link String#format} call.
+         * @type {String}
+         */
         remainingText: '{0} records remaining',
+        /**
+         * The text displayed as the watermark in the search text box.
+         * @type {String}
+         */
         searchText: 'Search',
+        /**
+         * The text displayed on the cancel button.
+         * @type {String}
+         * @deprecated
+         */
         cancelText: 'Cancel',
+        /**
+         * The text displayed on the insert button.
+         * @type {String}
+         * @deprecated
+         */
         insertText: 'New',
+        /**
+         * The text displayed when no records are available.
+         * @type {String}
+         */
         noDataText: 'no records',
+        /**
+         * The text displayed when data is being requested.
+         * @type {String}
+         */
         loadingText: 'loading...',
-        requestErrorText: 'A server error occured while requesting data.',
+        /**
+         * The text displayed when a data request fails.
+         * @type {String}
+         */
+        requestErrorText: 'A server error occurred while requesting data.',
         init: function() {
             Sage.Platform.Mobile.List.superclass.init.call(this);
 
