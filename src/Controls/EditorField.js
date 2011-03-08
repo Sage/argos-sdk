@@ -32,6 +32,17 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             Sage.Platform.Mobile.Controls.EditorField.superclass.init.apply(this, arguments);
 
             this.containerEl.on('click', this.onClick, this, {stopEvent: true});
+        },
+        enable: function() {
+            this.containerEl.removeClass('field-disabled');
+            this.el.dom.disabled = false;
+        },
+        disable: function() {
+            this.containerEl.addClass('field-disabled');
+            this.el.dom.disabled = true;
+        },
+        isDisabled: function() {
+            return this.containerEl.hasClass('field-disabled');
         },        
         createNavigationOptions: function() {
             return {
