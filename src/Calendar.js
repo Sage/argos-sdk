@@ -37,9 +37,9 @@
         calendarStartTemplate: '<table class="calendar-table">',
         calendarMonthHeaderTemplate: new Simplate([
             '<tr class="calendar-month-header">',
-            '<th class="calendar-prev-month"><a href="#" data-action="goToPreviousMonth"><span>&lt;&lt;</span></a></th>',
+            '<th class="calendar-prev-month"><button class="button toolButton" data-action="goToPreviousMonth"><span>&lt;&lt;</span></button></th>',
             '<th class="calendar-month-name" colspan="5">{%= $.monthName %} &nbsp; {%=$.year %}</th>',
-            '<th class="calendar-next-month"><a href="#" data-action="goToNextMonth"><span>&gt;&gt;</span></a></th>',
+            '<th class="calendar-next-month"><button class="button toolButton" data-action="goToNextMonth"><span>&gt;&gt;</span></button></th>',
             '</tr>'
         ]),
         titleText: 'Calendar',
@@ -149,7 +149,6 @@
         selectDay: function(options, evt, el) {
             if (this.selectedDateEl) this.selectedDateEl.removeClass('selected');
             this.selectedDateEl = Ext.get(el).addClass('selected');
-
             this.date = new Date(this.year, this.month, options.date);
         },
         getDateTime: function() {
@@ -169,7 +168,7 @@
                 today = new Date(),
                 day = 1, calHTML = [], dayClass = '', selectedClass = '',
                 weekendClass = '', i = 0, j = 0, selectedEl = false,
-                isCurrentMonth = this.date.between((new Date(yyyy, mm, 1)), (new Date(yyyy, mm, monthLength)));
+                isCurrentMonth =  this.year === Date.today().getFullYear() && this.month === Date.today().getMonth();
 
             this.monthName = this.monthLabels[this.month];
             
