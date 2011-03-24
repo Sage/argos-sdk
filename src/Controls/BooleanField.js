@@ -33,9 +33,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.el.on('click', this.onClick, this, {stopEvent: true});
         },
         enable: function() {
+            Sage.Platform.Mobile.Controls.BooleanField.superclass.enable.apply(this, arguments);
+
             this.containerEl.removeClass('field-disabled');
         },
         disable: function() {
+            Sage.Platform.Mobile.Controls.BooleanField.superclass.disable.apply(this, arguments);
+
             this.containerEl.addClass('field-disabled');
         },
         isDisabled: function() {

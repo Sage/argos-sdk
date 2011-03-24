@@ -35,11 +35,16 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
         applyTo: false,
         alwaysUseValue: false,
         disabled: false,
+        hidden: false,
         constructor: function(o) {
             Ext.apply(this, o);
 
             this.addEvents(
-                'change'    
+                'change',
+                'show',
+                'hide',
+                'enable',
+                'disable'
             );
 
             Sage.Platform.Mobile.Controls.Field.superclass.constructor.apply(this, arguments);
@@ -62,11 +67,22 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
             return true;
         },
         enable: function() {
+            this.fireEvent('enable', this);
         },
         disable: function() {
+            this.fireEvent('disable', this);
         },
         isDisabled: function() {
             return this.disabled;
+        },
+        show: function() {
+            this.fireEvent('show', this);
+        },
+        hide: function() {
+            this.fireEvent('hide', this);
+        },
+        isHidden: function() {
+            return this.hidden;
         },
         getValue: function() {
         },

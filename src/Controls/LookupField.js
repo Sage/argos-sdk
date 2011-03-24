@@ -54,9 +54,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         enable: function() {
+            Sage.Platform.Mobile.Controls.LookupField.superclass.enable.apply(this, arguments);
+
             this.containerEl.removeClass('field-disabled');
         },
         disable: function() {
+            Sage.Platform.Mobile.Controls.LookupField.superclass.disable.apply(this, arguments);
+
             this.containerEl.addClass('field-disabled');
         },
         isDisabled: function() {
