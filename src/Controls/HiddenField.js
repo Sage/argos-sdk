@@ -22,7 +22,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             '</div>'
         ]),
         template: new Simplate([
-            '<input type="hidden" class="field-text">'
+            '<input type="hidden">'
         ]),
         bind: function() {
             // call field's bind. we don't want event handlers for this.

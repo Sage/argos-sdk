@@ -36,18 +36,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         enable: function() {
             Sage.Platform.Mobile.Controls.EditorField.superclass.enable.apply(this, arguments);
 
-            this.containerEl.removeClass('field-disabled');
             this.el.dom.disabled = false;
         },
         disable: function() {
             Sage.Platform.Mobile.Controls.EditorField.superclass.disable.apply(this, arguments);
-            
-            this.containerEl.addClass('field-disabled');
+
             this.el.dom.disabled = true;
-        },
-        isDisabled: function() {
-            return this.containerEl.hasClass('field-disabled');
-        },        
+        },      
         createNavigationOptions: function() {
             return {
                 tools: {

@@ -25,11 +25,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '{% if ($.multiline) { %}',
-                '<textarea name="{%= $.name %}" class="field-text" ',
-                    'rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />',
+            '<textarea name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />',
             '{% } else { %}',
-                '<input type="{%: $.mask ? "password" : "text" %}" name="{%= $.name %}" class="field-text" ',
-                    '{% if ($.readonly) { %} readonly {% } %}>',
+            '<input type="{%: $.mask ? "password" : "text" %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
             '{% } %}'
         ]),        
         init: function() {
@@ -72,9 +70,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         onValidationTrigger: function(evt, el, o) {
             if (this.validate())
-                this.el.addClass('field-error');
+                this.containerEl.addClass('row-error');
             else
-                this.el.removeClass('field-error');
+                this.containerEl.removeClass('row-error');
         },
         getValue: function() {
             return this.el.getValue();

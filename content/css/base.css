@@ -318,33 +318,21 @@
 }
 
 /* edit/insert */
-input.field-error
-{
-    color: #f00;
-}
-
 .row > input:not([type|=radio]):not([type|=checkbox])
 {
     height: auto;
     padding: 10px 10px 0 110px;
 }
 
-.row-edit > div.field-lookup > a,
-.row-edit > div.field-address > a
-{
-    padding: 10px 10px 0px 110px;
-    display: block;
-}
-
-.row-edit > div.field-lookup.readonly > a {
-    color: #000;
-    text-decoration: none;
-}
-
 /* fields */
-.row-edit.field-disabled > button,
-.row-edit.field-disabled > input,
-.row-edit.field-disabled > .field-boolean
+.row-hidden
+{
+    display: none;
+}
+
+.row-disabled > button,
+.row-disabled > input,
+.row-disabled > .toggle
 {
     opacity: 0.3;
     cursor: default;

@@ -67,18 +67,22 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
             return true;
         },
         enable: function() {
+            this.disabled = false;
             this.fireEvent('enable', this);
         },
         disable: function() {
+            this.disabled = true;
             this.fireEvent('disable', this);
         },
         isDisabled: function() {
             return this.disabled;
         },
         show: function() {
+            this.hidden = false;
             this.fireEvent('show', this);
         },
         hide: function() {
+            this.hidden = true;
             this.fireEvent('hide', this);
         },
         isHidden: function() {
