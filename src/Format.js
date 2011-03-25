@@ -79,6 +79,10 @@ Sage.Platform.Mobile.Format = (function() {
 
             return v;
         },
+        percent: function(val) {
+        		var intVal = Math.floor(100 * (parseFloat(val) || 0));
+        		return intVal + "%";
+        },
         yesNo: function(val) {
             if (typeof val === 'string') val = /^true$/i.test(val);
 
