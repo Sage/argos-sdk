@@ -482,10 +482,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             for (var name in this.fields)
             {
-                var result;
-                if (false !== (result = this.fields[name].validate()))
+                var field = this.fields[name],
+                    result;
+
+                if (!field.isHidden() && false !== (result = field.validate()))
                 {
-                    this.fields[name].containerEl.addClass('row-error');
+                    field.containerEl.addClass('row-error');
 
                     this.errors.push({
                         name: name,
@@ -494,7 +496,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }
                 else
                 {
-                    this.fields[name].containerEl.removeClass('row-error');
+                    field.containerEl.removeClass('row-error');
                 }
             }
 

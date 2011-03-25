@@ -347,6 +347,21 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
 
         return false;
     },
+    isNavigationFromResourceKind: function(kind, predicate, scope) {
+        var lookup = {};
+        Ext.each(kind, function(item) { this[item] = true;  }, lookup);
+        return this.queryNavigationContext(function(o) {
+            var context = (o.options && o.options.source) || o,
+                resourceKind = context && context.resourceKind;
+
+            // if a predicate is defined, both resourceKind AND predicate must match.
+            if (lookup[resourceKind])
+                if (predicate)
+                    if (predicate.call(scope || this, o, context)) return o;
+                else
+                    return o;
+        });
+    },
     registerCustomization: function(set, id, spec) {
         var key = id || set,
             container = id ? this.customizationsForId : this.customizationsForSet,            
