@@ -226,14 +226,14 @@ textarea:focus
 .panel-content > ul > li,
 .panel-validation-summary > ul > li
 {
-    border-bottom: solid 1px #ddd;
+    border-top: solid 1px #ddd;
     cursor: pointer;
 }
 
-.panel-content > ul > li:last-child,
-.panel-validation-summary > ul > li:last-child
+.panel-content > ul > li:first-child,
+.panel-validation-summary > ul > li:first-child
 {
-    border-bottom: none 0 black;
+    border-top: none 0 black;
 }
 
 .panel-content > ul a,
@@ -247,12 +247,12 @@ textarea:focus
 {
     padding: .25em;
     min-height: 1.5em;
-    border-bottom: solid 1px #ddd;
+    border-top: solid 1px #ddd;
 }
 
-.panel-content > fieldset > .row:last-child
+.panel-content > fieldset > .row:first-child
 {
-    border-bottom: none 0px black;
+    border-top: none 0px black;
 }
 
 .panel-content > fieldset > .row > label
@@ -277,12 +277,12 @@ textarea:focus
 
 .panel-content > fieldset > .row-edit
 {
-    border-bottom: solid 1px #ddd;
+    border-top: solid 1px #ddd;
 }
 
-.panel-content > fieldset > .row-edit:last-child
+.panel-content > fieldset > .row-edit:first-child
 {
-    border-bottom: none 0 black;
+    border-top: none 0 black;
 }
 
 .button
