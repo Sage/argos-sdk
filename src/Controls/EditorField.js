@@ -34,16 +34,15 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.containerEl.on('click', this.onClick, this, {stopEvent: true});
         },
         enable: function() {
-            this.containerEl.removeClass('field-disabled');
+            Sage.Platform.Mobile.Controls.EditorField.superclass.enable.apply(this, arguments);
+
             this.el.dom.disabled = false;
         },
         disable: function() {
-            this.containerEl.addClass('field-disabled');
+            Sage.Platform.Mobile.Controls.EditorField.superclass.disable.apply(this, arguments);
+
             this.el.dom.disabled = true;
-        },
-        isDisabled: function() {
-            return this.containerEl.hasClass('field-disabled');
-        },        
+        },      
         createNavigationOptions: function() {
             return {
                 tools: {

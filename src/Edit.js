@@ -110,7 +110,19 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 fn: ReUI.back,
                 scope: ReUI
             }];
-        },        
+        },
+        _onShowField: function(field) {
+            field.containerEl.removeClass('row-hidden');
+        },
+        _onHideField: function(field) {
+            field.containerEl.addClass('row-hidden');
+        },
+        _onEnableField: function(field) {
+            field.containerEl.removeClass('row-disabled');
+        },
+        _onDisableField: function(field) {
+            field.containerEl.addClass('row-disabled');
+        },
         invokeAction: function(name, parameters, evt, el) {
             var fieldEl = el.findParent('[data-field]', this.el, true),
                 field = this.fields[fieldEl && fieldEl.getAttribute('data-field')];
@@ -215,6 +227,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                         owner: this
                     }, current)),
                     template = field.propertyTemplate || this.propertyTemplate;
+
+                field.on({
+                    'scope': this,
+                    'show': this._onShowField,
+                    'hide': this._onHideField,
+                    'enable': this._onEnableField,
+                    'disable': this._onDisableField
+                });
 
                 content.push(template.apply(field, this));
             }
@@ -462,10 +482,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             for (var name in this.fields)
             {
-                var result;
-                if (false !== (result = this.fields[name].validate()))
+                var field = this.fields[name],
+                    result;
+
+                if (!field.isHidden() && false !== (result = field.validate()))
                 {
-                    this.fields[name].el.addClass('panel-field-error');
+                    field.containerEl.addClass('row-error');
 
                     this.errors.push({
                         name: name,
@@ -474,7 +496,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }
                 else
                 {
-                    this.fields[name].el.removeClass('panel-field-error');
+                    field.containerEl.removeClass('row-error');
                 }
             }
 

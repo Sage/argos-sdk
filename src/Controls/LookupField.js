@@ -43,7 +43,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (this.isReadOnly())
             {
-                this.containerEl.addClass('field-disabled');
+                this.disable();
                 this.el.dom.readOnly = true;
             }
             else if (!this.requireSelection)
@@ -52,15 +52,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     .on('keyup', this.onKeyUp, this)
                     .on('blur', this.onBlur, this);
             }
-        },
-        enable: function() {
-            this.containerEl.removeClass('field-disabled');
-        },
-        disable: function() {
-            this.containerEl.addClass('field-disabled');
-        },
-        isDisabled: function() {
-            return this.containerEl.hasClass('field-disabled');
         },
         isReadOnly: function() {
             return !this.view;

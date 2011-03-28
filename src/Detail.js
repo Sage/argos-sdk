@@ -224,6 +224,11 @@ Ext.namespace('Sage.Platform.Mobile');
             for (var i = 0; i < layout.length; i++)
             {
                 var current = layout[i];
+                var include = this.expandExpression(current['include'], entry),
+                    exclude = this.expandExpression(current['exclude'], entry);
+
+                if (include !== undefined && !include) continue;
+                if (exclude !== undefined && exclude) continue;
 
                 if (current['as'])
                 {

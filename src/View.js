@@ -30,6 +30,15 @@ Ext.namespace('Sage.Platform.Mobile');
                 tools: {}
             });
 
+            this.addEvents(
+                'beforetransitionaway',
+                'beforetransitionto',
+                'transitionaway',
+                'transitionto',
+                'activate',
+                'show'
+            );
+
             Sage.Platform.Mobile.View.superclass.constructor.apply(this, arguments);
         },
         render: function() {
@@ -138,11 +147,15 @@ Ext.namespace('Sage.Platform.Mobile');
             this.options = data.options || this.options || {};
 
             if (this.options.title) this.setTitle(this.options.title);
+
+            this.fireEvent('activate', this);
         },
         show: function(options, transitionOptions) {
             /// <summary>
             ///     Show's the view using iUI in order to transition to the new element.
             /// </summary>
+            if (this.fireEvent('show', this) === false) return;
+
             if (this.refreshRequiredFor(options))
             {
                 this.refreshRequired = true;
@@ -158,11 +171,13 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <summary>
             ///     Called before the view is transitioned (slide animation complete) to.
             /// </summary>
+            this.fireEvent('beforetransitionto', this);
         },
         beforeTransitionAway: function() {
             /// <summary>
             ///     Called before the view is transitioned (slide animation complete) away from.
             /// </summary>
+            this.fireEvent('beforetransitionaway', this);
         },
         transitionTo: function() {
             /// <summary>
@@ -173,11 +188,14 @@ Ext.namespace('Sage.Platform.Mobile');
                 this.refreshRequired = false;
                 this.refresh();
             }
+
+            this.fireEvent('transitionto', this);
         },
         transitionAway: function() {
             /// <summary>
             ///     Called after the view has been transitioned (slide animation complete) away from.
             /// </summary>
+            this.fireEvent('transitionaway', this);
         },
         getService: function() {
             /// <summary>

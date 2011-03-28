@@ -54,12 +54,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (val)
             {
                 this.validationValue = this.currentValue = val;
-                this.el.removeClass('field-error');
+                this.containerEl.removeClass('row-error'); // todo: not the right spot for this, add validation eventing
             }
             else
             {
                 this.validationValue = this.currentValue = null;
-                this.el.addClass('field-error');
+                this.containerEl.addClass('row-error'); // todo: not the right spot for this, add validation eventing
             }
         },
         createNavigationOptions: function() {
@@ -75,7 +75,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (view)
             {
                 this.currentValue = this.validationValue = view.getDateTime();
-                this.el.removeClass('field-error');
+                this.containerEl.removeClass('row-error'); // todo: not the right spot for this, add validation eventing
             }
         },
         isDirty: function() {
@@ -85,7 +85,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         clearValue: function() {
             Sage.Platform.Mobile.Controls.DateField.superclass.clearValue.apply(this, arguments);
-            this.el.removeClass('field-error');
+            this.containerEl.removeClass('row-error'); // todo: not the right spot for this, add validation eventing
         },
         validate: function() {
             if (this.el.dom.value !== '' && !this.currentValue)
