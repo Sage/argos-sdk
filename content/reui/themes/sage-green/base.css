@@ -564,3 +564,85 @@ img
   height: 25px;
   width: 25px;
 }
+
+.calendar-day
+{
+    color: #000;
+    background-color: #e9eed7;
+    background-image: linear-gradient(top, #e9eed7, #dae2bb);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #e9eed7),
+		color-stop(1, #dae2bb)
+	);
+	background-image: -moz-linear-gradient(top, #e9eed7, #dae2bb);
+}
+
+.calendar-day.today
+{
+    color: #fff;
+    background-color: #4e5b2f;
+    background-image: linear-gradient(top, #4e5b2f, #8a9e57);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #4e5b2f),
+		color-stop(1, #8a9e57)
+	);
+	background-image: -moz-linear-gradient(top, #4e5b2f, #8a9e57);
+}
+
+
+.calendar-day.weekend
+{
+    background-color: #dedede;
+    background-image: linear-gradient(top, #dedede, #aeaeae);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #dedede),
+		color-stop(1, #aeaeae)
+	);
+	background-image: -moz-linear-gradient(top, #dedede, #aeaeae);
+}
+
+.calendar-day.selected
+{
+    background-color: #c4cfa5;
+    background-image: linear-gradient(top, #c4cfa5, #a6b979);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #c4cfa5),
+		color-stop(1, #a6b979)
+	);
+	background-image: -moz-linear-gradient(top, #c4cfa5, #a6b979);
+}
+
+.time-content > .date-tt > .toggle
+{
+    background-color: #69923A;
+    border: 1px solid #1a250f;    
+    background-color: #69923a;
+    background-image: linear-gradient(bottom, #4f6e2c, #35491d);
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0, #4f6e2c),
+        color-stop(1, #35491d)
+    );
+    background-image: -moz-linear-gradient(bottom, #4f6e2c, #35491d);
+}
+
+.time-content > .date-tt .toggleOff
+{
+    color: #FFFFFF;
+    text-shadow: rgba(0, 0, 0, 1.0) 0px 1px 0;
+}
+

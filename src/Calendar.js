@@ -27,9 +27,11 @@
                 '<div class="panel-content">',
                     '<div class="calendar-content"></div>',
                     '<div class="time-content">',
-                        '<input type="number" maxlength="2" min="0" max="23" class="hour-field" />',
+                        '<input type="number" maxlength="2" min="0" max="12" class="hour-field" />',
                         '&nbsp;:&nbsp;',
                         '<input type="number" maxlength="2" min="0" max="59" class="minute-field" />',
+                        '<div class="date-tt" data-field="tt" data-field-type="boolean">',
+                        '</div>',
                     '</div>',
                 '</div>',
             '</div>'
@@ -54,6 +56,7 @@
         id: 'generic_calendar',
         expose: false,
         date: false,
+        dateTTField: false,
         showTimePicker: false,
         selectedDateEl: false,
         weekEnds: [0, 6],
@@ -74,6 +77,22 @@
             this.minuteField
                 .on('keyup', this.validateMinute, this)
                 .on('blur', this.validateMinute, this);
+
+            this.dateTTField.init();
+        },
+        render: function() {
+            Sage.Platform.Mobile.Calendar.superclass.render.call(this);
+
+            this.dateTTField = new Sage.Platform.Mobile.Controls.BooleanField({
+                owner: this,
+                label: '',
+                name: 'TT',
+                onText: 'AM',
+                offText: 'PM'
+            });
+
+            var el = this.el.child('.date-tt');
+            this.dateTTField.renderTo(el);
         },
         onSwipe: function(evt, el, o) {            
             switch (evt.browserEvent.direction) {
@@ -103,7 +122,23 @@
             if (isNaN(value) || value < minimum || value > maximum)
                 field.addClass('field-error');
             else
+            {
                 field.removeClass('field-error');
+                field.dom.value = this.padNumber(value)
+            }
+        },
+        isValid: function() {
+            return !(this.hourField.hasClass('field-error') || this.minuteField.hasClass('field-error'));
+        },
+        padNumber: function(n) {
+            return n < 10 ? '0' + n : n;
+        },
+        setMilitaryTime: function() {
+            var TT = this.date.getHours() >= 12 ? false : true;
+
+            this.dateTTField.setValue(TT);
+            this.hourField.dom.value = this.padNumber(this.date.getHours() % 12);
+            this.minuteField.dom.value = this.padNumber(this.date.getMinutes());
         },
         show: function(options) {
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
@@ -114,8 +149,7 @@
             this.year = this.date.getFullYear();
             this.month = this.date.getMonth();
 
-            this.hourField.dom.value = this.date.getHours();
-            this.minuteField.dom.value = this.date.getMinutes();
+            this.setMilitaryTime();
             
             this.renderCalendar();
 
@@ -152,9 +186,12 @@
             this.date = new Date(this.year, this.month, options.date);
         },
         getDateTime: function() {
-            var result = new Date(this.date.getTime());
+            var result = new Date(this.date.getTime()),
+                isPM = !this.dateTTField.getValue(),
+                hours = parseInt(this.hourField.getValue(), 10);
 
-            result.setHours(this.hourField.getValue());
+            hours = isPM ? hours + 12 : hours;
+            result.setHours(hours);
             result.setMinutes(this.minuteField.getValue());
 
             return result;

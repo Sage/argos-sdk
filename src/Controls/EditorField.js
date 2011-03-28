@@ -109,7 +109,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.setText(this.formatValue(this.validationValue, true, true));
 
-            ReUI.back();
+            if (view.isValid && !view.isValid())
+                return;
+            else
+                ReUI.back();
 
             // if the event is fired before the transition, any XMLHttpRequest created in an event handler and
             // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
