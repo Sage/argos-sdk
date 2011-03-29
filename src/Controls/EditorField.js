@@ -108,6 +108,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.setText(this.formatValue(this.validationValue, true, true));
 
+            // todo: remove
             if (view.isValid && !view.isValid())
                 return;
             else

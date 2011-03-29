@@ -280,7 +280,7 @@ textarea:focus
     border-top: solid 1px #ddd;
 }
 
-.panel-content > fieldset > .row-edit:first-child
+.panel-content > fieldset > .row-edit:first-of-type
 {
     border-top: none 0 black;
 }

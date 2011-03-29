@@ -23,7 +23,7 @@
             minuteField: '.minute-field'
         },
         viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel">',
+            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
                 '<div class="panel-content">',
                     '<div class="calendar-content"></div>',
                     '<div class="time-content">',
@@ -39,9 +39,9 @@
         calendarStartTemplate: '<table class="calendar-table">',
         calendarMonthHeaderTemplate: new Simplate([
             '<tr class="calendar-month-header">',
-            '<th class="calendar-prev-month"><button class="button toolButton" data-action="goToPreviousMonth"><span>&lt;&lt;</span></button></th>',
+            '<th class="calendar-prev-month"><button class="button" data-action="goToPreviousMonth"><span></span></button></th>',
             '<th class="calendar-month-name" colspan="5">{%= $.monthName %} &nbsp; {%=$.year %}</th>',
-            '<th class="calendar-next-month"><button class="button toolButton" data-action="goToNextMonth"><span>&gt;&gt;</span></button></th>',
+            '<th class="calendar-next-month"><button class="button" data-action="goToNextMonth"><span></span></button></th>',
             '</tr>'
         ]),
         titleText: 'Calendar',
@@ -82,6 +82,8 @@
         },
         render: function() {
             Sage.Platform.Mobile.Calendar.superclass.render.call(this);
+
+            this.timeEl.setVisibilityMode(Ext.Element.DISPLAY);
 
             this.dateTTField = new Sage.Platform.Mobile.Controls.BooleanField({
                 owner: this,

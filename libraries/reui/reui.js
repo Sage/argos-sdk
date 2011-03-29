@@ -269,7 +269,9 @@ ReUI = {};
         D.dispatch(from, 'beforetransition', {out: true, tag: o.tag, data: o.data});
         D.dispatch(to, 'beforetransition', {out: false, tag: o.tag, data: o.data});
 
-        if (R.disableFx === true)
+        // todo: fix issue with disable fx where previous away transition does not get cleared
+
+        if (R.disableFx || o.disableFx)
         {
             D.unselect(from);
             D.select(to);
