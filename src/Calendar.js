@@ -20,10 +20,27 @@
             calendarEl: '.calendar-content',
             timeEl: '.time-content',
             hourField: '.hour-field',
-            minuteField: '.minute-field'
+            minuteField: '.minute-field',
+            validationContentEl: '.panel-validation-summary > ul'
         },
+        validationSummaryTemplate: new Simplate([
+            '<div class="panel-validation-summary">',
+            '<h2>{%: $.validationSummaryText %}</h2>',
+            '<ul>',
+            '</ul>',
+            '</div>'
+        ]),
+        validationSummaryItemTemplate: new Simplate([
+            '<li>',
+            '<a href="#TT">',
+            '<h3>{%: $.message %}</h3>',
+            '<h4>&nbsp;</h4>',
+            '</a>',
+            '</li>'
+        ]),
         viewTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
+                '{%! $.validationSummaryTemplate %}',
                 '<div class="panel-content">',
                     '<div class="calendar-content"></div>',
                     '<div class="time-content">',
@@ -36,6 +53,7 @@
                 '</div>',
             '</div>'
         ]),
+        validationSummaryText: 'Validation Summary',
         calendarStartTemplate: '<table class="calendar-table">',
         calendarMonthHeaderTemplate: new Simplate([
             '<tr class="calendar-month-header">',
@@ -53,6 +71,8 @@
         calendarDayTemplate: '<td class="calendar-day {1}" data-action="selectDay" data-date="{2}">{0}</td>',
         calendarWeekEndTemplate: '</tr>',
         calendarEndTemplate: '</table>',
+        invalidHourError: 'Invalid hour format',
+        invalidMinuteError: 'Invalid minute format',
         id: 'generic_calendar',
         expose: false,
         date: false,
@@ -128,6 +148,32 @@
                 field.removeClass('field-error');
                 field.dom.value = this.padNumber(value)
             }
+
+            if (!this.isValid())
+                this.showValidationSummary();
+            else
+                this.hideValidationSummary();
+        },
+        showValidationSummary: function() {
+            var content = [];
+
+            if (this.hourField.hasClass('field-error'))
+                content.push(this.validationSummaryItemTemplate.apply({
+                    'message': this.invalidHourError
+                }));
+            if (this.minuteField.hasClass('field-error'))
+                content.push(this.validationSummaryItemTemplate.apply({
+                    'message': this.invalidMinuteError
+                }));
+
+            this.validationContentEl.update(content.join(''));
+            this.el.addClass('panel-form-error');
+        },
+        hideValidationSummary: function() {
+            this.hourField.removeClass('field-error');
+            this.minuteField.removeClass('field-error');
+            this.el.removeClass('panel-form-error');
+            this.validationContentEl.update('');
         },
         isValid: function() {
             return !(this.hourField.hasClass('field-error') || this.minuteField.hasClass('field-error'));
@@ -152,7 +198,9 @@
             this.month = this.date.getMonth();
 
             this.setMilitaryTime();
-            
+
+            this.hideValidationSummary();
+
             this.renderCalendar();
 
             if (this.showTimePicker)
