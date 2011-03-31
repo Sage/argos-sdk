@@ -14,6 +14,8 @@
  */
 
 (function() {
+    var pad = function(n) { return n < 10 ? '0' + n : n };
+
     Sage.Platform.Mobile.Calendar = Ext.extend(Sage.Platform.Mobile.View, {
         attachmentPoints: {
             contentEl: '.panel-content',
@@ -21,6 +23,7 @@
             timeEl: '.time-content',
             hourField: '.hour-field',
             minuteField: '.minute-field',
+            meridiemField: '.meridiem-field',
             validationContentEl: '.panel-validation-summary > ul'
         },
         validationSummaryTemplate: new Simplate([
@@ -44,10 +47,15 @@
                 '<div class="panel-content">',
                     '<div class="calendar-content"></div>',
                     '<div class="time-content">',
-                        '<input type="number" maxlength="2" min="0" max="12" class="hour-field" />',
+                        '<input type="number" min="1" max="12" class="hour-field" />',
                         '&nbsp;:&nbsp;',
-                        '<input type="number" maxlength="2" min="0" max="59" class="minute-field" />',
-                        '<div class="date-tt" data-field="tt" data-field-type="boolean">',
+                        '<input type="number" min="0" max="59" class="minute-field" />',
+                        '<div class="date-tt">',
+                            '<div class="toggle meridiem-field" data-action="toggleMeridiem">',
+                                '<span class="thumb"></span>',
+                                '<span class="toggleOn">{%= $.amText %}</span>',
+                                '<span class="toggleOff">{%= $.pmText %}</span>',
+                            '</div>',
                         '</div>',
                     '</div>',
                 '</div>',
@@ -63,6 +71,8 @@
             '</tr>'
         ]),
         titleText: 'Calendar',
+        amText: 'AM',
+        pmText: 'PM',
         calendarWeekHeaderStartTemplate: '<tr class="calendar-week-header">',
         calendarWeekHeaderTemplate: '<td class="calendar-weekday">{0}</td>',
         calendarWeekHeaderEndTemplate: '</tr>',
@@ -76,7 +86,6 @@
         id: 'generic_calendar',
         expose: false,
         date: false,
-        dateTTField: false,
         showTimePicker: false,
         selectedDateEl: false,
         weekEnds: [0, 6],
@@ -89,32 +98,14 @@
             Sage.Platform.Mobile.Calendar.superclass.init.call(this);
 
             this.el.on('swipe', this.onSwipe, this);
-
-            this.hourField
-                .on('keyup', this.validateHour, this)
-                .on('blur', this.validateHour, this);
-
-            this.minuteField
-                .on('keyup', this.validateMinute, this)
-                .on('blur', this.validateMinute, this);
-
-            this.dateTTField.init();
-        },
-        render: function() {
-            Sage.Platform.Mobile.Calendar.superclass.render.call(this);
-
+            
             this.timeEl.setVisibilityMode(Ext.Element.DISPLAY);
 
-            this.dateTTField = new Sage.Platform.Mobile.Controls.BooleanField({
-                owner: this,
-                label: '',
-                name: 'TT',
-                onText: 'AM',
-                offText: 'PM'
-            });
+            this.hourField
+                .on('blur', this.validateHour, this);
 
-            var el = this.el.child('.date-tt');
-            this.dateTTField.renderTo(el);
+            this.minuteField                
+                .on('blur', this.validateMinute, this);
         },
         onSwipe: function(evt, el, o) {            
             switch (evt.browserEvent.direction) {
@@ -146,7 +137,7 @@
             else
             {
                 field.removeClass('field-error');
-                field.dom.value = this.padNumber(value)
+                field.dom.value = value;
             }
 
             if (!this.isValid())
@@ -172,21 +163,18 @@
         hideValidationSummary: function() {
             this.hourField.removeClass('field-error');
             this.minuteField.removeClass('field-error');
+            
             this.el.removeClass('panel-form-error');
             this.validationContentEl.update('');
         },
         isValid: function() {
             return !(this.hourField.hasClass('field-error') || this.minuteField.hasClass('field-error'));
         },
-        padNumber: function(n) {
-            return n < 10 ? '0' + n : n;
-        },
-        setMilitaryTime: function() {
-            var TT = this.date.getHours() >= 12 ? false : true;
+        toggleMeridiem: function(params) {
+            var el = params.$source,
+                toggledValue = el && (el.getAttribute('toggled') !== 'true');
 
-            this.dateTTField.setValue(TT);
-            this.hourField.dom.value = this.padNumber(this.date.getHours() % 12);
-            this.minuteField.dom.value = this.padNumber(this.date.getMinutes());
+            if (el) el.dom.setAttribute('toggled', toggledValue);
         },
         show: function(options) {
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
@@ -197,7 +185,9 @@
             this.year = this.date.getFullYear();
             this.month = this.date.getMonth();
 
-            this.setMilitaryTime();
+            this.hourField.dom.value = "" + this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12);
+            this.minuteField.dom.value = "" + pad(this.date.getMinutes());
+            this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
 
             this.hideValidationSummary();
 
@@ -237,12 +227,16 @@
         },
         getDateTime: function() {
             var result = new Date(this.date.getTime()),
-                isPM = !this.dateTTField.getValue(),
-                hours = parseInt(this.hourField.getValue(), 10);
+                isPM = this.meridiemField.getAttribute('toggled') !== 'true',
+                hours = parseInt(this.hourField.getValue(), 10),
+                minutes = parseInt(this.minuteField.getValue(), 10);
 
-            hours = isPM ? hours + 12 : hours;
+            hours = isPM
+                ? (hours % 12) + 12
+                : (hours % 12);
+
             result.setHours(hours);
-            result.setMinutes(this.minuteField.getValue());
+            result.setMinutes(minutes);
 
             return result;
         },
