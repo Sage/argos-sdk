@@ -22,10 +22,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton"><span>{%: $.lookupText %}</span></button>',
-            '<textarea readonly="readonly" rows="{%: $.rows %}" />'
+            '<div></div>'
         ]),
         rows: 4,
-        emptyText: 'no address'
+        emptyText: 'no address',
+        setText: function(text) {
+            this.el.dom.innerHTML = text;
+        }
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('address', Sage.Platform.Mobile.Controls.AddressField);

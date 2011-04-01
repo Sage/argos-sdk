@@ -106,7 +106,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.getValuesFromView();
 
-            this.setText(this.formatValue(this.validationValue, true, true));
+            this.setText(this.formatValue(this.validationValue));
 
             // todo: remove
             if (view.isValid && !view.isValid())
@@ -145,7 +145,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                 if (initial) this.originalValue = this.currentValue;
 
-                this.setText(this.formatValue(val, true, true));
+                this.setText(this.formatValue(val));
             }
             else
             {
