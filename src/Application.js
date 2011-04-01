@@ -24,6 +24,24 @@ Ext.DomQuery.matchers[2] = {
     select: 'n = byAttribute(n, "{2}", "{5}", "{3}", "{1}");'
 };
 
+// fix for IE9
+(function() {
+    var ieVersion = navigator.userAgent.match(/msie (\d+)/i),
+        ieVersion = ieVersion && parseInt(ieVersion[1]) || 0;
+
+    Ext.ieVersion = ieVersion;
+
+    if (ieVersion >= 9)
+    {
+        Ext.override(Ext.Element, {
+            getAttribute: function(name, ns) {
+                var d = this.dom;
+                return d.getAttributeNS(ns, name) || d.getAttribute(ns + ":" + name) || d.getAttribute(name) || d[name];
+            }
+        });
+    }
+})();
+
 Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
     environment: 'production',
     started: false,
