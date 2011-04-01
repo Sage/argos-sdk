@@ -112,7 +112,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         Ext.EventManager.on(window, 'resize', this._onResize, this, {buffer: 250});
         Ext.getBody().on('beforetransition', this._onBeforeTransition, this);
         Ext.getBody().on('aftertransition', this._onAfterTransition, this);
-        Ext.getBody().on('activate', this._onActivate, this);
+        Ext.getBody().on('show', this._onActivate, this);
     },
     initModules: function() {
         for (var i = 0; i < this.modules.length; i++)

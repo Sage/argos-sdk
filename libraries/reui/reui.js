@@ -262,9 +262,9 @@ ReUI = {};
 
         D.addClass(R.rootEl, 'transition');
 
-        // dispatch an 'activate' event to let the page be aware that is being show as the result of an external
+        // dispatch an 'show' event to let the page be aware that is being show as the result of an external
         // event (i.e. browser back/forward navigation).
-        if (o.external) D.dispatch(to, 'activate', {tag: o.tag, data: o.data});
+        if (o.external) D.dispatch(to, 'show', {tag: o.tag, data: o.data});
 
         D.dispatch(from, 'beforetransition', {out: true, tag: o.tag, data: o.data});
         D.dispatch(to, 'beforetransition', {out: false, tag: o.tag, data: o.data});
