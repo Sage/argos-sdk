@@ -445,22 +445,29 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 field,
                 value,
                 target,
-                included,
-                excluded;
+                include,
+                exclude;
 
             for (var name in this.fields)
             {
                 field = this.fields[name];
                 value = field.getValue();
-                included = typeof field.include === 'function'
-                    ? field.include(value, field, this)
-                    : field.include;
-                excluded = typeof included !== 'undefined' && !included;
+                include = this.expandExpression(field.include, value, field, this);
+                exclude = this.expandExpression(field.exclude, value, field, this);
 
-                //included = field.include && field.include(value, field, this),
-                //excluded = field.include && !included;
+                /**
+                 * include:
+                 *   true: always include value
+                 *   false: always exclude value
+                 * exclude:
+                 *   true: always exclude value
+                 *   false: default handling
+                 */
+                if (include !== undefined && !include) continue;
+                if (exclude !== undefined && exclude) continue;
 
-                if (all || ((field.alwaysUseValue || field.isDirty() || included) && (!excluded)))
+                // for now, explicitly hidden fields (via. the field.hide() method) are not included
+                if (all || ((field.alwaysUseValue || field.isDirty() || include) && !field.isHidden()))
                 {
                     if (field.applyTo !== false)
                     {
