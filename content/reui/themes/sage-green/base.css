@@ -396,12 +396,19 @@ img
     position: relative;
 }
 
-.panel-content > ul > * > a,
-.panel-validation-summary > ul > * > a
+.panel-content > ul > li > a,
+.panel-validation-summary > ul > li > a
 {
     padding: 8px;
     margin: 0px;
     display: block;
+}
+
+.panel-validation-summary > ul > li > a > h3
+{
+    overflow: visible;
+    text-overflow: inherit;
+    white-space: inherit;
 }
 
 .row > label
