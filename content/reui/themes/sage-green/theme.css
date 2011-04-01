@@ -79,7 +79,9 @@ body > .toolbar
     );
     box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
-    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;    
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#dae6c6, endColorstr=#c1d59f)";
 }
 
 .toolbar > h1
@@ -121,6 +123,8 @@ body > .toolbar
     background-clip: padding-box;
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#b3b3b3)";
 }
 
 .dialog > fieldset > hr
@@ -164,6 +168,8 @@ body > .toolbar
     color: #000;
     text-shadow: #fff 0px 1px 0px;
     font-weight: bold;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#cccccc)";
 }
 
 .panel-validation-summary > h2
@@ -186,6 +192,8 @@ body > .toolbar
     color: #fff;
     text-shadow: #000 0px 1px 0px;
     font-weight: bold;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#de6464, endColorstr=#b33737)";
 }
 
 .panel-content > h2:first-child
@@ -341,6 +349,8 @@ textarea:focus
     background-clip: padding-box;
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f2f2f2, endColorstr=#e6e6e6)";
 }
 
 .button:active
@@ -403,6 +413,8 @@ textarea:focus
         #00516f 50%,
         #0079a7 100%
     );
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00a1de, endColorstr=#0079a7)";
 }
 
 .taskButton:active,
@@ -466,6 +478,8 @@ textarea:focus
         #632f4e 50%,
         #833f67 100%
     );
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#a44e81, endColorstr=#833f67)";
 }
 
 .cancelButton:active,
@@ -533,6 +547,8 @@ textarea:focus
 
     -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
     -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#eaf1df, endColorstr=#d6e3bf)";
 }
 
 .toolButton:active,
@@ -598,6 +614,8 @@ textarea:focus
         #cccccc 50%,
         #e6e6e6 100%
     );
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f2f2f2, endColorstr=#e6e6e6)";
 }
 
 .subHeaderButton:active,
@@ -647,6 +665,8 @@ textarea:focus
         color-stop(1, #cccccc)
     );
     background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#cccccc)";
 }
 
 .simpleSubHeaderButton:active,

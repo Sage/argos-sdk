@@ -472,6 +472,8 @@
 		color-stop(1, #dae2bb)
 	);
 	background-image: -moz-linear-gradient(top, #e9eed7, #dae2bb);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e9eed7, endColorstr=#dae2bb)";
 }
 
 .calendar-day.today
@@ -487,6 +489,8 @@
 		color-stop(1, #8a9e57)
 	);
 	background-image: -moz-linear-gradient(top, #4e5b2f, #8a9e57);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4e5b2f, endColorstr=#8a9e57)";
 }
 
 
@@ -502,6 +506,8 @@
 		color-stop(1, #aeaeae)
 	);
 	background-image: -moz-linear-gradient(top, #dedede, #aeaeae);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#dedede, endColorstr=#aeaeae)";
 }
 
 .calendar-day.selected
@@ -516,6 +522,8 @@
 		color-stop(1, #a6b979)
 	);
 	background-image: -moz-linear-gradient(top, #c4cfa5, #a6b979);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#c4cfa5, endColorstr=#a6b979)";
 }
 
 .time-content > .date-tt > .toggle
@@ -532,6 +540,8 @@
         color-stop(1, #35491d)
     );
     background-image: -moz-linear-gradient(bottom, #4f6e2c, #35491d);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4f6e2c, endColorstr=#35491d)";
 }
 
 .time-content > .date-tt .toggleOff
