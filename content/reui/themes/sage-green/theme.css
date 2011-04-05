@@ -212,7 +212,9 @@ body > .toolbar
 }
 
 .panel-content > fieldset,
-.panel-validation-summary > fieldset
+.panel-content > div,
+.panel-validation-summary > fieldset,
+.panel-validation-summary > div
 {
     border: none 0px black;
 }
@@ -251,19 +253,22 @@ textarea:focus
     text-decoration: none;
 }
 
-.panel-content > fieldset > .row
+.panel-content > fieldset > .row,
+.panel-content > div > .row
 {
     padding: .25em;
     min-height: 1.5em;
     border-top: solid 1px #ddd;
 }
 
-.panel-content > fieldset > .row:first-child
+.panel-content > fieldset > .row:first-child,
+.panel-content > div > .row:first-child
 {
     border-top: none 0px black;
 }
 
-.panel-content > fieldset > .row > label
+.panel-content > fieldset > .row > label,
+.panel-content > div > .row > label
 {
     font-weight: bold;    
     color: #0079A7;

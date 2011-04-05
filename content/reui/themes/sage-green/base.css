@@ -333,6 +333,9 @@ img
     font-size: 1em;
     z-index: 5;
     position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;    
+    user-select: none;
 }
 
 .panel > ul > li,
@@ -362,12 +365,9 @@ img
 }
 
 .panel-content > fieldset,
-.panel-validation-summary > fieldset
-{
-    margin: 0;
-    padding: 0 0 1.5em 0;
-}
-
+.panel-validation-summary > fieldset,
+.panel-content > div,
+.panel-validation-summary > div,
 .panel-content > ul,
 .panel-validation-summary > ul
 {
@@ -375,13 +375,9 @@ img
     padding: 0 0 1.5em 0;
 }
 
-.panel-content > fieldset:last-child
-{
-    margin: 0;
-    padding: 0 0 0 0;
-}
-
-.panel-content > ul:last-child
+.panel-content > fieldset:last-child,
+.panel-content > ul:last-child,
+.panel-content > div:last-child
 {
     margin: 0;
     padding: 0 0 0 0;

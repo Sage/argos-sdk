@@ -29,21 +29,21 @@ Ext.namespace('Sage.Platform.Mobile');
         emptyTemplate: new Simplate([
         ]),
         loadingTemplate: new Simplate([
-            '<fieldset class="panel-loading-indicator">',
+            '<div class="panel-loading-indicator">',
             '<div class="row"><div>{%: $.loadingText %}</div></div>',
-            '</fieldset>'
+            '</div>'
         ]),     
         sectionBeginTemplate: new Simplate([
             '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<button class="collapsed-indicator"></button></h2>',
-            '{% if ($.list) { %}<ul class="{%= $.cls %}">{% } else { %}<fieldset class="{%= $.cls %}">{% } %}'
+            '{% if ($.list) { %}<ul class="{%= $.cls %}">{% } else { %}<div class="{%= $.cls %}">{% } %}'
         ]),
         sectionEndTemplate: new Simplate([
-            '{% if ($.list) { %}</ul>{% } else { %}</fieldset>{% } %}'
+            '{% if ($.list) { %}</ul>{% } else { %}</div>{% } %}'
         ]),
         propertyTemplate: new Simplate([
             '<div class="row {%= $.cls %}" data-property="{%= $.name %}">',
             '<label>{%: $.label %}</label>',
-            '<span>{%= $.value %}</span>',
+            '<span>{%= $.value %}</span>', // todo: create a way to allow the value to not be surrounded with a span tag
             '</div>'
         ]),
         relatedPropertyTemplate: new Simplate([
@@ -98,7 +98,7 @@ Ext.namespace('Sage.Platform.Mobile');
         titleText: 'Detail',
         detailsText: 'Details',
         loadingText: 'loading...',
-        requestErrorText: 'A server error occured while requesting data.',
+        requestErrorText: 'A server error occurred while requesting data.',
         editView: false,
         init: function() {
             Sage.Platform.Mobile.Detail.superclass.init.call(this);
@@ -251,9 +251,9 @@ Ext.namespace('Sage.Platform.Mobile');
                         ? provider(entry, current['name'])
                         : current['value'];
 
-                if (current['tpl'])
+                if (current['template'] || current['tpl'])
                 {
-                    var rendered = current['tpl'].apply(value, this),
+                    var rendered = (current['template'] || current['tpl']).apply(value, this),
                         formatted = current['encode'] === true
                             ? Sage.Platform.Mobile.Format.encode(rendered)
                             : rendered;
@@ -272,17 +272,12 @@ Ext.namespace('Sage.Platform.Mobile');
                         : value;
                 }
 
-                var options = {
-                    cls: current['cls'],
-                    icon: current['icon'],
-                    name: current['name'],
-                    label: current['label'],
-                    disabled: false,
+                var options = Ext.apply({}, {
                     entry: entry,
                     value: formatted,
                     raw: value
-                };
-              
+                }, current);
+        
                 if (current['descriptor'])
                     options['descriptor'] = typeof current['descriptor'] === 'function'
                         ? this.expandExpression(current['descriptor'], entry, value)

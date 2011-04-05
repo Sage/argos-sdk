@@ -576,7 +576,8 @@ h2 > .collapsed-indicator
 }
 
 .collapsed + ul,
-.collapsed + fieldset
+.collapsed + fieldset,
+.collapsed + div
 {
     display: none;
 }
