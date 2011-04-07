@@ -223,7 +223,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }                    
                 
                 var ctor = Sage.Platform.Mobile.Controls.FieldManager.get(current['type']),
-                    field = this.fields[current['name']] = new ctor(Ext.apply({
+                    // use either the `alias` property, or the `name` property as the key for the field.
+                    field = this.fields[current['alias'] || current['name']] = new ctor(Ext.apply({
                         owner: this
                     }, current)),
                     template = field.propertyTemplate || this.propertyTemplate;
