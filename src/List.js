@@ -249,15 +249,25 @@ Ext.namespace('Sage.Platform.Mobile');
          */
         queryInclude: null,
         /**
-         * The order by expression for an SData request.
+         * The default order by expression for an SData request.
          * @type {String}
          */
         queryOrderBy: null,
         /**
+         * The default where expression for an SData request.
+         * @type {String|Function}
+         */
+        queryWhere: null,
+        /**
          * The default resource property for an SData request.
-         * @type {String}
+         * @type {String|Function}
          */
         resourceProperty: null,
+        /**
+         * The default resource predicate for an SData request.
+         * @type {String|Function}
+         */
+        resourcePredicate: null,
         /**
          * The page size (defaults to 20).
          * @type {Number}
@@ -516,70 +526,59 @@ Ext.namespace('Sage.Platform.Mobile');
             ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.
             /// </summary>
             /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest">An SDataResourceCollectionRequest instance.<returns>
-            var pageSize = this.pageSize;
-            var startIndex = this.feed && this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0
-                ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
-                : 1;
+
+            // todo: should we cache the request? the only thing that needs to change on subsequent requests is the paging.
+
+            var where = [],
+                options = this.options,
+                pageSize = this.pageSize,
+                startIndex = this.feed && this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0
+                    ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
+                    : 1;
 
             var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())
                 .setCount(pageSize)
                 .setStartIndex(startIndex);
 
-            if (this.resourceKind)
+            var resourceKindExpr = this.expandExpression((options && options.resourceKind) || this.resourceKind);
+            if (resourceKindExpr)
                 request.setResourceKind(this.resourceKind);
 
-            if (this.resourceProperty)
+            var resourcePropertyExpr = this.expandExpression((options && options.resourceProperty) || this.resourceProperty);
+            if (resourcePropertyExpr)
                 request
                     .getUri()
-                    .setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, this.resourceProperty);
+                    .setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, resourcePropertyExpr);
 
-            if (this.querySelect)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, this.querySelect.join(','));
+            var resourcePredicateExpr = this.expandExpression((options && options.resourcePredicate) || this.resourcePredicate);
+            if (resourcePredicateExpr)
+                request
+                    .getUri()
+                    .setCollectionPredicate(resourcePredicateExpr);
 
-            if (this.queryInclude)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, this.queryInclude.join(','));
+            var querySelectExpr = this.expandExpression(this.querySelect);
+            if (querySelectExpr)
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, querySelectExpr.join(','));
 
-            if (this.queryOrderBy)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, this.queryOrderBy);
+            var queryIncludeExpr = this.expandExpression(this.queryInclude);
+            if (queryIncludeExpr)
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, queryIncludeExpr.join(','));
 
-            var where = [];
+            var queryOrderByExpr = this.expandExpression((options && options.orderBy) || this.queryOrderBy);
+            if (queryOrderByExpr)
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, queryOrderByExpr);
 
-            if (this.options)
-            {
-                var resourceKindExpr = this.expandExpression(this.options.resourceKind);
-                if (resourceKindExpr)
-                    request.setResourceKind(resourceKindExpr);
+            var queryWhereExpr = this.expandExpression((options && options.where) || this.queryWhere);
+            if (queryWhereExpr)
+                where.push(queryWhereExpr);
 
-                var resourcePropertyExpr = this.expandExpression(this.options.resourceProperty);
-                if (resourcePropertyExpr)
-                    request
-                        .getUri()
-                        .setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, resourcePropertyExpr);
-
-                var resourcePredicateExpr = this.expandExpression(this.options.resourcePredicate);
-                if (resourcePredicateExpr)
-                    request
-                        .getUri()
-                        .setCollectionPredicate(resourcePredicateExpr);
-
-                var whereExpr = this.expandExpression(this.options.where);
-                if (whereExpr)
-                    where.push(whereExpr);
-
-                var orderByExpr = this.expandExpression(this.options.orderBy);
-                if (orderByExpr)
-                    request.setQueryArgs({
-                        'orderby': orderByExpr
-                    });
-            }
-
+            // this is for search
+            // todo: rename to searchQuery
             if (this.query)
                 where.push(this.query);
 
             if (where.length > 0)
-                request.setQueryArgs({
-                    'where': where.join(' and ')
-                });
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Where, where.join(' and '));
 
             return request;
         },
@@ -809,8 +808,8 @@ Ext.namespace('Sage.Platform.Mobile');
             this.requestedFirstPage = false;
             this.entries = {};
             this.feed = false;
-            this.query = false;
-            this.queryText = false;
+            this.query = false; // todo: rename to searchQuery
+            this.queryText = false; // todo: rename to searchQueryText
 
             this.el.removeClass('list-has-more');
 
