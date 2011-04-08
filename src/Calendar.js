@@ -137,7 +137,7 @@
             else
             {
                 field.removeClass('field-error');
-                field.dom.value = value;
+                field.dom.value = pad(value);
             }
 
             if (!this.isValid())
@@ -185,7 +185,7 @@
             this.year = this.date.getFullYear();
             this.month = this.date.getMonth();
 
-            this.hourField.dom.value = "" + this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12);
+            this.hourField.dom.value = "" + pad(this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12));
             this.minuteField.dom.value = "" + pad(this.date.getMinutes());
             this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
 
