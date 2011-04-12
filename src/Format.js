@@ -60,15 +60,21 @@ Sage.Platform.Mobile.Format = (function() {
         trim: function(val) {
             return val.replace(/^\s+|\s+$/g,'');
         },
-        date: function(val, fmt) {
-            if (val instanceof Date) return val.toString(fmt || 'M/d/yyyy');
+        date: function(val, fmt, utc) {
+            var date = val instanceof Date
+                ? val
+                : Sage.Platform.Mobile.Convert.isDateString(val)
+                    ? Sage.Platform.Mobile.Convert.toDateFromString(val)
+                    : null;
 
-            if (Sage.Platform.Mobile.Convert.isDateString(val))
-                val = Sage.Platform.Mobile.Convert.toDateFromString(val);
-            else
-                return val;
+            if (date)
+            {
+                if (utc) date = date.clone().add({minutes: date.getTimezoneOffset()});
 
-            return val.toString(fmt || 'M/d/yyyy');
+                return date.toString(fmt || 'M/d/yyyy');
+            }
+
+            return val;
         },
         fixed: function(val, d) {
             if (typeof d !== 'number')

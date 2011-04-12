@@ -16,11 +16,15 @@
 Ext.namespace('Sage.Platform.Mobile');
 
 Sage.Platform.Mobile.Convert = (function() {
-    var isoDate = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|(-|\+)(\d{2}):(\d{2}))/,
+    var trueRE = /^(true|T)$/i,
+        isoDate = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|(-|\+)(\d{2}):(\d{2}))/,
         jsonDate = /\/Date\((-?\d+)(?:(-|\+)(\d{2})(\d{2}))?\)\//,
         pad = function(n) { return n < 10 ? '0' + n : n };
 
     return {
+        toBoolean: function(value) {
+            return trueRE.test(value);
+        },
         isDateString: function(value) {
             if (typeof value !== 'string')
                 return false;
