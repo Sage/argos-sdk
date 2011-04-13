@@ -421,7 +421,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         setValues: function(values, initial) {
             var noValue = {},
                 field,
-                path,
                 value;
 
             for (var name in this.fields)
@@ -437,10 +436,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }
                 else
                 {
-                    // fyi: uses the fact that ({} !== {})
-                    value = Sage.Platform.Mobile.Utility.getValue(values, name, noValue);
+                    value = Sage.Platform.Mobile.Utility.getValue(values, field.property || name, noValue);
                 }
 
+                // fyi: uses the fact that ({} !== {})
                 if (value !== noValue) field.setValue(value, initial);
             }
         },
@@ -451,12 +450,13 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 value,
                 target,
                 include,
-                exclude;
+                exclude,
+                property;
 
             for (var name in this.fields)
             {
                 field = this.fields[name];
-                value = field.getValue();
+
                 include = this.expandExpression(field.include, value, field, this);
                 exclude = this.expandExpression(field.exclude, value, field, this);
 
@@ -474,6 +474,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 // for now, explicitly hidden fields (via. the field.hide() method) are not included
                 if (all || ((field.alwaysUseValue || field.isDirty() || include) && !field.isHidden()))
                 {
+                    value = field.getValue();
+
                     if (field.applyTo !== false)
                     {
                         target = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo);
@@ -481,7 +483,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     }
                     else
                     {
-                        Sage.Platform.Mobile.Utility.setValue(o, name, value);
+                        Sage.Platform.Mobile.Utility.setValue(o, field.property || name, value);
                     }
 
                     empty = false;
