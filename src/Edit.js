@@ -427,6 +427,10 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             for (var name in this.fields)
             {
                 field = this.fields[name];
+
+                // for now, explicitly hidden fields (via. the field.hide() method) are not included
+                if (field.isHidden()) continue;
+
                 if (field.applyTo !== false)
                 {
                     value = Sage.Platform.Mobile.Utility.getValue(values, field.applyTo, noValue);
