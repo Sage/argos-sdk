@@ -450,12 +450,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 value,
                 target,
                 include,
-                exclude,
-                property;
+                exclude;
 
             for (var name in this.fields)
             {
                 field = this.fields[name];
+                value = field.getValue();
 
                 include = this.expandExpression(field.include, value, field, this);
                 exclude = this.expandExpression(field.exclude, value, field, this);
@@ -474,8 +474,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 // for now, explicitly hidden fields (via. the field.hide() method) are not included
                 if (all || ((field.alwaysUseValue || field.isDirty() || include) && !field.isHidden()))
                 {
-                    value = field.getValue();
-
                     if (field.applyTo !== false)
                     {
                         target = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo);
