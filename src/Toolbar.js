@@ -19,6 +19,7 @@ Ext.namespace('Sage.Platform.Mobile');
     Sage.Platform.Mobile.Toolbar = Ext.extend(Ext.util.Observable, {
         attachmentPoints: {},
         enabled: true,
+        managed: true,
         barTemplate: new Simplate([
             '<div class="toolbar">',            
             '</div>'

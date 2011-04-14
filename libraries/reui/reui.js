@@ -99,7 +99,7 @@ ReUI = {};
             if (this.hasClass(el, cls) == false) el.className = el.className.replace(/^\s+|\s+$/g,'') + ' ' + cls;
         },
         removeClass: function(el, cls) {
-            if (this.hasClass(el, cls)) el.className = el.className.replace(reForClass(cls), '');
+            if (this.hasClass(el, cls)) el.className = el.className.replace(reForClass(cls), ' ');
         },
         get: function(el) {
             if (typeof el === 'string') return document.getElementById(el);

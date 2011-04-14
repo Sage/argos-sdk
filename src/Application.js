@@ -287,7 +287,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         /// <summary>Sets the applications current title.</summary>
         /// <param name="title" type="String">The new title.</summary>
         for (var n in this.bars)
-            if (this.bars[n].setTitle)
+            if (this.bars[n].managed && typeof this.bars[n].setTitle === 'function')
                 this.bars[n].setTitle(title);
     },
     _onResize: function(evt, el) {
@@ -326,7 +326,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         this.fireEvent('beforeviewtransitionto', view);
 
         for (var n in this.bars)
-            this.bars[n].clear();
+            if (this.bars[n].managed)
+                this.bars[n].clear();
 
         view.beforeTransitionTo();
     },
@@ -341,7 +342,8 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         var tools = (view.options && view.options.tools) || view.tools || {};
 
         for (var n in this.bars)
-            this.bars[n].showTools(tools[n]);
+            if (this.bars[n].managed)
+                this.bars[n].showTools(tools[n]);
    
         view.transitionTo();
     },
