@@ -78,7 +78,9 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
         Sage.Platform.Mobile.Application.superclass.constructor.apply(this, arguments);
     },
     initConfiguration: function() {
-        var config = window['Configuration'] && window['Configuration'][this.environment];
+        var config = window['Configuration'] && window['Configuration'][this.environment],
+            filter = /^(?:modules|connections)$/;
+        
         if (config)
         {
             if (config.modules)
@@ -92,6 +94,10 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
                     if (config.connections.hasOwnProperty(n))
                         this.registerService(n, config.connections[n]);
             }
+
+            for (var property in config)
+                if (!filter.test(property))
+                    this[property] = config[property];
         }
     },
     initReUI: function() {
