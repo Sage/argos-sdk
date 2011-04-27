@@ -682,13 +682,22 @@ Ext.namespace('Sage.Platform.Mobile');
                 return true; // no way to determine, always assume more data
             }
         },
-        requestFailure: function(response, o) {
+        onRequestFailure: function(response, o) {
             /// <summary>
             ///     Called when an error occurs while request data from the SData endpoint.
             /// </summary>
             /// <param name="response" type="Object">The response object.</param>
             /// <param name="o" type="Object">The options that were passed to Ext when creating the Ajax request.</param>
             alert(String.format(this.requestErrorText, response, o));
+            this.el.removeClass('list-loading');
+        },
+        onRequestAborted: function(response, o) {
+            this.options = false; // force a refresh
+            this.el.removeClass('list-loading');
+        },
+        onRequestSuccess: function(feed) {
+            this.processFeed(feed);
+            this.el.removeClass('list-loading');
         },
         requestData: function() {
             /// <summary>
@@ -699,18 +708,9 @@ Ext.namespace('Sage.Platform.Mobile');
 
             var request = this.createRequest();
             request.read({
-                success: function(feed) {
-                    this.processFeed(feed);
-                    this.el.removeClass('list-loading');
-                },
-                failure: function(response, o) {
-                    this.requestFailure(response, o);
-                    this.el.removeClass('list-loading');
-                },
-                aborted: function(response, o) {
-                    this.options = false; // force a refresh
-                    this.el.removeClass('list-loading');
-                },
+                success: this.onRequestSuccess,
+                failure: this.onRequestFailure,
+                aborted: this.onRequestAborted,
                 scope: this
             });
         },

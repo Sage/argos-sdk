@@ -421,9 +421,6 @@ Ext.namespace('Sage.Platform.Mobile');
                 output.push.apply(output, insertRowsAfter);
             }
         },
-        requestFailure: function(response, o) {
-            alert(String.format(this.requestErrorText, response, o));
-        },
         processEntry: function(entry) {
             this.entry = entry;
 
@@ -431,25 +428,28 @@ Ext.namespace('Sage.Platform.Mobile');
             {
                 this.processLayout(this.compileLayout(), {title: this.detailsText}, this.entry);
             }
-        },        
+        },
+        onRequestFailure: function(response, o) {
+            alert(String.format(this.requestErrorText, response, o));
+            this.el.removeClass('panel-loading');
+        },
+        onRequestAborted: function(response, o) {
+            this.options = false; // force a refresh
+            this.el.removeClass('panel-loading');
+        },
+        onRequestSuccess: function(entry) {
+            this.processEntry(entry);
+            this.el.removeClass('panel-loading');
+        },
         requestData: function() {
             this.el.addClass('panel-loading');
 
             var request = this.createRequest();
             if (request)
                 request.read({
-                    success: function(entry) {
-                        this.processEntry(entry);
-                        this.el.removeClass('panel-loading');
-                    },
-                    failure: function(response, o) {
-                        this.requestFailure(response, o);
-                        this.el.removeClass('panel-loading');
-                    },
-                    aborted: function(response, o) {
-                        this.options = false; // force a refresh
-                        this.el.removeClass('panel-loading');
-                    },
+                    success: this.onRequestSuccess,
+                    failure: this.onRequestFailure,
+                    aborted: this.onRequestAborted,
                     scope: this
                 });
         },

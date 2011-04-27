@@ -336,27 +336,33 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 output.push.apply(output, insertRowsAfter);
             }
         },
-        requestFailure: function(response, o) {
+        onRequestFailure: function(response, o) {
             alert(String.format(this.requestErrorText, response, o));
+        },
+        onRequestSuccess: function(entry) {
+            this.processEntry(entry);
         },
         requestData: function() {
             var request = this.createRequest();
             if (request)
                 request.read({
-                    success: this.processEntry,
-                    failure: this.requestFailure,
+                    success: this.onRequestSuccess,
+                    failure: this.onRequestFailure,
                     scope: this
                 });
         },
-        requestTemplateFailure: function() {
+        onRequestTemplateFailure: function(response, o) {
             alert(String.format(this.requestErrorText, response, o));
+        },
+        onRequestTemplateSuccess: function(entry) {
+            this.processTemplateEntry(entry);
         },
         requestTemplateData: function() {
             var request = this.createTemplateRequest();
             if (request)
                 request.read({
-                    success: this.processTemplateEntry,
-                    failure: this.requestTemplateFailure,
+                    success: this.onRequestTemplateSuccess,
+                    failure: this.onRequestTemplateFailure,
                     scope: this
                 });
         },
@@ -569,19 +575,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 var request = this.createRequest();
                 if (request)
                     request.create(entry, {
-                        success: function(created) {
-                            this.enable();
-
-                            App.fireEvent('refresh', {
-                                resourceKind: this.resourceKind
-                            });                            
-
-                            this.insertCompleted(created);
-                        },
-                        failure: function(response, o) {
-                            this.enable();
-                            this.requestFailure(response, o);
-                        },
+                        success: this.onInsertSuccess,
+                        failure: this.onInsertFailure,
                         scope: this
                     });
             }
@@ -590,7 +585,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 ReUI.back();
             }
         },
-        insertCompleted: function(entry) {
+        onInsertSuccess: function(entry) {
+            this.enable();
+
+            App.fireEvent('refresh', {
+                resourceKind: this.resourceKind
+            });
+
+            this.onInsertCompleted(entry);
+        },
+        onInsertFailure: function(response, o) {
+            this.enable();
+            this.onRequestFailure(response, o);
+        },
+        onInsertCompleted: function(entry) {
             if (this.options && this.options.returnTo)
             {
                 var returnTo = this.options.returnTo,
@@ -616,30 +624,32 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 var request = this.createRequest();
                 if (request)
                     request.update(entry, {
-                        success: function(modified) {
-                            this.enable();
-
-                            App.fireEvent('refresh', {
-                                resourceKind: this.resourceKind,
-                                key: modified['$key'],
-                                data: modified
-                            });
-
-                            this.updateCompleted(modified);
-                        },
-                        failure: function(response, o) {
-                            this.enable();
-                            this.requestFailure(response, o);
-                        },
+                        success: this.onUpdateSuccess,
+                        failure: this.onUpdateFailure,
                         scope: this
                     });
             }
             else
             {
-                this.updateCompleted(false);
+                this.onUpdateCompleted(false);
             }
         },
-        updateCompleted: function(entry) {
+        onUpdateSuccess: function(entry) {
+            this.enable();
+
+            App.fireEvent('refresh', {
+                resourceKind: this.resourceKind,
+                key: entry['$key'],
+                data: entry
+            });
+
+            this.onUpdateCompleted(entry);
+        },
+        onUpdateFailure: function(response, o) {
+            this.enable();
+            this.onRequestFailure(response, o);
+        },
+        onUpdateCompleted: function(entry) {
             if (this.options && this.options.returnTo)
             {
                 var returnTo = this.options.returnTo,
