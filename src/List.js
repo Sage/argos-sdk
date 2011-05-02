@@ -644,8 +644,14 @@ Ext.namespace('Sage.Platform.Mobile');
                 {
                     var entry = feed['$resources'][i];
 
+                    if("$" in  entry)
+                    {
+                      delete entry.$;
+                    }
+                    
                     this.entries[entry.$key] = entry;
 
+                    entry.$descriptor = entry.$descriptor || this.feed.$descriptor; 
                     o.push(this.itemTemplate.apply(entry, this));
                 }
 
@@ -653,7 +659,7 @@ Ext.namespace('Sage.Platform.Mobile');
                     Ext.DomHelper.append(this.contentEl, o.join(''));
             }
 
-            if (this.remainingEl)
+            if (this.remainingEl && ('$totalResults' in this.feed))
                 this.remainingEl.update(String.format(
                     this.remainingText,
                     this.feed['$totalResults'] - (this.feed['$startIndex'] + this.feed['$itemsPerPage'] - 1)

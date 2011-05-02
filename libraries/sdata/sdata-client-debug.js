@@ -357,6 +357,9 @@
         setResourceSelector: function(value) {
             this.uri.setCollectionPredicate(value);
             return this;
+        },
+        setAccept: function(val) {
+        	this.accept = val;
         }
     });
 })();
@@ -872,20 +875,23 @@
 
             if (options)
             {
-                if (isDefined(options.uri)) this.uri = options.uri;
-                if (isDefined(options.version)) this.uri.setVersion(options.version);
-                if (isDefined(options.serverName)) this.uri.setHost(options.serverName);
-                if (isDefined(options.virtualDirectory)) this.uri.setServer(options.virtualDirectory);
-                if (isDefined(options.applicationName)) this.uri.setProduct(options.applicationName);
-                if (isDefined(options.contractName)) this.uri.setContract(options.contractName);
-                if (isDefined(options.port)) this.uri.setPort(options.port);
-                if (isDefined(options.protocol)) this.uri.setScheme(options.protocol);
-                if (isDefined(options.includeContent)) this.uri.setIncludeContent(options.includeContent);
+                if (options.uri) this.uri = options.uri;
+                if (options.version) this.uri.setVersion(options.version);
+                if (options.serverName) this.uri.setHost(options.serverName);
+                if (options.virtualDirectory) this.uri.setServer(options.virtualDirectory);
+                if (options.applicationName) this.uri.setProduct(options.applicationName);
+                if (options.contractName) this.uri.setContract(options.contractName);
+                if (options.dataset) this.uri.setCompanyDataset(options.dataset);
+                if (options.port) this.uri.setPort(options.port);
+                if (options.protocol) this.uri.setScheme(options.protocol);
 
-                if (isDefined(options.json)) this.json = options.json;
-                if (isDefined(options.userName)) this.userName = options.userName;
-                if (isDefined(options.password)) this.password = options.password;
-                if (isDefined(options.useCredentialedRequest)) this.useCredentialedRequest = options.useCredentialedRequest;
+                if (typeof options.includeContent === 'boolean') this.uri.setIncludeContent(options.includeContent);
+
+                if (options.json) this.json = true;
+                if (options.userName) this.userName = options.userName;
+                if (options.password) this.password = options.password;                
+                if (options.useCredentialedRequest) this.useCredentialedRequest = true;
+
             }
 
             this.addEvents(
@@ -1111,9 +1117,7 @@
 
             return this.executeRequest(request, o, {
                 headers: {
-                    'Accept': this.json
-                        ? 'application/json,*/*'
-                        : 'application/atom+xml;type=entry,*/*'
+                    'Accept': (this.json ? 'application/json' : 'application/atom+xml;type=entry') +  (request.accept? ';' + request.accept:'') //+ ',*/*' 
                 }
             });
         },
@@ -1636,7 +1640,7 @@
 
             var contentType = response.getResponseHeader && response.getResponseHeader('Content-Type');
             
-            if ((contentType === 'application/json') || (!contentType && this.isJsonEnabled()))
+            if ((contentType.indexOf('application/json', 0) >= 0) || (!contentType && this.isJsonEnabled()))
             {
                 var doc = JSON.parse(response.responseText);
 
