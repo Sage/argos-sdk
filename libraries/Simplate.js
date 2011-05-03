@@ -17,7 +17,8 @@
             tags: {
                 begin: "{%",
                 end: "%}"
-            }
+            },
+            allowWith: false
         };
 
     var mix = function(a, b, c) {
@@ -95,11 +96,11 @@
 
         fragments.unshift(
             'var __r = [], $ = __v, $$ = this, __s = Simplate, __p = function() { __r.push.apply(__r, arguments); };',
-            'with ($ || {}) {'
+            options.allowWith ? 'with ($ || {}) {' : ''
         );
 
         fragments.push(
-            '}',
+            options.allowWith ? '}': '',
             'return __r.join(\'\');'
         );
        
