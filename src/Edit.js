@@ -336,18 +336,18 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 output.push.apply(output, insertRowsAfter);
             }
         },
-        onRequestFailure: function(response, o) {
+        onRequestDataFailure: function(response, o) {
             alert(String.format(this.requestErrorText, response, o));
         },
-        onRequestSuccess: function(entry) {
+        onRequestDataSuccess: function(entry) {
             this.processEntry(entry);
         },
         requestData: function() {
             var request = this.createRequest();
             if (request)
                 request.read({
-                    success: this.onRequestSuccess,
-                    failure: this.onRequestFailure,
+                    success: this.onRequestDataSuccess,
+                    failure: this.onRequestDataFailure,
                     scope: this
                 });
         },
@@ -357,7 +357,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         onRequestTemplateSuccess: function(entry) {
             this.processTemplateEntry(entry);
         },
-        requestTemplateData: function() {
+        requestTemplate: function() {
             var request = this.createTemplateRequest();
             if (request)
                 request.read({
@@ -729,7 +729,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 if (this.options.template)                
                     this.processTemplateEntry(this.options.template);
                 else
-                    this.requestTemplateData();                
+                    this.requestTemplate();                
             }
             else
             {

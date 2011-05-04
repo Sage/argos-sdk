@@ -682,7 +682,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 return true; // no way to determine, always assume more data
             }
         },
-        onRequestFailure: function(response, o) {
+        onRequestDataFailure: function(response, o) {
             /// <summary>
             ///     Called when an error occurs while request data from the SData endpoint.
             /// </summary>
@@ -691,11 +691,11 @@ Ext.namespace('Sage.Platform.Mobile');
             alert(String.format(this.requestErrorText, response, o));
             this.el.removeClass('list-loading');
         },
-        onRequestAborted: function(response, o) {
+        onRequestDataAborted: function(response, o) {
             this.options = false; // force a refresh
             this.el.removeClass('list-loading');
         },
-        onRequestSuccess: function(feed) {
+        onRequestDataSuccess: function(feed) {
             this.processFeed(feed);
             this.el.removeClass('list-loading');
         },
@@ -708,9 +708,9 @@ Ext.namespace('Sage.Platform.Mobile');
 
             var request = this.createRequest();
             request.read({
-                success: this.onRequestSuccess,
-                failure: this.onRequestFailure,
-                aborted: this.onRequestAborted,
+                success: this.onRequestDataSuccess,
+                failure: this.onRequestDataFailure,
+                aborted: this.onRequestDataAborted,
                 scope: this
             });
         },

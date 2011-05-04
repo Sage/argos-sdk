@@ -429,15 +429,15 @@ Ext.namespace('Sage.Platform.Mobile');
                 this.processLayout(this.compileLayout(), {title: this.detailsText}, this.entry);
             }
         },
-        onRequestFailure: function(response, o) {
+        onRequestDataFailure: function(response, o) {
             alert(String.format(this.requestErrorText, response, o));
             this.el.removeClass('panel-loading');
         },
-        onRequestAborted: function(response, o) {
+        onRequestDataAborted: function(response, o) {
             this.options = false; // force a refresh
             this.el.removeClass('panel-loading');
         },
-        onRequestSuccess: function(entry) {
+        onRequestDataSuccess: function(entry) {
             this.processEntry(entry);
             this.el.removeClass('panel-loading');
         },
@@ -447,9 +447,9 @@ Ext.namespace('Sage.Platform.Mobile');
             var request = this.createRequest();
             if (request)
                 request.read({
-                    success: this.onRequestSuccess,
-                    failure: this.onRequestFailure,
-                    aborted: this.onRequestAborted,
+                    success: this.onRequestDataSuccess,
+                    failure: this.onRequestDataFailure,
+                    aborted: this.onRequestDataAborted,
                     scope: this
                 });
         },
