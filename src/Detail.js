@@ -87,6 +87,9 @@ Ext.namespace('Sage.Platform.Mobile');
             '</a>',
             '</li>'
         ]),
+        notAvailableTemplate: new Simplate([
+            '<div class="not-available">{%: $.notAvailableText %}</div>'
+        ]),
         id: 'generic_detail',
         layout: null,
         layoutCompiled: null,
@@ -99,6 +102,7 @@ Ext.namespace('Sage.Platform.Mobile');
         detailsText: 'Details',
         loadingText: 'loading...',
         requestErrorText: 'A server error occurred while requesting data.',
+        notAvailableText: 'The requested entry is not available.',
         editView: false,
         init: function() {
             Sage.Platform.Mobile.Detail.superclass.init.call(this);
@@ -430,7 +434,11 @@ Ext.namespace('Sage.Platform.Mobile');
             }
         },
         onRequestDataFailure: function(response, o) {
-            alert(String.format(this.requestErrorText, response, o));
+            if (response && response.status == 404)
+                Ext.DomHelper.append(this.contentEl, this.notAvailableTemplate.apply(this));
+            else
+                alert(String.format(this.requestErrorText, response, o));            
+
             this.el.removeClass('panel-loading');
         },
         onRequestDataAborted: function(response, o) {

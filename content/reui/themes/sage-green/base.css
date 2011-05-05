@@ -445,6 +445,13 @@ img
     cursor: pointer;
 }
 
+.not-available
+{
+    text-align: center;
+    padding: 8px 32px 8px 36px !important;
+    font-size: 1.25em;
+}
+
 .no-data
 {
 	text-align: center;
