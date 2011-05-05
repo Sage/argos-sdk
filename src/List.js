@@ -655,7 +655,8 @@ Ext.namespace('Sage.Platform.Mobile');
                     Ext.DomHelper.append(this.contentEl, o.join(''));
             }
 
-            if (this.remainingEl)
+            // todo: add more robust handling when $totalResults does not exist, i.e., hide element completely
+            if (this.remainingEl && typeof this.feed['$totalResults'] !== 'undefined')
                 this.remainingEl.update(String.format(
                     this.remainingText,
                     this.feed['$totalResults'] - (this.feed['$startIndex'] + this.feed['$itemsPerPage'] - 1)
