@@ -644,6 +644,8 @@ Ext.namespace('Sage.Platform.Mobile');
                 {
                     var entry = feed['$resources'][i];
 
+                    entry['$descriptor'] = entry['$descriptor'] || feed['$descriptor'];
+
                     this.entries[entry.$key] = entry;
 
                     o.push(this.itemTemplate.apply(entry, this));
