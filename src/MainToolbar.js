@@ -32,7 +32,7 @@ Ext.namespace("Sage.Platform.Mobile");
                 '{% if ($.icon) { %}',
                 '<img src="{%= $.icon %}" alt="{%= $.id %}" />',
                 '{% } else { %}',
-                '<span>{%: $.title %}</span>',
+                '<span>&nbsp;</span>',
                 '{% } %}',
             '</button>'
         ]),
