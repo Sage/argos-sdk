@@ -29,9 +29,12 @@ Ext.namespace('Sage.Platform.Mobile');
             '</div>'
         ]),
         groupTemplate: new Simplate([
-            '<h2 data-action="toggleGroup" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<button class="collapsed-indicator"></button></h2>',
+            '<h2 data-action="toggleGroup" class="{% if ($.collapsed) { %}collapsed{% } %}">',
+            '{%: $.title %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
+            '</h2>',
             '<ul data-group="{%= $.tag %}" class="list-content {%= $.cls %}"></ul>'
         ]),
+        toggleCollapseText: 'toggle collapse',
         getGroupForEntry: function(entry) {
             return {
                 tag: 1,

@@ -34,7 +34,9 @@ Ext.namespace('Sage.Platform.Mobile');
             '</div>'
         ]),     
         sectionBeginTemplate: new Simplate([
-            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">{%: $.title %}<button class="collapsed-indicator"></button></h2>',
+            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">',
+            '{%: $.title %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
+            '</h2>',
             '{% if ($.list) { %}<ul class="{%= $.cls %}">{% } else { %}<div class="{%= $.cls %}">{% } %}'
         ]),
         sectionEndTemplate: new Simplate([
@@ -100,6 +102,7 @@ Ext.namespace('Sage.Platform.Mobile');
         editText: 'Edit',
         titleText: 'Detail',
         detailsText: 'Details',
+        toggleCollapseText: 'toggle collapse',
         loadingText: 'loading...',
         requestErrorText: 'A server error occurred while requesting data.',
         notAvailableText: 'The requested entry is not available.',

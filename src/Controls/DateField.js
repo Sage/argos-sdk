@@ -24,7 +24,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button class="button whiteButton"><span>{%: $.lookupText %}</span></button>',
+            '<button class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
             '<input type="text" />'
         ]),
         view: 'generic_calendar',

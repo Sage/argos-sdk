@@ -21,7 +21,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     Sage.Platform.Mobile.Controls.NoteField = Ext.extend(Sage.Platform.Mobile.Controls.EditorField, {
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button class="button simpleSubHeaderButton"><span>{%: $.lookupText %}</span></button>',
+            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
             '<div class="note-text"></div>'
         ]),
         noteProperty: 'Notes',
