@@ -516,6 +516,9 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <returns type="String">An SData query compatible search expression.</returns>
             return false;
         },
+        escapeSearchQuery: function(query) {
+            return (query || '').replace(/"/g, '""');
+        },
         formatRelatedQuery: function(entry, fmt, property) {
             var property = property || '$key';
 
