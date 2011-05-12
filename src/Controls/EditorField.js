@@ -37,13 +37,19 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         enable: function() {
             Sage.Platform.Mobile.Controls.EditorField.superclass.enable.apply(this, arguments);
 
+            this._enableTextElement();
+        },
+        _enableTextElement: function() {
             this.el.dom.disabled = false;
         },
         disable: function() {
             Sage.Platform.Mobile.Controls.EditorField.superclass.disable.apply(this, arguments);
 
+            this._disableTextElement();
+        },
+        _disableTextElement: function() {
             this.el.dom.disabled = true;
-        },      
+        },
         createNavigationOptions: function() {
             return {
                 tools: {
@@ -64,6 +70,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             };
         },
         navigateToEditView: function() {
+            if (this.isDisabled()) return;
+
             var view = App.getView(this.view),
                 options = this.createNavigationOptions();
 

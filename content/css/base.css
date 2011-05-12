@@ -332,7 +332,7 @@
 
 .row-disabled > button,
 .row-disabled > input,
-.row-disabled > .toggle
+.row-disabled > div
 {
     opacity: 0.3;
     cursor: default;

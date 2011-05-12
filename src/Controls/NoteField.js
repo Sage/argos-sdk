@@ -26,7 +26,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         ]),
         noteProperty: 'Notes',
         emptyText: '',
-        
+
+        _enableTextElement: function() {
+        },
+        _disableTextElement: function() {
+        },
         createNavigationOptions: function() {
             var options = Sage.Platform.Mobile.Controls.NoteField.superclass.createNavigationOptions.apply(this, arguments);
             //Name does not have an entity.

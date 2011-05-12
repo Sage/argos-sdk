@@ -54,6 +54,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     .on('blur', this.onBlur, this);
             }
         },
+        enable: function() {
+            Sage.Platform.Mobile.Controls.EditorField.superclass.enable.apply(this, arguments);
+
+            this.el.dom.disabled = false;
+        },
+        disable: function() {
+            Sage.Platform.Mobile.Controls.EditorField.superclass.disable.apply(this, arguments);
+
+            this.el.dom.disabled = true;
+        },  
         isReadOnly: function() {
             return !this.view;
         },

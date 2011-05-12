@@ -27,6 +27,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         rows: 4,
         lookupLabelText: 'edit',
         emptyText: 'no address',
+
+        _enableTextElement: function() {
+        },
+        _disableTextElement: function() {
+        },
         setText: function(text) {
             this.el.dom.innerHTML = text;
         }

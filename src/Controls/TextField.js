@@ -38,6 +38,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 .on('keyup', this.onKeyUp, this)
                 .on('blur', this.onBlur, this);
         },
+        enable: function() {
+            Sage.Platform.Mobile.Controls.EditorField.superclass.enable.apply(this, arguments);
+
+            this.el.dom.disabled = false;
+        },
+        disable: function() {
+            Sage.Platform.Mobile.Controls.EditorField.superclass.disable.apply(this, arguments);
+
+            this.el.dom.disabled = true;
+        },  
         onKeyPress: function(evt, el, o) {
             var v = this.getValue() + String.fromCharCode(evt.getCharCode());
             if (this.validate(v))
