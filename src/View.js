@@ -146,7 +146,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
             this.options = data.options || this.options || {};
 
-            if (this.options.title) this.setTitle(this.options.title);
+            (this.options.title) ? this.setTitle(this.options.title) : this.setTitle(this.titleText);
 
             this.fireEvent('activate', this);
         },
@@ -163,7 +163,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
             this.options = options || this.options || {};
 
-            if (this.options.title) this.setTitle(this.options.title);
+            (this.options.title) ? this.setTitle(this.options.title) : this.setTitle(this.titleText);
 
             ReUI.show(this.el.dom, Ext.apply(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
         },
