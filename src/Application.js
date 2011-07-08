@@ -510,9 +510,15 @@ Ext.onReady(function(){
         var endAt = evt.getXY(),
             endTime = (new Date()).getTime(),
             duration = (endTime - startTime) / 1000.0,
-            direction = {x: endAt[0] - startAt[0], y: endAt[1] - startAt[1]},
+            direction = {
+                x: endAt[0] - startAt[0],
+                y: endAt[1] - startAt[1]
+            },
             length = Math.sqrt(direction.x * direction.x + direction.y * direction.y),
-            normalized = {x: direction.x / length, y: direction.y / length},
+            normalized = {
+                x: direction.x / length,
+                y: direction.y / length
+            },
             dotProd = normalized.x * 0.0 + normalized.y * 1.0;
 
         if (duration <= maxSwipeTime && length >= minSwipeLength)
