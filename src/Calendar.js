@@ -89,15 +89,12 @@
         showTimePicker: false,
         selectedDateEl: false,
         weekEnds: [0, 6],
-        dayLabels : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        monthLabels : ['January', 'February', 'March', 'April',
-                     'May', 'June', 'July', 'August', 'September',
-                     'October', 'November', 'December'],
         daysInMonth : [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
         init: function() {
             Sage.Platform.Mobile.Calendar.superclass.init.call(this);
 
             this.el.on('swipe', this.onSwipe, this);
+			
             
             this.timeEl.setVisibilityMode(Ext.Element.DISPLAY);
 
@@ -251,7 +248,7 @@
                 weekendClass = '', i = 0, j = 0, selectedEl = false,
                 isCurrentMonth =  this.year === Date.today().getFullYear() && this.month === Date.today().getMonth();
 
-            this.monthName = this.monthLabels[this.month];
+            this.monthName = Date.CultureInfo.monthNames[mm];
             
             // compensate for leap year
             if (this.month == 1 && Date.isLeapYear(yyyy)) // February only!
@@ -266,7 +263,7 @@
             // Week Header
             calHTML.push(this.calendarWeekHeaderStartTemplate);
             for(i = 0; i <= 6; i++ ){
-                calHTML.push(String.format(this.calendarWeekHeaderTemplate, this.dayLabels[i]));
+                calHTML.push(String.format(this.calendarWeekHeaderTemplate, Date.CultureInfo.abbreviatedDayNames[i]  ));
             }
             calHTML.push(this.calendarWeekHeaderEndTemplate);
 
@@ -321,6 +318,10 @@
             selectedEl = Ext.DomQuery.select('.selected', 'table.calendar-table', 'td');
             if (Ext.isArray(selectedEl) && selectedEl.length > 0) this.selectedDateEl = Ext.get(selectedEl[0]);
             else this.selectedDateEl = false;
-        }
+        },
+		cellSizeNormalize: function(){
+				var cellWidth = (screen.width/7) - 21;
+				Ext.select('.calendar-day').setWidth(cellWidth);
+		}
     });
 })();
