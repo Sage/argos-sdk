@@ -31,7 +31,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         emptyText: '',
         formatString: 'MM/dd/yyyy',
         showTimePicker: false,
-        invalidDateFormatError: "Field '{0}' has Invalid date format.",
+        invalidDateFormatErrorText: "Field '{0}' has Invalid date format.",
         formatValue: function(value) {
             return Sage.Platform.Mobile.Format.date(value, this.formatString);
         },
@@ -89,7 +89,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         validate: function() {
             if (this.el.dom.value !== '' && !this.currentValue)
-                return String.format(this.invalidDateFormatError, this.label);
+                return String.format(this.invalidDateFormatErrorText, this.label);
 
             return Sage.Platform.Mobile.Controls.DateField.superclass.validate.apply(this, arguments);
         }
