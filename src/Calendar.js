@@ -81,8 +81,8 @@
         calendarDayTemplate: '<td class="calendar-day {1}" data-action="selectDay" data-date="{2}">{0}</td>',
         calendarWeekEndTemplate: '</tr>',
         calendarEndTemplate: '</table>',
-        invalidHourError: 'Invalid hour format',
-        invalidMinuteError: 'Invalid minute format',
+        invalidHourErrorText: 'Invalid hour format',
+        invalidMinuteErrorText: 'Invalid minute format',
         id: 'generic_calendar',
         expose: false,
         date: false,
@@ -147,11 +147,11 @@
 
             if (this.hourField.hasClass('field-error'))
                 content.push(this.validationSummaryItemTemplate.apply({
-                    'message': this.invalidHourError
+                    'message': this.invalidHourErrorText
                 }));
             if (this.minuteField.hasClass('field-error'))
                 content.push(this.validationSummaryItemTemplate.apply({
-                    'message': this.invalidMinuteError
+                    'message': this.invalidMinuteErrorText
                 }));
 
             this.validationContentEl.update(content.join(''));
