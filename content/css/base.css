@@ -27,14 +27,14 @@
     display: none;
 }
 
-.list-more
+.list-more, .list-none
 {
     display: none;
     padding: 12px;
     border-bottom: 1px solid #DDD;
 }
 
-.list-more .button
+.list-more .button, .list-none .button
 {
     height: 40px;
     line-height: 40px;
@@ -58,13 +58,13 @@
     display: none;
 }
 
-.list-has-more .list-more
+.list-has-more .list-more, .list-has-none .list-none
 {
     display: block;
     background-color: #fff;
 }
 
-.list-has-more .list-more .button
+.list-has-more .list-more .button, .list-has-more .list-none .button
 {
     width: 100%;
 }

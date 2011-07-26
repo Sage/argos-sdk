@@ -123,6 +123,7 @@ Ext.namespace('Sage.Platform.Mobile');
             searchQueryEl: '.list-search input',
             searchLabelEl: '.list-search label',
             moreEl: '.list-more',
+            noneEl: '.list-none',
             remainingEl: '.list-more .list-remaining span'
         },
         /**
@@ -133,6 +134,7 @@ Ext.namespace('Sage.Platform.Mobile');
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
             '{%! $.searchTemplate %}',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',                
+            '{%! $.noneTemplate %}',
             '<ul class="list-content"></ul>',
             '{%! $.moreTemplate %}',
             '</div>'
@@ -168,6 +170,27 @@ Ext.namespace('Sage.Platform.Mobile');
             '<div class="list-remaining"><span></span></div>',
             '<button class="button" data-action="more">',
             '<span>{%= $.moreText %}</span>',
+            '</button>',
+            '</div>'
+        ]),
+        /**
+         * Template used on lookups to have a "None" option at the top of the list.
+         * This template is not directly rendered but included in {@link #viewTemplate}.
+         *
+         * The default template uses the following properties:
+         *
+         *      name                description
+         *      ----------------------------------------------------------------
+         *      noneText            The text to display on the none button.
+         *
+         * The default template exposes the following actions:
+         *
+         * * none
+         */
+        noneTemplate: new Simplate([
+            '<div class="list-none">',
+            '<button class="button" data-action="none">',
+            '<span>{%= $.noneText %}</span>',
             '</button>',
             '</div>'
         ]),
@@ -332,6 +355,16 @@ Ext.namespace('Sage.Platform.Mobile');
          */
         moreText: 'Retrieve More Records',
         /**
+         * The text displayed in the more button.
+         * @type {String}
+         */
+        noneText: 'None',
+        /**
+         * True to display and allow selection of None value (defaults to false).
+         * @type {Boolean}
+         */
+        hasNoneOption: false,
+        /**
          * The text displayed as the default title.
          * @type {String}
          */
@@ -470,10 +503,18 @@ Ext.namespace('Sage.Platform.Mobile');
         },
         activateEntry: function(params) {
             if (params.key)
-                if (this.isNavigationDisabled())
+                if (this.isNavigationDisabled()) {
                     this.selectionModel.toggle(params.key, this.entries[params.key], params.$source);
-                else
+                    if( this.options.singleSelect ) {
+                        // FIX. relying on 'complete' action in picklist's tools.tbar
+                        var t = this.options.tools.tbar;
+                        for( i = 0; i < t.length; i += 1) {
+                            if( 'complete' == t[i].id ) { t[i].fn.call(t[i].scope); break; }
+                        }
+                    }
+                } else {
                     this.navigateToDetailView(params.key, params.descriptor);
+                }
         },
         clearSearchQuery: function() {
             this.searchEl.removeClass('list-search-active');
@@ -669,6 +710,10 @@ Ext.namespace('Sage.Platform.Mobile');
                 this.el.addClass('list-has-more');
             else
                 this.el.removeClass('list-has-more');
+
+            if (this.hasNoneOption)
+                this.el.addClass('list-has-none');
+
         },
         hasMoreData: function() {
             /// <summary>
@@ -725,6 +770,16 @@ Ext.namespace('Sage.Platform.Mobile');
             ///     Called when the more button is clicked.
             /// </summary>
             this.requestData();
+        },
+        none: function() {
+            /// <summary>
+            ///     Called when the none button is clicked. Set value to empty string.
+            /// </summary>
+            var t = this.options.tools.tbar;
+            for( i = 0; i < t.length; i += 1) { if( 'complete' == t[i].id ) { break; }}
+            t[i].scope.el.dom.value = '';
+            // FIX. relying on 'complete' action in picklist's tools.tbar
+            t[i].fn.call(t[i].scope);
         },
         expandExpression: function(expression) {
             /// <summary>
