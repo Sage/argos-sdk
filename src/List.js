@@ -123,7 +123,7 @@ Ext.namespace('Sage.Platform.Mobile');
             searchQueryEl: '.list-search input',
             searchLabelEl: '.list-search label',
             moreEl: '.list-more',
-            noneEl: '.list-none',
+            emptySelectionEl: '.list-empty-opt',
             remainingEl: '.list-more .list-remaining span'
         },
         /**
@@ -134,7 +134,7 @@ Ext.namespace('Sage.Platform.Mobile');
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
             '{%! $.searchTemplate %}',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',                
-            '{%! $.noneTemplate %}',
+            '{%! $.emptySelectionTemplate %}',
             '<ul class="list-content"></ul>',
             '{%! $.moreTemplate %}',
             '</div>'
@@ -174,23 +174,23 @@ Ext.namespace('Sage.Platform.Mobile');
             '</div>'
         ]),
         /**
-         * Template used on lookups to have a "None" option at the top of the list.
+         * Template used on lookups to have empty Selection option.
          * This template is not directly rendered but included in {@link #viewTemplate}.
          *
          * The default template uses the following properties:
          *
          *      name                description
          *      ----------------------------------------------------------------
-         *      noneText            The text to display on the none button.
+         *      emptySelectionText  The text to display on the empty Selection button.
          *
          * The default template exposes the following actions:
          *
-         * * none
+         * * emptySelection
          */
-        noneTemplate: new Simplate([
-            '<div class="list-none">',
-            '<button class="button" data-action="none">',
-            '<span>{%= $.noneText %}</span>',
+        emptySelectionTemplate: new Simplate([
+            '<div class="list-empty-opt">',
+            '<button class="button" data-action="emptySelection">',
+            '<span>{%= $.emptySelectionText %}</span>',
             '</button>',
             '</div>'
         ]),
@@ -355,15 +355,10 @@ Ext.namespace('Sage.Platform.Mobile');
          */
         moreText: 'Retrieve More Records',
         /**
-         * The text displayed in the more button.
+         * The text displayed in the emptySelection button.
          * @type {String}
          */
-        noneText: 'None',
-        /**
-         * True to display and allow selection of None value (defaults to false).
-         * @type {Boolean}
-         */
-        hasNoneOption: false,
+        emptySelectionText: 'None',
         /**
          * The text displayed as the default title.
          * @type {String}
@@ -505,12 +500,11 @@ Ext.namespace('Sage.Platform.Mobile');
             if (params.key)
                 if (this.isNavigationDisabled()) {
                     this.selectionModel.toggle(params.key, this.entries[params.key], params.$source);
-                    if( this.options.singleSelect ) {
-                        // FIX. relying on 'complete' action in picklist's tools.tbar
-                        var t = this.options.tools.tbar;
-                        for( i = 0; i < t.length; i += 1) {
-                            if( 'complete' == t[i].id ) { t[i].fn.call(t[i].scope); break; }
-                        }
+
+                    if (this.options.singleSelect && this.options.singleSelectAction) {
+                        App.bars.tbar.invokeTool({tool: this.options.singleSelectAction});
+
+                        if (this.autoClearSelection) { this.selectionModel.clear(); }
                     }
                 } else {
                     this.navigateToDetailView(params.key, params.descriptor);
@@ -711,8 +705,8 @@ Ext.namespace('Sage.Platform.Mobile');
             else
                 this.el.removeClass('list-has-more');
 
-            if (this.hasNoneOption)
-                this.el.addClass('list-has-none');
+            if (this.allowEmptySelection)
+                this.el.addClass('list-has-empty-opt');
 
         },
         hasMoreData: function() {
@@ -771,15 +765,19 @@ Ext.namespace('Sage.Platform.Mobile');
             /// </summary>
             this.requestData();
         },
-        none: function() {
+        emptySelection: function() {
             /// <summary>
-            ///     Called when the none button is clicked. Set value to empty string.
+            ///     Called when the emptySelection/None button is clicked.
             /// </summary>
             var t = this.options.tools.tbar;
-            for( i = 0; i < t.length; i += 1) { if( 'complete' == t[i].id ) { break; }}
-            t[i].scope.el.dom.value = '';
-            // FIX. relying on 'complete' action in picklist's tools.tbar
-            t[i].fn.call(t[i].scope);
+            for (i = 0; i < t.length; i += 1) {
+                if (this.options.singleSelectAction == t[i].id) {
+                    t[i].scope.el.dom.value = ''; // Set value to empty string.
+                    break;
+                }
+            }
+            this.selectionModel.clear();
+            App.bars.tbar.invokeTool({tool: this.options.singleSelectAction}); // invoke action of tool
         },
         expandExpression: function(expression) {
             /// <summary>
