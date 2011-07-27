@@ -90,7 +90,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         createNavigationOptions: function() {
             var options = {
                 selectionOnly: true,
-                singleSelect: true,                
+                singleSelect: true,
+                singleSelectAction: 'complete',
+                allowEmptySelection: false,
                 resourceKind: this.resourceKind,
                 resourcePredicate: this.resourcePredicate,
                 where: this.where,
