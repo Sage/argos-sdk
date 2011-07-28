@@ -318,10 +318,6 @@
             selectedEl = Ext.DomQuery.select('.selected', 'table.calendar-table', 'td');
             if (Ext.isArray(selectedEl) && selectedEl.length > 0) this.selectedDateEl = Ext.get(selectedEl[0]);
             else this.selectedDateEl = false;
-        },
-		cellSizeNormalize: function(){
-				var cellWidth = (screen.width/7) - 21;
-				Ext.select('.calendar-day').setWidth(cellWidth);
-		}
+        }
     });
 })();
