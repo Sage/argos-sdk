@@ -81,23 +81,20 @@
         calendarDayTemplate: '<td class="calendar-day {1}" data-action="selectDay" data-date="{2}">{0}</td>',
         calendarWeekEndTemplate: '</tr>',
         calendarEndTemplate: '</table>',
-        invalidHourError: 'Invalid hour format',
-        invalidMinuteError: 'Invalid minute format',
+        invalidHourErrorText: 'Invalid hour format',
+        invalidMinuteErrorText: 'Invalid minute format',
         id: 'generic_calendar',
         expose: false,
         date: false,
         showTimePicker: false,
         selectedDateEl: false,
         weekEnds: [0, 6],
-        dayLabels : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-        monthLabels : ['January', 'February', 'March', 'April',
-                     'May', 'June', 'July', 'August', 'September',
-                     'October', 'November', 'December'],
         daysInMonth : [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
         init: function() {
             Sage.Platform.Mobile.Calendar.superclass.init.call(this);
 
             this.el.on('swipe', this.onSwipe, this);
+			
             
             this.timeEl.setVisibilityMode(Ext.Element.DISPLAY);
 
@@ -150,11 +147,11 @@
 
             if (this.hourField.hasClass('field-error'))
                 content.push(this.validationSummaryItemTemplate.apply({
-                    'message': this.invalidHourError
+                    'message': this.invalidHourErrorText
                 }));
             if (this.minuteField.hasClass('field-error'))
                 content.push(this.validationSummaryItemTemplate.apply({
-                    'message': this.invalidMinuteError
+                    'message': this.invalidMinuteErrorText
                 }));
 
             this.validationContentEl.update(content.join(''));
@@ -251,7 +248,7 @@
                 weekendClass = '', i = 0, j = 0, selectedEl = false,
                 isCurrentMonth =  this.year === Date.today().getFullYear() && this.month === Date.today().getMonth();
 
-            this.monthName = this.monthLabels[this.month];
+            this.monthName = Date.CultureInfo.monthNames[mm];
             
             // compensate for leap year
             if (this.month == 1 && Date.isLeapYear(yyyy)) // February only!
@@ -266,7 +263,7 @@
             // Week Header
             calHTML.push(this.calendarWeekHeaderStartTemplate);
             for(i = 0; i <= 6; i++ ){
-                calHTML.push(String.format(this.calendarWeekHeaderTemplate, this.dayLabels[i]));
+                calHTML.push(String.format(this.calendarWeekHeaderTemplate, Date.CultureInfo.abbreviatedDayNames[i]  ));
             }
             calHTML.push(this.calendarWeekHeaderEndTemplate);
 
