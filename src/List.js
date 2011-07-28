@@ -769,13 +769,6 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <summary>
             ///     Called when the emptySelection/None button is clicked.
             /// </summary>
-            var t = this.options.tools.tbar;
-            for (i = 0; i < t.length; i += 1) {
-                if (this.options.singleSelectAction == t[i].id) {
-                    t[i].scope.el.dom.value = ''; // Set value to empty string.
-                    break;
-                }
-            }
             this.selectionModel.clear();
             App.bars.tbar.invokeTool({tool: this.options.singleSelectAction}); // invoke action of tool
         },

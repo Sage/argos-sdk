@@ -177,6 +177,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 var selections = view.selectionModel.getSelections();
 
+                if (0 == view.selectionModel.getSelectionCount() && view.allowEmptySelection)
+                    this.setText( this.emptyText );
+
                 for (var selectionKey in selections)
                 {
                     var val = selections[selectionKey].data,
