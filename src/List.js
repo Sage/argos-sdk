@@ -705,7 +705,7 @@ Ext.namespace('Sage.Platform.Mobile');
             else
                 this.el.removeClass('list-has-more');
 
-            if (this.allowEmptySelection)
+            if (this.options.allowEmptySelection)
                 this.el.addClass('list-has-empty-opt');
 
         },
