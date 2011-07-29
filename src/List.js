@@ -325,7 +325,7 @@ Ext.namespace('Sage.Platform.Mobile');
          * The regular expression used to determine if a search query is a hash tag search.
          * @type {Object}
          */
-        hashTagSearchRE: /^(?:#|;|,|\.)(\w+)/,
+        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
         /**
          * The text displayed in the more button.
          * @type {String}
@@ -487,7 +487,7 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <param name="searchText" type="String">The search query.</param>
             var search = this.searchQueryEl.dom.value.length > 0 ? this.searchQueryEl.dom.value : false,
                 customMatch = search && this.customSearchRE.exec(search),
-                hashTagMatch = search && this.hashTagSearchRE.exec(search);
+                hashTagMatches = search && search.match(this.hashTagSearchRE);
 
             this.clear();
 
@@ -498,9 +498,23 @@ Ext.namespace('Sage.Platform.Mobile');
             {
                 this.query = search.replace(this.customSearchRE, '');
             }
-            else if (hashTagMatch && this.hashTagQueries && this.hashTagQueries[hashTagMatch[1]])
+            else if (hashTagMatches && this.hashTagQueries)
             {
-                this.query = this.expandExpression(this.hashTagQueries[hashTagMatch[1]], hashTagMatch);
+                var i,
+                    matchLength=hashTagMatches.length,
+                    currentHash,
+                    hashQueries=[];
+
+                console.log(hashTagMatches);
+                for(i=0; i<matchLength; i+=1){
+                    currentHash = hashTagMatches[i].substring(1);
+                    // localization
+                    currentHash = this.lookupHashQueryText(currentHash);
+                    console.log(currentHash);
+                    hashQueries.push(this.expandExpression(this.hashTagQueries[currentHash]));
+                }
+                console.log(hashQueries);
+                this.query = (hashQueries.length>1) ? '('+hashQueries.join(') and (')+')': hashQueries[0];
             }
             else if (search)
             {
@@ -508,6 +522,16 @@ Ext.namespace('Sage.Platform.Mobile');
             }
 
             this.requestData();
+        },
+        lookupHashQueryText: function(hash){
+            if(this.hashTagQueriesText===undefined) return hash;
+
+            for(key in this.hashTagQueriesText){
+                if(this.hashTagQueriesText[key]===hash) {
+                    return key;
+                }
+            }
+            return hash;
         },
         formatSearchQuery: function(query) {
             /// <summary>
