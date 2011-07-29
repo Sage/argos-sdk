@@ -92,7 +92,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 selectionOnly: true,
                 singleSelect: true,
                 singleSelectAction: 'complete',
-                allowEmptySelection: false,
+                allowEmptySelection: !this.requireSelection,
                 resourceKind: this.resourceKind,
                 resourcePredicate: this.resourcePredicate,
                 where: this.where,
@@ -177,8 +177,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             {
                 var selections = view.selectionModel.getSelections();
 
-                if (0 == view.selectionModel.getSelectionCount() && view.allowEmptySelection)
-                    this.setText( this.emptyText );
+                if (0 == view.selectionModel.getSelectionCount() && view.options.allowEmptySelection)
+                    this.clearValue( true );
 
                 for (var selectionKey in selections)
                 {
