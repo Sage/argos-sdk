@@ -511,9 +511,7 @@ Ext.namespace('Sage.Platform.Mobile');
                     currentHash = this.lookupHashQueryText(currentHash);
                     hashQueries.push(this.expandExpression(this.hashTagQueries[currentHash]));
                 }
-                this.query = (hashQueries.length > 1)
-                    ? '('+hashQueries.join(') and (')+')'
-                    : '('+hashQueries[0]+')';
+                this.query = '('+hashQueries.join(') and (')+')';
 
                 // append any further search queries
                 search = search.replace(/^\s+|\s+$/g,'');
