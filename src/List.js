@@ -502,6 +502,7 @@ Ext.namespace('Sage.Platform.Mobile');
             {
                 var hashLookup={},
                     hashQueries=[],
+                    hashQueryExpression,
                     match,
                     hashTag,
                     additionalSearch=search.replace(hashTagMatches[0],'');
@@ -509,18 +510,20 @@ Ext.namespace('Sage.Platform.Mobile');
                 // localize
                 for (var key in this.hashTagQueriesText) hashLookup[this.hashTagQueriesText[key]] = key;
 
-                // push the initial hash that the first test caught
-                hashQueries.push(this.expandExpression(this.hashTagQueries[hashLookup[hashTagMatches[1]] || hashTagMatches[1]]));
+                // add initial hash caught for if test
+                hashTag = hashTagMatches[1];
+                hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                hashQueries.push(this.expandExpression(hashQueryExpression));
 
-                // check for any further hashes
                 while (match = this.hashTagSearchRE.exec(search)) {
                     hashTag = match[1];
+                    hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                    hashQueries.push(this.expandExpression(hashQueryExpression));
                     additionalSearch = additionalSearch.replace(match[0],'');
-                    hashQueries.push(this.expandExpression(this.hashTagQueries[hashLookup[hashTag] || hashTag]));
                 }
+
                 this.query = '('+hashQueries.join(') and (')+')';
 
-                // append any further search queries
                 additionalSearch = additionalSearch.replace(/^\s+|\s+$/g,'');
                 if(additionalSearch !== ''){
                     this.query += ' and (' + this.formatSearchQuery(additionalSearch) + ')';
