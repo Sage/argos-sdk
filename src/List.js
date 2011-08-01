@@ -487,7 +487,7 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <param name="searchText" type="String">The search query.</param>
             var search = this.searchQueryEl.dom.value.length > 0 ? this.searchQueryEl.dom.value : false,
                 customMatch = search && this.customSearchRE.exec(search),
-                hashTagMatches = search && search.match(this.hashTagSearchRE);
+                hashTagMatches = search && this.hashTagSearchRE.exec(search);
 
             this.clear();
 
@@ -500,23 +500,30 @@ Ext.namespace('Sage.Platform.Mobile');
             }
             else if (hashTagMatches && this.hashTagQueries)
             {
-                var i,
-                    matchLength=hashTagMatches.length,
-                    currentHash,
-                    hashQueries=[];
+                var hashLookup={},
+                    hashQueries=[],
+                    match,
+                    hashTag,
+                    additionalSearch=search.replace(hashTagMatches[0],'');
 
-                for(i=0; i<matchLength; i+=1){
-                    search = search.replace(hashTagMatches[i],'');
-                    currentHash = hashTagMatches[i].substring(1);
-                    currentHash = this.lookupHashQueryText(currentHash);
-                    hashQueries.push(this.expandExpression(this.hashTagQueries[currentHash]));
+                // localize
+                for (var key in this.hashTagQueriesText) hashLookup[this.hashTagQueriesText[key]] = key;
+
+                // push the initial hash that the first test caught
+                hashQueries.push(this.expandExpression(this.hashTagQueries[hashLookup[hashTagMatches[1]] || hashTagMatches[1]]));
+
+                // check for any further hashes
+                while (match = this.hashTagSearchRE.exec(search)) {
+                    hashTag = match[1];
+                    additionalSearch = additionalSearch.replace(match[0],'');
+                    hashQueries.push(this.expandExpression(this.hashTagQueries[hashLookup[hashTag] || hashTag]));
                 }
                 this.query = '('+hashQueries.join(') and (')+')';
 
                 // append any further search queries
-                search = search.replace(/^\s+|\s+$/g,'');
-                if(search !== ''){
-                    this.query += ' and (' + this.formatSearchQuery(search) + ')';
+                additionalSearch = additionalSearch.replace(/^\s+|\s+$/g,'');
+                if(additionalSearch !== ''){
+                    this.query += ' and (' + this.formatSearchQuery(additionalSearch) + ')';
                 }
             }
             else if (search)
@@ -525,16 +532,6 @@ Ext.namespace('Sage.Platform.Mobile');
             }
 
             this.requestData();
-        },
-        lookupHashQueryText: function(hash){
-            if(this.hashTagQueriesText===undefined) return hash;
-
-            for(key in this.hashTagQueriesText){
-                if(this.hashTagQueriesText[key] === hash) {
-                    return key;
-                }
-            }
-            return hash;
         },
         formatSearchQuery: function(query) {
             /// <summary>
