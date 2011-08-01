@@ -505,16 +505,21 @@ Ext.namespace('Sage.Platform.Mobile');
                     currentHash,
                     hashQueries=[];
 
-                console.log(hashTagMatches);
                 for(i=0; i<matchLength; i+=1){
+                    search = search.replace(hashTagMatches[i],'');
                     currentHash = hashTagMatches[i].substring(1);
-                    // localization
                     currentHash = this.lookupHashQueryText(currentHash);
-                    console.log(currentHash);
                     hashQueries.push(this.expandExpression(this.hashTagQueries[currentHash]));
                 }
-                console.log(hashQueries);
-                this.query = (hashQueries.length>1) ? '('+hashQueries.join(') and (')+')': hashQueries[0];
+                this.query = (hashQueries.length > 1)
+                    ? '('+hashQueries.join(') and (')+')'
+                    : '('+hashQueries[0]+')';
+
+                // append any further search queries
+                search = search.replace(/^\s+|\s+$/g,'');
+                if(search !== ''){
+                    this.query += ' and (' + this.formatSearchQuery(search) + ')';
+                }
             }
             else if (search)
             {
@@ -527,7 +532,7 @@ Ext.namespace('Sage.Platform.Mobile');
             if(this.hashTagQueriesText===undefined) return hash;
 
             for(key in this.hashTagQueriesText){
-                if(this.hashTagQueriesText[key]===hash) {
+                if(this.hashTagQueriesText[key] === hash) {
                     return key;
                 }
             }
