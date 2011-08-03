@@ -254,14 +254,19 @@
         activityCache: {},
         requestActivityList: function(startd, endd) {
             // call data request
-// Sdata seem unable to search with EndDate criteria?
-// 'EndDate gt "{1}" and StartDate lt "{2}"'
+            // unable to search with EndDate criteria 'EndDate gt "{1}" and StartDate lt "{2}"'
             var request = this.requestActivities(
                 String.format(
-                    'UserId eq "{0}" and StartDate ge @{1}@ and StartDate le @{2}@',
+                    [
+                    'UserId eq "{0}" and (',
+                    '(Timeless eq false and StartDate between @{1}@ and @{2}@) or ',
+                    '(Timeless eq true and StartDate between @{3}@ and @{4}@))'
+                    ].join(''),
                     App.context['user'] && App.context['user']['$key'],
                     Sage.Platform.Mobile.Convert.toIsoStringFromDate(startd),
-                    Sage.Platform.Mobile.Convert.toIsoStringFromDate(endd)
+                    Sage.Platform.Mobile.Convert.toIsoStringFromDate(endd),
+                    startd.toString('yyyy-MM-ddT00:00:00Z'),
+                    endd.toString('yyyy-MM-ddT23:59:59Z')
                 )
             );
             request.read({
@@ -275,20 +280,21 @@
             console.log("ERROR: "); console.log( er );
         },
         processActivityList: function(sources) {
-            var flatList = [], dt_fr, dt_to;
+            var flatList = [], dt;
+            var currentMonthStart = new Date(this.year, this.month, 1, 0, 0, 0);
+            var currentMonthEnd   = new Date(this.year, this.month, this.daysInMonth[this.month], 23, 59, 59);
             var r = sources['$resources']; //console.log(r);
             // make a list of days and their event counts
             for(var i=0, l=r.length; i<l; i++){
-                var sday = Sage.Platform.Mobile.Convert.toDateFromString(r[i].StartDate); // "/Date(1311952500000)/"
+                var sday = Sage.Platform.Mobile.Convert.toDateFromString(r[i].StartDate);
                 var eday = Sage.Platform.Mobile.Convert.toDateFromString(r[i].EndDate);
-                dt_fr = sday < new Date(this.year, this.month, 1) ? 1 : (r[i].Timeless ? sday.getUTCDate() : sday.getDate());
-                dt_to = eday > new Date(this.year, this.month, this.daysInMonth[this.month]) ? this.daysInMonth[this.month] : (r[i].Timeless ? eday.getUTCDate() : eday.getDate());
-                do { // this method tracks No. of activities for each calendar day
-                    flatList[ dt_fr ] = flatList[ dt_fr ] ? 1 + flatList[ dt_fr ] : 1;
-                    dt_fr += 1;
-                } while (dt_fr < dt_to);
+                do { // track No. of activities for each calendar day
+                    dt = sday < currentMonthStart ? 1 : (r[i].Timeless ? sday.getUTCDate() : sday.getDate());
+                    flatList[ dt ] = flatList[ dt ] ? 1 + flatList[ dt ] : 1;
+                    sday.add({day: 1});
+                } while (sday < eday && sday < currentMonthEnd);
             }
-            //console.log(flatList);
+console.log(flatList);
             this.activityCache[this.monthName] = flatList;
             this.highlightActivities(flatList);
         },
