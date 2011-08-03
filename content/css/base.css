@@ -526,6 +526,9 @@
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#c4cfa5, endColorstr=#a6b979)";
 }
 
+/* in Month view .activeDay has individual events */
+.calendar-day.activeDay { color: #c00 !important; }
+
 .time-content > .date-tt > .toggle
 {
     background-color: #69923A;
