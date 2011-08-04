@@ -240,13 +240,13 @@
         requestActivities: function(where) {
             // get activities feed for current month
             var request = new Sage.SData.Client.SDataResourceCollectionRequest(App.getService())
-                .setResourceKind('activities')
+                .setResourceKind('useractivities')
                 .setContractName('dynamic');
             var uri = request.getUri();
             uri.setQueryArg('count','31');
             uri.setQueryArg('startIndex','1');
-            uri.setQueryArg('select','StartDate,EndDate,Timeless');
-            uri.setQueryArg('orderby','StartDate asc');
+            uri.setQueryArg('select','Activity/StartDate,Activity/EndDate,Activity/Timeless');
+            uri.setQueryArg('orderby','Activity.StartDate asc');
             uri.setQueryArg('where',where);
             request.allowCacheUse = true;
             return request;
@@ -259,8 +259,8 @@
                 String.format(
                     [
                     'UserId eq "{0}" and (',
-                    '(Timeless eq false and StartDate between @{1}@ and @{2}@) or ',
-                    '(Timeless eq true and StartDate between @{3}@ and @{4}@))'
+                    '(Activity.Timeless eq false and Activity.StartDate between @{1}@ and @{2}@) or ',
+                    '(Activity.Timeless eq true and Activity.StartDate between @{3}@ and @{4}@))'
                     ].join(''),
                     App.context['user'] && App.context['user']['$key'],
                     Sage.Platform.Mobile.Convert.toIsoStringFromDate(startd),
@@ -286,10 +286,10 @@
             var r = sources['$resources']; //console.log(r);
             // make a list of days and their event counts
             for(var i=0, l=r.length; i<l; i++){
-                var sday = Sage.Platform.Mobile.Convert.toDateFromString(r[i].StartDate);
-                var eday = Sage.Platform.Mobile.Convert.toDateFromString(r[i].EndDate);
+                var sday = Sage.Platform.Mobile.Convert.toDateFromString(r[i].Activity.StartDate);
+                var eday = Sage.Platform.Mobile.Convert.toDateFromString(r[i].Activity.EndDate);
                 do { // track No. of activities for each calendar day
-                    dt = sday < currentMonthStart ? 1 : (r[i].Timeless ? sday.getUTCDate() : sday.getDate());
+                    dt = sday < currentMonthStart ? 1 : (r[i].Activity.Timeless ? sday.getUTCDate() : sday.getDate());
                     flatList[ dt ] = flatList[ dt ] ? 1 + flatList[ dt ] : 1;
                     sday.add({day: 1});
                 } while (sday < eday && sday < currentMonthEnd);
