@@ -66,7 +66,7 @@
         calendarMonthHeaderTemplate: new Simplate([
             '<tr class="calendar-month-header">',
             '<th class="calendar-prev-month"><button class="button" data-action="goToPreviousMonth"><span></span></button></th>',
-            '<th class="calendar-month-name" colspan="5">{%= $.monthName %} &nbsp; {%=$.year %} <span id="calendar-activities-loading"></span></span></th>',
+            '<th class="calendar-month-name" colspan="5">{%= $.monthName %} &nbsp; {%=$.year %}</th>',
             '<th class="calendar-next-month"><button class="button" data-action="goToNextMonth"><span></span></button></th>',
             '</tr>'
         ]),
@@ -237,84 +237,6 @@
 
             return result;
         },
-        requestActivities: function(where) {
-            // get activities feed for current month
-            var request = new Sage.SData.Client.SDataResourceCollectionRequest(App.getService())
-                .setResourceKind('useractivities')
-                .setContractName('dynamic');
-            var uri = request.getUri();
-            uri.setQueryArg('count','31');
-            uri.setQueryArg('startIndex','1');
-            uri.setQueryArg('select','Activity/StartDate,Activity/EndDate,Activity/Timeless');
-            uri.setQueryArg('orderby','Activity.StartDate asc');
-            uri.setQueryArg('where',where);
-            request.allowCacheUse = true;
-            return request;
-        },
-        activityCache: {},
-        requestActivityList: function(startd, endd) {
-            // call data request
-            // unable to search with EndDate criteria 'EndDate gt "{1}" and StartDate lt "{2}"'
-            var request = this.requestActivities(
-                String.format(
-                    [
-                    'UserId eq "{0}" and (',
-                    '(Activity.Timeless eq false and Activity.StartDate between @{1}@ and @{2}@) or ',
-                    '(Activity.Timeless eq true and Activity.StartDate between @{3}@ and @{4}@))'
-                    ].join(''),
-                    App.context['user'] && App.context['user']['$key'],
-                    Sage.Platform.Mobile.Convert.toIsoStringFromDate(startd),
-                    Sage.Platform.Mobile.Convert.toIsoStringFromDate(endd),
-                    startd.toString('yyyy-MM-ddT00:00:00Z'),
-                    endd.toString('yyyy-MM-ddT23:59:59Z')
-                )
-            );
-            request.read({
-                success: function(data) { this.processActivityList(data); },
-                failure: this.requestActivityFailure,
-                scope: this
-            });
-        },
-        requestActivityFailure: function(er) {
-            // TODO: handle showing this to user. Or not.
-            console.log("ERROR: "); console.log( er );
-        },
-        processActivityList: function(sources) {
-            var flatList = [], dt;
-            var currentMonthStart = new Date(this.year, this.month, 1, 0, 0, 0);
-            var currentMonthEnd   = new Date(this.year, this.month, this.daysInMonth[this.month], 23, 59, 59);
-            var r = sources['$resources']; //console.log(r);
-            // make a list of days and their event counts
-            for(var i=0, l=r.length; i<l; i++){
-                var sday = Sage.Platform.Mobile.Convert.toDateFromString(r[i].Activity.StartDate);
-                var eday = Sage.Platform.Mobile.Convert.toDateFromString(r[i].Activity.EndDate);
-                do { // track No. of activities for each calendar day
-                    dt = sday < currentMonthStart ? 1 : (r[i].Activity.Timeless ? sday.getUTCDate() : sday.getDate());
-                    flatList[ dt ] = flatList[ dt ] ? 1 + flatList[ dt ] : 1;
-                    sday.add({day: 1});
-                } while (sday < eday && sday < currentMonthEnd);
-            }
-console.log(flatList);
-            this.activityCache[this.monthName] = flatList;
-            this.highlightActivities(flatList);
-        },
-        highlightActivities: function(flatList){
-            Ext.select('.calendar-day').each( function(el) {
-                if (flatList[el.dom.textContent]) {
-                    el.addClass("activeDay");
-                    el.dom.title = flatList[el.dom.textContent]
-                        + ' event'
-                        + (1 < flatList[el.dom.textContent] ? 's' : '');
-                }
-            });
-            Ext.get('calendar-activities-loading').dom.textContent = '';
-        },
-        toggleActHighlight: function(){
-            // possible Toggle setting ??
-            Ext.select('.activityDay').each(function(el){
-
-            });
-        },
         renderCalendar: function() {
             var mm = this.month,
                 yyyy = this.year,
@@ -323,7 +245,7 @@ console.log(flatList);
                 monthLength = this.daysInMonth[mm],
                 today = new Date(),
                 day = 1, calHTML = [], dayClass = '', selectedClass = '',
-                weekendClass = '', activityClass = '', i = 0, j = 0, selectedEl = false,
+                weekendClass = '', i = 0, j = 0, selectedEl = false,
                 isCurrentMonth =  this.year === Date.today().getFullYear() && this.month === Date.today().getMonth();
 
             this.monthName = Date.CultureInfo.monthNames[mm];
@@ -373,7 +295,7 @@ console.log(flatList);
 
                         calHTML.push(String.format( this.calendarDayTemplate,
                                                     day,
-                                                    (dayClass + weekendClass + activityClass + selectedClass),
+                                                    (dayClass + weekendClass + selectedClass),
                                                     day
                                                    )
                                     );
@@ -392,19 +314,6 @@ console.log(flatList);
             calHTML.push(this.calendarEndTemplate);
 
             this.calendarEl.update(calHTML.join(''));
-
-            // --- begin getting list of activities for current month
-            var lastDay = new Date(yyyy, mm, monthLength, 23, 59, 59);
-            var dateFormatString = 'yyyy-MM-ddThh:mm:ss';
-            Ext.get('calendar-activities-loading').dom.textContent = 'Loading...';
-            if(this.activityCache[this.monthName]!==undefined){
-                // load from cache
-                this.highlightActivities(this.activityCache[this.monthName]);
-            } else {
-                // make data request. TODO: Handle timezone offsets
-                this.requestActivityList(firstDay, lastDay);
-            }
-            // --- end highlight activities feature
 
             selectedEl = Ext.DomQuery.select('.selected', 'table.calendar-table', 'td');
             if (Ext.isArray(selectedEl) && selectedEl.length > 0) this.selectedDateEl = Ext.get(selectedEl[0]);
