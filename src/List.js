@@ -348,7 +348,7 @@ Ext.namespace('Sage.Platform.Mobile');
          * The regular expression used to determine if a search query is a hash tag search.
          * @type {Object}
          */
-        hashTagSearchRE: /^(?:#|;|,|\.)(\w+)/,
+        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
         /**
          * The text displayed in the more button.
          * @type {String}
@@ -522,7 +522,7 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <param name="searchText" type="String">The search query.</param>
             var search = this.searchQueryEl.dom.value.length > 0 ? this.searchQueryEl.dom.value : false,
                 customMatch = search && this.customSearchRE.exec(search),
-                hashTagMatch = search && this.hashTagSearchRE.exec(search);
+                hashTagMatches = search && this.hashTagSearchRE.exec(search);
 
             this.clear();
 
@@ -533,9 +533,36 @@ Ext.namespace('Sage.Platform.Mobile');
             {
                 this.query = search.replace(this.customSearchRE, '');
             }
-            else if (hashTagMatch && this.hashTagQueries && this.hashTagQueries[hashTagMatch[1]])
+            else if (hashTagMatches && this.hashTagQueries)
             {
-                this.query = this.expandExpression(this.hashTagQueries[hashTagMatch[1]], hashTagMatch);
+                var hashLookup={},
+                    hashQueries=[],
+                    hashQueryExpression,
+                    match,
+                    hashTag,
+                    additionalSearch=search.replace(hashTagMatches[0],'');
+
+                // localize
+                for (var key in this.hashTagQueriesText) hashLookup[this.hashTagQueriesText[key]] = key;
+
+                // add initial hash caught for if test
+                hashTag = hashTagMatches[1];
+                hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                hashQueries.push(this.expandExpression(hashQueryExpression));
+
+                while (match = this.hashTagSearchRE.exec(search)) {
+                    hashTag = match[1];
+                    hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                    hashQueries.push(this.expandExpression(hashQueryExpression));
+                    additionalSearch = additionalSearch.replace(match[0],'');
+                }
+
+                this.query = '('+hashQueries.join(') and (')+')';
+
+                additionalSearch = additionalSearch.replace(/^\s+|\s+$/g,'');
+                if(additionalSearch !== ''){
+                    this.query += ' and (' + this.formatSearchQuery(additionalSearch) + ')';
+                }
             }
             else if (search)
             {
