@@ -13,25 +13,20 @@
  * limitations under the License.
  */
 
+// todo: move to argos-saleslogix; this does not belong here.
+
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
-    Sage.Platform.Mobile.Controls.DecimalField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
+    Sage.Platform.Mobile.Controls.UrlField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '{% if ($.multiline) { %}',
             '<textarea name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />',
             '{% } else { %}',
-            '<input type="number" min="0" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
+            '<input type="url" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
             '{% } %}'
-        ]),        
-        precision: 2,
-        setValue: function(val) {
-            val = parseFloat(val, 10).toFixed(this.precision || 2);
-            val = isNaN(val) ? '0.00' : val;
-            Sage.Platform.Mobile.Controls.DecimalField.superclass.setValue.call(this, val);
-        }
-    });
-
-    Sage.Platform.Mobile.Controls.FieldManager.register('decimal', Sage.Platform.Mobile.Controls.DecimalField);
+        ])
+	});
+    Sage.Platform.Mobile.Controls.FieldManager.register('url', Sage.Platform.Mobile.Controls.UrlField);
 })();
