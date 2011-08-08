@@ -92,7 +92,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.previousValue = false;
 
-            this.el.dom.value = val;
+            this.el.dom.value = val || '';
         },
         clearValue: function() {
             this.setValue('', true);

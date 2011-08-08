@@ -61,7 +61,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             
             this.previousValue = false;
 
-            this.el.dom.value = this.formatNumberForDisplay(val);
+            this.el.dom.value = this.formatNumberForDisplay(val) || '';
         },
         formatNumberForDisplay: function(number, clean) {
             if (typeof clean === 'undefined') clean = number;
