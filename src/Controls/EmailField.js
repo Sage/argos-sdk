@@ -19,14 +19,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Controls.EmailField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
-        template: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '{% if ($.multiline) { %}',
-            '<textarea name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />',
-            '{% } else { %}',
-            '<input type="email" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
-            '{% } %}'
-        ])
+		inputType: 'email'
     });
     Sage.Platform.Mobile.Controls.FieldManager.register('email', Sage.Platform.Mobile.Controls.EmailField);
 })();

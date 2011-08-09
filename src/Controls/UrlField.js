@@ -19,14 +19,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Controls.UrlField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
-        template: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '{% if ($.multiline) { %}',
-            '<textarea name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />',
-            '{% } else { %}',
-            '<input type="url" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
-            '{% } %}'
-        ])
+		inputType: 'url'
 	});
     Sage.Platform.Mobile.Controls.FieldManager.register('url', Sage.Platform.Mobile.Controls.UrlField);
 })();

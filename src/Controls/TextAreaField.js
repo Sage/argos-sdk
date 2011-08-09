@@ -16,15 +16,12 @@
 Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
-    Sage.Platform.Mobile.Controls.DecimalField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
-		inputType: 'number',
-        precision: 2,
-        setValue: function(val) {
-            val = parseFloat(val, 10).toFixed(this.precision || 2);
-            val = isNaN(val) ? '0.00' : val;
-            Sage.Platform.Mobile.Controls.DecimalField.superclass.setValue.call(this, val);
-        }
+    Sage.Platform.Mobile.Controls.TextAreaField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {        
+        rows: 4,
+        template: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<textarea name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />'
+        ]),        
     });
-
-    Sage.Platform.Mobile.Controls.FieldManager.register('decimal', Sage.Platform.Mobile.Controls.DecimalField);
+    Sage.Platform.Mobile.Controls.FieldManager.register('textarea', Sage.Platform.Mobile.Controls.TextAreaField);
 })();

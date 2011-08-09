@@ -17,10 +17,6 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Controls.PhoneField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
-        template: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<input type="text" name="{%= name %}">'
-        ]),
         /*
             {0}: original value
             {1}: cleaned value
@@ -61,7 +57,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             
             this.previousValue = false;
 
-            this.el.dom.value = this.formatNumberForDisplay(val);
+            this.el.dom.value = this.formatNumberForDisplay(val) || '';
         },
         formatNumberForDisplay: function(number, clean) {
             if (typeof clean === 'undefined') clean = number;
