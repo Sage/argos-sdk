@@ -420,7 +420,8 @@ Ext.onReady(function(){
         startEl = null,
         startAt = null,
         startTime = null,      
-        longPressTimer = null;
+        longPressTimer = null,
+        at = [];
 
     // states => 
 
@@ -483,9 +484,11 @@ Ext.onReady(function(){
 
     var onTouchMove = function(evt, el) {
         var touch = evt.touches && evt.touches[0],
-            at = touch ? [touch.pageX, touch.pageY] : evt.getXY(),
-            direction = {x: at[0] - startAt[0], y: at[1] - startAt[1]},
-            length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+            direction,
+            length;
+        at = touch ? [touch.pageX, touch.pageY] : evt.getXY();
+        direction = {x: at[0] - startAt[0], y: at[1] - startAt[1]};
+        length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
 
         if (length > maxLongPressLength)
         {
@@ -507,7 +510,7 @@ Ext.onReady(function(){
             return;
         }
 
-        var endAt = evt.getXY(),
+        var endAt = isMobile ? at : evt.getXY(),
             endTime = (new Date()).getTime(),
             duration = (endTime - startTime) / 1000.0,
             direction = {
