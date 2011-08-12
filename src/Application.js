@@ -420,8 +420,7 @@ Ext.onReady(function(){
         startEl = null,
         startAt = null,
         startTime = null,      
-        longPressTimer = null,
-        at = [];
+        longPressTimer = null;
 
     // states => 
 
@@ -477,23 +476,19 @@ Ext.onReady(function(){
     // only occurs when the touch lifecycle is cancelled (by the browser).
     var onTouchCancel = function() {
         stopTouchTracking();
-        
-        preventClick = false,       
+        preventClick = false,
         preventOther = false;
     };
 
     var onTouchMove = function(evt, el) {
         var touch = evt.touches && evt.touches[0],
-            direction,
-            length;
-        at = touch ? [touch.pageX, touch.pageY] : evt.getXY();
-        direction = {x: at[0] - startAt[0], y: at[1] - startAt[1]};
-        length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+            at = touch ? [touch.pageX, touch.pageY] : evt.getXY(),
+            direction = {x: at[0] - startAt[0], y: at[1] - startAt[1]},
+            length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
 
         if (length > maxLongPressLength)
         {
             clearTimeout(longPressTimer);
-
             longPressTimer = null;
         }
     };
@@ -510,7 +505,8 @@ Ext.onReady(function(){
             return;
         }
 
-        var endAt = isMobile ? at : evt.getXY(),
+        var touch = evt.changedTouches && evt.changedTouches[evt.changedTouches.length-1],
+            endAt = touch ? [touch.pageX, touch.pageY] : evt.getXY(),
             endTime = (new Date()).getTime(),
             duration = (endTime - startTime) / 1000.0,
             direction = {
@@ -522,7 +518,7 @@ Ext.onReady(function(){
                 x: direction.x / length,
                 y: direction.y / length
             },
-            dotProd = normalized.x * 0.0 + normalized.y * 1.0;
+        dotProd = normalized.x * 0.0 + normalized.y * 1.0;
 
         if (duration <= maxSwipeTime && length >= minSwipeLength)
         {
