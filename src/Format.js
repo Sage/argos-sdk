@@ -71,7 +71,7 @@ Sage.Platform.Mobile.Format = (function() {
             {
                 if (utc) date = date.clone().add({minutes: date.getTimezoneOffset()});
 
-                return date.toString(fmt || 'M/d/yyyy');
+                return date.toString(fmt || Date.CultureInfo.formatPatterns.shortDate);
             }
 
             return val;
