@@ -452,7 +452,7 @@ Ext.onReady(function(){
     var onTouchStart = function(evt, el) {
         if (evt.browserEvent && evt.browserEvent.button == 2) return;
         
-        var touch = evt.touches && evt.touches[0];
+        var touch = evt.browserEvent.touches && evt.browserEvent.touches[0];
 
         startEl = el;
         startAt = touch ? [touch.pageX, touch.pageY] : evt.getXY();
@@ -481,7 +481,7 @@ Ext.onReady(function(){
     };
 
     var onTouchMove = function(evt, el) {
-        var touch = evt.touches && evt.touches[0],
+        var touch = evt.browserEvent.touches && evt.browserEvent.touches[0],
             at = touch ? [touch.pageX, touch.pageY] : evt.getXY(),
             direction = {x: at[0] - startAt[0], y: at[1] - startAt[1]},
             length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -505,7 +505,7 @@ Ext.onReady(function(){
             return;
         }
 
-        var touch = evt.changedTouches && evt.changedTouches[evt.changedTouches.length-1],
+        var touch = evt.browserEvent.changedTouches && evt.browserEvent.changedTouches[evt.browserEvent.changedTouches.length-1],
             endAt = touch ? [touch.pageX, touch.pageY] : evt.getXY(),
             endTime = (new Date()).getTime(),
             duration = (endTime - startTime) / 1000.0,
