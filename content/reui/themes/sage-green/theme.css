@@ -355,7 +355,7 @@ textarea:focus
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
 
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f2f2f2, endColorstr=#e6e6e6)";
+    /*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f2f2f2, endColorstr=#e6e6e6)";*/
 }
 
 .button:active
@@ -620,7 +620,7 @@ textarea:focus
         #e6e6e6 100%
     );
 
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f2f2f2, endColorstr=#e6e6e6)";
+    /*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f2f2f2, endColorstr=#e6e6e6)";*/
 }
 
 .subHeaderButton:active,
@@ -671,7 +671,7 @@ textarea:focus
     );
     background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
 
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#cccccc)";
+    /*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#cccccc)";*/
 }
 
 .simpleSubHeaderButton:active,
