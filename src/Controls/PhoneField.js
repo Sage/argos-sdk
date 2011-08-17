@@ -39,6 +39,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             test: /^(\d{11,})(.*)$/,
             format: '{1}'
         }],
+
+        inputType: 'tel',
+
         onBlur: function() {
             Sage.Platform.Mobile.Controls.PhoneField.superclass.onBlur.apply(this, arguments);
 
