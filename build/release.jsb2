@@ -52,6 +52,9 @@
 			text: 'TextField.js',
 			path: '../src/Controls/'
 		},{
+			text: 'TextAreaField.js',
+			path: '../src/Controls/'
+		},{
 			text: 'EditorField.js',
 			path: '../src/Controls/'
 		},{
