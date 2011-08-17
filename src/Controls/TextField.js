@@ -17,18 +17,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
-        multiline: false,
         notificationTrigger: false,
-        rows: 4,
         validationTrigger: false,
-        mask: false,
+		inputType: 'text',
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '{% if ($.multiline) { %}',
-            '<textarea name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />',
-            '{% } else { %}',
-            '<input type="{%: $.mask ? "password" : "text" %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
-            '{% } %}'
+            '<input type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
         ]),        
         init: function() {
             if (this.validInputOnly)
