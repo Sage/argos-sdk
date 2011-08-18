@@ -496,34 +496,34 @@
 
 .calendar-day.weekend
 {
-    background-color: #dedede;
-    background-image: linear-gradient(top, #dedede, #aeaeae);
+    background-color: #c4cfa5;
+    background-image: linear-gradient(top, #c4cfa5, #a6b979);
     background-image: -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #dedede),
-		color-stop(1, #aeaeae)
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #c4cfa5),
+        color-stop(1, #a6b979)
 	);
-	background-image: -moz-linear-gradient(top, #dedede, #aeaeae);
+    background-image: -moz-linear-gradient(top, #c4cfa5, #a6b979);
 
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#dedede, endColorstr=#aeaeae)";
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#c4cfa5, endColorstr=#a6b979)";
 }
 
 .calendar-day.selected
 {
-    background-color: #c4cfa5;
-    background-image: linear-gradient(top, #c4cfa5, #a6b979);
+    background-color: #CAE2EB;
+    background-image: linear-gradient(top, #CAE2EB, #7EB7CC);
     background-image: -webkit-gradient(
 		linear,
 		left top,
 		left bottom,
-		color-stop(0, #c4cfa5),
-		color-stop(1, #a6b979)
+		color-stop(0, #CAE2EB),
+		color-stop(1, #7EB7CC)
 	);
-	background-image: -moz-linear-gradient(top, #c4cfa5, #a6b979);
+	background-image: -moz-linear-gradient(top, #CAE2EB, #7EB7CC);
 
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#c4cfa5, endColorstr=#a6b979)";
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#CAE2EB, endColorstr=#7EB7CC)";
 }
 
 .time-content > .date-tt > .toggle
