@@ -17,11 +17,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
 (function() {
     Sage.Platform.Mobile.Controls.DecimalField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
-		inputType: 'number',
         precision: 2,
         setValue: function(val) {
-            val = parseFloat(val, 10).toFixed(this.precision || 2);
-            val = isNaN(val) ? '0.00' : val;
+            val = parseFloat(val, 10).toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
+            val = isNaN(val)
+                ? String.format('0{0}00', Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.')
+                : val;
             Sage.Platform.Mobile.Controls.DecimalField.superclass.setValue.call(this, val);
         }
     });
