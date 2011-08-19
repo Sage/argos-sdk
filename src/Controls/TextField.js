@@ -22,7 +22,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 		inputType: 'text',
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<input type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
+            '<input type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),        
         init: function() {
             if (this.validInputOnly)
