@@ -512,6 +512,7 @@
 
 .calendar-day.selected
 {
+    color: #000;
     background-color: #CAE2EB;
     background-image: linear-gradient(top, #CAE2EB, #7EB7CC);
     background-image: -webkit-gradient(
