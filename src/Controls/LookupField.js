@@ -90,8 +90,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         createNavigationOptions: function() {
             var options = {
                 selectionOnly: true,
-                singleSelect: true,
-                singleSelectAction: 'complete',
+                singleSelect: (false !== this.singleSelect),
+                singleSelectAction: this.singleSelectAction || 'complete',
                 allowEmptySelection: !this.requireSelection,
                 resourceKind: this.resourceKind,
                 resourcePredicate: this.resourcePredicate,
@@ -110,6 +110,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     }]
                 }
             };
+
+            if (options.singleSelect && options.singleSelectAction) {
+                Ext.each(options.tools.tbar, function(t) {
+                    if( t.id == options.singleSelectAction ) {
+                        t.cls = 'invisible';
+                    }
+                });
+            }
 
             var expand = ['resourceKind', 'resourcePredicate', 'where'],
                 dependentValue = this.getDependentValue();

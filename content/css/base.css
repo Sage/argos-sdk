@@ -622,3 +622,7 @@ h2 > .collapsed-indicator
     overflow: hidden;
     white-space: nowrap;
 }
+
+.invisible {
+    visibility: hidden;
+}
