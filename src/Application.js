@@ -491,17 +491,6 @@ Ext.onReady(function(){
             clearTimeout(longPressTimer);
             longPressTimer = null;
         }
-
-        // prevent iphone/ipad from scrolling out of bounds (rubberbanding)
-        if(touch && isApple){
-            if(document.scrollHeight < -1
-                || document.scrollHeight > document.body.clientHeight
-                || document.scrollWidth < -1
-                || document.scrollWidth > document.body.clientWidth
-                )
-                evt.browserEvent.preventDefault();
-        }
-
     };
 
     var onTouchEnd = function(evt, el) {
