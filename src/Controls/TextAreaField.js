@@ -18,10 +18,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 (function() {
     Sage.Platform.Mobile.Controls.TextAreaField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {        
         rows: 4,
+        clearBox: false,
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<textarea name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />'
-        ]),        
+        ])
     });
     Sage.Platform.Mobile.Controls.FieldManager.register('textarea', Sage.Platform.Mobile.Controls.TextAreaField);
 })();
