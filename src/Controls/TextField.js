@@ -20,14 +20,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         notificationTrigger: false,
         validationTrigger: false,
 		inputType: 'text',
-        clearBox: true,
+        enableClearButton: true,
         attachmentPoints: {
             clearEl: '.clear-button'
         },
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '{% if($.clearBox) { %}',
-                '<span class="clear-button"></span>',
+            '{% if($.enableClearButton) { %}',
+                '<button class="clear-button"></button>',
             '{% } %}',
             '<input class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),
@@ -42,7 +42,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         renderTo: function(){
             Sage.Platform.Mobile.Controls.EditorField.superclass.renderTo.apply(this, arguments);
-            if(this.clearBox && this.clearEl)
+            if(this.enableClearButton && this.clearEl)
                 this.clearEl.on('click', this.onClearPress, this);
         },
         enable: function() {
@@ -70,7 +70,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (this.notificationTrigger == 'keyup')
                 this.onNotificationTrigger(evt, el, o);
             
-            if(this.clearBox && this.clearEl) {
+            if(this.enableClearButton && this.clearEl) {
                 if(!this.clearEl.isVisible() && this.getValue())
                     this.clearEl.show(true);
                 else if (!this.getValue())
@@ -78,7 +78,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         onFocus: function(evt, el, o){
-            if(this.clearBox && this.clearEl && !this.clearEl.isVisible() && this.getValue())
+            if(this.enableClearButton && this.clearEl && !this.clearEl.isVisible() && this.getValue())
                 this.clearEl.show(true);
         },
         onBlur: function(evt, el, o) {
@@ -88,7 +88,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (this.notificationTrigger == 'blur')
                 this.onNotificationTrigger(evt, el, o);
 
-            if(this.clearBox) {
+            if(this.enableClearButton) {
                 // fix for mobile event handling
                 var scope = this;
                 setTimeout(function(){
