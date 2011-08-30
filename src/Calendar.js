@@ -21,151 +21,150 @@
             contentEl: '.panel-content',
             calendarEl: '.calendar-content',
             timeEl: '.time-content',
-            hourField: '.hour-field',
-            minuteField: '.minute-field',
+            dayField: '#day-field',
+            monthField: '#month-field',
+            yearField: '#year-field',
+            hourField: '#hour-field',
+            minuteField: '#minute-field',
             meridiemField: '.meridiem-field',
-            validationContentEl: '.panel-validation-summary > ul'
+            decrementing: '.decrement',
         },
-        validationSummaryTemplate: new Simplate([
-            '<div class="panel-validation-summary">',
-            '<h2>{%: $.validationSummaryText %}</h2>',
-            '<ul>',
-            '</ul>',
-            '</div>'
-        ]),
-        validationSummaryItemTemplate: new Simplate([
-            '<li>',
-            '<a href="#TT">',
-            '<h3>{%: $.message %}</h3>',
-            '<h4>&nbsp;</h4>',
-            '</a>',
-            '</li>'
-        ]),
         viewTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
-                '{%! $.validationSummaryTemplate %}',
-                '<div class="panel-content">',
-                    '<div class="calendar-content"></div>',
+                '<div class="panel-content" id="datetime-picker">',
+                    '<div class="calendar-content">',
+                    '<table id="datetime-picker-date">',
+                        '<caption>Date</caption>',
+                        '<tr>',
+                            '<td><button class="day"   data-action="increment">+</button></td>',
+                            '<td><button class="month" data-action="increment">+</button></td>',
+                            '<td><button class="year"  data-action="increment">+</button></td>',
+                        '</tr>',
+                        '<tr>',
+                            '<td><input type="number" id="day-field" min="1" max="31" /></td>',
+                            '<td>',
+								'<select id="month-field">',
+									'<option value="0">Jan</option>',
+									'<option value="1">Feb</option>',
+									'<option value="2">Mar</option>',
+									'<option value="3">Apr</option>',
+									'<option value="4">May</option>',
+									'<option value="5">Jun</option>',
+									'<option value="6">Jul</option>',
+									'<option value="7">Aug</option>',
+									'<option value="8">Sep</option>',
+									'<option value="9">Oct</option>',
+									'<option value="10">Nov</option>',
+									'<option value="11">Dec</option>',
+                                '</select>',
+							'</td>',
+                            '<td><input class="year" type="number" id="year-field" min="2010" max="2020" /></td>',
+                        '</tr>',
+                        '<tr>',
+                            '<td><button class="day"   data-action="decrement">-</button></td>',
+                            '<td><button class="month" data-action="decrement">-</button></td>',
+                            '<td><button class="year"  data-action="decrement">-</button></td>',
+                        '</tr>',
+                        '<tr id="datetime-picker-today-button">',
+                            '<td colspan="3"><button onclick="return init(this.form.id);">Today</button></td>',
+                        '</tr>',
+                    '</table>',
+                    '</div>',
                     '<div class="time-content">',
-                        '<input type="number" min="1" max="12" class="hour-field" />',
-                        '&nbsp;:&nbsp;',
-                        '<input type="number" min="0" max="59" class="minute-field" />',
-                        '<div class="date-tt">',
-                            '<div class="toggle meridiem-field" data-action="toggleMeridiem">',
-                                '<span class="thumb"></span>',
-                                '<span class="toggleOn">{%= $.amText %}</span>',
-                                '<span class="toggleOff">{%= $.pmText %}</span>',
-                            '</div>',
-                        '</div>',
+                        '<table id="datetime-picker-time">',
+                            '<caption>Time</caption>',
+                            '<tr>',
+                                '<td><button class="hour" data-action="increment">+</button></td>',
+                                '<td><button class="minute" data-action="increment">+</button></td>',
+                            '</tr>',
+                            '<tr>',
+                                '<td><input type="number" id="hour-field" min="1" max="12" /></td>',
+                                '<td><input type="number" id="minute-field" min="0" max="59" step="15" /></td>',
+                                '<td>',
+                                    '<div class="date-tt">',
+                                        '<div class="toggle meridiem-field" data-action="toggleMeridiem">',
+                                            '<span class="thumb"></span>',
+                                            '<span class="toggleOn">{%= $.amText %}</span>',
+                                            '<span class="toggleOff">{%= $.pmText %}</span>',
+                                        '</div>',
+                                    '</div>',
+                                '</td>',
+                            '</tr>',
+                            '<tr>',
+                                '<td><button class="hour" data-action="decrement">-</button></td>',
+                                '<td><button class="minute" data-action="decrement">-</button></td>',
+                            '</tr>',
+                        '</table>',
                     '</div>',
                 '</div>',
             '</div>'
         ]),
-        validationSummaryText: 'Validation Summary',
-        calendarStartTemplate: '<table class="calendar-table">',
-        calendarMonthHeaderTemplate: new Simplate([
-            '<tr class="calendar-month-header">',
-            '<th class="calendar-prev-month"><button class="button" data-action="goToPreviousMonth"><span></span></button></th>',
-            '<th class="calendar-month-name" colspan="5">{%= $.monthName %} &nbsp; {%=$.year %}</th>',
-            '<th class="calendar-next-month"><button class="button" data-action="goToNextMonth"><span></span></button></th>',
-            '</tr>'
-        ]),
         titleText: 'Calendar',
-        amText: 'AM',
-        pmText: 'PM',
-        calendarWeekHeaderStartTemplate: '<tr class="calendar-week-header">',
-        calendarWeekHeaderTemplate: '<td class="calendar-weekday">{0}</td>',
-        calendarWeekHeaderEndTemplate: '</tr>',
-        calendarWeekStartTemplate: '<tr class="calendar-week">',
-        calendarEmptyDayTemplate: '<td>&nbsp;</td>',
-        calendarDayTemplate: '<td class="calendar-day {1}" data-action="selectDay" data-date="{2}">{0}</td>',
-        calendarWeekEndTemplate: '</tr>',
-        calendarEndTemplate: '</table>',
-        invalidHourErrorText: 'Invalid hour format',
-        invalidMinuteErrorText: 'Invalid minute format',
+        amText: (Date.CultureInfo ? Date.CultureInfo.amDesignator : 'AM'),
+        pmText: (Date.CultureInfo ? Date.CultureInfo.pmDesignator : 'PM'),
+        months: (Date.CultureInfo ? Date.CultureInfo.abbreviatedMonthNames : ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']),
+        dateFormat: (Date.CultureInfo ? Date.CultureInfo.formatPatterns.shortDate : 'mm/dd/YYYY'),
         id: 'generic_calendar',
         expose: false,
         date: false,
         showTimePicker: false,
         selectedDateEl: false,
         weekEnds: [0, 6],
-        daysInMonth : [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+        daysInMonth: function() {
+            var dlo = (1==this.month) ? 28 : 30;
+            var dhi = (1==this.month) ? 29 : 31;
+            return (new Date(this.year, this.month, dlo).getMonth() == new Date(this.year, this.month, dhi).getMonth())
+                ? dhi
+                : dlo
+                ;
+        },
         init: function() {
             Sage.Platform.Mobile.Calendar.superclass.init.call(this);
 
             this.el.on('swipe', this.onSwipe, this);
-			
-            
             this.timeEl.setVisibilityMode(Ext.Element.DISPLAY);
 
+            this.dayField
+                .on('blur', this.validate, this);
+            this.monthField
+                .on('change', this.validate, this);
+            this.yearField
+                .on('blur', this.validate, this);
             this.hourField
-                .on('blur', this.validateHour, this);
-
+                .on('blur', this.validate, this);
             this.minuteField                
-                .on('blur', this.validateMinute, this);
+                .on('blur', this.validate, this);
         },
         onSwipe: function(evt, el, o) {            
             switch (evt.browserEvent.direction) {
                 case 'right':
-                    this.goToPreviousMonth();
+                    this.decrement('month');
                     break;
                 case 'left':
-                    this.goToNextMonth();
+                    this.increment('month');
                     break;
             }
         },
-        validateHour: function(evt, el, o) {
-            var minimum = parseInt(this.hourField.getAttribute('min'), 10),
-                maximum = parseInt(this.hourField.getAttribute('max'), 10);
-
-            this.validate(this.hourField, minimum, maximum);
-        },
-        validateMinute: function(evt, el, o) {
-            var minimum = parseInt(this.minuteField.getAttribute('min'), 10),
-                maximum = parseInt(this.minuteField.getAttribute('max'), 10);
-
-            this.validate(this.minuteField, minimum, maximum);
-        },
-        validate: function(field, minimum, maximum) {
-            var value = parseInt(field.getValue(), 10);
-
-            if (isNaN(value) || value < minimum || value > maximum)
-                field.addClass('field-error');
-            else
-            {
-                field.removeClass('field-error');
-                field.dom.value = pad(value);
+        validate: function(event, field) {
+            var fields = ['year','month','day'];
+            var el = field.id || field.dom.id;
+            if (el.match('year')) {
+                this.year = this.yearField.dom.value;
             }
+            if (el.match('month')) {
+                this.month = this.monthField.dom.value;
+                this.dayField.dom.max = this.daysInMonth();
+            }
+            this.date = new Date(this.year, this.month, this.dayField.dom.value);
 
-            if (!this.isValid())
-                this.showValidationSummary();
-            else
-                this.hideValidationSummary();
-        },
-        showValidationSummary: function() {
-            var content = [];
-
-            if (this.hourField.hasClass('field-error'))
-                content.push(this.validationSummaryItemTemplate.apply({
-                    'message': this.invalidHourErrorText
-                }));
-            if (this.minuteField.hasClass('field-error'))
-                content.push(this.validationSummaryItemTemplate.apply({
-                    'message': this.invalidMinuteErrorText
-                }));
-
-            this.validationContentEl.update(content.join(''));
-            this.el.addClass('panel-form-error');
-        },
-        hideValidationSummary: function() {
-            this.hourField.removeClass('field-error');
-            this.minuteField.removeClass('field-error');
-            
-            this.el.removeClass('panel-form-error');
-            this.validationContentEl.update('');
-        },
-        isValid: function() {
-            return !(this.hourField.hasClass('field-error') || this.minuteField.hasClass('field-error'));
+            for (i in fields) {
+                var el = this[ fields[i] + 'Field'];
+                if(el) {
+                    if ('day' == fields[i]) { el.dom.max = this.daysInMonth(); }
+                    if (el.dom.min && parseInt(el.dom.value) < el.dom.min) { el.dom.value = el.dom.min; }
+                    if (el.dom.max && parseInt(el.dom.value) > el.dom.max) { el.dom.value = el.dom.max; }
+                }
+            }
         },
         toggleMeridiem: function(params) {
             var el = params.$source,
@@ -178,49 +177,66 @@
 
             this.showTimePicker = this.options && this.options.showTimePicker;
 
-            this.date = (this.options && this.options.date) || new Date();
-            this.year = this.date.getFullYear();
+            this.date  = (this.options && this.options.date) || new Date();
+            this.year  = this.date.getFullYear();
             this.month = this.date.getMonth();
 
             this.hourField.dom.value = "" + pad(this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12));
             this.minuteField.dom.value = "" + pad(this.date.getMinutes());
             this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
 
-            this.hideValidationSummary();
-
-            this.renderCalendar();
+            this.yearField.dom.value  = this.year;
+            this.monthField.dom.value = this.month;
+            this.dayField.dom.value   = this.date.getDate();
+            this.dayField.dom.max  = this.daysInMonth();
+            this.yearField.dom.min = this.year - 1;
+            this.yearField.dom.max = this.year + 3;
 
             if (this.showTimePicker)
                 this.timeEl.show();
             else
                 this.timeEl.hide();
         },
-        goToNextMonth: function() {
-            if (this.month == 11)
-            {
-                this.year += 1;
+        decrement: function(which) {
+            var el  = ('string' == typeof(which)) ? this[which + 'Field'] : this[which.$source.dom.className + 'Field'];
+            var val = parseInt(el.dom.value);
+            var max = el.dom.max || el.dom.options.length - 1;
+            var min = el.dom.min || 0;
+            var inc = parseInt(el.dom.step) || 1;
+            if (val - inc >= min) {
+                el.dom.value = val - inc;
+                if (el.dom.id.match('hour') && el.dom.value == (max - 1)) {
+                    this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
+                }
+            } else {
+                if (el.dom.id.match('year')) { return false; }
+                if (el.dom.id.match('day')) { this.decrement('month'); }
+                if (el.dom.id.match('month')) { this.decrement('year'); }
+                if (el.dom.id.match('minute')) { this.decrement('hour'); }
+                el.dom.value = inc * Math.floor(max / inc);
             }
-            this.month = (this.month + 1) % 12;
-
-            this.renderCalendar();
+            this.validate(null,el);
         },
-        goToPreviousMonth: function() {
-            if (this.month == 0)
-            {
-                this.year -= 1;
-                this.month = 11;
+        increment: function(which) {
+            var el  = ('string' == typeof(which)) ? this[which + 'Field'] : this[which.$source.dom.className + 'Field'];
+            var val = parseInt(el.dom.value);
+            var max = el.dom.max || el.dom.options.length - 1;
+            var min = el.dom.min || 0;
+            var inc = parseInt(el.dom.step) || 1;
+            if (val + inc <= max) {
+                el.dom.value = val + inc;
+                if (el.dom.id.match('hour') && el.dom.value == max) {
+                    this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
+                }
+            } else {
+                if (el.dom.id.match('year')) { return false; }
+                if (el.dom.id.match('day')) { this.increment('month'); }
+                if (el.dom.id.match('month')) { this.increment('year'); }
+                if (el.dom.id.match('minute')) { this.increment('hour'); }
+                el.dom.value = min;
             }
-            else
-            {
-                this.month = (this.month - 1) % 12;
-            }
-
-            this.renderCalendar();
-        },
-        selectDay: function(options, evt, el) {
-            if (this.selectedDateEl) this.selectedDateEl.removeClass('selected');
-            this.selectedDateEl = Ext.get(el).addClass('selected');
-            this.date = new Date(this.year, this.month, options.date);
+            this.validate(null,el);
+            return false;
         },
         getDateTime: function() {
             var result = new Date(this.date.getTime()),
@@ -236,88 +252,6 @@
             result.setMinutes(minutes);
 
             return result;
-        },
-        renderCalendar: function() {
-            var mm = this.month,
-                yyyy = this.year,
-                firstDay = new Date(yyyy, mm, 1),
-                startingDay = firstDay.getDay(),
-                monthLength = this.daysInMonth[mm],
-                today = new Date(),
-                day = 1, calHTML = [], dayClass = '', selectedClass = '',
-                weekendClass = '', i = 0, j = 0, selectedEl = false,
-                isCurrentMonth =  this.year === Date.today().getFullYear() && this.month === Date.today().getMonth();
-
-            this.monthName = Date.CultureInfo.monthNames[mm];
-            
-            // compensate for leap year
-            if (this.month == 1 && Date.isLeapYear(yyyy)) // February only!
-            {
-                monthLength = 29;
-            }
-
-            calHTML.push(this.calendarStartTemplate);
-            // Month Header
-            calHTML.push(this.calendarMonthHeaderTemplate.apply(this));
-
-            // Week Header
-            calHTML.push(this.calendarWeekHeaderStartTemplate);
-            for(i = 0; i <= 6; i++ ){
-                calHTML.push(String.format(this.calendarWeekHeaderTemplate, Date.CultureInfo.abbreviatedDayNames[i]  ));
-            }
-            calHTML.push(this.calendarWeekHeaderEndTemplate);
-
-            //Weeks
-            for (i = 0; i <= 6; i++)
-            {
-                calHTML.push(this.calendarWeekStartTemplate);
-                //Days
-                for (j = 0; j <= 6; j++)
-                {
-                    if (day <= monthLength && (i > 0 || j >= startingDay))
-                    {
-                        //Check for today
-                        dayClass = (isCurrentMonth == true && day == today.getDate()) ? 'today' : '';
-
-                        //Check for weekends
-                        weekendClass = (this.weekEnds.indexOf(j) !== -1) ? ' weekend' : '';
-
-                        //Check for selected date
-                        if (day == this.date.getDate() && mm == this.date.getMonth() && yyyy == this.date.getFullYear())
-                        {
-                            selectedClass = ' selected';
-                        }
-                        else
-                        {
-                            selectedClass = '';
-                        }
-                        weekendClass = (this.weekEnds.indexOf(j) !== -1) ? ' weekend' : '';
-
-                        calHTML.push(String.format( this.calendarDayTemplate,
-                                                    day,
-                                                    (dayClass + weekendClass + selectedClass),
-                                                    day
-                                                   )
-                                    );
-                        day++;
-                    }
-                    else
-                    {
-                        calHTML.push(this.calendarEmptyDayTemplate);
-                    }
-                    
-                }
-                calHTML.push(this.calendarWeekEndTemplate);
-                // stop making rows if we've run out of days
-                if (day > monthLength) break;
-            }
-            calHTML.push(this.calendarEndTemplate);
-
-            this.calendarEl.update(calHTML.join(''));
-
-            selectedEl = Ext.DomQuery.select('.selected', 'table.calendar-table', 'td');
-            if (Ext.isArray(selectedEl) && selectedEl.length > 0) this.selectedDateEl = Ext.get(selectedEl[0]);
-            else this.selectedDateEl = false;
         }
     });
 })();
