@@ -21,7 +21,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         validationTrigger: false,
 		inputType: 'text',
         enableClearButton: true,
-        clearButtonAnimation : {duration:.3},
+        clearAnimation: {},
         attachmentPoints: {
             clearEl: '.clear-button'
         },
@@ -73,8 +73,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         onFocus: function(evt, el, o){
             if(this.enableClearButton && this.clearEl){
-                if(this.clearButtonAnimation.anim) this.clearButtonAnimation.anim.stop();
-                this.clearEl.show(this.clearButtonAnimation);
+                if(this.clearAnimation.anim) this.clearAnimation.anim.stop();
+                this.clearEl.show();
             }
         },
         onBlur: function(evt, el, o) {
@@ -89,10 +89,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 var scope = this;
                 setTimeout(function(){
                     if(!(scope.el.dom == document.activeElement)) {
-                        if(scope.clearButtonAnimation.anim) scope.clearButtonAnimation.anim.stop();
-                        scope.clearEl.hide(scope.clearButtonAnimation);
+                        scope.clearEl.hide(scope.clearAnimation);
                     }
-                }, 250);
+                }, 150);
             }
         },
         onClearPress: function(evt){
