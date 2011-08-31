@@ -371,6 +371,7 @@
 
 .row-edit[data-field-type="address"] > div
 {
+    min-height: 1.5em !important;
     padding: 4px 34px 4px 110px !important;
 }
 
