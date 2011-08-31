@@ -21,6 +21,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         validationTrigger: false,
 		inputType: 'text',
         enableClearButton: true,
+        clearButtonAnimation : {duration:.3},
         attachmentPoints: {
             clearEl: '.clear-button'
         },
@@ -69,17 +70,12 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (this.notificationTrigger == 'keyup')
                 this.onNotificationTrigger(evt, el, o);
-            
-            if(this.enableClearButton && this.clearEl) {
-                if(!this.clearEl.isVisible() && this.getValue())
-                    this.clearEl.show(true);
-                else if (!this.getValue())
-                    this.clearEl.hide(true);
-            }
         },
         onFocus: function(evt, el, o){
-            if(this.enableClearButton && this.clearEl && !this.clearEl.isVisible() && this.getValue())
-                this.clearEl.show(true);
+            if(this.enableClearButton && this.clearEl){
+                if(this.clearButtonAnimation.anim) this.clearButtonAnimation.anim.stop();
+                this.clearEl.show(this.clearButtonAnimation);
+            }
         },
         onBlur: function(evt, el, o) {
             if (this.validationTrigger == 'blur')
@@ -92,13 +88,15 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 // fix for mobile event handling
                 var scope = this;
                 setTimeout(function(){
-                    scope.clearEl.hide(true);
+                    if(!(scope.el.dom == document.activeElement)) {
+                        if(scope.clearButtonAnimation.anim) scope.clearButtonAnimation.anim.stop();
+                        scope.clearEl.hide(scope.clearButtonAnimation);
+                    }
                 }, 250);
             }
         },
         onClearPress: function(evt){
             this.clearValue();
-            this.clearEl.hide(true);
             this.el.focus();
         },
         onNotificationTrigger: function(evt, el, o) {
