@@ -385,7 +385,7 @@ input.text-input {
     right:4px;
     margin: 1px 1px 0 0 !important;
     padding: 0;
-    background: url('../images/delete.png') no-repeat top center;
+    background: url('../images/delete.png') no-repeat 50% 50%;
     border: none;
     cursor: pointer;
     z-index:101;
