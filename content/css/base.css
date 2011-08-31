@@ -559,17 +559,20 @@
 }
 #datetime-picker table {
     border-collapse: collapse;
-    border: 0;
-    padding:0;
+    border: 4px #000 solid;
+    border-spacing: 0;
+    padding:2px;
     margin: 0.5em auto 0;
     text-align:center;
+    background-color: #000;
 }
+#datetime-picker table caption { padding: 4px; color: #fff; background-color: #000; /*width: 100%;*/ }
 #datetime-picker table#datetime-picker-time { margin-bottom: 2em; }
 #datetime-picker td { padding: 0; margin: 0; border: 0; }
 #datetime-picker td>input { font-size: 1.5em; width: 2em; text-align: center; padding: 0 !important; margin: 0; }
 #datetime-picker td>select { font-size: 1.5em; width: auto; }
 #datetime-picker td>input.year { width: 3.5em !important; }
-#datetime-picker td>button { font-size: 1.25em; width: 100%; padding: 0.25em 0; }
+#datetime-picker td>button { font-size: 1.25em; width: 100%; padding: 0; line-height: 1.5em; }
 #datetime-picker-today-button { display: none; } /* Reset datetime button */
 
 .collapsed

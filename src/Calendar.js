@@ -28,41 +28,28 @@
             minuteField: '#minute-field',
             meridiemField: '.meridiem-field',
             decrementing: '.decrement',
+            datePickControl: '#datetime-picker-date',
+            timePickControl: '#datetime-picker-time',
         },
         viewTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
                 '<div class="panel-content" id="datetime-picker">',
                     '<div class="calendar-content">',
                     '<table id="datetime-picker-date">',
-                        '<caption>Date</caption>',
+                        '<caption>&nbsp;</caption>',
                         '<tr>',
-                            '<td><button class="day"   data-action="increment">+</button></td>',
                             '<td><button class="month" data-action="increment">+</button></td>',
+                            '<td><button class="day"   data-action="increment">+</button></td>',
                             '<td><button class="year"  data-action="increment">+</button></td>',
                         '</tr>',
                         '<tr>',
+                            '<td><select id="month-field"></select></td>',
                             '<td><input type="number" id="day-field" min="1" max="31" /></td>',
-                            '<td>',
-								'<select id="month-field">',
-									'<option value="0">Jan</option>',
-									'<option value="1">Feb</option>',
-									'<option value="2">Mar</option>',
-									'<option value="3">Apr</option>',
-									'<option value="4">May</option>',
-									'<option value="5">Jun</option>',
-									'<option value="6">Jul</option>',
-									'<option value="7">Aug</option>',
-									'<option value="8">Sep</option>',
-									'<option value="9">Oct</option>',
-									'<option value="10">Nov</option>',
-									'<option value="11">Dec</option>',
-                                '</select>',
-							'</td>',
                             '<td><input class="year" type="number" id="year-field" min="2010" max="2020" /></td>',
                         '</tr>',
                         '<tr>',
-                            '<td><button class="day"   data-action="decrement">-</button></td>',
                             '<td><button class="month" data-action="decrement">-</button></td>',
+                            '<td><button class="day"   data-action="decrement">-</button></td>',
                             '<td><button class="year"  data-action="decrement">-</button></td>',
                         '</tr>',
                         '<tr id="datetime-picker-today-button">',
@@ -72,7 +59,7 @@
                     '</div>',
                     '<div class="time-content">',
                         '<table id="datetime-picker-time">',
-                            '<caption>Time</caption>',
+                            '<caption>&nbsp;</caption>',
                             '<tr>',
                                 '<td><button class="hour" data-action="increment">+</button></td>',
                                 '<td><button class="minute" data-action="increment">+</button></td>',
@@ -100,10 +87,10 @@
             '</div>'
         ]),
         titleText: 'Calendar',
-        amText: (Date.CultureInfo ? Date.CultureInfo.amDesignator : 'AM'),
-        pmText: (Date.CultureInfo ? Date.CultureInfo.pmDesignator : 'PM'),
-        months: (Date.CultureInfo ? Date.CultureInfo.abbreviatedMonthNames : ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']),
-        dateFormat: (Date.CultureInfo ? Date.CultureInfo.formatPatterns.shortDate : 'mm/dd/YYYY'),
+        amText: 'AM',
+        pmText: 'PM',
+        months: Date.CultureInfo.abbreviatedMonthNames,
+        dateFormat: Date.CultureInfo.formatPatterns.shortDate,
         id: 'generic_calendar',
         expose: false,
         date: false,
@@ -153,24 +140,33 @@
             }
             if (el.match('month')) {
                 this.month = this.monthField.dom.value;
-                this.dayField.dom.max = this.daysInMonth();
+                this.dayField.dom.setAttribute('max', this.daysInMonth());
             }
-            this.date = new Date(this.year, this.month, this.dayField.dom.value);
+
+            this.date = new Date(this.year, this.month, this.dayField.dom.value),
+                isPM = this.meridiemField.getAttribute('toggled') !== 'true',
+                hours = parseInt(this.hourField.getValue(), 10),
+                minutes = parseInt(this.minuteField.getValue(), 10);
+            hours = isPM ? (hours % 12) + 12 : (hours % 12);
+            this.date.setHours(hours);
+            this.date.setMinutes(minutes);
 
             for (i in fields) {
                 var el = this[ fields[i] + 'Field'];
                 if(el) {
-                    if ('day' == fields[i]) { el.dom.max = this.daysInMonth(); }
-                    if (el.dom.min && parseInt(el.dom.value) < el.dom.min) { el.dom.value = el.dom.min; }
-                    if (el.dom.max && parseInt(el.dom.value) > el.dom.max) { el.dom.value = el.dom.max; }
+                    if ('day' == fields[i]) { el.dom.setAttribute('max', this.daysInMonth()); }
+                    if (el.dom.getAttribute('min') && parseInt(el.dom.value) < el.dom.getAttribute('min')) { el.dom.value = el.dom.getAttribute('min'); }
+                    if (el.dom.getAttribute('max') && parseInt(el.dom.value) > el.dom.getAttribute('max')) { el.dom.value = el.dom.getAttribute('max'); }
                 }
             }
+            this.updateDatetimeText();
         },
         toggleMeridiem: function(params) {
             var el = params.$source,
                 toggledValue = el && (el.getAttribute('toggled') !== 'true');
 
             if (el) el.dom.setAttribute('toggled', toggledValue);
+            this.updateDatetimeText();
         },
         show: function(options) {
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
@@ -185,12 +181,19 @@
             this.minuteField.dom.value = "" + pad(this.date.getMinutes());
             this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
 
+            this.monthField.dom.options.length = 0;
+            for(var i=0; i < this.months.length; i++) {
+                this.monthField.dom.options[this.monthField.dom.options.length] = new Option(this.months[i], i);
+            }
+
             this.yearField.dom.value  = this.year;
-            this.monthField.dom.value = this.month;
+            this.monthField.dom.selectedIndex = this.month;
             this.dayField.dom.value   = this.date.getDate();
-            this.dayField.dom.max  = this.daysInMonth();
-            this.yearField.dom.min = this.year - 1;
-            this.yearField.dom.max = this.year + 3;
+            this.dayField.dom.setAttribute('max', this.daysInMonth());
+            this.yearField.dom.setAttribute('min', this.year - 1);
+            this.yearField.dom.setAttribute('max', this.year + 3);
+
+            this.updateDatetimeText();
 
             if (this.showTimePicker)
                 this.timeEl.show();
@@ -200,8 +203,8 @@
         decrement: function(which) {
             var el  = ('string' == typeof(which)) ? this[which + 'Field'] : this[which.$source.dom.className + 'Field'];
             var val = parseInt(el.dom.value);
-            var max = el.dom.max || el.dom.options.length - 1;
-            var min = el.dom.min || 0;
+            var max = el.getAttribute('max') || el.dom.options.length - 1;
+            var min = el.getAttribute('min') || 0;
             var inc = parseInt(el.dom.step) || 1;
             if (val - inc >= min) {
                 el.dom.value = val - inc;
@@ -216,12 +219,13 @@
                 el.dom.value = inc * Math.floor(max / inc);
             }
             this.validate(null,el);
+            return false;
         },
         increment: function(which) {
             var el  = ('string' == typeof(which)) ? this[which + 'Field'] : this[which.$source.dom.className + 'Field'];
             var val = parseInt(el.dom.value);
-            var max = el.dom.max || el.dom.options.length - 1;
-            var min = el.dom.min || 0;
+            var max = el.getAttribute('max') || el.dom.options.length - 1;
+            var min = el.getAttribute('min') || 0;
             var inc = parseInt(el.dom.step) || 1;
             if (val + inc <= max) {
                 el.dom.value = val + inc;
@@ -237,6 +241,16 @@
             }
             this.validate(null,el);
             return false;
+        },
+        updateDatetimeText: function() {
+            var t = this.getDateTime();
+            this.datePickControl.dom.caption.innerHTML = t.toString('ddd ' + Date.CultureInfo.formatPatterns.monthDay);
+            this.timePickControl.dom.caption.innerHTML = t.toString('h:mm ') + (
+                this.meridiemField.getAttribute('toggled') !== 'true'
+                    ? this.pmText
+                    : this.amText
+                );
+            // this.timePickControl.dom.caption.style.cssText = 'background: #000 url(../../products/argos-saleslogix/content/images/icons/Scheduling_24x24.png) 4px 50% no-repeat;'
         },
         getDateTime: function() {
             var result = new Date(this.date.getTime()),
