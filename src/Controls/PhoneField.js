@@ -40,6 +40,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             format: '{1}'
         }],
 
+        /* Currently only iOS supports non-numbers when a tel field has a default value
+            http://code.google.com/p/android/issues/detail?id=19724
+         */
+        inputType: Ext.isSafari ? 'tel' : 'text',
+
         onBlur: function() {
             Sage.Platform.Mobile.Controls.PhoneField.superclass.onBlur.apply(this, arguments);
 
