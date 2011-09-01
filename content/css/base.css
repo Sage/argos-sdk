@@ -557,23 +557,67 @@
 {
     width: 60px;
 }
+#datetime-picker { padding-bottom: 2em; }
 #datetime-picker table {
     border-collapse: collapse;
     border: 4px #000 solid;
     border-spacing: 0;
-    padding:2px;
+    padding: 2px;
     margin: 0.5em auto 0;
     text-align:center;
     background-color: #000;
 }
-#datetime-picker table caption { padding: 4px; color: #fff; background-color: #000; }
+#datetime-picker div.calendar-content { padding-bottom: 0; }
+#datetime-picker div.date-tt { margin: 0; }
+#datetime-picker table caption {
+    padding: 4px;
+    color: #fff;
+    background-color: #000;
+    border-top-left-radius: 0.5em;
+    border-top-right-radius: 0.5em;
+}
 .ext-webkit #datetime-picker table caption { width: 100%; } /* Webkit caption does not match table width by default */
-#datetime-picker table#datetime-picker-time { margin-bottom: 2em; }
 #datetime-picker td { padding: 0; margin: 0; border: 0; }
 #datetime-picker td>input { font-size: 1.5em; width: 2em; text-align: center; padding: 0 !important; margin: 0; }
-#datetime-picker td>select { font-size: 1.5em; width: auto; }
+#datetime-picker td>select { font-size: 1.25em; width: auto; }
 #datetime-picker td>input.year { width: 3.5em !important; }
-#datetime-picker td>button { font-size: 1.25em; width: 100%; padding: 0; line-height: 1.5em; }
+#datetime-picker td>button {
+    display: block;
+    font-size: 1.25em;
+    width: 100%;
+    margin: 0;
+    line-height: 1.5em;
+}
+#datetime-picker td>button.plus {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -o-linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -webkit-linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(1, #cccccc)
+    );
+}
+#datetime-picker td>button.minus {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-image: linear-gradient(top, #cccccc, #e6e6e6);
+    background-image: -moz-linear-gradient(top, #cccccc, #e6e6e6);
+    background-image: -o-linear-gradient(top, #cccccc, #e6e6e6);
+    background-image: -webkit-linear-gradient(top, #cccccc, #e6e6e6);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #cccccc)
+        color-stop(1, #e6e6e6),
+    );
+}
 
 .collapsed
 {
