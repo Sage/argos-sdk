@@ -14,7 +14,6 @@
  */
 
 (function() {
-    var pad = function(n) { return n < 10 ? '0' + n : n };
 
     Sage.Platform.Mobile.Calendar = Ext.extend(Sage.Platform.Mobile.View, {
         attachmentPoints: {
@@ -45,15 +44,12 @@
                         '<tr>',
                             '<td><select id="month-field"></select></td>',
                             '<td><input type="number" id="day-field" min="1" max="31" /></td>',
-                            '<td><input class="year" type="number" id="year-field" min="2010" max="2020" /></td>',
+                            '<td><input class="year" type="number" id="year-field" min="2000" max="2020" /></td>',
                         '</tr>',
                         '<tr>',
                             '<td><button class="month" data-action="decrement">-</button></td>',
                             '<td><button class="day"   data-action="decrement">-</button></td>',
                             '<td><button class="year"  data-action="decrement">-</button></td>',
-                        '</tr>',
-                        '<tr id="datetime-picker-today-button">',
-                            '<td colspan="3"><button onclick="return init(this.form.id);">Today</button></td>',
                         '</tr>',
                     '</table>',
                     '</div>',
@@ -87,6 +83,8 @@
             '</div>'
         ]),
         titleText: 'Calendar',
+        selectDateText: 'Select Date',
+        selectTimeText: ' &amp; Time',
         amText: 'AM',
         pmText: 'PM',
         months: Date.CultureInfo.abbreviatedMonthNames,
@@ -108,7 +106,6 @@
         init: function() {
             Sage.Platform.Mobile.Calendar.superclass.init.call(this);
 
-            this.el.on('swipe', this.onSwipe, this);
             this.timeEl.setVisibilityMode(Ext.Element.DISPLAY);
 
             this.dayField
@@ -121,16 +118,6 @@
                 .on('blur', this.validate, this);
             this.minuteField                
                 .on('blur', this.validate, this);
-        },
-        onSwipe: function(evt, el, o) {            
-            switch (evt.browserEvent.direction) {
-                case 'right':
-                    this.decrement('month');
-                    break;
-                case 'left':
-                    this.increment('month');
-                    break;
-            }
         },
         validate: function(event, field) {
             var fields = ['year','month','day'];
@@ -151,24 +138,25 @@
             this.date.setHours(hours);
             this.date.setMinutes(minutes);
 
-            for (i in fields) {
-                var el = this[ fields[i] + 'Field'];
-                if(el) {
-                    if ('day' == fields[i]) { el.dom.setAttribute('max', this.daysInMonth()); }
-                    if (el.dom.getAttribute('min') && parseInt(el.dom.value) < el.dom.getAttribute('min')) { el.dom.value = el.dom.getAttribute('min'); }
-                    if (el.dom.getAttribute('max') && parseInt(el.dom.value) > el.dom.getAttribute('max')) { el.dom.value = el.dom.getAttribute('max'); }
-                }
+            var max = this.daysInMonth();
+            this.dayField.dom.setAttribute('max', max);
+            if (parseInt(this.dayField.dom.value) > max) {
+                this.dayField.dom.value = max;
             }
-            this.updateDatetimeText();
+            this.updateDatetimeCaption();
         },
         toggleMeridiem: function(params) {
             var el = params.$source,
                 toggledValue = el && (el.getAttribute('toggled') !== 'true');
 
             if (el) el.dom.setAttribute('toggled', toggledValue);
-            this.updateDatetimeText();
+            this.updateDatetimeCaption();
         },
         show: function(options) {
+            this.titleText = (options.label ? options.label : options.entityName)
+                + ': ' + this.selectDateText
+                + (options.showTimePicker ? this.selectTimeText : '');
+
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
 
             this.showTimePicker = this.options && this.options.showTimePicker;
@@ -177,23 +165,23 @@
             this.year  = this.date.getFullYear();
             this.month = this.date.getMonth();
 
-            this.hourField.dom.value = "" + pad(this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12));
-            this.minuteField.dom.value = "" + pad(this.date.getMinutes());
+            this.hourField.dom.value = this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12);
+            this.minuteField.dom.value = this.date.getMinutes();
             this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
 
             this.monthField.dom.options.length = 0;
             for(var i=0; i < this.months.length; i++) {
-                this.monthField.dom.options[this.monthField.dom.options.length] = new Option(this.months[i], i);
+                this.monthField.dom.options[this.monthField.dom.options.length] = new Option(this.months[i].charAt(0).toUpperCase() + this.months[i].substring(1), i);
             }
 
             this.yearField.dom.value  = this.year;
             this.monthField.dom.selectedIndex = this.month;
             this.dayField.dom.value   = this.date.getDate();
             this.dayField.dom.setAttribute('max', this.daysInMonth());
-            this.yearField.dom.setAttribute('min', this.year - 1);
-            this.yearField.dom.setAttribute('max', this.year + 3);
+            this.yearField.dom.setAttribute('min', this.year - 1); // arbitrary limits to Year selection
+            this.yearField.dom.setAttribute('max', this.year + 9);
 
-            this.updateDatetimeText();
+            this.updateDatetimeCaption();
 
             if (this.showTimePicker)
                 this.timeEl.show();
@@ -205,7 +193,7 @@
             var val = parseInt(el.dom.value);
             var max = el.getAttribute('max') || el.dom.options.length - 1;
             var min = el.getAttribute('min') || 0;
-            var inc = parseInt(el.dom.step) || 1;
+            var inc = parseInt(el.getAttribute('step')) || 1;
             if (val - inc >= min) {
                 el.dom.value = val - inc;
                 if (el.dom.id.match('hour') && el.dom.value == (max - 1)) {
@@ -213,7 +201,10 @@
                 }
             } else {
                 if (el.dom.id.match('year')) { return false; }
-                if (el.dom.id.match('day')) { this.decrement('month'); }
+                if (el.dom.id.match('day')) {
+                    this.decrement('month');
+                    max = el.getAttribute('max');
+                }
                 if (el.dom.id.match('month')) { this.decrement('year'); }
                 if (el.dom.id.match('minute')) { this.decrement('hour'); }
                 el.dom.value = inc * Math.floor(max / inc);
@@ -226,7 +217,7 @@
             var val = parseInt(el.dom.value);
             var max = el.getAttribute('max') || el.dom.options.length - 1;
             var min = el.getAttribute('min') || 0;
-            var inc = parseInt(el.dom.step) || 1;
+            var inc = parseInt(el.getAttribute('step')) || 1;
             if (val + inc <= max) {
                 el.dom.value = val + inc;
                 if (el.dom.id.match('hour') && el.dom.value == max) {
@@ -242,15 +233,16 @@
             this.validate(null,el);
             return false;
         },
-        updateDatetimeText: function() {
+        updateDatetimeCaption: function() {
             var t = this.getDateTime();
             this.datePickControl.dom.caption.innerHTML = t.toString('ddd ' + Date.CultureInfo.formatPatterns.monthDay);
-            this.timePickControl.dom.caption.innerHTML = t.toString('h:mm ') + (
-                this.meridiemField.getAttribute('toggled') !== 'true'
-                    ? this.pmText
-                    : this.amText
-                );
-            // this.timePickControl.dom.caption.style.cssText = 'background: #000 url(../../products/argos-saleslogix/content/images/icons/Scheduling_24x24.png) 4px 50% no-repeat;'
+            if(this.showTimePicker) {
+                this.timePickControl.dom.caption.innerHTML = t.toString('h:mm ') + (
+                    this.meridiemField.getAttribute('toggled') !== 'true'
+                        ? this.pmText
+                        : this.amText
+                    );
+            }
         },
         getDateTime: function() {
             var result = new Date(this.date.getTime()),
