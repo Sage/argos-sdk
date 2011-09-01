@@ -588,35 +588,21 @@
     margin: 0;
     line-height: 1.5em;
 }
-#datetime-picker td>button.plus {
+#datetime-picker .plus td>button {
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
-    background-image: linear-gradient(top, #e6e6e6, #cccccc);
-    background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
-    background-image: -o-linear-gradient(top, #e6e6e6, #cccccc);
-    background-image: -webkit-linear-gradient(top, #e6e6e6, #cccccc);
-    background-image: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        color-stop(0, #e6e6e6),
-        color-stop(1, #cccccc)
-    );
+    background-image: linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
+    background-image: -moz-linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
+    background-image: -o-linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
+    background-image: -webkit-linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
 }
-#datetime-picker td>button.minus {
+#datetime-picker .minus td>button {
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
-    background-image: linear-gradient(top, #cccccc, #e6e6e6);
-    background-image: -moz-linear-gradient(top, #cccccc, #e6e6e6);
-    background-image: -o-linear-gradient(top, #cccccc, #e6e6e6);
-    background-image: -webkit-linear-gradient(top, #cccccc, #e6e6e6);
-    background-image: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        color-stop(0, #cccccc)
-        color-stop(1, #e6e6e6),
-    );
+    background-image: linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
+    background-image: -moz-linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
+    background-image: -o-linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
+    background-image: -webkit-linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
 }
 
 .collapsed

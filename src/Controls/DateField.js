@@ -67,6 +67,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             options.date = this.currentValue;
             options.showTimePicker = this.showTimePicker;
+            options.label = this.label;
 
             return options;
         },

@@ -36,29 +36,29 @@
                     '<div class="calendar-content">',
                     '<table id="datetime-picker-date">',
                         '<caption>&nbsp;</caption>',
-                        '<tr valign="bottom">',
-                            '<td><button class="month plus" data-action="increment">+</button></td>',
-                            '<td><button class="day plus"   data-action="increment">+</button></td>',
-                            '<td><button class="year plus"  data-action="increment">+</button></td>',
+                        '<tr class="plus">',
+                            '<td><button class="month" data-action="increment">+</button></td>',
+                            '<td><button class="day"   data-action="increment">+</button></td>',
+                            '<td><button class="year"  data-action="increment">+</button></td>',
                         '</tr>',
                         '<tr>',
                             '<td><select id="month-field"></select></td>',
                             '<td><input type="number" id="day-field" min="1" max="31" /></td>',
                             '<td><input class="year" type="number" id="year-field" min="2000" max="2020" /></td>',
                         '</tr>',
-                        '<tr valign="top">',
-                            '<td><button class="month minus" data-action="decrement">-</button></td>',
-                            '<td><button class="day minus"   data-action="decrement">-</button></td>',
-                            '<td><button class="year minus"  data-action="decrement">-</button></td>',
+                        '<tr class="minus">',
+                            '<td><button class="month" data-action="decrement">-</button></td>',
+                            '<td><button class="day"   data-action="decrement">-</button></td>',
+                            '<td><button class="year"  data-action="decrement">-</button></td>',
                         '</tr>',
                     '</table>',
                     '</div>',
                     '<div class="time-content">',
                         '<table id="datetime-picker-time">',
                             '<caption>&nbsp;</caption>',
-                            '<tr>',
-                                '<td><button class="hour plus" data-action="increment">+</button></td>',
-                                '<td><button class="minute plus" data-action="increment">+</button></td>',
+                            '<tr class="plus">',
+                                '<td><button class="hour" data-action="increment">+</button></td>',
+                                '<td><button class="minute" data-action="increment">+</button></td>',
                             '</tr>',
                             '<tr>',
                                 '<td><input type="number" id="hour-field" min="1" max="12" /></td>',
@@ -73,9 +73,9 @@
                                     '</div>',
                                 '</td>',
                             '</tr>',
-                            '<tr>',
-                                '<td><button class="hour minus" data-action="decrement">-</button></td>',
-                                '<td><button class="minute minus" data-action="decrement">-</button></td>',
+                            '<tr class="minus">',
+                                '<td><button class="hour" data-action="decrement">-</button></td>',
+                                '<td><button class="minute" data-action="decrement">-</button></td>',
                             '</tr>',
                         '</table>',
                     '</div>',
@@ -153,9 +153,12 @@
             this.updateDatetimeCaption();
         },
         show: function(options) {
-            this.titleText = (options.label ? options.label : options.entityName)
-                + ': ' + this.selectDateText
-                + (options.showTimePicker ? this.selectTimeText : '');
+            this.titleText = options.label
+                ? options.label
+                : (options.entityName
+                    + ': ' + this.selectDateText
+                    + (options.showTimePicker ? this.selectTimeText : '')
+                );
 
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
 
@@ -191,7 +194,7 @@
         decrement: function(which) {
             var el  = ('string' == typeof(which))
                 ? this[which + 'Field']
-                : this[which.$source.dom.className.split(' ').shift() + 'Field'];
+                : this[which.$source.dom.className + 'Field'];
             var val = parseInt(el.dom.value);
             var max = el.getAttribute('max') || el.dom.options.length - 1;
             var min = el.getAttribute('min') || 0;
@@ -217,7 +220,7 @@
         increment: function(which) {
             var el  = ('string' == typeof(which))
                 ? this[which + 'Field']
-                : this[which.$source.dom.className.split(' ').shift() + 'Field'];
+                : this[which.$source.dom.className + 'Field'];
             var val = parseInt(el.dom.value);
             var max = el.getAttribute('max') || el.dom.options.length - 1;
             var min = el.getAttribute('min') || 0;
@@ -239,7 +242,7 @@
         },
         updateDatetimeCaption: function() {
             var t = this.getDateTime();
-            this.datePickControl.dom.caption.innerHTML = t.toString('ddd. ' + Date.CultureInfo.formatPatterns.monthDay);
+            this.datePickControl.dom.caption.innerHTML = t.toString('dddd');
             if(this.showTimePicker) {
                 this.timePickControl.dom.caption.innerHTML = t.toString('h:mm ') + (
                     this.meridiemField.getAttribute('toggled') !== 'true'
