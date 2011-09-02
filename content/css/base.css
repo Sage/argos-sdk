@@ -578,15 +578,15 @@
 }
 .ext-webkit #datetime-picker table caption { width: 100%; } /* Webkit caption does not match table width by default */
 #datetime-picker td { padding: 0; margin: 0; border: 0; }
-#datetime-picker td>input { font-size: 1.5em; width: 2em; text-align: center; padding: 0 !important; margin: 0; }
-#datetime-picker td>select { font-size: 1.25em; width: auto; }
+#datetime-picker td>input { display: block; font-size: 1.5em; width: 2em; text-align: center; padding: 0 !important; margin: 0; height: 1.5em;}
+#datetime-picker td>select { display: block; font-size: 1.5em; width: auto; }
 #datetime-picker td>input.year { width: 3.5em !important; }
 #datetime-picker td>button {
     display: block;
-    font-size: 1.25em;
+    font-size: 1.5em;
     width: 100%;
     margin: 0;
-    line-height: 1.5em;
+    line-height: 1.75em;
 }
 #datetime-picker .plus td>button {
     border-top-left-radius: 6px;
@@ -595,6 +595,14 @@
     background-image: -moz-linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
     background-image: -o-linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
     background-image: -webkit-linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(0.5, #f2f2f2),
+        color-stop(2, #cccccc)
+    );
 }
 #datetime-picker .minus td>button {
     border-bottom-left-radius: 6px;
@@ -603,6 +611,14 @@
     background-image: -moz-linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
     background-image: -o-linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
     background-image: -webkit-linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #ccc),
+        color-stop(0.5, #f2f2f2),
+        color-stop(2, #e6e6e6)
+    );
 }
 
 .collapsed
