@@ -578,9 +578,7 @@
 }
 .ext-webkit #datetime-picker table caption { width: 100%; } /* Webkit caption does not match table width by default */
 #datetime-picker td { padding: 0; margin: 0; border: 0; }
-#datetime-picker td>input { display: block; font-size: 1.5em; width: 2em; text-align: center; padding: 0 !important; margin: 0; height: 1.5em;}
 #datetime-picker td>select { display: block; font-size: 1.5em; width: auto; }
-#datetime-picker td>input.year { width: 3.5em !important; }
 #datetime-picker td>button {
     display: block;
     font-size: 1.5em;

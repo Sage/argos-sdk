@@ -14,6 +14,8 @@
  */
 
 (function() {
+    var pad = function(n) { return n < 10 ? '0' + n : n };
+    var uCase = function (str) { return str.charAt(0).toUpperCase() + str.substring(1); }
 
     Sage.Platform.Mobile.Calendar = Ext.extend(Sage.Platform.Mobile.View, {
         attachmentPoints: {
@@ -26,7 +28,6 @@
             hourField: '#hour-field',
             minuteField: '#minute-field',
             meridiemField: '.meridiem-field',
-            decrementing: '.decrement',
             datePickControl: '#datetime-picker-date',
             timePickControl: '#datetime-picker-time',
         },
@@ -37,19 +38,19 @@
                     '<table id="datetime-picker-date">',
                         '<caption>&nbsp;</caption>',
                         '<tr class="plus">',
-                            '<td><button class="month" data-action="increment">+</button></td>',
-                            '<td><button class="day"   data-action="increment">+</button></td>',
-                            '<td><button class="year"  data-action="increment">+</button></td>',
+                            '<td><button data-action="incrementMonth">+</button></td>',
+                            '<td><button data-action="incrementDay">+</button></td>',
+                            '<td><button data-action="incrementYear">+</button></td>',
                         '</tr>',
                         '<tr>',
                             '<td><select id="month-field"></select></td>',
-                            '<td><input type="number" id="day-field" min="1" max="31" /></td>',
-                            '<td><input class="year" type="number" id="year-field" min="2000" max="2020" /></td>',
+                            '<td><select id="day-field"></select></td>',
+                            '<td><select id="year-field"></select></td>',
                         '</tr>',
                         '<tr class="minus">',
-                            '<td><button class="month" data-action="decrement">-</button></td>',
-                            '<td><button class="day"   data-action="decrement">-</button></td>',
-                            '<td><button class="year"  data-action="decrement">-</button></td>',
+                            '<td><button data-action="decrementMonth">-</button></td>',
+                            '<td><button data-action="decrementDay">-</button></td>',
+                            '<td><button data-action="decrementYear">-</button></td>',
                         '</tr>',
                     '</table>',
                     '</div>',
@@ -57,12 +58,12 @@
                         '<table id="datetime-picker-time">',
                             '<caption>&nbsp;</caption>',
                             '<tr class="plus">',
-                                '<td><button class="hour" data-action="increment">+</button></td>',
-                                '<td><button class="minute" data-action="increment">+</button></td>',
+                                '<td><button data-action="incrementHour">+</button></td>',
+                                '<td><button data-action="incrementMinute">+</button></td>',
                             '</tr>',
                             '<tr>',
-                                '<td><input type="number" id="hour-field" min="1" max="12" /></td>',
-                                '<td><input type="number" id="minute-field" min="0" max="59" step="15" /></td>',
+                                '<td><select id="hour-field"></select></td>',
+                                '<td><select id="minute-field" step="15"></select></td>',
                                 '<td>',
                                     '<div class="date-tt">',
                                         '<div class="toggle meridiem-field" data-action="toggleMeridiem">',
@@ -74,8 +75,8 @@
                                 '</td>',
                             '</tr>',
                             '<tr class="minus">',
-                                '<td><button class="hour" data-action="decrement">-</button></td>',
-                                '<td><button class="minute" data-action="decrement">-</button></td>',
+                                '<td><button data-action="decrementHour">-</button></td>',
+                                '<td><button data-action="decrementMinute">-</button></td>',
                             '</tr>',
                         '</table>',
                     '</div>',
@@ -109,26 +110,19 @@
             this.timeEl.setVisibilityMode(Ext.Element.DISPLAY);
 
             this.dayField
-                .on('blur', this.validate, this);
+                .on('change', this.validate, this);
             this.monthField
                 .on('change', this.validate, this);
             this.yearField
-                .on('blur', this.validate, this);
+                .on('change', this.validate, this);
             this.hourField
-                .on('blur', this.validate, this);
+                .on('change', this.validate, this);
             this.minuteField                
-                .on('blur', this.validate, this);
+                .on('change', this.validate, this);
         },
         validate: function(event, field) {
-            var fields = ['year','month','day'];
-            var el = field.id || field.dom.id;
-            if (el.match('year')) {
-                this.year = this.yearField.dom.value;
-            }
-            if (el.match('month')) {
-                this.month = this.monthField.dom.value;
-                this.dayField.dom.setAttribute('max', this.daysInMonth());
-            }
+            this.year = this.yearField.dom.value;
+            this.month = this.monthField.dom.value;
 
             this.date = new Date(this.year, this.month, this.dayField.dom.value),
                 isPM = this.meridiemField.getAttribute('toggled') !== 'true',
@@ -138,11 +132,6 @@
             this.date.setHours(hours);
             this.date.setMinutes(minutes);
 
-            var max = this.daysInMonth();
-            this.dayField.dom.setAttribute('max', max);
-            if (parseInt(this.dayField.dom.value) > max) {
-                this.dayField.dom.value = max;
-            }
             this.updateDatetimeCaption();
         },
         toggleMeridiem: function(params) {
@@ -151,6 +140,18 @@
 
             if (el) el.dom.setAttribute('toggled', toggledValue);
             this.updateDatetimeCaption();
+        },
+        populateSelector: function(el, val, min, max) {
+            if( val > max ) { val = max; }
+            el.dom.options.length = 0;
+            for (var i=min; i <= max; i++) {
+                opt = new Option(
+                    (this.monthField == el) ? uCase(this.months[i]) : pad(i),
+                    i,
+                    (i == val)
+                );
+                el.dom.options[el.dom.options.length] = opt;
+            }
         },
         show: function(options) {
             this.titleText = options.label
@@ -168,21 +169,15 @@
             this.year  = this.date.getFullYear();
             this.month = this.date.getMonth();
 
-            this.hourField.dom.value = this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12);
-            this.minuteField.dom.value = this.date.getMinutes();
-            this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
-
-            this.monthField.dom.options.length = 0;
-            for(var i=0; i < this.months.length; i++) {
-                this.monthField.dom.options[this.monthField.dom.options.length] = new Option(this.months[i].charAt(0).toUpperCase() + this.months[i].substring(1), i);
-            }
-
-            this.yearField.dom.value  = this.year;
-            this.monthField.dom.selectedIndex = this.month;
-            this.dayField.dom.value   = this.date.getDate();
-            this.dayField.dom.setAttribute('max', this.daysInMonth());
-            this.yearField.dom.setAttribute('min', this.year - 1); // arbitrary limits to Year selection
-            this.yearField.dom.setAttribute('max', this.year + 9);
+            var today = new Date();
+            this.populateSelector(this.yearField, this.year,
+                    (this.year < today.getFullYear() ? this.year : today.getFullYear()),
+                    (10 + today.getFullYear()) // max 10 years into future
+            );
+            this.populateSelector(this.monthField, this.month, 0, 11);
+            this.populateSelector(this.dayField, this.date.getDate(), 1, this.daysInMonth());
+            this.populateSelector(this.hourField, this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12), 1, 12);
+            this.populateSelector(this.minuteField, this.date.getMinutes(), 0, 59);
 
             this.updateDatetimeCaption();
 
@@ -191,54 +186,53 @@
             else
                 this.timeEl.hide();
         },
-        decrement: function(which) {
-            var el  = ('string' == typeof(which))
-                ? this[which + 'Field']
-                : this[which.$source.dom.className + 'Field'];
-            var val = parseInt(el.dom.value);
-            var max = el.getAttribute('max') || el.dom.options.length - 1;
-            var min = el.getAttribute('min') || 0;
+        decrementYear:   function() { this.decrement(this.yearField);   },
+        decrementMonth:  function() { this.decrement(this.monthField);  },
+        decrementDay:    function() { this.decrement(this.dayField);    },
+        decrementHour:   function() { this.decrement(this.hourField);   },
+        decrementMinute: function() { this.decrement(this.minuteField); },
+        decrement: function(el) { // all fields are <select> elements
             var inc = parseInt(el.getAttribute('step')) || 1;
-            if (val - inc >= min) {
-                el.dom.value = val - inc;
-                if (el.dom.id.match('hour') && el.dom.value == (max - 1)) {
+            if (0 < (el.dom.selectedIndex - inc)) {
+                el.dom.selectedIndex = el.dom.selectedIndex - (1 == inc ? 1 : el.dom.selectedIndex % inc);
+                if (el == this.hourField && '11' == el.dom.options[el.dom.selectedIndex].value ) {
                     this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
                 }
             } else {
-                if (el.dom.id.match('year')) { return false; }
-                if (el.dom.id.match('day')) {
-                    this.decrement('month');
-                    max = el.getAttribute('max');
+                if (el == this.yearField) { return false; }
+                if (el == this.dayField) {
+                    this.decrementMonth();
+                    this.populateSelector(this.dayField, this.date.getDate(), 1, this.daysInMonth());
                 }
-                if (el.dom.id.match('month')) { this.decrement('year'); }
-                if (el.dom.id.match('minute')) { this.decrement('hour'); }
-                el.dom.value = inc * Math.floor(max / inc);
+                if (el == this.monthField)  { this.decrementYear(); }
+                if (el == this.minuteField) { this.decrementHour(); }
+                el.dom.selectedIndex = el.dom.options.length - 1;
             }
             this.validate(null,el);
-            return false;
+            // return false;
         },
-        increment: function(which) {
-            var el  = ('string' == typeof(which))
-                ? this[which + 'Field']
-                : this[which.$source.dom.className + 'Field'];
-            var val = parseInt(el.dom.value);
-            var max = el.getAttribute('max') || el.dom.options.length - 1;
-            var min = el.getAttribute('min') || 0;
+
+        incrementYear:   function() { this.increment(this.yearField);   },
+        incrementMonth:  function() { this.increment(this.monthField);  },
+        incrementDay:    function() { this.increment(this.dayField);    },
+        incrementHour:   function() { this.increment(this.hourField);   },
+        incrementMinute: function() { this.increment(this.minuteField); },
+        increment: function(el) {
             var inc = parseInt(el.getAttribute('step')) || 1;
-            if (val + inc <= max) {
-                el.dom.value = val + inc;
-                if (el.dom.id.match('hour') && el.dom.value == max) {
+            if (el.dom.options.length > (el.dom.selectedIndex + inc)) {
+                el.dom.selectedIndex = el.dom.selectedIndex + inc;
+                if (el == this.hourField && el.dom.selectedIndex == (el.dom.options.length - 1)) {
                     this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
                 }
             } else {
-                if (el.dom.id.match('year')) { return false; }
-                if (el.dom.id.match('day')) { this.increment('month'); }
-                if (el.dom.id.match('month')) { this.increment('year'); }
-                if (el.dom.id.match('minute')) { this.increment('hour'); }
-                el.dom.value = min;
+                if (el == this.yearField) { return false; }
+                if (el == this.dayField) { this.incrementMonth(); }
+                if (el == this.monthField)  { this.incrementYear(); }
+                if (el == this.minuteField) { this.incrementHour(); }
+                el.dom.selectedIndex = 0;
             }
             this.validate(null,el);
-            return false;
+            // return false;
         },
         updateDatetimeCaption: function() {
             var t = this.getDateTime();
