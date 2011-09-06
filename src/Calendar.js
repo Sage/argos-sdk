@@ -63,7 +63,7 @@
                             '</tr>',
                             '<tr>',
                                 '<td><select id="hour-field"></select></td>',
-                                '<td><select id="minute-field" step="15"></select></td>',
+                                '<td><select id="minute-field"></select></td>',
                                 '<td>',
                                     '<div class="date-tt">',
                                         '<div class="toggle meridiem-field" data-action="toggleMeridiem">',
@@ -84,8 +84,6 @@
             '</div>'
         ]),
         titleText: 'Calendar',
-        selectDateText: 'Select Date',
-        selectTimeText: ' &amp; Time',
         amText: 'AM',
         pmText: 'PM',
         months: Date.CultureInfo.abbreviatedMonthNames,
@@ -123,6 +121,10 @@
         validate: function(event, field) {
             this.year = this.yearField.dom.value;
             this.month = this.monthField.dom.value;
+            // adjust dayField selector from changes to monthField or leap/non-leap year
+            if(this.dayField.dom.options.length != this.daysInMonth()) {
+                this.populateSelector(this.dayField, this.dayField.dom.selectedIndex + 1, 1, this.daysInMonth());
+            }
 
             this.date = new Date(this.year, this.month, this.dayField.dom.value),
                 isPM = this.meridiemField.getAttribute('toggled') !== 'true',
@@ -142,24 +144,16 @@
             this.updateDatetimeCaption();
         },
         populateSelector: function(el, val, min, max) {
-            if( val > max ) { val = max; }
+            if (val > max) { val = max; }
             el.dom.options.length = 0;
             for (var i=min; i <= max; i++) {
-                opt = new Option(
-                    (this.monthField == el) ? uCase(this.months[i]) : pad(i),
-                    i,
-                    (i == val)
-                );
+                opt = new Option((this.monthField == el) ? uCase(this.months[i]) : pad(i), i);
+                opt.selected = (i == val);
                 el.dom.options[el.dom.options.length] = opt;
             }
         },
         show: function(options) {
-            this.titleText = options.label
-                ? options.label
-                : (options.entityName
-                    + ': ' + this.selectDateText
-                    + (options.showTimePicker ? this.selectTimeText : '')
-                );
+            this.titleText = options.label ? options.label : this.titleText;
 
             Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
 
@@ -186,44 +180,45 @@
             else
                 this.timeEl.hide();
         },
-        decrementYear:   function() { this.decrement(this.yearField);   },
-        decrementMonth:  function() { this.decrement(this.monthField);  },
-        decrementDay:    function() { this.decrement(this.dayField);    },
-        decrementHour:   function() { this.decrement(this.hourField);   },
-        decrementMinute: function() { this.decrement(this.minuteField); },
-        decrement: function(el) { // all fields are <select> elements
-            var inc = parseInt(el.getAttribute('step')) || 1;
-            if (0 < (el.dom.selectedIndex - inc)) {
-                el.dom.selectedIndex = el.dom.selectedIndex - (1 == inc ? 1 : el.dom.selectedIndex % inc);
-                if (el == this.hourField && '11' == el.dom.options[el.dom.selectedIndex].value ) {
-                    this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
-                }
+
+        decrementYear: function() { this.decrement(this.yearField); },
+        decrementMonth: function() { this.decrement(this.monthField); },
+        decrementDay: function() { this.decrement(this.dayField); },
+        decrementHour: function() {
+            this.decrement(this.hourField);
+            if ('11' == this.hourField.dom.options[this.hourField.dom.selectedIndex].value ) {
+                this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
+            }
+        },
+        decrementMinute: function() { this.decrement(this.minuteField, 15); },
+        decrement: function(el, inc) { // all fields are <select> elements
+            var inc = inc || 1;
+            if (0 <= (el.dom.selectedIndex - inc)) {
+                el.dom.selectedIndex = inc * Math.floor((el.dom.selectedIndex -1)/ inc);
             } else {
-                if (el == this.yearField) { return false; }
-                if (el == this.dayField) {
-                    this.decrementMonth();
-                    this.populateSelector(this.dayField, this.date.getDate(), 1, this.daysInMonth());
-                }
-                if (el == this.monthField)  { this.decrementYear(); }
-                if (el == this.minuteField) { this.decrementHour(); }
-                el.dom.selectedIndex = el.dom.options.length - 1;
+                if (el == this.yearField)   { return false; }
+                if (el == this.dayField)    { this.decrementMonth(); }
+                if (el == this.monthField)  { this.decrementYear();  }
+                if (el == this.minuteField) { this.decrementHour();  }
+                el.dom.selectedIndex = el.dom.options.length - inc;
             }
             this.validate(null,el);
-            // return false;
         },
 
-        incrementYear:   function() { this.increment(this.yearField);   },
-        incrementMonth:  function() { this.increment(this.monthField);  },
-        incrementDay:    function() { this.increment(this.dayField);    },
-        incrementHour:   function() { this.increment(this.hourField);   },
-        incrementMinute: function() { this.increment(this.minuteField); },
-        increment: function(el) {
-            var inc = parseInt(el.getAttribute('step')) || 1;
+        incrementYear: function() { this.increment(this.yearField); },
+        incrementMonth: function() { this.increment(this.monthField); },
+        incrementDay: function() { this.increment(this.dayField); },
+        incrementHour: function() {
+            this.increment(this.hourField);
+            if (this.hourField.dom.selectedIndex == (this.hourField.dom.options.length - 1)) {
+                this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
+            }
+        },
+        incrementMinute: function() { this.increment(this.minuteField, 15); },
+        increment: function(el, inc) {
+            var inc = inc || 1;
             if (el.dom.options.length > (el.dom.selectedIndex + inc)) {
-                el.dom.selectedIndex = el.dom.selectedIndex + inc;
-                if (el == this.hourField && el.dom.selectedIndex == (el.dom.options.length - 1)) {
-                    this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
-                }
+                el.dom.selectedIndex += inc;
             } else {
                 if (el == this.yearField) { return false; }
                 if (el == this.dayField) { this.incrementMonth(); }
@@ -232,7 +227,6 @@
                 el.dom.selectedIndex = 0;
             }
             this.validate(null,el);
-            // return false;
         },
         updateDatetimeCaption: function() {
             var t = this.getDateTime();
