@@ -213,7 +213,7 @@ Ext.namespace('Sage.Platform.Mobile');
             '<div class="list-search">',
             '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" />',
             '<button class="subHeaderButton dismissButton" data-action="clearSearchQuery">X</button>',
-            '<button class="subHeaderButton searchButton" data-action="search">Search</button>',
+            '<button class="subHeaderButton searchButton" data-action="search">{%= $.searchText %}</button>',
             '<label>{%= $.searchText %}</label>',
             '</div>'
         ]),
