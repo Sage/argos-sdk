@@ -557,6 +557,7 @@
 {
     width: 60px;
 }
+
 #datetime-picker { padding-bottom: 2em; }
 #datetime-picker table {
     border-collapse: collapse;
@@ -578,7 +579,12 @@
 }
 .ext-webkit #datetime-picker table caption { width: 100%; } /* Webkit caption does not match table width by default */
 #datetime-picker td { padding: 0; margin: 0; border: 0; }
-#datetime-picker td>select { display: block; font-size: 1.5em; width: auto; }
+#datetime-picker td>select {
+    display: block;
+    font-size: 1.5em;
+    width: auto;
+    position: relative; /* Fix android browser issue with -webkit-transform blocking <select> */
+}
 #datetime-picker td>button {
     display: block;
     font-size: 1.5em;
