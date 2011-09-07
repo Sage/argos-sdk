@@ -20,17 +20,31 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         notificationTrigger: false,
         validationTrigger: false,
 		inputType: 'text',
+        enableClearButton: true,
+        clearAnimation: {},
+        attachmentPoints: {
+            clearEl: '.clear-button'
+        },
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<input type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
-        ]),        
+            '{% if($.enableClearButton) { %}',
+                '<button class="clear-button"></button>',
+            '{% } %}',
+            '<input class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
+        ]),
         init: function() {
             if (this.validInputOnly)
                 this.el.on('keypress', this.onKeyPress, this);
 
             this.el
                 .on('keyup', this.onKeyUp, this)
-                .on('blur', this.onBlur, this);
+                .on('blur', this.onBlur, this)
+                .on('focus', this.onFocus, this);
+        },
+        renderTo: function(){
+            Sage.Platform.Mobile.Controls.EditorField.superclass.renderTo.apply(this, arguments);
+            if(this.enableClearButton && this.clearEl)
+                this.clearEl.on('click', this.onClearPress, this);
         },
         enable: function() {
             Sage.Platform.Mobile.Controls.EditorField.superclass.enable.apply(this, arguments);
@@ -57,14 +71,34 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (this.notificationTrigger == 'keyup')
                 this.onNotificationTrigger(evt, el, o);
         },
+        onFocus: function(evt, el, o){
+            if(this.enableClearButton && this.clearEl){
+                if(this.clearAnimation.anim) this.clearAnimation.anim.stop();
+                this.clearEl.show();
+            }
+        },
         onBlur: function(evt, el, o) {
             if (this.validationTrigger == 'blur')
                 this.onValidationTrigger(evt, el, o);
 
             if (this.notificationTrigger == 'blur')
                 this.onNotificationTrigger(evt, el, o);
+
+            if(this.enableClearButton) {
+                // fix for mobile event handling
+                var scope = this;
+                setTimeout(function(){
+                    if(!(scope.el.dom == document.activeElement)) {
+                        scope.clearEl.hide(scope.clearAnimation);
+                    }
+                }, 150);
+            }
         },
-        onNotificationTrigger: function(evt, el, o) {            
+        onClearPress: function(evt){
+            this.clearValue();
+            this.el.focus();
+        },
+        onNotificationTrigger: function(evt, el, o) {
             var currentValue = this.getValue();
 
             if (this.previousValue != currentValue)

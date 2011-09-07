@@ -371,7 +371,26 @@
 
 .row-edit[data-field-type="address"] > div
 {
+    min-height: 1.5em !important;
     padding: 4px 34px 4px 110px !important;
+}
+
+input.text-input {
+    padding:  8px 34px 8px 110px !important;
+}
+
+.clear-button {
+    visibility: hidden;
+    position: absolute !important;
+    right:4px;
+    margin: 1px 1px 0 0 !important;
+    padding: 0;
+    background: url('../images/delete.png') no-repeat 50% 50%;
+    border: none;
+    cursor: pointer;
+    z-index:101;
+    width:30px;
+    height:30px;
 }
 
 /* TODO: Move color specifics to theme folder */

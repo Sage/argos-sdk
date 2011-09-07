@@ -24,6 +24,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         template: new Simplate([
             '<input type="hidden">'
         ]),
+        enableClearButton: false,
         bind: function() {
             // call field's bind. we don't want event handlers for this.
             Sage.Platform.Mobile.Controls.Field.prototype.bind.apply(this, arguments);
