@@ -166,7 +166,7 @@
             var today = new Date();
             this.populateSelector(this.yearField, this.year,
                     (this.year < today.getFullYear() ? this.year : today.getFullYear()),
-                    (10 + today.getFullYear()) // max 10 years into future
+                    (10 + today.getFullYear()) // max 10 years into future - arbitrary limit
             );
             this.populateSelector(this.monthField, this.month, 0, 11);
             this.populateSelector(this.dayField, this.date.getDate(), 1, this.daysInMonth());
@@ -230,7 +230,7 @@
         },
         updateDatetimeCaption: function() {
             var t = this.getDateTime();
-            this.datePickControl.dom.caption.innerHTML = t.toString('dddd');
+            this.datePickControl.dom.caption.innerHTML = t.toString('dddd'); // weekday text
             if(this.showTimePicker) {
                 this.timePickControl.dom.caption.innerHTML = t.toString('h:mm ') + (
                     this.meridiemField.getAttribute('toggled') !== 'true'
