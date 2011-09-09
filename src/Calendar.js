@@ -187,7 +187,7 @@
         decrementHour: function() {
             this.decrement(this.hourField);
             if ('11' == this.hourField.dom.options[this.hourField.dom.selectedIndex].value ) {
-                this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
+                this.toggleMeridiem({$source:this.meridiemField});
             }
         },
         decrementMinute: function() { this.decrement(this.minuteField, 15); },
@@ -211,7 +211,7 @@
         incrementHour: function() {
             this.increment(this.hourField);
             if (this.hourField.dom.selectedIndex == (this.hourField.dom.options.length - 1)) {
-                this.meridiemField.dom.setAttribute('toggled', 'true' != this.meridiemField.dom.getAttribute('toggled'));
+                this.toggleMeridiem({$source:this.meridiemField});
             }
         },
         incrementMinute: function() { this.increment(this.minuteField, 15); },
