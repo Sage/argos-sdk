@@ -103,7 +103,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 }
                 else if (source.action)
                 {
-                    var view = App.getActiveView();
+                    var view = App.getPrimaryActiveView();
                     if (view && view.hasAction(source.action))
                         view.invokeAction(source.action, Ext.apply(parameters, {'$tool': source}), evt, el);
                 }

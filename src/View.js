@@ -13,129 +13,97 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile');
+define('Sage/Platform/Mobile/View', ['dojo', 'dijit/_Widget', 'Sage/Platform/Mobile/_Templated', 'Sage/Platform/Mobile/_ActionMixin'], function() {
 
-(function() {
-    Sage.Platform.Mobile.View = Ext.extend(Ext.util.Observable, {
-        attachmentPoints: {},
-        viewTemplate: new Simplate([
+    dojo.declare('Sage.Platform.Mobile.View', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
+        _loadConnect: null,
+        attributeMap: {
+            'title': {
+                node: 'domNode',
+                type: 'attribute',
+                attribute: 'title'
+            },
+            'selected': {
+                node: 'domNode',
+                type: 'attribute',
+                attribute: 'selected'
+            }
+        },
+        widgetTemplate: new Simplate([
             '<ul id="{%= $.id %}" title="{%= $.titleText %}" class="{%= $.cls %}">',
             '</ul>'
         ]),
         id: 'generic_view',
         titleText: 'Generic View',
+        tools: null,
         serviceName: false,
         constructor: function(options) {
-            Ext.apply(this, options, {
-                tools: {}
-            });
-
-            this.addEvents(
-                'beforetransitionaway',
-                'beforetransitionto',
-                'transitionaway',
-                'transitionto',
-                'activate',
-                'show'
-            );
-
-            Sage.Platform.Mobile.View.superclass.constructor.apply(this, arguments);
         },
-        render: function() {
-            /// <summary>
-            ///     Renders the view to the body of the page and stores the rendered element in the 'el' field.
-            /// </summary>
-            this.el = Ext.DomHelper.insertFirst(
-                Ext.getBody(),
-                this.viewTemplate.apply(this),
-                true
-            );
-
-            for (var n in this.attachmentPoints)
-                if (this.attachmentPoints.hasOwnProperty(n))
-                    this[n] = this.el.child(this.attachmentPoints[n]);
+        createToolLayout: function() {
+            return this.tools || {};
         },
         init: function() {
-            /// <summary>
-            ///     Initializes the view by rendering calling render and binding any applicable events to the
-            ///     view's main element.
-            /// </summary>
-            this.render();
-
-            this.initEvents();
+            this.startup();
+            this.initConnects();
         },
-        initEvents: function() {
-            this.el.on('load', this._onLoad, this, {single: true});
-            this.el.on('click', this._initiateActionFromClick,  this, {delegate: '[data-action]'});
+        initConnects: function() {
+            this._loadConnect = this.connect(this.domNode, 'onload', this._onLoad);
         },
         _onLoad: function(evt, el, o) {
+            this.disconnect(this._loadConnect);
+
             this.load(evt, el, o);
         },
-        _initiateActionFromClick: function(evt, el) {
-            var el = Ext.get(el),
-                action = el.getAttribute('data-action');
-
-            if (this.hasAction(action, evt, el))
-            {
-                var parameters = this._getParametersForAction(action, evt, el);
-
-                this.invokeAction(action, parameters, evt, el);
-            }
-        },
-        _getParametersForAction: function(name, evt, el) {
-            var parameters = {
-                $event: evt,
-                $source: el
-            };
-
-            for (var i = 0, attrLen = el.dom.attributes.length; i < attrLen; i++)
-            {
-                var attributeName = el.dom.attributes[i].name;
-                if (/^((?=data-action)|(?!data))/.test(attributeName)) continue;
-
-                /* transform hyphenated names to pascal case, minus the data segment, to be in line with HTML5 dataset naming conventions */
-                /* see: http://dev.w3.org/html5/spec/elements.html#embedding-custom-non-visible-data */
-                /* todo: remove transformation and use dataset when browser support is there */
-                var parameterName = attributeName.substr('data-'.length).replace(/-(\w)(\w+)/g, function($0, $1, $2) { return $1.toUpperCase() + $2; });
-
-                parameters[parameterName] = el.getAttribute(attributeName);
-            }
-
-            return parameters;
-        },
-        hasAction: function(name, evt, el) {
-            return (typeof this[name] === 'function');
-        },
-        invokeAction: function(name, parameters, evt, el) {            
-            return this[name].apply(this, [parameters, evt, el]);
-        },
-        isActive: function() {
-            return (this.el.getAttribute('selected') === 'true');
-        },
-        setTitle: function(title) {
-            /// <summary>
-            ///     Sets the title attribute on the view's main element.  This will be used by iUI during transition
-            ///     to replace the title in the top bar.
-            /// </summary>
-            /// <param name="title" type="String">The new title.</param>
-            this.el.dom.setAttribute('title', title);
-        },
+        /**
+         * Called once the first time the view is about to be transitioned to.
+         * @deprecated
+         */
         load: function() {
-            /// <summary>
-            ///     Called once the first time the view is about to be transitioned to.
-            /// </summary>
+            // todo: remove load entirely?
         },
         refreshRequiredFor: function(options) {
             if (this.options)
-            {
-                if (options) return true;
-
-                return false;
-            }
+                return options; // if options provided, then refresh
             else
                 return true;
         },
         refresh: function() {
+        },
+        /**
+         * The onBeforeTransitionAway event.
+         * @param self
+         */
+        onBeforeTransitionAway: function(self) {
+        },
+        /**
+         * The onBeforeTransitionTo event.
+         * @param self
+         */
+        onBeforeTransitionTo: function(self) {
+        },
+        /**
+         * The onTransitionAway event.
+         * @param self
+         */
+        onTransitionAway: function(self) {
+        },
+        /**
+         * The onTransitionTo event.
+         * @param self
+         */
+        onTransitionTo: function(self) {
+        },
+        /**
+         * The onActivate event.
+         * @param self
+         */
+        onActivate: function(self) {
+        },
+        /**
+         * The onShow event.
+         * @param self
+         */
+        onShow: function(self) {
         },
         activate: function(tag, data) {
             // todo: use tag only?
@@ -146,15 +114,16 @@ Ext.namespace('Sage.Platform.Mobile');
 
             this.options = data.options || this.options || {};
 
-            (this.options.title) ? this.setTitle(this.options.title) : this.setTitle(this.titleText);
+            (this.options.title) ? this.set('title', this.options.title) : this.set('title', this.titleText);
 
-            this.fireEvent('activate', this);
+            this.onActivate(this);
         },
         show: function(options, transitionOptions) {
             /// <summary>
-            ///     Show's the view using iUI in order to transition to the new element.
+            ///     Shows the view using iUI in order to transition to the new element.
             /// </summary>
-            if (this.fireEvent('show', this) === false) return;
+
+            if (this.onShow(this) === false) return;
 
             if (this.refreshRequiredFor(options))
             {
@@ -163,7 +132,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
             this.options = options || this.options || {};
 
-            (this.options.title) ? this.setTitle(this.options.title) : this.setTitle(this.titleText);
+            (this.options.title) ? this.set('title', this.options.title) : this.set('title', this.titleText);
 
             ReUI.show(this.el.dom, Ext.apply(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
         },
@@ -171,13 +140,15 @@ Ext.namespace('Sage.Platform.Mobile');
             /// <summary>
             ///     Called before the view is transitioned (slide animation complete) to.
             /// </summary>
-            this.fireEvent('beforetransitionto', this);
+            
+            this.onBeforeTransitionTo(this);
         },
         beforeTransitionAway: function() {
             /// <summary>
             ///     Called before the view is transitioned (slide animation complete) away from.
             /// </summary>
-            this.fireEvent('beforetransitionaway', this);
+
+            this.onBeforeTransitionAway(this);
         },
         transitionTo: function() {
             /// <summary>
@@ -189,13 +160,14 @@ Ext.namespace('Sage.Platform.Mobile');
                 this.refresh();
             }
 
-            this.fireEvent('transitionto', this);
+            this.onTransitionTo(this);
         },
         transitionAway: function() {
             /// <summary>
             ///     Called after the view has been transitioned (slide animation complete) away from.
             /// </summary>
-            this.fireEvent('transitionaway', this);
+
+            this.onTransitionAway(this);
         },
         getService: function() {
             /// <summary>
@@ -211,4 +183,4 @@ Ext.namespace('Sage.Platform.Mobile');
             return {id: this.id, options: this.options};
         }
     });
-})();
+});

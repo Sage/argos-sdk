@@ -71,7 +71,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return options;
         },
         getValuesFromView: function() {
-            var view = App.getActiveView();
+            var view = App.getPrimaryActiveView();
             if (view)
             {
                 this.currentValue = this.validationValue = view.getDateTime();

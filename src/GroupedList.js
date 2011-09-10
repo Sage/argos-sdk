@@ -81,7 +81,7 @@ Ext.namespace('Sage.Platform.Mobile');
 
                     this.entries[entry.$key] = entry;
 
-                    o.push(this.itemTemplate.apply(entry, this));
+                    o.push(this.rowTemplate.apply(entry, this));
                 }
 
                 if (o.length > 0)

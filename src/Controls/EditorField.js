@@ -77,7 +77,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (view && options)
             {
-                if (options.title) view.setTitle(options.title);
+                if (options.title) view.set('title', options.title);
                 view.show(options);
             }
         },
@@ -87,7 +87,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.navigateToEditView();
         },
         getValuesFromView: function() {
-            var view = App.getActiveView(),
+            var view = App.getPrimaryActiveView(),
                 values = view && view.getValues();
 
             if (view && values)
@@ -99,7 +99,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         complete: function() {
-            var view = App.getActiveView();
+            var view = App.getPrimaryActiveView();
             var success = true;
 
             if (view instanceof Sage.Platform.Mobile.Edit)

@@ -13,33 +13,57 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile');
+define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Application'], function() {
 
-Sage.Platform.Mobile.ApplicationModule = Ext.extend(Ext.util.Observable, {
-    application: null,
-    init: function(application) {
-        this.application = application;
-      
-        this.loadCustomizations();
-        this.loadToolbars();
-        this.loadViews();
-    },
-    loadCustomizations: function() {
-    },
-    loadViews: function() {
-    },
-    loadToolbars: function() {
-    },
-    registerView: function(view) {
-        if (this.application)
-            this.application.registerView(view);
-    },
-    registerToolbar: function(name, toolbar) {
-        if (this.application)
-            this.application.registerToolbar(name, toolbar);
-    },
-    registerCustomization: function(set, id, spec) {
-        if (this.application)
-            this.application.registerCustomization(set, id, spec);
-    }
+    dojo.declare('Sage.Platform.Mobile.ApplicationModule', null, {
+        _connects: null,
+        _subscribes: null,
+        application: null,
+        constructor: function(options) {
+            this._connects = [];
+            this._subscribes = [];
+
+            dojo.mixin(this, options);
+        },
+        destroy: function() {
+            dojo.forEach(this._connects, function(handle) {
+                dojo.disconnect(handle);
+            });
+
+            dojo.forEach(this._subscribes, function(handle){
+                dojo.unsubscribe(handle);
+            });
+
+            this.uninitialize();
+        },
+        uninitialize: function() {
+
+        },
+        init: function(application) {
+            this.application = application;
+
+            this.loadCustomizations();
+            this.loadToolbars();
+            this.loadViews();
+        },
+        loadCustomizations: function() {
+        },
+        loadViews: function() {
+        },
+        loadToolbars: function() {
+        },
+        registerView: function(view) {
+            if (this.application)
+                this.application.registerView(view);
+        },
+        registerToolbar: function(name, toolbar) {
+            if (this.application)
+                this.application.registerToolbar(name, toolbar);
+        },
+        registerCustomization: function(set, id, spec) {
+            if (this.application)
+                this.application.registerCustomization(set, id, spec);
+        }
+    });
+    
 });

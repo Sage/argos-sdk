@@ -180,7 +180,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         },
         complete: function() {
             // todo: should there be a better way?
-            var view = App.getActiveView();
+            var view = App.getPrimaryActiveView();
             if (view && view.selectionModel)
             {
                 var selections = view.selectionModel.getSelections();

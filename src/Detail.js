@@ -137,7 +137,7 @@ Ext.namespace('Sage.Platform.Mobile');
                 if (descriptor)
                 {
                     this.options.title = descriptor;
-                    this.setTitle(descriptor);
+                    this.set('title', descriptor);
                 }
             }
         },
