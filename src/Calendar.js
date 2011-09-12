@@ -31,6 +31,9 @@
             datePickControl: '#datetime-picker-date',
             timePickControl: '#datetime-picker-time',
         },
+        selectorTemplate:  '<select id="{0}-field"></select>',
+        incrementTemplate: '<button data-action="increment{0}">+</button>',
+        decrementTemplate: '<button data-action="decrement{0}">-</button>',
         viewTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
                 '<div class="panel-content" id="datetime-picker">',
@@ -38,19 +41,19 @@
                     '<table id="datetime-picker-date">',
                         '<caption>&nbsp;</caption>',
                         '<tr class="plus">',
-                            '<td><button data-action="incrementMonth">+</button></td>',
-                            '<td><button data-action="incrementDay">+</button></td>',
-                            '<td><button data-action="incrementYear">+</button></td>',
+                            '<td>{%= $.localizeViewTemplate("incrementTemplate", 0) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("incrementTemplate", 1) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("incrementTemplate", 2) %}</td>',
                         '</tr>',
                         '<tr>',
-                            '<td><select id="month-field"></select></td>',
-                            '<td><select id="day-field"></select></td>',
-                            '<td><select id="year-field"></select></td>',
+                            '<td>{%= $.localizeViewTemplate("selectorTemplate", 0) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("selectorTemplate", 1) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("selectorTemplate", 2) %}</td>',
                         '</tr>',
                         '<tr class="minus">',
-                            '<td><button data-action="decrementMonth">-</button></td>',
-                            '<td><button data-action="decrementDay">-</button></td>',
-                            '<td><button data-action="decrementYear">-</button></td>',
+                            '<td>{%= $.localizeViewTemplate("decrementTemplate", 0) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("decrementTemplate", 1) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("decrementTemplate", 2) %}</td>',
                         '</tr>',
                     '</table>',
                     '</div>',
@@ -58,12 +61,12 @@
                         '<table id="datetime-picker-time">',
                             '<caption>&nbsp;</caption>',
                             '<tr class="plus">',
-                                '<td><button data-action="incrementHour">+</button></td>',
-                                '<td><button data-action="incrementMinute">+</button></td>',
+                                '<td>{%= $.localizeViewTemplate("incrementTemplate", 3) %}</td>',
+                                '<td>{%= $.localizeViewTemplate("incrementTemplate", 4) %}</td>',
                             '</tr>',
                             '<tr>',
-                                '<td><select id="hour-field"></select></td>',
-                                '<td><select id="minute-field"></select></td>',
+                                '<td>{%= $.localizeViewTemplate("selectorTemplate", 3) %}</td>',
+                                '<td>{%= $.localizeViewTemplate("selectorTemplate", 4) %}</td>',
                                 '<td>',
                                     '<div class="date-tt">',
                                         '<div class="toggle meridiem-field" data-action="toggleMeridiem">',
@@ -75,8 +78,8 @@
                                 '</td>',
                             '</tr>',
                             '<tr class="minus">',
-                                '<td><button data-action="decrementHour">-</button></td>',
-                                '<td><button data-action="decrementMinute">-</button></td>',
+                                '<td>{%= $.localizeViewTemplate("decrementTemplate", 3) %}</td>',
+                                '<td>{%= $.localizeViewTemplate("decrementTemplate", 4) %}</td>',
                             '</tr>',
                         '</table>',
                     '</div>',
@@ -152,6 +155,19 @@
                 el.dom.options[el.dom.options.length] = opt;
             }
         },
+        localizeViewTemplate: function() {
+            var whichTemplate = arguments[0],
+                formatIndex = arguments[1],
+                fields = { y:'year', M:'month', d:'day', h:'hour', H:'hour', m:'minute' };
+            var whichField = fields[ (3 > formatIndex)
+                ? this.dateFormat.split(/[^a-z]/i)[formatIndex].charAt(0)
+                : Date.CultureInfo.formatPatterns.shortTime.split(/[^a-z]/i)[formatIndex - 3].charAt(0)
+                ];
+            var whichFormat = ('selectorTemplate' == whichTemplate)
+                ? whichField
+                : uCase(whichField);
+            return String.format(this[whichTemplate], whichFormat);
+        },
         show: function(options) {
             this.titleText = options.label ? options.label : this.titleText;
 
@@ -172,6 +188,7 @@
             this.populateSelector(this.dayField, this.date.getDate(), 1, this.daysInMonth());
             this.populateSelector(this.hourField, this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12), 1, 12);
             this.populateSelector(this.minuteField, this.date.getMinutes(), 0, 59);
+            this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
 
             this.updateDatetimeCaption();
 
