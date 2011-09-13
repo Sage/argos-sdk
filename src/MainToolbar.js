@@ -13,16 +13,18 @@
  * limitations under the License.
  */
 
-Ext.namespace("Sage.Platform.Mobile");
+define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], function() {
 
-(function() {
-    Sage.Platform.Mobile.MainToolbar = Ext.extend(Sage.Platform.Mobile.Toolbar, {
-        attachmentPoints: {
-            titleEl: '.toolbar-title'
+    dojo.declare('Sage.Platform.Mobile.MainToolbar', [Sage.Platform.Mobile.Toolbar], {
+        attributeMap: {
+            'title': {
+                node: 'titleNode',
+                type: 'innerHTML'
+            }
         },
-        barTemplate: new Simplate([
+        widgetTemplate: new Simplate([
             '<div class="toolbar {%= $.cls %}">',            
-            '<h1 id="pageTitle" class="toolbar-title">{%= $.titleText %}</h1>',
+            '<h1 id="pageTitle" class="toolbar-title" dojoAttachPoint="titleNode">{%= $.titleText %}</h1>',
             '</div>'
         ]),
         toolTemplate: new Simplate([
@@ -40,18 +42,15 @@ Ext.namespace("Sage.Platform.Mobile");
 
         titleText: 'Mobile',
         
-        setTitle: function(title) {
-            this.titleEl.update(title);
-        },
         clear: function() {
-            Sage.Platform.Mobile.MainToolbar.superclass.clear.apply(this, arguments);
+            this.inherited(arguments);
 
-            this.el.select('[data-action]').remove();
+            dojo.query("> [data-action]", this.domNode).remove();
         },
         showTools: function(tools) {
-            Sage.Platform.Mobile.MainToolbar.superclass.showTools.apply(this, arguments);
+            this.inherited(arguments);
 
-            this.el.removeClass('toolbar-size-' + this.size);
+            dojo.removeClass(this.domNode, 'toolbar-size-' + this.size);
             
             if (tools)
             {
@@ -61,12 +60,13 @@ Ext.namespace("Sage.Platform.Mobile");
                 {
                     count[tools[i].side || 'right'] += 1;
 
-                    Ext.DomHelper.append(this.el, this.toolTemplate.apply(tools[i]));
+                    dojo.query(this.domNode).append(this.toolTemplate.apply(tools[i]));
                 }
 
                 this.size = Math.max(count.left, count.right);
-                this.el.addClass('toolbar-size-' + this.size);
+                dojo.addClass(this.domNode, 'toolbar-size-' + this.size);
             }
         }
     });
-})();
+    
+});

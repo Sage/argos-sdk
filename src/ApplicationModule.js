@@ -65,5 +65,5 @@ define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Applicat
                 this.application.registerCustomization(set, id, spec);
         }
     });
-    
+
 });

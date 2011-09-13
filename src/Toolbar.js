@@ -13,84 +13,24 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile');
+define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_Templated'], function() {
 
-(function() {
-    Sage.Platform.Mobile.Toolbar = Ext.extend(Ext.util.Observable, {
-        attachmentPoints: {},
+    dojo.declare('Sage.Platform.Mobile.Toolbar', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
+        widgetTemplate: new Simplate([
+            '<div class="toolbar">',
+            '</div>'
+        ]),
         enabled: true,
         managed: true,
-        barTemplate: new Simplate([
-            '<div class="toolbar">',            
-            '</div>'
-        ]), 
-        constructor: function(options) {
-            Sage.Platform.Mobile.Toolbar.superclass.constructor.apply(this, arguments);
-
-            Ext.apply(this, options);
-        },
-        expandExpression: function(expression, scope) {
+        expandExpression: function(expression) {
             if (typeof expression === 'function')
-                return expression.call(scope || this);
+                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
             else
                 return expression;
         },
         init: function() {
-            this.render();
-
-            this.el.setVisibilityMode(Ext.Element.DISPLAY);
-            this.el.on('click', this.initiateActionFromClick, this, {delegate: '[data-action]'}); 
+            this.startup();
         },
-        render: function() {
-            this.el = Ext.DomHelper.insertFirst(
-                Ext.getBody(),
-                this.barTemplate.apply(this),
-                true
-            );
-
-            for (var n in this.attachmentPoints)
-                if (this.attachmentPoints.hasOwnProperty(n))
-                    this[n] = this.el.child(this.attachmentPoints[n]);
-        },        
-        // todo: mixin action support
-        getParametersForAction: function(name, evt, el) {
-            var parameters = {
-                $event: evt,
-                $source: el
-            };
-
-            for (var i = 0, attrLen = el.dom.attributes.length; i < attrLen; i++)
-            {
-                var attributeName = el.dom.attributes[i].name;
-                if (/^((?=data-action)|(?!data))/.test(attributeName)) continue;
-
-                /* transform hyphenated names to pascal case, minus the data segment, to be in line with HTML5 dataset naming conventions */
-                /* see: http://dev.w3.org/html5/spec/elements.html#embedding-custom-non-visible-data */
-                /* todo: remove transformation and use dataset when browser support is there */
-                var parameterName = attributeName.substr('data-'.length).replace(/-(\w)(\w+)/g, function($0, $1, $2) { return $1.toUpperCase() + $2; });
-
-                parameters[parameterName] = el.getAttribute(attributeName);
-            }
-
-            return parameters;
-        },
-        initiateActionFromClick: function(evt, el) {
-            var el = Ext.get(el),
-                action = el.getAttribute('data-action');
-
-            if (this.hasAction(action, evt, el))
-            {
-                var parameters = this.getParametersForAction(action, evt, el);
-
-                this.invokeAction(action, parameters, evt, el);
-            }
-        },
-        hasAction: function(name, evt, el) {
-            return (typeof this[name] === 'function');
-        },
-        invokeAction: function(name, parameters, evt, el) {
-            return this[name].apply(this, [parameters, evt, el]);
-        },     
         invokeTool: function(parameters, evt, el) {
             var id = parameters && parameters.tool,
                 tool = this.tools && this.tools[id],
@@ -110,22 +50,22 @@ Ext.namespace('Sage.Platform.Mobile');
             }
         },
         show: function() {
-            this.el.show();
+            dojo.style(this.domNode, "display", "block");
         },
         hide: function() {
-            this.el.hide();
+            dojo.style(this.domNode, "display", "none");
         },
         clear: function() {
             this.tools = {};
-            this.el.removeClass('toolbar-disabled');
+            dojo.removeClass(this.domNode, 'toolbar-disabled');
             this.enabled = true;
         },
         enable: function() {
-            this.el.removeClass('toolbar-disabled');
+            dojo.removeClass(this.domNode, 'toolbar-disabled');
             this.enabled = true;
         },
         disable: function() {
-            this.el.addClass('toolbar-disabled');
+            dojo.addClass(this.domNode, 'toolbar-disabled');
             this.enabled = false;
         },
         enableTool: function(id) {
@@ -162,5 +102,5 @@ Ext.namespace('Sage.Platform.Mobile');
                 };
         }
     });
-})();
+});
 

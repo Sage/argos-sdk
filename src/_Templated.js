@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/_Templated', null, function() {
+define('Sage/Platform/Mobile/_Templated', ['dojo', 'dijit/_Widget'], function() {
 
     // not inheriting from dijit._Templated, but using similar functionality.
     // this is required for contentTemplate to work property.

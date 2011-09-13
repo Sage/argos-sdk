@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/View', ['dojo', 'dijit/_Widget', 'Sage/Platform/Mobile/_Templated', 'Sage/Platform/Mobile/_ActionMixin'], function() {
+define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_Templated'], function() {
 
     dojo.declare('Sage.Platform.Mobile.View', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
         _loadConnect: null,
@@ -63,7 +63,7 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dijit/_Widget', 'Sage/Platform/Mob
         },
         refreshRequiredFor: function(options) {
             if (this.options)
-                return options; // if options provided, then refresh
+                return !!options; // if options provided, then refresh
             else
                 return true;
         },
@@ -134,7 +134,7 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dijit/_Widget', 'Sage/Platform/Mob
 
             (this.options.title) ? this.set('title', this.options.title) : this.set('title', this.titleText);
 
-            ReUI.show(this.el.dom, Ext.apply(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
+            ReUI.show(this.domNode, dojo.mixin(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
         },
         beforeTransitionTo: function() {
             /// <summary>

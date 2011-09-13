@@ -13,18 +13,15 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile');
+define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], function() {
 
-(function() {
-    Sage.Platform.Mobile.GroupedList = Ext.extend(Sage.Platform.Mobile.List, {
-        attachmentPoints: Ext.apply({}, {
-            contentEl: '.group-content'
-        }, Sage.Platform.Mobile.List.prototype.attachmentPoints),
-        viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list grouped-list {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
+    dojo.declare('Sage.Platform.Mobile.GroupedList', [Sage.Platform.Mobile.List], {
+        widgetTemplate: new Simplate([
+            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list grouped-list{%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
             '{%! $.searchTemplate %}',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',
-            '<div class="group-content"></div>',
+            '{%! $.emptySelectionTemplate %}',
+            '<div class="group-content" dojoAttachPoint="contentNode"></div>',
             '{%! $.moreTemplate %}',
             '</div>'
         ]),
@@ -35,6 +32,8 @@ Ext.namespace('Sage.Platform.Mobile');
             '<ul data-group="{%= $.tag %}" class="list-content {%= $.cls %}"></ul>'
         ]),
         toggleCollapseText: 'toggle collapse',
+        _currentGroup: null,
+        _currentGroupNode: null,
         getGroupForEntry: function(entry) {
             return {
                 tag: 1,
@@ -51,13 +50,13 @@ Ext.namespace('Sage.Platform.Mobile');
             ///     Processes the feed result from the SData request and renders out the resource feed entries.
             /// </summary>
             /// <param name="feed" type="Object">The feed object.</param>
-            if (!this.feed) this.contentEl.update('');
+            if (!this.feed) this.set('listContent', '');
 
             this.feed = feed;
 
             if (this.feed['$totalResults'] === 0)
             {
-                Ext.DomHelper.append(this.contentEl, this.noDataTemplate.apply(this));
+                this.set('listContent', this.noDataTemplate.apply(this));               
             }
             else if (feed['$resources'])
             {
@@ -68,15 +67,15 @@ Ext.namespace('Sage.Platform.Mobile');
                     var entry = feed['$resources'][i],
                         entryGroup = this.getGroupForEntry(entry);
 
-                    if (entryGroup.tag != this.currentGroup)
+                    if (entryGroup.tag != this._currentGroup)
                     {
-                        if (o.length > 0)
-                            Ext.DomHelper.append(this.currentGroupEl, o.join(''));
+                        if (o.length > 0) dojo.query(this._currentGroupNode).append(o.join(''));
 
                         o = [];
 
-                        this.currentGroup = entryGroup.tag;
-                        this.currentGroupEl = Ext.DomHelper.append(this.contentEl, this.groupTemplate.apply(entryGroup, this), true);
+                        this._currentGroup = entryGroup.tag;
+                        dojo.query(this.contentNode).append(this.groupTemplate.apply(entryGroup, this));
+                        this._currentGroupNode = dojo.query("> :last-child", this.contentNode)[0];
                     }
 
                     this.entries[entry.$key] = entry;
@@ -84,26 +83,25 @@ Ext.namespace('Sage.Platform.Mobile');
                     o.push(this.rowTemplate.apply(entry, this));
                 }
 
-                if (o.length > 0)
-                    Ext.DomHelper.append(this.currentGroupEl, o.join(''));
+                if (o.length > 0) dojo.query(this._currentGroupNode).append(o.join(''));
             }
 
-            if (this.remainingEl)
-                this.remainingEl.update(String.format(
-                    this.remainingText,
-                    this.feed['$totalResults'] - (this.feed['$startIndex'] + this.feed['$itemsPerPage'] - 1)
-                ));
+            // todo: add more robust handling when $totalResults does not exist, i.e., hide element completely
+            if (typeof this.feed['$totalResults'] !== 'undefined')
+            {
+                var remaining = this.feed['$totalResults'] - (this.feed['$startIndex'] + this.feed['$itemsPerPage'] - 1);
+                this.set('remainingContent', dojo.string.substitute(this.remainingText, [remaining]));
+            }
 
-            if (this.hasMoreData())
-                this.el.addClass('list-has-more');
-            else
-                this.el.removeClass('list-has-more');
+            dojo.toggleClass(this.domNode, 'list-has-more', this.hasMoreData());
         },
         clear: function() {
-            Sage.Platform.Mobile.GroupedList.superclass.clear.apply(this, arguments);
+            this.inherited(arguments);
 
-            this.currentGroup = false;
-            this.currentGroupEl = false;
+            this._currentGroup = null;
+            this._currentGroupNode = null;
         }
     });
-})();
+
+
+});

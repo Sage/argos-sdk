@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/_ServiceMixin', null, function() {
+define('Sage/Platform/Mobile/_ServiceMixin', [], function() {
 
     dojo.declare('Sage.Platform.Mobile._ServiceMixin', null, {
         serviceMap: null,

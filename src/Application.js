@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Application', null, function() {
-   
+define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
+
     dojo.declare('Sage.Platform.Mobile.Application', null, {
         _connects: null,
         _subscribes: null,
@@ -161,7 +161,7 @@ define('Sage/Platform/Mobile/Application', null, function() {
                 var feed = window.localStorage.getItem(key);
                 if (feed)
                 {
-                    o.result = Ext.decode(feed);
+                    o.result = dojo.fromJson(feed);
                 }
             }
         },
@@ -174,7 +174,7 @@ define('Sage/Platform/Mobile/Application', null, function() {
                     var key = this._createCacheKey(request);
 
                     window.localStorage.removeItem(key);
-                    window.localStorage.setItem(key, Ext.encode(feed));
+                    window.localStorage.setItem(key, dojo.toJson(feed));
                 }
             }
         },
@@ -211,7 +211,9 @@ define('Sage/Platform/Mobile/Application', null, function() {
 
             if (this.started) view.init();
 
-            this.fireEvent('registered', view);
+            view.placeAt(dojo.body(), 'first');
+
+            this.onRegistered(view);
 
             return this;
         },
@@ -226,6 +228,8 @@ define('Sage/Platform/Mobile/Application', null, function() {
             this.bars[name] = tbar;
 
             if (this.started) tbar.init();
+
+            tbar.placeAt(dojo.body(), 'last');
 
             return this;
         },
@@ -276,8 +280,7 @@ define('Sage/Platform/Mobile/Application', null, function() {
             /// <summary>Sets the applications current title.</summary>
             /// <param name="title" type="String">The new title.</summary>
             for (var n in this.bars)
-                if (this.bars[n].managed && typeof this.bars[n].setTitle === 'function')
-                    this.bars[n].setTitle(title);
+                if (this.bars[n].managed) this.bars[n].set('title', title);
         },
         onResize: function() {
         },
@@ -295,29 +298,29 @@ define('Sage/Platform/Mobile/Application', null, function() {
         },
         onViewActivate: function(view, tag, data) {
         },
-        _onBeforeTransition: function(evt, el) {
-            var view = this.getView(el);
+        _onBeforeTransition: function(evt) {
+            var view = this.getView(evt.target);
             if (view)
             {
-                if (evt.browserEvent.out)
+                if (evt.out)
                     this._beforeViewTransitionAway(view);
                 else
                     this._beforeViewTransitionTo(view);
             }
         },
-        _onAfterTransition: function(evt, el) {
-            var view = this.getView(el);
+        _onAfterTransition: function(evt) {
+            var view = this.getView(evt.target);
             if (view)
             {
-                if (evt.browserEvent.out)
+                if (evt.out)
                     this._viewTransitionAway(view);
                 else
                     this._viewTransitionTo(view);
             }
         },
-        _onActivate: function(evt, el) {
-            var view = this.getView(el);
-            if (view) this._viewActivate(view, evt.browserEvent.tag, evt.browserEvent.data);
+        _onActivate: function(evt) {
+            var view = this.getView(evt.target);
+            if (view) this._viewActivate(view, evt.tag, evt.data);
         },
         _beforeViewTransitionAway: function(view) {
             this.onBeforeViewTransitionAway(view);
