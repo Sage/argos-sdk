@@ -91,6 +91,8 @@
         pmText: 'PM',
         months: Date.CultureInfo.abbreviatedMonthNames,
         dateFormat: Date.CultureInfo.formatPatterns.shortDate,
+        timeFormat: Date.CultureInfo.formatPatterns.shortTime,
+        is24hrTimeFormat: Date.CultureInfo.formatPatterns.shortTime.match(/H\:/),
         id: 'generic_calendar',
         expose: false,
         date: false,
@@ -125,12 +127,12 @@
             this.year = this.yearField.dom.value;
             this.month = this.monthField.dom.value;
             // adjust dayField selector from changes to monthField or leap/non-leap year
-            if(this.dayField.dom.options.length != this.daysInMonth()) {
+            if (this.dayField.dom.options.length != this.daysInMonth()) {
                 this.populateSelector(this.dayField, this.dayField.dom.selectedIndex + 1, 1, this.daysInMonth());
             }
 
             this.date = new Date(this.year, this.month, this.dayField.dom.value),
-                isPM = this.meridiemField.getAttribute('toggled') !== 'true',
+                isPM = this.is24hrTimeFormat ? (11 < this.hourField.getValue()) : this.meridiemField.getAttribute('toggled') !== 'true',
                 hours = parseInt(this.hourField.getValue(), 10),
                 minutes = parseInt(this.minuteField.getValue(), 10);
             hours = isPM ? (hours % 12) + 12 : (hours % 12);
@@ -186,16 +188,25 @@
             );
             this.populateSelector(this.monthField, this.month, 0, 11);
             this.populateSelector(this.dayField, this.date.getDate(), 1, this.daysInMonth());
-            this.populateSelector(this.hourField, this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12), 1, 12);
+            this.populateSelector(this.hourField,
+                this.date.getHours() > 12 && !this.is24hrTimeFormat
+                    ? this.date.getHours() - 12
+                    : (this.date.getHours() || 12),
+                this.is24hrTimeFormat ? 0 : 1,
+                this.is24hrTimeFormat ? 23 : 12
+            );
             this.populateSelector(this.minuteField, this.date.getMinutes(), 0, 59);
             this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
 
             this.updateDatetimeCaption();
 
-            if (this.showTimePicker)
+            if (this.showTimePicker) {
                 this.timeEl.show();
-            else
+                // hide meridiem toggle when useing 24hr time format:
+                if (this.is24hrTimeFormat) { this.meridiemField.dom.parentNode.style.display='none'; }
+            } else {
                 this.timeEl.hide();
+            }
         },
 
         decrementYear: function() { this.decrement(this.yearField); },
@@ -203,7 +214,7 @@
         decrementDay: function() { this.decrement(this.dayField); },
         decrementHour: function() {
             this.decrement(this.hourField);
-            if ('11' == this.hourField.dom.options[this.hourField.dom.selectedIndex].value ) {
+            if (11 == this.hourField.getValue() % 12) {
                 this.toggleMeridiem({$source:this.meridiemField});
             }
         },
@@ -248,17 +259,13 @@
         updateDatetimeCaption: function() {
             var t = this.getDateTime();
             this.datePickControl.dom.caption.innerHTML = t.toString('dddd'); // weekday text
-            if(this.showTimePicker) {
-                this.timePickControl.dom.caption.innerHTML = t.toString('h:mm ') + (
-                    this.meridiemField.getAttribute('toggled') !== 'true'
-                        ? this.pmText
-                        : this.amText
-                    );
+            if (this.showTimePicker) {
+                this.timePickControl.dom.caption.innerHTML = t.toString(this.timeFormat);
             }
         },
         getDateTime: function() {
             var result = new Date(this.date.getTime()),
-                isPM = this.meridiemField.getAttribute('toggled') !== 'true',
+                isPM = this.is24hrTimeFormat ? (11 < this.hourField.getValue()) : this.meridiemField.getAttribute('toggled') !== 'true',
                 hours = parseInt(this.hourField.getValue(), 10),
                 minutes = parseInt(this.minuteField.getValue(), 10);
 
