@@ -13,20 +13,17 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile');
-Ext.namespace('Sage.Platform.Mobile.Controls');
+define('Sage/Platform/Mobile/Edit',
+    ['Sage/Platform/Mobile/View',
+        'Sage/Platform/Mobile/Utility'
+    ], function() {
 
-(function() {
-    Sage.Platform.Mobile.Edit = Ext.extend(Sage.Platform.Mobile.View, {
-        attachmentPoints: {
-            contentEl: '.panel-content',
-            validationContentEl: '.panel-validation-summary > ul'
-        },
+    dojo.declare('Sage.Platform.Mobile.Edit', [Sage.Platform.Mobile.View], {
         viewTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="edit panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',            
             '{%! $.loadingTemplate %}',
             '{%! $.validationSummaryTemplate %}',
-            '<div class="panel-content"></div>',
+            '<div class="panel-content" dojoAttachPoint="contentNode"></div>',
             '</div>'
         ]),
         loadingTemplate: new Simplate([
@@ -37,7 +34,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         validationSummaryTemplate: new Simplate([
             '<div class="panel-validation-summary">',
             '<h2>{%: $.validationSummaryText %}</h2>',
-            '<ul>',
+            '<ul dojoAttachPoint="validationContentNode">',
             '</ul>',
             '</div>'
         ]),
@@ -81,50 +78,48 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         requestErrorText: 'A server error occured while requesting data.',
         constructor: function(o) {
             this.fields = {};
-            
-            Sage.Platform.Mobile.Edit.superclass.constructor.apply(this, arguments);
         },
         render: function() {
-            Sage.Platform.Mobile.Edit.superclass.render.apply(this, arguments);
+            this.inherited(arguments);
             
             this.processLayout(this.compileLayout(), {title: this.detailsText});
 
-            this.el
-                .select('div[data-field]')
-                .each(function(value) {
-                    var el = Ext.get(value.dom),
-                        name = el.getAttribute('data-field'),
-                        field = this.fields[name];
-                    if (field)
-                        field.renderTo(el);
-                }, this);
+            dojo.query('div[data-field').forEach(function(node, index, nodeList){
+                var name = dojo.attr(node, 'data-field'),
+                    field = this.fields[name];
+                if (field)
+                    field.renderTo(node);
+            });
         },
         init: function() {
-            Sage.Platform.Mobile.Edit.superclass.init.apply(this, arguments);
+            this.inherited(arguments);
 
             for (var name in this.fields) this.fields[name].init();
-
-            this.tools.tbar = [{
-                id: 'save',
-                action: 'save'
-            },{
-                id: 'cancel',
-                side: 'left',
-                fn: ReUI.back,
-                scope: ReUI
-            }];
+        },
+        createToolLayout: function() {
+            return this.tools || (this.tools = {
+                'tbar': [{
+                    id: 'save',
+                    action: 'save'
+                },{
+                    id: 'cancel',
+                    side: 'left',
+                    fn: ReUI.back,
+                    scope: ReUI
+                }]
+            });
         },
         _onShowField: function(field) {
-            field.containerEl.removeClass('row-hidden');
+            field.containerNode.removeClass('row-hidden');
         },
         _onHideField: function(field) {
-            field.containerEl.addClass('row-hidden');
+            field.containerNode.addClass('row-hidden');
         },
         _onEnableField: function(field) {
-            field.containerEl.removeClass('row-disabled');
+            field.containerNode.removeClass('row-disabled');
         },
         _onDisableField: function(field) {
-            field.containerEl.addClass('row-disabled');
+            field.containerNode.addClass('row-disabled');
         },
         invokeAction: function(name, parameters, evt, el) {
             var fieldEl = el.findParent('[data-field]', this.el, true),
@@ -133,7 +128,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (field && typeof field[name] === 'function')
                 return field[name].apply(field, [parameters, evt, el]);
 
-            return Sage.Platform.Mobile.Edit.superclass.invokeAction.apply(this, arguments);
+            return this.inherited(arguments);
         },
         hasAction: function(name, evt, el) {
             var fieldEl = el && el.findParent('[data-field]', this.el, true),
@@ -142,7 +137,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (field && typeof field[name] === 'function')
                 return true;
 
-            return Sage.Platform.Mobile.Edit.superclass.hasAction.apply(this, arguments);
+            return this.inherited(arguments);
         },
         toggleSection: function(params) {
             var el = Ext.get(params.$source);
@@ -419,7 +414,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.setValues(this.entry);
             }
 
-            this.el.removeClass('panel-loading');
+            this.contentNode.removeClass('panel-loading');
         },
         clearValues: function() {
             for (var name in this.fields)
@@ -486,7 +481,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     if (field.applyTo !== false)
                     {
                         target = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo);
-                        Ext.apply(target, value);
+                        dojo.mixin(target, value);
                     }
                     else
                     {
@@ -508,7 +503,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                 if (!field.isHidden() && false !== (result = field.validate()))
                 {
-                    field.containerEl.addClass('row-error');
+                    field.containerNode.addClass('row-error');
 
                     this.errors.push({
                         name: name,
@@ -517,7 +512,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 }
                 else
                 {
-                    field.containerEl.removeClass('row-error');
+                    field.containerNode.removeClass('row-error');
                 }
             }
 
@@ -535,7 +530,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         createEntryForUpdate: function(values) {
             values = this.convertValues(values);
 
-            return Ext.apply(values, {
+            return dojo.mixin(values, {
                 '$key': this.entry['$key'],
                 '$etag': this.entry['$etag'],
                 '$name': this.entry['$name']
@@ -544,7 +539,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         createEntryForInsert: function(values) {
             values = this.convertValues(values);
             
-            return Ext.apply(values, {
+            return dojo.mixin(values, {
                 '$name': this.entityName
             });
         },
@@ -557,7 +552,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (App.bars.tbar)
                 App.bars.tbar.disable();
 
-            this.el.addClass('busy');
+            this.contentNode.addClass('busy');
         },
         enable: function() {
             this.busy = false;
@@ -565,7 +560,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (App.bars.tbar)
                 App.bars.tbar.enable();
 
-            this.el.removeClass('busy');
+            this.contentNode.removeClass('busy');
         },
         insert: function() {
             this.disable();
@@ -591,7 +586,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         onInsertSuccess: function(entry) {
             this.enable();
 
-            App.fireEvent('refresh', {
+            this.refresh({
                 resourceKind: this.resourceKind
             });
 
@@ -640,7 +635,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         onUpdateSuccess: function(entry) {
             this.enable();
 
-            App.fireEvent('refresh', {
+            this.refresh({
                 resourceKind: this.resourceKind,
                 key: entry['$key'],
                 data: entry
@@ -673,11 +668,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             for (var i = 0; i < this.errors.length; i++)
                 content.push(this.validationSummaryItemTemplate.apply(this.errors[i], this.fields[this.errors[i].name]));
 
-            this.validationContentEl.update(content.join(''));
-            this.el.addClass('panel-form-error');
+            this.validationContentNode.update(content.join(''));
+            this.contentNode.addClass('panel-form-error');
         },
         hideValidationSummary: function() {
-            this.el.removeClass('panel-form-error');
+            this.contentNode.removeClass('panel-form-error');
             this.validationContentEl.update('');
         },
         save: function() {
@@ -697,7 +692,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.update();
         },
         getContext: function() {
-            return Ext.apply(Sage.Platform.Mobile.Edit.superclass.getContext.call(this), {
+            return dojo.mixin(Sage.Platform.Mobile.Edit.superclass.getContext.call(this), {
                 resourceKind: this.resourceKind,
                 insert: this.options.insert,
                 key: this.options.insert ? false : this.options.entry && this.options.entry['$key']
@@ -709,9 +704,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (this.refreshRequired)
             {
                 if (this.options.insert === true)
-                    this.el.addClass('panel-loading');
+                    this.contentNode.addClass('panel-loading');
                 else
-                    this.el.removeClass('panel-loading');
+                    this.contentNode.removeClass('panel-loading');
             }
         },
         activate: function() {
@@ -723,7 +718,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.changes = false;
             this.inserting = (this.options.insert === true);
 
-            this.el.removeClass('panel-form-error');
+            this.contentNode.removeClass('panel-form-error');
 
             this.clearValues();
 
@@ -756,4 +751,4 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this);
         }
     });
-})();
+});

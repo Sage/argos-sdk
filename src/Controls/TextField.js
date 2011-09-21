@@ -13,48 +13,44 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
-    Sage.Platform.Mobile.Controls.TextField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
+define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Controls/Field'], function() {
+    dojo.declare('Sage.Platform.Mobile.Controls.TextField', [Sage.Platform.Mobile.Controls.Field], {
         notificationTrigger: false,
         validationTrigger: false,
 		inputType: 'text',
         enableClearButton: true,
+        validInputOnly: false,
         clearAnimation: {},
-        attachmentPoints: {
-            clearEl: '.clear-button'
+        attributeMap: {
+            clearNode: {node: 'clearNode', type: 'innerHTML'}
         },
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '{% if($.enableClearButton) { %}',
-                '<button class="clear-button"></button>',
+                '<button class="clear-button" dojoAttachPoint="clearNode"></button>',
             '{% } %}',
-            '<input class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
+            '<input dojoAttachPoint="inputNode" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),
         init: function() {
             if (this.validInputOnly)
-                this.el.on('keypress', this.onKeyPress, this);
+                dojo.connect(this.inputNode, 'onkeypress', this.onKeyPress);
 
-            this.el
-                .on('keyup', this.onKeyUp, this)
-                .on('blur', this.onBlur, this)
-                .on('focus', this.onFocus, this);
+            dojo.connect(this.inputNode, 'onkeyup', this.onKeyUp);
+            dojo.connect(this.inputNode, 'onblur', this.onBlur);
+            dojo.connect(this.inputNode, 'onfocus', this.onFocus);
         },
         renderTo: function(){
-            Sage.Platform.Mobile.Controls.EditorField.superclass.renderTo.apply(this, arguments);
-            if(this.enableClearButton && this.clearEl)
-                this.clearEl.on('click', this.onClearPress, this);
+            this.inherited(arguments);
+            if(this.enableClearButton && this.clearNode)
+                this.clearNode.on('click', this.onClearPress, this);
         },
         enable: function() {
-            Sage.Platform.Mobile.Controls.EditorField.superclass.enable.apply(this, arguments);
-
-            this.el.dom.disabled = false;
+            this.inherited(arguments);
+            this.inputNode.disabled = false;
         },
         disable: function() {
-            Sage.Platform.Mobile.Controls.EditorField.superclass.disable.apply(this, arguments);
-
-            this.el.dom.disabled = true;
+            this.inherited(arguments);
+            this.inputNode.disabled = true;
         },  
         onKeyPress: function(evt, el, o) {
             var v = this.getValue() + String.fromCharCode(evt.getCharCode());
@@ -72,9 +68,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 this.onNotificationTrigger(evt, el, o);
         },
         onFocus: function(evt, el, o){
-            if(this.enableClearButton && this.clearEl){
-                if(this.clearAnimation.anim) this.clearAnimation.anim.stop();
-                this.clearEl.show();
+            if(this.enableClearButton && this.clearNode){
+                dojo.attr(this.clearNode,'visibility','visible');
             }
         },
         onBlur: function(evt, el, o) {
@@ -84,43 +79,46 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (this.notificationTrigger == 'blur')
                 this.onNotificationTrigger(evt, el, o);
 
-            if(this.enableClearButton) {
+            if(this.enableClearButton && this.clearNode) {
+                dojo.attr(this.clearNode,'visibility','hidden');
+                /*
                 // fix for mobile event handling
                 var scope = this;
                 setTimeout(function(){
-                    if(!(scope.el.dom == document.activeElement)) {
-                        scope.clearEl.hide(scope.clearAnimation);
+                    if(!(scope.inputNode == document.activeElement)) {
+                        scope.clearNode.hide(scope.clearAnimation);
                     }
                 }, 150);
+                */
             }
         },
         onClearPress: function(evt){
             this.clearValue();
-            this.el.focus();
+            this.inputNode.focus();
         },
         onNotificationTrigger: function(evt, el, o) {
             var currentValue = this.getValue();
 
             if (this.previousValue != currentValue)
-                this.fireEvent('change', currentValue, this);
+                this.change(currentValue);
 
             this.previousValue = currentValue;
         },
         onValidationTrigger: function(evt, el, o) {
             if (this.validate())
-                this.containerEl.addClass('row-error');
+                this.containerNode.addClass('row-error');
             else
-                this.containerEl.removeClass('row-error');
+                this.containerNode.removeClass('row-error');
         },
         getValue: function() {
-            return this.el.getValue();
+            return this.inputNode.getValue();
         },
         setValue: function(val, initial) {
             if (initial) this.originalValue = val;
 
             this.previousValue = false;
 
-            this.el.dom.value = val || '';
+            this.inputNode.value = val || '';
         },
         clearValue: function() {
             this.setValue('', true);
@@ -131,4 +129,4 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('text', Sage.Platform.Mobile.Controls.TextField);
-})();
+});

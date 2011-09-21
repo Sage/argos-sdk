@@ -678,7 +678,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             if (!this.feed) this.set('listContent', '');
 
             this.feed = feed;
-
             if (this.feed['$totalResults'] === 0)
             {
                 this.set('listContent', this.noDataTemplate.apply(this));                

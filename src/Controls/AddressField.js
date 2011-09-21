@@ -14,15 +14,12 @@
  */
 
 // todo: move to argos-saleslogix; this does not belong here.
-
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
-    Sage.Platform.Mobile.Controls.AddressField = Ext.extend(Sage.Platform.Mobile.Controls.EditorField, {
+define('Sage/Platform/Mobile/Controls/AddressField', ['Sage/Platform/Mobile/Controls/EditorField'], function() {
+    dojo.declare('Sage.Platform.Mobile.Controls.AddressField', [Sage.Platform.Mobile.Controls.EditorField], {
         template: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<div></div>'
+            '<div dojoAttachPoint="inputNode"></div>'
         ]),
         rows: 4,
         lookupLabelText: 'edit',
@@ -33,9 +30,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         _disableTextElement: function() {
         },
         setText: function(text) {
-            this.el.dom.innerHTML = text;
+            this.inputNode.innerHTML = text;
         }
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('address', Sage.Platform.Mobile.Controls.AddressField);
-})();
+});

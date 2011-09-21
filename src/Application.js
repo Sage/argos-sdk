@@ -402,6 +402,22 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             var forId = (id && this.customizationsForId[id]) || [];
 
             return forSet.concat(forId);
+        },
+        frontHitchArgs: function(scope, method){
+            var pre = dojo._toArray(arguments,2);
+            return function(){
+                var args = dojo._toArray(arguments);
+                return method.apply(scope||this, args.concat(pre));
+            }
+        },
+        frontHitch: function(scope, method){
+            if(arguments.length>2)
+                return this.frontHitchArgs.apply(dojo, arguments);
+            return !scope
+                ? method
+                : function(){
+                    return method.apply(scope, arguments || []);
+                };
         }
     });
 
