@@ -34,11 +34,11 @@ define('Sage/Platform/Mobile/_ActionMixin', ['dojo', 'dojo/NodeList-traverse'], 
             var el = dojo.query(evt.target).closest('[data-action]')[0],
                 action = el && dojo.attr(el, 'data-action'); 
 
-            if (action && this._isValidElementForAction(el) && this._hasAction(action, evt, el))
+            if (action && this._isValidElementForAction(el) && this.hasAction(action, evt, el))
             {
                 var parameters = this._getParametersForAction(action, evt, el);
 
-                this._invokeAction(action, parameters, evt, el);
+                this.invokeAction(action, parameters, evt, el);
 
                 dojo.stopEvent(evt);
             }
@@ -64,10 +64,10 @@ define('Sage/Platform/Mobile/_ActionMixin', ['dojo', 'dojo/NodeList-traverse'], 
 
             return parameters;
         },
-        _hasAction: function(name, evt, el) {
+        hasAction: function(name, evt, el) {
             return (typeof this[name] === 'function');
         },
-        _invokeAction: function(name, parameters, evt, el) {
+        invokeAction: function(name, parameters, evt, el) {
             return this[name].apply(this, [parameters, evt, el]);
         }
     });

@@ -45,7 +45,7 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
                 {
                     var view = App.getPrimaryActiveView();
                     if (view && view.hasAction(source.action))
-                        view.invokeAction(source.action, Ext.apply(parameters, {'$tool': source}), evt, el);
+                        view.invokeAction(source.action, dojo.mixin(parameters, {'$tool': source}), evt, el);
                 }
             }
         },
