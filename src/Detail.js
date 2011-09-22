@@ -13,12 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Detail',
-    ['Sage/Platform/Mobile/View',
-        'Sage/Platform/Mobile/Utility',
-        'Sage/Platform/Mobile/Format',
-        'Mobile/SalesLogix/Format'
-    ], function() {
+define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Utility', 'Mobile/SalesLogix/Format'], function() {
 
     dojo.declare('Sage.Platform.Mobile.Detail', [Sage.Platform.Mobile.View], {
         attributeMap: {
@@ -40,7 +35,7 @@ define('Sage/Platform/Mobile/Detail',
             '<div class="panel-loading-indicator">',
             '<div class="row"><div>{%: $.loadingText %}</div></div>',
             '</div>'
-        ]),     
+        ]),
         sectionBeginTemplate: new Simplate([
             '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">',
             '{%: $.title %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
@@ -102,9 +97,6 @@ define('Sage/Platform/Mobile/Detail',
         ]),
         id: 'generic_detail',
         layout: null,
-        layoutCompiled: null,
-        layoutCompiledFrom: null,
-        enableCustomizations: true,
         customizationSet: 'detail',
         expose: false,
         editText: 'Edit',
@@ -252,7 +244,7 @@ define('Sage/Platform/Mobile/Detail',
             for (i = 0; i < layoutLength; i+=1) {
                 current = layout[i];
                 include = this.expandExpression(current['include'], entry);
-                exclude = this.expandExpression(current['exclude'], entry);
+                    exclude = this.expandExpression(current['exclude'], entry);
 
                 if (include !== undefined && !include) continue;
                 if (exclude !== undefined && exclude) continue;
@@ -272,21 +264,21 @@ define('Sage/Platform/Mobile/Detail',
                 }
 
                 provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue;
-                value = typeof current['value'] === 'undefined'
-                    ? provider(entry, current['name'])
-                    : current['value'];
+                    value = typeof current['value'] === 'undefined'
+                        ? provider(entry, current['name'])
+                        : current['value'];
 
                 if (current['template'] || current['tpl']) {
                     rendered = (current['template'] || current['tpl']).apply(value, this);
-                    formatted = current['encode'] === true
-                        ? Sage.Platform.Mobile.Format.encode(rendered)
-                        : rendered;
+                        formatted = current['encode'] === true
+                            ? Sage.Platform.Mobile.Format.encode(rendered)
+                            : rendered;
                 }
                 else if (current['renderer'] && typeof current['renderer'] === 'function') {
                     rendered = current['renderer'].call(this, value);
-                    formatted = current['encode'] === true
-                        ? Sage.Platform.Mobile.Format.encode(rendered)
-                        : rendered;
+                        formatted = current['encode'] === true
+                            ? Sage.Platform.Mobile.Format.encode(rendered)
+                            : rendered;
                 }
                 else {
                     formatted = current['encode'] !== false
@@ -299,7 +291,7 @@ define('Sage/Platform/Mobile/Detail',
                     value: formatted,
                     raw: value
                 }, current);
-        
+
                 if (current['descriptor'])
                     options['descriptor'] = typeof current['descriptor'] === 'function'
                         ? this.expandExpression(current['descriptor'], entry, value)
@@ -357,99 +349,16 @@ define('Sage/Platform/Mobile/Detail',
                 this.processLayout(current['as'], current['options'], entry);
             }
         },
-        compileLayout: function() {
-            var layout = this.createLayout(),
-                source = layout,
-                customizations;
-
-            if (source === this.layoutCompiledFrom && this.layoutCompiled)
-                return this.layoutCompiled; // same layout, no changes
-      
-            if (this.enableCustomizations) {
-                customizations = App.getCustomizationsFor(this.customizationSet, this.id);
-                if (customizations && customizations.length > 0) {
-                    layout = [];
-                    this.applyCustomizationsToLayout(source, customizations, layout);
-                }
-            }
-
-            this.layoutCompiled = layout;
-            this.layoutCompiledFrom = source;
-
-            return layout;
-        },
-        applyCustomizationsToLayout: function(layout, customizations, output) {
-            var row,
-                insertRowsBefore,
-                insertRowsAfter,
-                customization,
-                stop,
-                row,
-                subLayout,
-                subLayoutOutput;
-
-            for (var i = 0; i < layout.length; i++) {
-                row = layout[i];
-                insertRowsBefore = [];
-                insertRowsAfter = [];
-
-                for (var j = 0; j < customizations.length; j++) {
-                    customization = customizations[j];
-                    stop = false;
-
-                    if (customization.at(row)) {
-                        switch (customization.type) {
-                            case 'remove':
-                                // full stop
-                                stop = true;
-                                row = null;
-                                break;
-                            case 'replace':
-                                // full stop
-                                stop = true;
-                                row = this.expandExpression(customization.value, row);
-                                break;
-                            case 'modify':
-                                // make a shallow copy if we haven't already
-                                if (row === layout[i])
-                                    row = dojo.mixin({}, row);
-                                row = dojo.mixin(row, this.expandExpression(customization.value, row));
-                                break;
-                            case 'insert':
-                                (customization.where !== 'before'
-                                    ? insertRowsAfter
-                                    : insertRowsBefore
-                                ).push(this.expandExpression(customization.value, row));
-                                break;
-                        }
-                    }
-                    if (stop) break;
-                }
-
-                output.push.apply(output, insertRowsBefore);
-                if (row) {
-                    if (row['as']) {
-                        // make a shallow copy if we haven't already
-                        if (row === layout[i])
-                            row = dojo.mixin({}, row);
-
-                        subLayout = row['as'];
-                        subLayoutOutput = (row['as'] = []);
-
-                        this.applyCustomizationsToLayout(subLayout, customizations, subLayoutOutput);
-                    }
-
-                    output.push(row);
-                }
-                output.push.apply(output, insertRowsAfter);
-            }
-        },
         processEntry: function(entry) {
-            if (!this.entry) this.set('detailContent', '');
             this.entry = entry;
 
-            if (this.entry) {
-                this.processLayout(this.compileLayout(), {title: this.detailsText}, this.entry);
+            if (this.entry)
+            {
+                this.processLayout(this._createCustomizedLayout(this.customizationSet, this.id, this.createLayout()), {title: this.detailsText}, this.entry);
+            }
+            else
+            {
+                this.set('detailContent', '');
             }
         },
         onRequestDataFailure: function(response, o) {
@@ -462,7 +371,6 @@ define('Sage/Platform/Mobile/Detail',
         },
         onRequestDataAborted: function(response, o) {
             this.options = false; // force a refresh
-            dojo.query(this.domNode).removeClass('panel-loading');
             dojo.removeClass(this.domNode, 'panel-loading');
         },
         onRequestDataSuccess: function(entry) {
@@ -531,7 +439,7 @@ define('Sage/Platform/Mobile/Detail',
             this.inherited(arguments);
         },
         clear: function() {
-            this.set('detailContent', this.loadingTemplate.apply(this));
+            this.set('detailContent', this.emptyTemplate.apply(this));
             this.context = false;
         }
     });

@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_Templated'], function() {
+define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_CustomizationMixin', 'Sage/Platform/Mobile/_Templated'], function() {
 
-    dojo.declare('Sage.Platform.Mobile.View', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
-        _loadConnect: null,
+    dojo.declare('Sage.Platform.Mobile.View', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._CustomizationMixin, Sage.Platform.Mobile._Templated], {
         attributeMap: {
             'title': {
                 node: 'domNode',
@@ -33,6 +32,7 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manip
             '<ul id="{%= $.id %}" title="{%= $.titleText %}" class="{%= $.cls %}">',
             '</ul>'
         ]),
+        _loadConnect: null,
         id: 'generic_view',
         titleText: 'Generic View',
         tools: null,

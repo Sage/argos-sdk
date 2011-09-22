@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/_ActionMixin', ['dojo/NodeList-traverse'], function() {
+define('Sage/Platform/Mobile/_ActionMixin', ['dojo', 'dojo/NodeList-traverse'], function() {
 
     dojo.declare('Sage.Platform.Mobile._ActionMixin', null, {
         actionsFrom: 'click',

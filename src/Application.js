@@ -14,7 +14,22 @@
  */
 
 define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
+    dojo.extend(Function, {
+        bindDelegate: function(scope) {
+            var fn = this;
 
+            if (arguments.length == 1) return function() {
+                return fn.apply(scope || this, arguments);
+            };
+
+            var optional = Array.prototype.slice.call(arguments, 1);
+            return function() {
+                var called = Array.prototype.slice.call(arguments, 0);
+                return fn.apply(scope || this, called.concat(optional));
+            };
+        }
+    });
+    
     dojo.declare('Sage.Platform.Mobile.Application', null, {
         _connects: null,
         _subscribes: null,
