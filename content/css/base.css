@@ -318,6 +318,7 @@
 }
 
 /* edit/insert */
+.row > div > input:not([type|=radio]):not([type|=checkbox]),
 .row > input:not([type|=radio]):not([type|=checkbox])
 {
     height: auto;
@@ -330,6 +331,9 @@
     display: none;
 }
 
+.row-disabled > div > button,
+.row-disabled > div > input,
+.row-disabled > div > div,
 .row-disabled > button,
 .row-disabled > input,
 .row-disabled > div
@@ -338,6 +342,13 @@
     cursor: default;
 }
 
+.row-edit[data-field-type="picklist"] > div > .button,
+.row-edit[data-field-type="lookup"] > div > .button,
+.row-edit[data-field-type="select"] > div > .button,
+.row-edit[data-field-type="address"] > div > .button,
+.row-edit[data-field-type="name"] > div > .button,
+.row-edit[data-field-type="date"] > div > .button,
+.row-edit[data-field-type="note"] > div > .button,
 .row-edit[data-field-type="picklist"] > .button,
 .row-edit[data-field-type="lookup"] > .button,
 .row-edit[data-field-type="select"] > .button,
@@ -352,6 +363,12 @@
     right: 4px;
 }
 
+.row-edit[data-field-type="picklist"] > div > input,
+.row-edit[data-field-type="lookup"] > div > input,
+.row-edit[data-field-type="select"] > div > input,
+.row-edit[data-field-type="name"] > div > input,
+.row-edit[data-field-type="date"] > div > input,
+.row-edit[data-field-type="note"] > div > input,
 .row-edit[data-field-type="picklist"] > input,
 .row-edit[data-field-type="lookup"] > input,
 .row-edit[data-field-type="select"] > input,
@@ -362,6 +379,7 @@
     padding: 8px 34px 8px 110px !important;
 }
 
+.row-edit[data-field-type="note"] > div > textarea,
 .row-edit[data-field-type="note"] > textarea
 {
     padding: 8px 34px 8px 110px !important;
@@ -369,7 +387,7 @@
     overflow: hidden;
 }
 
-.row-edit[data-field-type="address"] > div
+.row-edit[data-field-type="address"] > div > div
 {
     min-height: 1.5em !important;
     padding: 4px 34px 4px 110px !important;

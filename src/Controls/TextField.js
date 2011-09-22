@@ -22,35 +22,43 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         validInputOnly: false,
         clearAnimation: {},
         attributeMap: {
-            clearNode: {node: 'clearNode', type: 'innerHTML'}
+            inputValue: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'value'
+            },
+            focus: {
+                node: 'inputNode',
+                type: 'attribute'
+            }
         },
-        template: new Simplate([
+        widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '{% if($.enableClearButton) { %}',
-                '<button class="clear-button" dojoAttachPoint="clearNode"></button>',
+                '<button class="clear-button" data-dojo-attach-point="clearNode"></button>',
             '{% } %}',
-            '<input dojoAttachPoint="inputNode" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
+            '<input data-dojo-attach-point="inputNode" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),
         init: function() {
             if (this.validInputOnly)
-                dojo.connect(this.inputNode, 'onkeypress', this.onKeyPress);
+                dojo.connect(this.inputNode, 'onkeypress', this, this.onKeyPress);
 
-            dojo.connect(this.inputNode, 'onkeyup', this.onKeyUp);
-            dojo.connect(this.inputNode, 'onblur', this.onBlur);
-            dojo.connect(this.inputNode, 'onfocus', this.onFocus);
+            dojo.connect(this.inputNode, 'onkeyup', this, this.onKeyUp);
+            dojo.connect(this.inputNode, 'onblur', this, this.onBlur);
+            dojo.connect(this.inputNode, 'onfocus', this, this.onFocus);
         },
         renderTo: function(){
             this.inherited(arguments);
             if(this.enableClearButton && this.clearNode)
-                this.clearNode.on('click', this.onClearPress, this);
+                dojo.connect(this.clearNode, 'click', this, this.onClearPress);
         },
         enable: function() {
             this.inherited(arguments);
-            this.inputNode.disabled = false;
+            dojo.attr(this.inputNode, 'disabled', false);
         },
         disable: function() {
             this.inherited(arguments);
-            this.inputNode.disabled = true;
+            dojo.attr(this.inputNode, 'disabled', true);
         },  
         onKeyPress: function(evt, el, o) {
             var v = this.getValue() + String.fromCharCode(evt.getCharCode());
@@ -69,7 +77,7 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         },
         onFocus: function(evt, el, o){
             if(this.enableClearButton && this.clearNode){
-                dojo.attr(this.clearNode,'visibility','visible');
+                dojo.style(this.clearNode, 'visibility', 'visible');
             }
         },
         onBlur: function(evt, el, o) {
@@ -80,7 +88,7 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
                 this.onNotificationTrigger(evt, el, o);
 
             if(this.enableClearButton && this.clearNode) {
-                dojo.attr(this.clearNode,'visibility','hidden');
+                dojo.style(this.clearNode,'visibility','hidden');
                 /*
                 // fix for mobile event handling
                 var scope = this;
@@ -94,7 +102,7 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         },
         onClearPress: function(evt){
             this.clearValue();
-            this.inputNode.focus();
+            this.focus();
         },
         onNotificationTrigger: function(evt, el, o) {
             var currentValue = this.getValue();
@@ -111,14 +119,14 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
                 this.containerNode.removeClass('row-error');
         },
         getValue: function() {
-            return this.inputNode.getValue();
+            return this.get('inputValue');
         },
         setValue: function(val, initial) {
             if (initial) this.originalValue = val;
 
             this.previousValue = false;
 
-            this.inputNode.value = val || '';
+            this.set('inputValue', val);
         },
         clearValue: function() {
             this.setValue('', true);

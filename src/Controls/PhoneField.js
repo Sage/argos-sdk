@@ -49,7 +49,8 @@ define('Sage/Platform/Mobile/Controls/PhoneField', ['Sage/Platform/Mobile/Contro
             this.inputNode.value = this.formatNumberForDisplay(this.inputNode.value, this.getValue());
         },
         getValue: function() {
-            var value = this.inputNode.getValue();
+            var value = dojo.attr(this.inputNode, 'value');
+
 
             if (/^\+/.test(value)) return value;
 
@@ -60,6 +61,7 @@ define('Sage/Platform/Mobile/Controls/PhoneField', ['Sage/Platform/Mobile/Contro
             
             this.previousValue = false;
 
+            dojo.attr(this.inputNode, 'value', this.formatNumberForDisplay(val) || '');
             this.inputNode.value = this.formatNumberForDisplay(val) || '';
         },
         formatNumberForDisplay: function(number, clean) {
@@ -71,7 +73,7 @@ define('Sage/Platform/Mobile/Controls/PhoneField', ['Sage/Platform/Mobile/Contro
                     match;
                 if ((match = formatter.test.exec(clean)))
                 {
-                    return dojo.string.substitute(formatter.format, [number, clean, match]);
+                    return dojo.string.substitute(formatter.format, [number, clean].concat(match));
                     /*
                     return String.format.apply(String, [formatter.format, number, clean].concat(match));
                     */

@@ -13,33 +13,28 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
-    var U = Sage.Platform.Mobile.Utility;
-
-    Sage.Platform.Mobile.Controls.DateField = Ext.extend(Sage.Platform.Mobile.Controls.EditorField, {
-        attachmentPoints: {
-            'triggerBtn': '.button'
-        },
-        template: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<input type="text" />'
-        ]),
-        view: 'generic_calendar',
+define('Sage/Platform/Mobile/Controls/DateField', ['Sage/Platform/Mobile/Controls/EditorField'], function() {
+    dojo.declare('Sage.Platform.Mobile.Controls.DateField', [Sage.Platform.Mobile.Controls.EditorField], {
+        // Localization
         emptyText: '',
         dateFormatText: 'MM/dd/yyyy',
+        invalidDateFormatErrorText: "Field '${0}' has Invalid date format.",
+
+        widgetTemplate: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<button data-dojo-attach-point="triggerNode" class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
+            '<input data-dojo-attach-point="inputNode" type="text" />'
+        ]),
+        view: 'generic_calendar',
         showTimePicker: false,
-        invalidDateFormatErrorText: "Field '{0}' has Invalid date format.",
         formatValue: function(value) {
             return Sage.Platform.Mobile.Format.date(value, this.dateFormatText);
         },
         init: function() {
-            Sage.Platform.Mobile.Controls.EditorField.superclass.init.apply(this, arguments);
-
-            this.el.on('change', this.onChange, this, {stopEvent: true});
-            this.triggerBtn.on('click', this.onClick, this, {stopEvent: true});
+            this.inherited(arguments);
+            
+            dojo.connect(this.inputNode, 'onchange', this, this.onChange, true);
+            dojo.connect(this.triggerNode, 'onclick', this, this.onClick, true);
         },
         onChange: function(evt, el, o) {
             if (!el) return;
@@ -54,16 +49,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (val)
             {
                 this.validationValue = this.currentValue = val;
-                this.containerEl.removeClass('row-error'); // todo: not the right spot for this, add validation eventing
+                dojo.removeClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
             }
             else
             {
                 this.validationValue = this.currentValue = null;
-                this.containerEl.addClass('row-error'); // todo: not the right spot for this, add validation eventing
+                dojo.addClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
             }
         },
         createNavigationOptions: function() {
-            var options = Sage.Platform.Mobile.Controls.DateField.superclass.createNavigationOptions.apply(this, arguments);
+            var options = this.inherited(arguments);
 
             options.date = this.currentValue;
             options.showTimePicker = this.showTimePicker;
@@ -75,7 +70,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             if (view)
             {
                 this.currentValue = this.validationValue = view.getDateTime();
-                this.containerEl.removeClass('row-error'); // todo: not the right spot for this, add validation eventing
+                dojo.removeClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
             }
         },
         isDirty: function() {
@@ -84,16 +79,15 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 : this.originalValue !== this.currentValue;
         },
         clearValue: function() {
-            Sage.Platform.Mobile.Controls.DateField.superclass.clearValue.apply(this, arguments);
-            this.containerEl.removeClass('row-error'); // todo: not the right spot for this, add validation eventing
+            this.inherited(arguments);
+            dojo.removeClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
         },
         validate: function() {
             if (this.el.dom.value !== '' && !this.currentValue)
                 return String.format(this.invalidDateFormatErrorText, this.label);
 
-            return Sage.Platform.Mobile.Controls.DateField.superclass.validate.apply(this, arguments);
+            return this.inherited(arguments);
         }
     });
-
     Sage.Platform.Mobile.Controls.FieldManager.register('date', Sage.Platform.Mobile.Controls.DateField);
-})();
+});

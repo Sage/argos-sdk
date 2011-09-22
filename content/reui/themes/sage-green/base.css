@@ -407,6 +407,7 @@ img
     white-space: inherit;
 }
 
+.row > div > label,
 .row > label
 {
 	margin: 0px;
@@ -426,6 +427,8 @@ img
     padding: 0 .75em;
 }
 
+.row > div > span,
+.row > div > a,
 .row > span,
 .row > a
 {
@@ -509,6 +512,7 @@ img
     padding: 2px 0.75em;
 }
 
+.row-edit > div > label,
 .row-edit > label
 {
 	position: absolute;
@@ -518,6 +522,7 @@ img
     overflow: hidden;
 }
 
+.row > div > input[type|=radio], .row > div > input[type|=checkbox],
 .row > input[type|=radio], .row > input[type|=checkbox]
 {
     margin: 7px 7px 0 0;
@@ -525,6 +530,7 @@ img
     width: 25px;
 }
 
+.row > div > input:not([type|=radio]):not([type|=checkbox]),
 .row > input:not([type|=radio]):not([type|=checkbox])
 {
     -webkit-appearance: none;
@@ -549,6 +555,7 @@ img
     background: transparent;
 }
 
+.row > div > textarea,
 .row > textarea
 {
     -webkit-appearance: none;
@@ -568,7 +575,8 @@ img
     display: block;    
 }
 
-.row > input[type|=radio], .row > input[type|=checkbox]
+.row > div > input[type|=radio], .row > div >x input[type|=checkbox],
+.row > input[type|=radio], .row > div >x input[type|=checkbox]
 {
   margin: 7px 7px 0 0;
   height: 25px;

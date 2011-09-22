@@ -13,13 +13,11 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
-    Sage.Platform.Mobile.Controls.BooleanField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
-        template: new Simplate([
+define('Sage/Platform/Mobile/Controls/BooleanField', ['Sage/Platform/Mobile/Controls/Field'], function() {
+    dojo.declare('Sage.Platform.Mobile.Controls.BooleanField', [Sage.Platform.Mobile.Controls.Field], {
+        widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<div class="toggle" toggled="{%= !!$.checked %}">',
+            '<div class="toggle" data-dojo-attach-point="toggleNode" toggled="{%= !!$.checked %}">',
             '<span class="thumb"></span>',
             '<span class="toggleOn">{%= $.onText %}</span>',
             '<span class="toggleOff">{%= $.offText %}</span>',
@@ -28,21 +26,20 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         onText: 'ON',
         offText: 'OFF',
         init: function() {
-            Sage.Platform.Mobile.Controls.BooleanField.superclass.init.apply(this, arguments);
-
-            this.el.on('click', this.onClick, this, {stopEvent: true});
+            this.inherited(arguments);
+            dojo.connect(this.toggleNode, 'onclick', this, this.onClick, true);
         },
         onClick: function(evt, el, o) {
             if (this.isDisabled()) return;
 
-            var toggledValue = this.el.getAttribute('toggled') !== 'true';
+            var toggledValue = dojo.attr(this.toggleNode, 'toggled') !== 'true';
 
-            this.el.dom.setAttribute('toggled', toggledValue);
+            dojo.attr(this.toggleNode, 'toggled', toggledValue);
 
-            this.fireEvent('change', toggledValue, this);
+            this.change(toggledValue, this);
         },
         getValue: function() {
-            return this.el.getAttribute('toggled') === 'true';
+            return (dojo.attr(this.toggleNode, 'toggled') === 'true');
         },
         setValue: function(val, initial) {
             val = typeof val === 'string'
@@ -51,7 +48,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             if (initial) this.originalValue = val;
 
-            this.el.dom.setAttribute('toggled', val.toString());
+            dojo.attr(this.toggleNode, 'toggled', val.toString());
         },
         clearValue: function(flag) {
             var initial = flag !== true;
@@ -64,4 +61,4 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('boolean', Sage.Platform.Mobile.Controls.BooleanField);
-})();
+});

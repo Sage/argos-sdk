@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile');
-
-Sage.Platform.Mobile.Convert = (function() {
+define('Sage/Platform/Mobile/Convert', ['dojo'], function() {
+    dojo.declare('Sage.Platform.Mobile.Convert', null, {});
+    Sage.Platform.Mobile.Convert = (function() {
     var trueRE = /^(true|T)$/i,
         isoDate = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|(-|\+)(\d{2}):(\d{2}))/,
         jsonDate = /\/Date\((-?\d+)(?:(-|\+)(\d{2})(\d{2}))?\)\//,
@@ -99,5 +99,6 @@ Sage.Platform.Mobile.Convert = (function() {
             return value;
         }
     };
-})();
+    })();
+});
 

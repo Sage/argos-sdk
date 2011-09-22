@@ -154,11 +154,9 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manip
             /// <summary>
             ///     Called after the view has been transitioned (slide animation complete) to.
             /// </summary>
-            console.log('transitionTo');
             if (this.refreshRequired)
             {
                 this.refreshRequired = false;
-                console.log('refresh');
                 this.refresh();
             }
 

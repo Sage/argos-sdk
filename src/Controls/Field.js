@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Controls/Field', ['dojo', 'dojo/string'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.FieldManager', null, {});
+define('Sage/Platform/Mobile/Controls/Field', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_Templated'], function() {
+    dojo.setObject('Sage.Platform.Mobile.Controls.FieldManager', null);
+    
     Sage.Platform.Mobile.Controls.FieldManager = (function() {
         var types = {};
         return {
@@ -28,26 +29,21 @@ define('Sage/Platform/Mobile/Controls/Field', ['dojo', 'dojo/string'], function(
         };
     })();
 
-    dojo.declare('Sage.Platform.Mobile.Controls.Field', null, {
-        attributeMap: {},
+    dojo.declare('Sage.Platform.Mobile.Controls.Field', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
         owner: false,
         applyTo: false,
         alwaysUseValue: false,
         disabled: false,
         hidden: false,
-        template: new Simplate([
-            '<input dojoAttachPoint="inputNode">'
+        widgetTemplate: new Simplate([
+            '<input data-dojo-attach-point="inputNode">'
         ]),
         constructor: function(o) {
             dojo.mixin(this, o);
-            this.inherited(arguments);
-        },       
+        },
         renderTo: function(node) {
-            this.containerNode = node; // todo: should el actually be containerEl instead of last rendered node?
-            dojo.place(
-                this.template.apply(this),
-                node
-            );
+            this.containerNode = node; // todo: should node actually be containerNode instead of last rendered node?
+            this.placeAt(node);
         },
         init: function() {
         },

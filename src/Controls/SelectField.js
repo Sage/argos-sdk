@@ -13,20 +13,16 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
-    Sage.Platform.Mobile.Controls.SelectField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
+define('Sage/Platform/Mobile/Controls/SelectField', ['Sage/Platform/Mobile/Controls/LookupField'], function() {
+    dojo.declare('Sage.Platform.Mobile.Controls.SelectField', [Sage.Platform.Mobile.Controls.LookupField], {
         valueKeyProperty: false,
         valueTextProperty: false,
         createNavigationOptions: function() {
-            var options = Sage.Platform.Mobile.Controls.SelectField.superclass.createNavigationOptions.apply(this, arguments);
-
+            var options = this.inherited(arguments);
             options.data = this.expandExpression(this.data);
-
             return options;
         }        
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('select', Sage.Platform.Mobile.Controls.SelectField);
-})();
+});

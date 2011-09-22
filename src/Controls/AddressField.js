@@ -16,11 +16,17 @@
 // todo: move to argos-saleslogix; this does not belong here.
 define('Sage/Platform/Mobile/Controls/AddressField', ['Sage/Platform/Mobile/Controls/EditorField'], function() {
     dojo.declare('Sage.Platform.Mobile.Controls.AddressField', [Sage.Platform.Mobile.Controls.EditorField], {
-        template: new Simplate([
+        widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<div dojoAttachPoint="inputNode"></div>'
+            '<div data-dojo-attach-point="inputNode"></div>'
         ]),
+        attributeMap: {
+            addressContent : {
+                node: 'inputNode',
+                type: 'innerHTML'
+            }
+        },
         rows: 4,
         lookupLabelText: 'edit',
         emptyText: 'no address',
@@ -30,7 +36,7 @@ define('Sage/Platform/Mobile/Controls/AddressField', ['Sage/Platform/Mobile/Cont
         _disableTextElement: function() {
         },
         setText: function(text) {
-            this.inputNode.innerHTML = text;
+            this.set('addressContent', text);
         }
     });
 

@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
-    Sage.Platform.Mobile.Controls.TextAreaField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {        
+define('Sage/Platform/Mobile/Controls/TextAreaField', ['Sage/Platform/Mobile/Controls/TextField'], function() {
+    dojo.declare('Sage.Platform.Mobile.Controls.TextAreaField', [Sage.Platform.Mobile.Controls.TextField], {
         rows: 4,
         enableClearButton: false,
-        template: new Simplate([
+        widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<textarea name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %} />'
+            '<textarea data-dojo-attach-point="inputNode" name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %}></textarea>'
         ])
     });
     Sage.Platform.Mobile.Controls.FieldManager.register('textarea', Sage.Platform.Mobile.Controls.TextAreaField);
-})();
+});

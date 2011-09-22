@@ -14,21 +14,30 @@
  */
 define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Controls/Field'], function() {
     dojo.declare('Sage.Platform.Mobile.Controls.EditorField', [Sage.Platform.Mobile.Controls.Field], {
-        template: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<input dojoAttachPoint="inputNode" type="text" />'
-        ]),
+        // Localization
         lookupLabelText: 'edit',
         lookupText: '...',
         emptyText: 'empty',
         completeText: 'Ok',
+
+        widgetTemplate: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
+            '<input data-dojo-attach-point="inputNode" type="text" />'
+        ]),
+        attributeMap: {
+            inputValue: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'value'
+            }
+        },
         formatValue: function(val) {
             return '';
         },
         init: function() {
             this.inherited(arguments);
-            dojo.connect(this.containerNode, "onclick", this.onClick, this, {stopEvent: true});
+            dojo.connect(this.containerNode, "onclick", this, this.onClick, true);
         },
         enable: function() {
             this.inherited(arguments);
@@ -64,21 +73,26 @@ define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Contr
             };
         },
         navigateToEditView: function() {
+            console.log('in nav to edit');
             if (this.isDisabled()) return;
 
+            console.log(this.view);
             var view = App.getView(this.view),
                 options = this.createNavigationOptions();
 
+            console.log(view);
             if (view && options)
             {
                 if (options.title) view.set('title', options.title);
                 view.show(options);
             }
         },
-        onClick: function(evt, el, o) {
-            evt.stopEvent();
-
-            this.navigateToEditView();
+        onClick: function(evt) {
+            dojo.stopEvent(evt);
+            if(evt.target.nodeName === 'BUTTON'){
+                console.log('navigating...');
+                this.navigateToEditView();
+            }
         },
         getValuesFromView: function() {
             var view = App.getPrimaryActiveView(),
@@ -127,8 +141,8 @@ define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Contr
             this.change(this.currentValue);
         },
         setText: function(text) {
-            this.inputNode.value = text;
-        },        
+            this.set('inputValue', text);
+        },
         isDirty: function() {
             return this.originalValue !== this.currentValue;
         },
