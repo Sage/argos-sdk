@@ -31,6 +31,16 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
                 node: 'inputNode',
                 type: 'attribute',
                 attribute: 'value'
+            },
+            inputDisabled: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'disabled'
+            },
+            inputReadOnly: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'readonly'
             }
         },
         view: false,
@@ -48,7 +58,7 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
 
             if (this.isReadOnly()) {
                 this.disable();
-                this.inputNode.readOnly = true;
+                this.set('inputReadOnly', true);
             } else {
                 if (!this.requireSelection) {
                     dojo.connect(this.inputNode, 'onkeyup', this, this.onKeyUp);
@@ -59,12 +69,12 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
         enable: function() {
             this.inherited(arguments);
 
-            this.inputNode.disabled = false;
+            this.set('inputDisabled', false);
         },
         disable: function() {
             this.inherited(arguments);
 
-            this.inputNode.disabled = true;
+            this.set('inputDisabled', true);
         },  
         isReadOnly: function() {
             return !this.view;
@@ -147,7 +157,9 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
         },
         onClick: function(evt, el, o) {
             // todo: is evt.target always the button or need an ancestor traverser?
-            if (!this.isDisabled() && (dojo.hasClass(evt.target, 'button') || this.requireSelection)) {
+            if (!this.isDisabled() &&
+                ((dojo.hasClass(evt.target, 'button') || dojo.hasClass(evt.target.parentNode, 'button'))
+                    || this.requireSelection)) {
                 dojo.stopEvent(evt);
                 this.navigateToListView();
             }
@@ -178,16 +190,13 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
         },
         complete: function() {
             // todo: should there be a better way?
-            console.log('in lookup complete!');
             var view = App.getPrimaryActiveView(),
                 selections;
 
-            console.log(view.selectionModel);
-            console.log(view.selectionModel.getSelections());
-            if (view && view.selectionModel) {
-                selections = view.selectionModel.getSelections();
+            if (view && view._selectionModel) {
+                selections = view._selectionModel.getSelections();
 
-                if (0 == view.selectionModel.getSelectionCount() && view.options.allowEmptySelection)
+                if (0 == view._selectionModel.getSelectionCount() && view.options.allowEmptySelection)
                     this.clearValue(true);
 
                 for (var selectionKey in selections) {

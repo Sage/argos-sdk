@@ -76,6 +76,13 @@ define('Sage/Platform/Mobile/Edit',
             '<div class="row row-edit {%= $.cls %}" data-field="{%= $.name %}" data-field-type="{%= $.type %}">',            
             '</div>'
         ]),
+        attributeMap: {
+            validationContent: {
+                node: 'validationContentNode',
+                type: 'innerHTML'
+            }
+
+        },
         transitionEffect: 'slide',
         id: 'generic_edit',
         layout: null,
@@ -125,20 +132,20 @@ define('Sage/Platform/Mobile/Edit',
             });
         },
         _onShowField: function(field) {
-            field.containerNode.removeClass('row-hidden');
+            dojo.removeClass(field.containerNode, 'row-hidden');
         },
         _onHideField: function(field) {
-            field.containerNode.addClass('row-hidden');
+            dojo.addClass(field.containerNode, 'row-hidden');
         },
         _onEnableField: function(field) {
-            field.containerNode.removeClass('row-disabled');
+            dojo.removeClass(field.containerNode, 'row-disabled');
         },
         _onDisableField: function(field) {
-            field.containerNode.addClass('row-disabled');
+            dojo.addClass(field.containerNode, 'row-disabled');
         },
         invokeAction: function(name, parameters, evt, el) {
-            var fieldEl = el.findParent('[data-field]', this.el, true),
-                field = this.fields[fieldEl && fieldEl.getAttribute('data-field')];
+            var fieldEl = dojo.query(el).parents('[data-field]'),
+                field = this.fields[fieldEl.length>0 && dojo.attr(fieldEl[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
                 return field[name].apply(field, [parameters, evt, el]);
@@ -147,7 +154,7 @@ define('Sage/Platform/Mobile/Edit',
         },
         hasAction: function(name, evt, el) {
             var fieldEl = el && el.findParent('[data-field]', this.contentNode, true),
-                field = this.fields[fieldEl && dojo.attr(fieldEl,'data-field')];
+                field = this.fields[fieldEl && dojo.attr(fieldEl, 'data-field')];
 
             if (field && typeof field[name] === 'function')
                 return true;
@@ -155,11 +162,9 @@ define('Sage/Platform/Mobile/Edit',
             return this.inherited(arguments);
         },
         toggleSection: function(params) {
-            console.log(params);
-            return;
-            var el = Ext.get(params.$source);
+            var el = dojo.query(params.$source);
             if (el)
-                el.toggleClass('collapsed');
+                dojo.toggleClass(el, 'collapsed');
         },
         expandExpression: function(expression) {
             /// <summary>
@@ -178,7 +183,7 @@ define('Sage/Platform/Mobile/Edit',
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
 
             if (this.entry && this.entry['$key'])
-                request.setResourceSelector(String.format("'{0}'", this.entry['$key']));
+                request.setResourceSelector(dojo.string.substitute("'${0}'", [this.entry['$key']]));
 
             if (this.resourceKind)
                 request.setResourceKind(this.resourceKind);
@@ -428,7 +433,7 @@ define('Sage/Platform/Mobile/Edit',
                 this.setValues(this.entry);
             }
 
-            this.contentNode.removeClass('panel-loading');
+            dojo.removeClass(this.contentNode, 'panel-loading');
         },
         clearValues: function() {
             for (var name in this.fields)
@@ -517,7 +522,7 @@ define('Sage/Platform/Mobile/Edit',
 
                 if (!field.isHidden() && false !== (result = field.validate()))
                 {
-                    field.containerNode.addClass('row-error');
+                    dojo.addClass(field.containerNode, 'row-error');
 
                     this.errors.push({
                         name: name,
@@ -526,7 +531,7 @@ define('Sage/Platform/Mobile/Edit',
                 }
                 else
                 {
-                    field.containerNode.removeClass('row-error');
+                    dojo.removeClass(field.containerNode, 'row-error');
                 }
             }
 
@@ -566,7 +571,7 @@ define('Sage/Platform/Mobile/Edit',
             if (App.bars.tbar)
                 App.bars.tbar.disable();
 
-            this.contentNode.addClass('busy');
+            dojo.addClass(this.contentNode, 'busy');
         },
         enable: function() {
             this.busy = false;
@@ -574,7 +579,7 @@ define('Sage/Platform/Mobile/Edit',
             if (App.bars.tbar)
                 App.bars.tbar.enable();
 
-            this.contentNode.removeClass('busy');
+            dojo.removeClass(this.contentNode, 'busy');
         },
         insert: function() {
             this.disable();
@@ -682,12 +687,12 @@ define('Sage/Platform/Mobile/Edit',
             for (var i = 0; i < this.errors.length; i++)
                 content.push(this.validationSummaryItemTemplate.apply(this.errors[i], this.fields[this.errors[i].name]));
 
-            this.validationContentNode.update(content.join(''));
-            this.contentNode.addClass('panel-form-error');
+            this.set('validationContent', content.join(''));
+            dojo.addClass(this.contentNode, 'panel-form-error');
         },
         hideValidationSummary: function() {
-            this.contentNode.removeClass('panel-form-error');
-            this.validationContentEl.update('');
+            dojo.removeClass(this.contentNode, 'panel-form-error');
+            this.set('validationContent', '');
         },
         save: function() {
             if (this.isFormDisabled())  return;

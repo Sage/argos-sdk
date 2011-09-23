@@ -488,13 +488,11 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
                 this._selectionModel.toggle(key, this.entries[key], row);
         },
         activateEntry: function(params) {
-            console.log('activating entry');
             if (params.key)
             {
                 if (this._selectionModel && this.isNavigationDisabled())
                 {
                     this._selectionModel.toggle(params.key, this.entries[params.key], params.$source);
-                    console.log('toggle done, about to do action');
                     if (this.options.singleSelect && this.options.singleSelectAction)
                     {
                         if (App.bars['tbar'])
@@ -505,7 +503,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
                 }
                 else
                 {
-                    console.log('navigating...');
                     this.navigateToDetailView(params.key, params.descriptor);
                 }
             }

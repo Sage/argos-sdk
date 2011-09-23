@@ -39,15 +39,11 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
             {
                 if (source.fn)
                 {
-                    console.log('fn...');
-                    console.log(source);
                     source.fn.call(source.scope || this, source);
                 }
                 else if (source.action)
                 {
-                    console.log('action!');
                     var view = App.getPrimaryActiveView();
-                    console.log(view);
                     if (view && view.hasAction(source.action))
                         view.invokeAction(source.action, dojo.mixin(parameters, {'$tool': source}), evt, el);
                 }

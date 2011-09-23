@@ -73,14 +73,11 @@ define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Contr
             };
         },
         navigateToEditView: function() {
-            console.log('in nav to edit');
             if (this.isDisabled()) return;
 
-            console.log(this.view);
             var view = App.getView(this.view),
                 options = this.createNavigationOptions();
 
-            console.log(view);
             if (view && options)
             {
                 if (options.title) view.set('title', options.title);
@@ -90,7 +87,6 @@ define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Contr
         onClick: function(evt) {
             dojo.stopEvent(evt);
             if(evt.target.nodeName === 'BUTTON'){
-                console.log('navigating...');
                 this.navigateToEditView();
             }
         },
@@ -149,9 +145,9 @@ define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Contr
         getValue: function() {
             return this.currentValue;
         },
-        validate: function(value) {            
+        validate: function(value) {
             return typeof value === 'undefined'
-                ? this.inherited(this.validationValue)
+                ? Sage.Platform.Mobile.Controls.EditorField.superclass.validate.call(this, this.validationValue)
                 : this.inherited(arguments);
         },
         setValue: function(val, initial)
