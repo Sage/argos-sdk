@@ -354,7 +354,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
             if (this.entry)
             {
-                this.processLayout(this._createCustomizedLayout(this.customizationSet, this.id, this.createLayout()), {title: this.detailsText}, this.entry);
+                this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
             }
             else
             {

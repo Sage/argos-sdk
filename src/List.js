@@ -404,6 +404,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
          * @type {String}
          */
         requestErrorText: 'A server error occurred while requesting data.',
+        customizationSet: 'list',
         _selectionModel: null,
         _selectionConnects: null,
         _setSelectionModelAttr: function(selectionModel) {
