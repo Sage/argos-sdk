@@ -29,6 +29,8 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             };
         }
     });
+
+    var customizationPathRE = /\/|#/
     
     dojo.declare('Sage.Platform.Mobile.Application', null, {
         _connects: null,
@@ -37,8 +39,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         started: false,
         enableCaching: false,
         defaultService: null,
-        customizationsForSet: null,
-        customizationsForId: null,
+        customizations: null,
         services: null,
         modules: null,
         views: null,
@@ -47,8 +48,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             this._connects = [];
             this._subscribes = [];
             
-            this.customizationsForSet = {};
-            this.customizationsForId = {};
+            this.customizations = {};
             this.services = {};
             this.modules = [];
             this.views = {};
@@ -402,21 +402,43 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
                         return o;
             });
         },
-        registerCustomization: function(set, id, spec) {
-            var key = id || set,
-                container = id ? this.customizationsForId : this.customizationsForSet,
-                list = container[key] || (container[key] = []);
+        /**
+         * legacy: registerCustomization(set, id, spec);
+         */
+        registerCustomization: function(path, spec) {
+            if (arguments.length > 2)
+            {
+                var customizationSet = arguments[0],
+                    id = arguments[1];
 
-            if (list)
-                list.push(spec);
+                spec = arguments[2];
+                path = id
+                    ? customizationSet + '#' + id
+                    : customizationSet;
+            }
+            
+            var container = this.customizations[path] || (this.customizations[path] = []);
+            if (container) container.push(spec);
         },
-        getCustomizationsFor: function(set, id) {
-            // { action: 'remove|modify|insert|replace', at: (index|fn), where: 'before|after', value: {} }
+        /**
+         * legacy: getCustomizationsFor(set, id);
+         * { action: 'remove|modify|insert|replace', at: (index|fn), or: (fn), where: 'before|after', value: {} }
+         */
+        getCustomizationsFor: function(path) {
+            if (arguments.length > 1)
+            {
+                path = arguments[1]
+                    ? arguments[0] + '#' + arguments[1]
+                    : arguments[0];
+            }
 
-            var forSet = (set && this.customizationsForSet[set]) || [];
-            var forId = (id && this.customizationsForId[id]) || [];
+            var segments = path.split('#'),
+                customizationSet = segments[0];
 
-            return forSet.concat(forId);
+            var forPath = this.customizations[path] || [],
+                forSet = this.customizations[customizationSet] || [];
+
+            return forPath.concat(forSet);
         },
         frontHitchArgs: function(scope, method){
             var pre = dojo._toArray(arguments,2);

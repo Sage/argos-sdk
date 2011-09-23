@@ -42,7 +42,7 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
             var customizationSet = customizationSubSet
                     ? this.customizationSet + '/' + customizationSubSet
                     : this.customizationSet,
-                key = customizationSet, // was `customizationSet;id` but since the store is per instance, `id` is not needed
+                key = customizationSet + '#' + this.id,
                 source = layout;
             if (source === this._layoutCompiledFrom[key] && this._layoutCompiled[key])
                 return this._layoutCompiled[key]; // same source layout, no changes
