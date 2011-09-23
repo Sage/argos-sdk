@@ -359,7 +359,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         _viewTransitionTo: function(view) {
             this.onViewTransitionTo(view);
 
-            var tools = (view.options && view.options.tools) || view.createToolLayout() || {};
+            var tools = (view.options && view.options.tools) || view.get('tools') || {};
 
             for (var n in this.bars)
                 if (this.bars[n].managed)

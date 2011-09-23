@@ -25,23 +25,31 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
     dojo.declare('Sage.Platform.Mobile._CustomizationMixin', null, {
         _layoutCompiled: null,
         _layoutCompiledFrom: null,
+        id: null,
+        customizationSet: null,
         enableCustomizations: true,
         constructor: function() {
             this._layoutCompiled = {};
             this._layoutCompiledFrom = {};
         },
-        _getCustomizationsFor: function(customizationSet, id) {
-            return App.getCustomizationsFor(customizationSet, id);
+        _getCustomizationsFor: function(customizationSubSet) {
+            var customizationSet = customizationSubSet
+                ? this.customizationSet + '/' + customizationSubSet
+                : this.customizationSet;
+            return App.getCustomizationsFor(customizationSet, this.id);
         },
-        _createCustomizedLayout: function(customizationSet, id, layout) {
-            var key = customizationSet + ';' + id,
+        _createCustomizedLayout: function(layout, customizationSubSet) {
+            var customizationSet = customizationSubSet
+                    ? this.customizationSet + '/' + customizationSubSet
+                    : this.customizationSet,
+                key = customizationSet, // was `customizationSet;id` but since the store is per instance, `id` is not needed
                 source = layout;
             if (source === this._layoutCompiledFrom[key] && this._layoutCompiled[key])
                 return this._layoutCompiled[key]; // same source layout, no changes
 
             if (this.enableCustomizations)
             {
-                var customizations = this._getCustomizationsFor(customizationSet, id);
+                var customizations = this._getCustomizationsFor(customizationSubSet);
                 if (customizations && customizations.length > 0)
                 {
                     layout = this._compileCustomizedLayout(customizations, source, null);
@@ -57,89 +65,104 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
             var customizationCount = customizations.length,
                 layoutCount = layout.length,
                 applied = {},
-                output = [],
+                output,
                 insertRowsBefore,
                 insertRowsAfter,
                 customization,
                 stop,
                 row;
 
-            for (var i = 0; i < layoutCount; i++)
+            if (dojo.isArray(layout))
             {
-                row = layout[i];
-                insertRowsBefore = [];
-                insertRowsAfter = [];
-
-                for (var j = 0; j < customizationCount; j++)
+                output = [];
+                
+                for (var i = 0; i < layoutCount; i++)
                 {
-                    customization = customizations[j];
-                    stop = false;
+                    row = layout[i];
+                    insertRowsBefore = [];
+                    insertRowsAfter = [];
 
-                    if (customization.at(row, parent, i, layoutCount, customization))
+                    for (var j = 0; j < customizationCount; j++)
                     {
-                        switch (customization.type)
+                        customization = customizations[j];
+                        stop = false;
+
+                        if (customization.at(row, parent, i, layoutCount, customization))
                         {
-                            case 'remove':
-                                // full stop
-                                stop = true;
-                                row = null;
-                                break;
-                            case 'replace':
-                                // full stop
-                                stop = true;
-                                row = expand(customization.value, row);
-                                break;
-                            case 'modify':
-                                // make a shallow copy if we haven't already
-                                if (row === layout[i])
-                                    row = Ext.apply({}, row);
-                                row = dojo.mixin(row, expand(customization.value, row));
-                                break;
-                            case 'insert':
-                                (customization.where !== 'before'
-                                    ? insertRowsAfter
-                                    : insertRowsBefore
-                                ).push(expand(customization.value, row));
-                                break;
+                            switch (customization.type)
+                            {
+                                case 'remove':
+                                    // full stop
+                                    stop = true;
+                                    row = null;
+                                    break;
+                                case 'replace':
+                                    // full stop
+                                    stop = true;
+                                    row = expand(customization.value, row);
+                                    break;
+                                case 'modify':
+                                    // make a shallow copy if we haven't already
+                                    if (row === layout[i])
+                                        row = Ext.apply({}, row);
+                                    row = dojo.mixin(row, expand(customization.value, row));
+                                    break;
+                                case 'insert':
+                                    (customization.where !== 'before'
+                                        ? insertRowsAfter
+                                        : insertRowsBefore
+                                    ).push(expand(customization.value, row));
+                                    break;
+                            }
+
+                            applied[j] = true;
                         }
 
-                        applied[j] = true;
+                        if (stop) break;
                     }
 
-                    if (stop) break;
-                }
-
-                output.push.apply(output, insertRowsBefore);
-                if (row)
-                {
-                    if (row['as'])
+                    output.push.apply(output, insertRowsBefore);
+                    if (row)
                     {
-                        // make a shallow copy if we haven't already
-                        if (row === layout[i])
-                            row = dojo.mixin({}, row);
+                        if (row['as'])
+                        {
+                            // make a shallow copy if we haven't already
+                            if (row === layout[i])
+                                row = dojo.mixin({}, row);
 
-                        row['as'] = this._applyCustomizationsToLayout(customizations, row['as'], row);
+                            row['as'] = this._compileCustomizedLayout(customizations, row['as'], row);
+                        }
+
+                        output.push(row);
                     }
-
-                    output.push(row);
+                    output.push.apply(output, insertRowsAfter);
                 }
-                output.push.apply(output, insertRowsAfter);
-            }
-
-            /**
-             * for any non-applied, insert only, customizations, if they have an `or` property that expands into a true expression
-             * the value is applied at the end of the parent group that the `or` property (ideally) matches.
-             */
-            for (var k = 0; k < customizationCount; k++)
-            {
-                if (applied[k]) continue;
-
-                customization = customizations[k];
-                
-                if (customization.type == 'insert' && expand(customization.or, parent, customization))
+            
+                /**
+                 * for any non-applied, insert only, customizations, if they have an `or` property that expands into a true expression
+                 * the value is applied at the end of the parent group that the `or` property (ideally) matches.
+                 */
+                for (var k = 0; k < customizationCount; k++)
                 {
-                    output.push(expand(customization.value, null));
+                    if (applied[k]) continue;
+
+                    customization = customizations[k];
+
+                    if (customization.type == 'insert' && expand(customization.or, parent, customization))
+                    {
+                        output.push(expand(customization.value, null));
+                    }
                 }
+            }
+            else if (dojo.isObject(layout))
+            {
+                output = {};
+
+                for (var name in layout)
+                    if (dojo.isArray(layout[name]))
+                        output[name] = this._compileCustomizedLayout(customizations, layout[name], name);
+                    else
+                        output[name] = layout[name];
             }
 
             return output;

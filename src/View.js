@@ -39,6 +39,9 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manip
         serviceName: false,
         constructor: function(options) {
         },
+        _getToolsAttr: function() {
+            return this._createCustomizedLayout(this.createToolLayout(), 'tools');
+        },
         createToolLayout: function() {
             return this.tools || {};
         },
