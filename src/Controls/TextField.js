@@ -119,7 +119,7 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
                 this.containerNode.removeClass('row-error');
         },
         getValue: function() {
-            return this.get('inputValue');
+            return this.inputNode.value;
         },
         setValue: function(val, initial) {
             if (initial) this.originalValue = val;

@@ -144,7 +144,7 @@ define('Sage/Platform/Mobile/Edit',
             dojo.addClass(field.containerNode, 'row-disabled');
         },
         invokeAction: function(name, parameters, evt, el) {
-            var fieldEl = dojo.query(el).parents('[data-field]'),
+            var fieldEl = el && dojo.query(el, this.contentNode).parents('[data-field]'),
                 field = this.fields[fieldEl.length>0 && dojo.attr(fieldEl[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
@@ -153,8 +153,8 @@ define('Sage/Platform/Mobile/Edit',
             return this.inherited(arguments);
         },
         hasAction: function(name, evt, el) {
-            var fieldEl = el && el.findParent('[data-field]', this.contentNode, true),
-                field = this.fields[fieldEl && dojo.attr(fieldEl, 'data-field')];
+            var fieldEl = el && dojo.query(el, this.contentNode).parents('[data-field]'),
+                field = this.fields[fieldEl.length>0 && dojo.attr(fieldEl[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
                 return true;
@@ -250,10 +250,10 @@ define('Sage/Platform/Mobile/Edit',
                     template = field.propertyTemplate || this.propertyTemplate;
 
 
-                dojo.connect(field, 'show', null, this._onShowField);
-                dojo.connect(field, 'hide', null, this._onHideField);
-                dojo.connect(field, 'enable', null, this._onEnableField);
-                dojo.connect(field, 'disable', null, this._onDisableField);
+                dojo.connect(field, 'show', this, this._onShowField);
+                dojo.connect(field, 'hide', this, this._onHideField);
+                dojo.connect(field, 'enable', this, this._onEnableField);
+                dojo.connect(field, 'disable', this, this._onDisableField);
 
                 content.push(template.apply(field, this));
             }
