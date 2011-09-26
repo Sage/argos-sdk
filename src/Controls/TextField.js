@@ -20,7 +20,7 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
 		inputType: 'text',
         enableClearButton: true,
         validInputOnly: false,
-        clearAnimation: {},
+        clearNodeHiding: false,
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -77,10 +77,13 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         },
         onFocus: function(evt, el, o){
             if(this.enableClearButton && this.clearNode){
+                console.log('showing..');
                 dojo.style(this.clearNode, 'visibility', 'visible');
             }
         },
         onBlur: function(evt, el, o) {
+            var scope = this;
+
             if (this.validationTrigger == 'blur')
                 this.onValidationTrigger(evt, el, o);
 
@@ -88,21 +91,21 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
                 this.onNotificationTrigger(evt, el, o);
 
             if(this.enableClearButton && this.clearNode) {
-                dojo.style(this.clearNode,'visibility','hidden');
-                /*
-                // fix for mobile event handling
-                var scope = this;
-                setTimeout(function(){
-                    if(!(scope.inputNode == document.activeElement)) {
-                        scope.clearNode.hide(scope.clearAnimation);
-                    }
-                }, 150);
-                */
+                if(!this.clearNodeHiding) {
+                    this.clearNodeHiding = true;
+                    setTimeout(function(){
+                        if(scope.inputNode != document.activeElement) {
+                            dojo.style(scope.clearNode, 'visibility', 'hidden');
+                        }
+                        scope.clearNodeHiding = false;
+                    }, 100);
+                }
             }
         },
         onClearPress: function(evt){
             this.clearValue();
-            this.focus();
+            this.inputNode.focus();
+            this.onFocus();
         },
         onNotificationTrigger: function(evt, el, o) {
             var currentValue = this.getValue();
