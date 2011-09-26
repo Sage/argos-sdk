@@ -13,23 +13,22 @@
  * limitations under the License.
  */
 
-(function() {
+define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function() {
     var pad = function(n) { return n < 10 ? '0' + n : n };
+    dojo.declare('Sage.Platform.Mobile.Calendar', [Sage.Platform.Mobile.View], {
+        // Localization
+        titleText: 'Calendar',
+        amText: 'AM',
+        pmText: 'PM',
+        validationSummaryText: 'Validation Summary',
+        invalidHourErrorText: 'Invalid hour format',
+        invalidMinuteErrorText: 'Invalid minute format',
 
-    Sage.Platform.Mobile.Calendar = Ext.extend(Sage.Platform.Mobile.View, {
-        attachmentPoints: {
-            contentEl: '.panel-content',
-            calendarEl: '.calendar-content',
-            timeEl: '.time-content',
-            hourField: '.hour-field',
-            minuteField: '.minute-field',
-            meridiemField: '.meridiem-field',
-            validationContentEl: '.panel-validation-summary > ul'
-        },
+
         validationSummaryTemplate: new Simplate([
             '<div class="panel-validation-summary">',
             '<h2>{%: $.validationSummaryText %}</h2>',
-            '<ul>',
+            '<ul data-dojo-attach-point="validationNode">',
             '</ul>',
             '</div>'
         ]),
@@ -41,17 +40,17 @@
             '</a>',
             '</li>'
         ]),
-        viewTemplate: new Simplate([
+        widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
                 '{%! $.validationSummaryTemplate %}',
-                '<div class="panel-content">',
-                    '<div class="calendar-content"></div>',
-                    '<div class="time-content">',
-                        '<input type="number" min="1" max="12" class="hour-field" />',
+                '<div data-dojo-attach-point="contentNode" class="panel-content">',
+                    '<div data-dojo-attach-point="calendarNode" class="calendar-content"></div>',
+                    '<div data-dojo-attach-point="timeNode" class="time-content">',
+                        '<input data-dojo-attach-point="hourNode" type="number" min="1" max="12" class="hour-field" />',
                         '&nbsp;:&nbsp;',
-                        '<input type="number" min="0" max="59" class="minute-field" />',
+                        '<input data-dojo-attach-point="minuteNode" type="number" min="0" max="59" class="minute-field" />',
                         '<div class="date-tt">',
-                            '<div class="toggle meridiem-field" data-action="toggleMeridiem">',
+                            '<div data-dojo-attach-point="meridiemNode" class="toggle meridiem-field" data-action="toggleMeridiem">',
                                 '<span class="thumb"></span>',
                                 '<span class="toggleOn">{%= $.amText %}</span>',
                                 '<span class="toggleOff">{%= $.pmText %}</span>',
@@ -61,7 +60,6 @@
                 '</div>',
             '</div>'
         ]),
-        validationSummaryText: 'Validation Summary',
         calendarStartTemplate: '<table class="calendar-table">',
         calendarMonthHeaderTemplate: new Simplate([
             '<tr class="calendar-month-header">',
@@ -70,71 +68,57 @@
             '<th class="calendar-next-month"><button class="button" data-action="goToNextMonth"><span></span></button></th>',
             '</tr>'
         ]),
-        titleText: 'Calendar',
-        amText: 'AM',
-        pmText: 'PM',
         calendarWeekHeaderStartTemplate: '<tr class="calendar-week-header">',
-        calendarWeekHeaderTemplate: '<td class="calendar-weekday">{0}</td>',
+        calendarWeekHeaderTemplate: '<td class="calendar-weekday">${0}</td>',
         calendarWeekHeaderEndTemplate: '</tr>',
         calendarWeekStartTemplate: '<tr class="calendar-week">',
         calendarEmptyDayTemplate: '<td>&nbsp;</td>',
-        calendarDayTemplate: '<td class="calendar-day {1}" data-action="selectDay" data-date="{2}">{0}</td>',
+        calendarDayTemplate: '<td class="calendar-day ${1}" data-action="selectDay" data-date="${2}">${0}</td>',
         calendarWeekEndTemplate: '</tr>',
         calendarEndTemplate: '</table>',
-        invalidHourErrorText: 'Invalid hour format',
-        invalidMinuteErrorText: 'Invalid minute format',
+        attributeMap: {
+            validationContent: {
+                node: 'validationNode',
+                type: 'innerHTML'
+            },
+            calendarContent: {
+                node: 'calendarNode',
+                type: 'innerHTML'
+            }
+        },
+
+
         id: 'generic_calendar',
         expose: false,
         date: false,
         showTimePicker: false,
         selectedDateEl: false,
         weekEnds: [0, 6],
-        daysInMonth : [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
         init: function() {
-            Sage.Platform.Mobile.Calendar.superclass.init.call(this);
+            this.inherited(arguments);
 
-            this.el.on('swipe', this.onSwipe, this);
-			
-            
-            this.timeEl.setVisibilityMode(Ext.Element.DISPLAY);
-
-            this.hourField
-                .on('blur', this.validateHour, this);
-
-            this.minuteField                
-                .on('blur', this.validateMinute, this);
-        },
-        onSwipe: function(evt, el, o) {            
-            switch (evt.browserEvent.direction) {
-                case 'right':
-                    this.goToPreviousMonth();
-                    break;
-                case 'left':
-                    this.goToNextMonth();
-                    break;
-            }
+            dojo.connect(this.hourNode, 'onblur', this, this.validateHour);
+            dojo.connect(this.minuteNode, 'onblur', this, this.validateMinute);
         },
         validateHour: function(evt, el, o) {
-            var minimum = parseInt(this.hourField.getAttribute('min'), 10),
-                maximum = parseInt(this.hourField.getAttribute('max'), 10);
-
-            this.validate(this.hourField, minimum, maximum);
+            var minimum = parseInt(dojo.attr(this.hourField, 'min'), 10),
+                maximum = parseInt(dojo.attr(this.hourField, 'max'), 10);
+            this.validate(this.hourNode, minimum, maximum);
         },
         validateMinute: function(evt, el, o) {
-            var minimum = parseInt(this.minuteField.getAttribute('min'), 10),
-                maximum = parseInt(this.minuteField.getAttribute('max'), 10);
+            var minimum = parseInt(dojo.attr(this.minuteField, 'min'), 10),
+                maximum = parseInt(dojo.attr(this.minuteField, 'max'), 10);
 
             this.validate(this.minuteField, minimum, maximum);
         },
         validate: function(field, minimum, maximum) {
-            var value = parseInt(field.getValue(), 10);
+            var value = parseInt(field.value, 10);
 
-            if (isNaN(value) || value < minimum || value > maximum)
-                field.addClass('field-error');
-            else
-            {
-                field.removeClass('field-error');
-                field.dom.value = pad(value);
+            if (isNaN(value) || value < minimum || value > maximum) {
+                dojo.addClass(field, 'field-error');
+            } else {
+                dojo.removeClass(field, 'field-error');
+                field.value = pad(value);
             }
 
             if (!this.isValid())
@@ -145,36 +129,36 @@
         showValidationSummary: function() {
             var content = [];
 
-            if (this.hourField.hasClass('field-error'))
+            if (dojo.hasClass(this.hourNode, 'field-error'))
                 content.push(this.validationSummaryItemTemplate.apply({
                     'message': this.invalidHourErrorText
                 }));
-            if (this.minuteField.hasClass('field-error'))
+            if (dojo.hasClass(this.minuteNode, 'field-error'))
                 content.push(this.validationSummaryItemTemplate.apply({
                     'message': this.invalidMinuteErrorText
                 }));
 
-            this.validationContentEl.update(content.join(''));
-            this.el.addClass('panel-form-error');
+            this.set('validationContent', content.join(''));
+            dojo.addClass(this.contentNode, 'panel-form-error');
         },
         hideValidationSummary: function() {
-            this.hourField.removeClass('field-error');
-            this.minuteField.removeClass('field-error');
-            
-            this.el.removeClass('panel-form-error');
-            this.validationContentEl.update('');
-        },
+            dojo.removeClass(this.hourNode, 'field-error');
+            dojo.removeClass(this.minuteNode, 'field-error');
+
+            dojo.removeClass(this.contentNode, 'panel-form-error');
+            this.set('validationContent', '');
+         },
         isValid: function() {
-            return !(this.hourField.hasClass('field-error') || this.minuteField.hasClass('field-error'));
+            return !(dojo.hasClass(this.hourNode, 'field-error') || dojo.hasClass(this.minuteNode, 'field-error'));
         },
         toggleMeridiem: function(params) {
             var el = params.$source,
-                toggledValue = el && (el.getAttribute('toggled') !== 'true');
+                toggledValue = el && (dojo.attr(el, 'toggled') !== 'true');
 
-            if (el) el.dom.setAttribute('toggled', toggledValue);
+            if (el) dojo.attr(el, 'toggled', toggledValue);
         },
         show: function(options) {
-            Sage.Platform.Mobile.Calendar.superclass.show.call(this, options);
+            this.inherited(arguments);
 
             this.showTimePicker = this.options && this.options.showTimePicker;
 
@@ -182,18 +166,19 @@
             this.year = this.date.getFullYear();
             this.month = this.date.getMonth();
 
-            this.hourField.dom.value = "" + pad(this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12));
-            this.minuteField.dom.value = "" + pad(this.date.getMinutes());
-            this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
+            this.hourNode.value = "" + pad(this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12));
+            this.minuteNode.value = "" + pad(this.date.getMinutes());
+            dojo.attr(this.meridiemNode, 'toggled', this.date.getHours() < 12);
 
             this.hideValidationSummary();
 
             this.renderCalendar();
 
             if (this.showTimePicker)
-                this.timeEl.show();
+                dojo.style(this.timeNode, 'display', 'block');
             else
-                this.timeEl.hide();
+                dojo.style(this.timeNode, 'display', 'none');
+
         },
         goToNextMonth: function() {
             if (this.month == 11)
@@ -218,15 +203,20 @@
             this.renderCalendar();
         },
         selectDay: function(options, evt, el) {
-            if (this.selectedDateEl) this.selectedDateEl.removeClass('selected');
-            this.selectedDateEl = Ext.get(el).addClass('selected');
+            if (this.selectedDateNode) dojo.removeClass(this.selectedDateNode, 'selected');
+            this.selectedDateNode = el;
+            dojo.addClass(el, 'selected');
             this.date = new Date(this.year, this.month, options.date);
+        },
+        selectToday: function(){
+            var today = dojo.query('.today')[0];
+            if(today) this.selectDay({date: new Date().getDate()}, null, today);
         },
         getDateTime: function() {
             var result = new Date(this.date.getTime()),
-                isPM = this.meridiemField.getAttribute('toggled') !== 'true',
-                hours = parseInt(this.hourField.getValue(), 10),
-                minutes = parseInt(this.minuteField.getValue(), 10);
+                isPM = dojo.attr(this.meridiemNode, 'toggled') !== 'true',
+                hours = parseInt(this.hourNode.value, 10),
+                minutes = parseInt(this.minuteNode.value, 10);
 
             hours = isPM
                 ? (hours % 12) + 12
@@ -242,19 +232,13 @@
                 yyyy = this.year,
                 firstDay = new Date(yyyy, mm, 1),
                 startingDay = firstDay.getDay(),
-                monthLength = this.daysInMonth[mm],
+                monthLength = firstDay.getDaysInMonth(),
                 today = new Date(),
                 day = 1, calHTML = [], dayClass = '', selectedClass = '',
-                weekendClass = '', i = 0, j = 0, selectedEl = false,
+                weekendClass = '', i = 0, j = 0, selectedNode = false,
                 isCurrentMonth =  this.year === Date.today().getFullYear() && this.month === Date.today().getMonth();
 
             this.monthName = Date.CultureInfo.monthNames[mm];
-            
-            // compensate for leap year
-            if (this.month == 1 && Date.isLeapYear(yyyy)) // February only!
-            {
-                monthLength = 29;
-            }
 
             calHTML.push(this.calendarStartTemplate);
             // Month Header
@@ -263,7 +247,7 @@
             // Week Header
             calHTML.push(this.calendarWeekHeaderStartTemplate);
             for(i = 0; i <= 6; i++ ){
-                calHTML.push(String.format(this.calendarWeekHeaderTemplate, Date.CultureInfo.abbreviatedDayNames[i]  ));
+                calHTML.push(dojo.string.substitute(this.calendarWeekHeaderTemplate, [Date.CultureInfo.abbreviatedDayNames[i]]));
             }
             calHTML.push(this.calendarWeekHeaderEndTemplate);
 
@@ -277,26 +261,22 @@
                     if (day <= monthLength && (i > 0 || j >= startingDay))
                     {
                         //Check for today
-                        dayClass = (isCurrentMonth == true && day == today.getDate()) ? 'today' : '';
+                        dayClass = (isCurrentMonth === true && day == today.getDate()) ? 'today' : '';
 
                         //Check for weekends
                         weekendClass = (this.weekEnds.indexOf(j) !== -1) ? ' weekend' : '';
 
-                        //Check for selected date
-                        if (day == this.date.getDate() && mm == this.date.getMonth() && yyyy == this.date.getFullYear())
-                        {
-                            selectedClass = ' selected';
-                        }
-                        else
-                        {
-                            selectedClass = '';
-                        }
-                        weekendClass = (this.weekEnds.indexOf(j) !== -1) ? ' weekend' : '';
+                        //Check for selected
+                        selectedClass = (this.date.getFullYear() === yyyy &&
+                                        this.date.getMonth() === mm &&
+                                        this.date.getDate() === day)
+                                            ? ' selected'
+                                            : '';
 
-                        calHTML.push(String.format( this.calendarDayTemplate,
-                                                    day,
+                        calHTML.push(dojo.string.substitute( this.calendarDayTemplate,
+                                                    [day,
                                                     (dayClass + weekendClass + selectedClass),
-                                                    day
+                                                    day]
                                                    )
                                     );
                         day++;
@@ -313,11 +293,8 @@
             }
             calHTML.push(this.calendarEndTemplate);
 
-            this.calendarEl.update(calHTML.join(''));
-
-            selectedEl = Ext.DomQuery.select('.selected', 'table.calendar-table', 'td');
-            if (Ext.isArray(selectedEl) && selectedEl.length > 0) this.selectedDateEl = Ext.get(selectedEl[0]);
-            else this.selectedDateEl = false;
+            this.set('calendarContent', calHTML.join(''));
+            this.selectedDateNode = dojo.query('.selected')[0];
         }
     });
-})();
+});

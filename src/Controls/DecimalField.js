@@ -20,7 +20,7 @@ define('Sage/Platform/Mobile/Controls/DecimalField', ['Sage/Platform/Mobile/Cont
         setValue: function(val) {
             val = parseFloat(val, 10).toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
             val = isNaN(val)
-                ? dojo.string.substitute('0${0}00', Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.')
+                ? dojo.string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.'])
                 : val;
             Sage.Platform.Mobile.Controls.DecimalField.superclass.setValue.call(this, val);
         }
