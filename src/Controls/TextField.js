@@ -26,10 +26,6 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
                 node: 'inputNode',
                 type: 'attribute',
                 attribute: 'value'
-            },
-            focus: {
-                node: 'inputNode',
-                type: 'attribute'
             }
         },
         widgetTemplate: new Simplate([
@@ -77,7 +73,6 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         },
         onFocus: function(evt, el, o){
             if(this.enableClearButton && this.clearNode){
-                console.log('showing..');
                 dojo.style(this.clearNode, 'visibility', 'visible');
             }
         },

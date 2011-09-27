@@ -135,6 +135,7 @@ define('Sage/Platform/Mobile/Edit',
             dojo.removeClass(field.containerNode, 'row-hidden');
         },
         _onHideField: function(field) {
+            console.log(arguments);
             dojo.addClass(field.containerNode, 'row-hidden');
         },
         _onEnableField: function(field) {
