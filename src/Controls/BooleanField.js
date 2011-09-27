@@ -25,6 +25,14 @@ define('Sage/Platform/Mobile/Controls/BooleanField', ['Sage/Platform/Mobile/Cont
         ]),        
         onText: 'ON',
         offText: 'OFF',
+        attributeMap: {
+            toggled:{
+                node: 'toggleNode',
+                type: 'attribute',
+                attribute: 'toggled'
+            }
+        },
+
         init: function() {
             this.inherited(arguments);
             dojo.connect(this.toggleNode, 'onclick', this, this.onClick, true);
@@ -32,9 +40,9 @@ define('Sage/Platform/Mobile/Controls/BooleanField', ['Sage/Platform/Mobile/Cont
         onClick: function(evt, el, o) {
             if (this.isDisabled()) return;
 
-            var toggledValue = dojo.attr(this.toggleNode, 'toggled') !== 'true';
+            var toggledValue = !this.getValue();
 
-            dojo.attr(this.toggleNode, 'toggled', toggledValue);
+            this.setValue(toggledValue);
 
             this.change(toggledValue, this);
         },
@@ -48,7 +56,7 @@ define('Sage/Platform/Mobile/Controls/BooleanField', ['Sage/Platform/Mobile/Cont
 
             if (initial) this.originalValue = val;
 
-            dojo.attr(this.toggleNode, 'toggled', val.toString());
+            this.set('toggled', val.toString());
         },
         clearValue: function(flag) {
             var initial = flag !== true;
