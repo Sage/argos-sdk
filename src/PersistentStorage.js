@@ -13,20 +13,19 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile');
-
-(function() {
-    Sage.Platform.Mobile.PersistentStorage = function(options) {
-        Ext.apply(this, options);
-    };
+define('Sage/Platform/Mobile/PersistentStorage', ['dojo', 'dojo/string', 'Sage/Platform/Mobile/Convert', 'Sage/Platform/Mobile/Utility'], function() {
 
     var sosCache = {};
-    
-    Ext.override(Sage.Platform.Mobile.PersistentStorage, {
+    dojo.declare('Sage.Platform.Mobile.PersistentStorage', null, {
+
         name: false,
         singleObjectStore: false,
         allowCacheUse: true,
         serializeValues: true,
+
+        constructor: function(options){
+            dojo.mixin(this, options);
+        },
         formatQualifiedKey: function(name, key) {
             if (key && key.indexOf(name) !== 0)
                 return name + '.' + key;
@@ -34,29 +33,30 @@ Ext.namespace('Sage.Platform.Mobile');
         },
         serializeValue: function(value) {
             return typeof value === 'object'
-                ? Ext.encode(value)
+                ? dojo.toJson(value)
                 : value && value.toString
                     ? value.toString()
                     : value;
         },
-        deserializeValue: function(value) {            
+        deserializeValue: function(value) {
             if (value && value.indexOf('{') === 0 && value.lastIndexOf('}') === (value.length - 1))
-                return Ext.decode(value);
+                return dojo.fromJson(value);
             if (value && value.indexOf('[') === 0 && value.lastIndexOf(']') === (value.length - 1))
-                return Ext.decode(value);
+                return dojo.fromJson(value);
             if (Sage.Platform.Mobile.Convert.isDateString(value))
                 return Sage.Platform.Mobile.Convert.toDateFromString(value);
             if (/^(true|false)$/.test(value))
                 return value === 'true';
-            var numeric = parseFloat(value);
+            var numeric = parseFloat(value, 10);
             if (!isNaN(numeric))
                 return numeric;
 
             return value;
         },
         getItem: function(key, options) {
+            console.log('getting item storage');
             options = options || {};
-            
+
             try
             {
                 if (window.localStorage)
@@ -73,7 +73,7 @@ Ext.namespace('Sage.Platform.Mobile');
                         else
                         {
                             encoded = window.localStorage.getItem(this.name);
-                            store = Ext.decode(encoded);
+                            store = dojo.fromJson(encoded);
 
                             if (this.allowCacheUse) sosCache[this.name] = store;
                         }
@@ -91,7 +91,7 @@ Ext.namespace('Sage.Platform.Mobile');
                             serialized = window.localStorage.getItem(fqKey),
                             value = this.serializeValues && options.serialize !== false
                                 ? this.deserializeValue(serialized)
-                                : serialized;                         
+                                : serialized;
 
                         if (options.success)
                             options.success.call(options.scope || this, value);
@@ -113,6 +113,7 @@ Ext.namespace('Sage.Platform.Mobile');
         },
         setItem: function(key, value, options) {
             options = options || {};
+            console.log('setting item storage');
 
             try
             {
@@ -130,14 +131,14 @@ Ext.namespace('Sage.Platform.Mobile');
                         else
                         {
                             encoded = window.localStorage.getItem(this.name);
-                            store = (encoded && Ext.decode(encoded)) || {};
+                            store = (encoded && dojo.fromJson(encoded)) || {};
 
                             if (this.allowCacheUse) sosCache[this.name] = store;
                         }
 
                         Sage.Platform.Mobile.Utility.setValue(store, key, value);
 
-                        encoded = Ext.encode(store);
+                        encoded = dojo.toJson(store);
 
                         window.localStorage.setItem(this.name, encoded);
 
@@ -149,7 +150,7 @@ Ext.namespace('Sage.Platform.Mobile');
                     else
                     {
                         var fqKey = this.formatQualifiedKey(this.name, key),
-                            serialized = this.serializeValues && options.serialize !== false 
+                            serialized = this.serializeValues && options.serialize !== false
                                 ? this.serializeValue(value)
                                 : value;
 
@@ -178,6 +179,6 @@ Ext.namespace('Sage.Platform.Mobile');
             }
         },
         clearItem: function(key, options) {
-        }        
+        }
     });
-})();
+});
