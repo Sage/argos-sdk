@@ -14,6 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
+    
     dojo.extend(Function, {
         bindDelegate: function(scope) {
             var fn = this;
@@ -30,20 +31,50 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         }
     });
 
-    var customizationPathRE = /\/|#/
+    var applyLocalizationTo = function(object, localization) {
+            var target = object.prototype || object;
+            for(var key in localization)
+            {
+                if(dojo.isObject(localization[key]))
+                    applyLocalizationTo(target[key], localization[key]);
+                else
+                    target[key] = localization[key];
+            }
+        },
+        localize = function(name, localization) {
+            var target = dojo.getObject(name);
+            if (target && target.prototype) target = target.prototype;
+            if (target) applyLocalizationTo(target, localization);
+        },
+        mergeConfiguration = function(baseConfiguration, moduleConfiguration) {
+            if (baseConfiguration)
+            {
+                if (baseConfiguration.modules && moduleConfiguration.modules)
+                    baseConfiguration.modules = baseConfiguration.modules.concat(moduleConfiguration.modules);
+
+                if (baseConfiguration.connections && moduleConfiguration.connections)
+                    baseConfiguration.connections = dojo.mixin(baseConfiguration.connections, moduleConfiguration.connections);
+            }
+
+            return baseConfiguration;
+        };
+
+    dojo.mixin(dojo.global, {
+        'localize': localize,
+        'mergeConfiguration': mergeConfiguration
+    });
     
-    dojo.declare('Sage.Platform.Mobile.Application', null, {
+    return dojo.declare('Sage.Platform.Mobile.Application', null, {
         _connects: null,
         _subscribes: null,
-        environment: 'production',
-        started: false,
-        enableCaching: false,
-        defaultService: null,
+        _started: false,
         customizations: null,
         services: null,
         modules: null,
         views: null,
         bars: null,
+        enableCaching: false,
+        defaultService: null,
         constructor: function(options) {
             this._connects = [];
             this._subscribes = [];
@@ -72,29 +103,6 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         uninitialize: function() {
 
         },
-        initConfiguration: function() {
-            var config = window['Configuration'] && window['Configuration'][this.environment],
-                filter = /^(?:modules|connections)$/;
-
-            if (config)
-            {
-                if (config.modules)
-                {
-                    this.modules = this.modules.concat(config.modules);
-                }
-
-                if (config.connections)
-                {
-                    for (var n in config.connections)
-                        if (config.connections.hasOwnProperty(n))
-                            this.registerService(n, config.connections[n]);
-                }
-
-                for (var property in config)
-                    if (!filter.test(property))
-                        this[property] = config[property];
-            }
-        },
         initReUI: function() {
             // prevent ReUI from attempting to load the URLs view as we handle that ourselves.
             // todo: add support for handling the URL?
@@ -115,6 +123,9 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             this._connects.push(dojo.connect(dojo.body(), 'aftertransition', this, this._onAfterTransition));
             this._connects.push(dojo.connect(dojo.body(), 'activate', this, this._onActivate));
         },
+        initServices: function() {
+            for (var name in this.connections) this.registerService(name, this.connections[name]);
+        },
         initModules: function() {
             for (var i = 0; i < this.modules.length; i++)
                 this.modules[i].init(this);
@@ -132,16 +143,16 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             /// <summary>
             ///     Initializes this application as well as the toolbar and all currently registered views.
             /// </summary>
-            this.initConfiguration();
             this.initConnects();
             this.initCaching();
+            this.initServices();
             this.initModules();
             this.initToolbars();
             this.initViews();
             this.initReUI();
         },
         run: function() {
-            this.started = true;
+            this._started = true;
         },
         isOnline: function() {
             return window.navigator.onLine;
@@ -224,7 +235,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             /// <param name="view" type="Sage.Platform.Mobile.View">The view to be registered.</param>
             this.views[view.id] = view;
 
-            if (this.started) view.init();
+            if (this._started) view.init();
 
             view.placeAt(dojo.body(), 'first');
 
@@ -242,7 +253,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
 
             this.bars[name] = tbar;
 
-            if (this.started) tbar.init();
+            if (this._started) tbar.init();
 
             tbar.placeAt(dojo.body(), 'last');
 
@@ -459,6 +470,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
     });
 
     /* todo: convert swipe */
+    /* todo: move to top */
     /*
     Ext.onReady(function(){
         var isApple = /(iphone|ipad|ipod)/i.test(navigator.userAgent),
