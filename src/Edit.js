@@ -132,16 +132,23 @@ define('Sage/Platform/Mobile/Edit',
             });
         },
         _onShowField: function(field) {
+            // todo: investigate why field is not being passed
+            if(!field) return;
             dojo.removeClass(field.containerNode, 'row-hidden');
         },
         _onHideField: function(field) {
-            console.log(arguments);
+            // todo: investigate why field is not being passed
+            if(!field) return;
             dojo.addClass(field.containerNode, 'row-hidden');
         },
         _onEnableField: function(field) {
+            // todo: investigate why field is not being passed
+            if(!field) return;
             dojo.removeClass(field.containerNode, 'row-disabled');
         },
         _onDisableField: function(field) {
+            // todo: investigate why field is not being passed
+            if(!field) return;
             dojo.addClass(field.containerNode, 'row-disabled');
         },
         invokeAction: function(name, parameters, evt, el) {
