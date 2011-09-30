@@ -579,7 +579,7 @@ define('Sage/Platform/Mobile/Edit',
             if (App.bars.tbar)
                 App.bars.tbar.disable();
 
-            dojo.addClass(this.contentNode, 'busy');
+            dojo.addClass(this.domNode, 'busy');
         },
         enable: function() {
             this.busy = false;
@@ -587,7 +587,7 @@ define('Sage/Platform/Mobile/Edit',
             if (App.bars.tbar)
                 App.bars.tbar.enable();
 
-            dojo.removeClass(this.contentNode, 'busy');
+            dojo.removeClass(this.domNode, 'busy');
         },
         insert: function() {
             this.disable();
