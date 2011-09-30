@@ -86,9 +86,7 @@ define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Contr
         },
         onClick: function(evt) {
             dojo.stopEvent(evt);
-            if(evt.target.nodeName === 'BUTTON'){
-                this.navigateToEditView();
-            }
+            this.navigateToEditView();
         },
         getValuesFromView: function() {
             var view = App.getPrimaryActiveView(),

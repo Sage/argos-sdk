@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/Controls/NameField', ['Sage/Platform/Mobile/Control
             '<input data-dojo-attach-point="inputNode" readonly="readonly" type="text" />'
         ]),
         createNavigationOptions: function() {
-            var options = this.inherited(options);
+            var options = this.inherited(arguments);
             //Name does not have an entity.
             delete options.entityName;
 
