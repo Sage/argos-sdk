@@ -14,207 +14,245 @@
  */
 
 define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function() {
+
     var pad = function(n) { return n < 10 ? '0' + n : n };
+    var uCase = function (str) { return str.charAt(0).toUpperCase() + str.substring(1); }
+
     dojo.declare('Sage.Platform.Mobile.Calendar', [Sage.Platform.Mobile.View], {
         // Localization
         titleText: 'Calendar',
         amText: 'AM',
         pmText: 'PM',
-        validationSummaryText: 'Validation Summary',
-        invalidHourErrorText: 'Invalid hour format',
-        invalidMinuteErrorText: 'Invalid minute format',
 
-
-        validationSummaryTemplate: new Simplate([
-            '<div class="panel-validation-summary">',
-            '<h2>{%: $.validationSummaryText %}</h2>',
-            '<ul data-dojo-attach-point="validationNode">',
-            '</ul>',
-            '</div>'
-        ]),
-        validationSummaryItemTemplate: new Simplate([
-            '<li>',
-            '<a href="#TT">',
-            '<h3>{%: $.message %}</h3>',
-            '<h4>&nbsp;</h4>',
-            '</a>',
-            '</li>'
-        ]),
+        id: 'generic_calendar',
+        contentNode: null,
+        calendarNode: null,
+        timeNode: null,
+        meridiemNode: null,
+        months: Date.CultureInfo.abbreviatedMonthNames,
+        dateFormat: Date.CultureInfo.formatPatterns.shortDate,
+        timeFormat: Date.CultureInfo.formatPatterns.shortTime,
+        is24hrTimeFormat: Date.CultureInfo.formatPatterns.shortTime.match(/H\:/),
+        date: false,
+        showTimePicker: false,
+        selectorTemplate:  '<select id="${0}-field" data-dojo-attach-point="${0}Node"></select>',
+        incrementTemplate: '<button data-action="increment${0}">+</button>',
+        decrementTemplate: '<button data-action="decrement${0}">-</button>',
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
-                '{%! $.validationSummaryTemplate %}',
-                '<div data-dojo-attach-point="contentNode" class="panel-content">',
-                    '<div data-dojo-attach-point="calendarNode" class="calendar-content"></div>',
-                    '<div data-dojo-attach-point="timeNode" class="time-content">',
-                        '<input data-dojo-attach-point="hourNode" type="number" min="1" max="12" class="hour-field" />',
-                        '&nbsp;:&nbsp;',
-                        '<input data-dojo-attach-point="minuteNode" type="number" min="0" max="59" class="minute-field" />',
-                        '<div class="date-tt">',
-                            '<div data-dojo-attach-point="meridiemNode" class="toggle meridiem-field" data-action="toggleMeridiem">',
-                                '<span class="thumb"></span>',
-                                '<span class="toggleOn">{%= $.amText %}</span>',
-                                '<span class="toggleOff">{%= $.pmText %}</span>',
-                            '</div>',
-                        '</div>',
+                '<div class="panel-content" id="datetime-picker">',
+                    '<div class="calendar-content">',
+                    '<table id="datetime-picker-date" data-dojo-attach-point="datePickControl">',
+                        '<caption>&nbsp;</caption>',
+                        '<tr class="plus">',
+                            '<td>{%= $.localizeViewTemplate("incrementTemplate", 0) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("incrementTemplate", 1) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("incrementTemplate", 2) %}</td>',
+                        '</tr>',
+                        '<tr>',
+                            '<td>{%= $.localizeViewTemplate("selectorTemplate", 0) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("selectorTemplate", 1) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("selectorTemplate", 2) %}</td>',
+                        '</tr>',
+                        '<tr class="minus">',
+                            '<td>{%= $.localizeViewTemplate("decrementTemplate", 0) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("decrementTemplate", 1) %}</td>',
+                            '<td>{%= $.localizeViewTemplate("decrementTemplate", 2) %}</td>',
+                        '</tr>',
+                    '</table>',
+                    '</div>',
+                    '<div class="time-content" data-dojo-attach-point="timeNode">',
+                        '<table id="datetime-picker-time" data-dojo-attach-point="timePickControl">',
+                            '<caption>&nbsp;</caption>',
+                            '<tr class="plus">',
+                                '<td>{%= $.localizeViewTemplate("incrementTemplate", 3) %}</td>',
+                                '<td>{%= $.localizeViewTemplate("incrementTemplate", 4) %}</td>',
+                            '</tr>',
+                            '<tr>',
+                                '<td>{%= $.localizeViewTemplate("selectorTemplate", 3) %}</td>',
+                                '<td>{%= $.localizeViewTemplate("selectorTemplate", 4) %}</td>',
+                                '<td>',
+                                    '<div class="date-tt">',
+                                        '<div class="toggle meridiem-field" data-action="toggleMeridiem" data-dojo-attach-point="meridiemNode">',
+                                            '<span class="thumb"></span>',
+                                            '<span class="toggleOn">{%= $.amText %}</span>',
+                                            '<span class="toggleOff">{%= $.pmText %}</span>',
+                                        '</div>',
+                                    '</div>',
+                                '</td>',
+                            '</tr>',
+                            '<tr class="minus">',
+                                '<td>{%= $.localizeViewTemplate("decrementTemplate", 3) %}</td>',
+                                '<td>{%= $.localizeViewTemplate("decrementTemplate", 4) %}</td>',
+                            '</tr>',
+                        '</table>',
                     '</div>',
                 '</div>',
             '</div>'
         ]),
-        calendarStartTemplate: '<table class="calendar-table">',
-        calendarMonthHeaderTemplate: new Simplate([
-            '<tr class="calendar-month-header">',
-            '<th class="calendar-prev-month"><button class="button" data-action="goToPreviousMonth"><span></span></button></th>',
-            '<th class="calendar-month-name" colspan="5">{%= $.monthName %} &nbsp; {%=$.year %}</th>',
-            '<th class="calendar-next-month"><button class="button" data-action="goToNextMonth"><span></span></button></th>',
-            '</tr>'
-        ]),
-        calendarWeekHeaderStartTemplate: '<tr class="calendar-week-header">',
-        calendarWeekHeaderTemplate: '<td class="calendar-weekday">${0}</td>',
-        calendarWeekHeaderEndTemplate: '</tr>',
-        calendarWeekStartTemplate: '<tr class="calendar-week">',
-        calendarEmptyDayTemplate: '<td>&nbsp;</td>',
-        calendarDayTemplate: '<td class="calendar-day ${1}" data-action="selectDay" data-date="${2}">${0}</td>',
-        calendarWeekEndTemplate: '</tr>',
-        calendarEndTemplate: '</table>',
-        attributeMap: {
-            validationContent: {
-                node: 'validationNode',
-                type: 'innerHTML'
-            },
-            calendarContent: {
-                node: 'calendarNode',
-                type: 'innerHTML'
-            }
+
+        daysInMonth: function() {
+            var dlo = (1==this.month) ? 28 : 30;
+            var dhi = (1==this.month) ? 29 : 31;
+            return (new Date(this.year, this.month, dlo).getMonth() == new Date(this.year, this.month, dhi).getMonth())
+                ? dhi
+                : dlo
+                ;
         },
-
-
-        id: 'generic_calendar',
-        expose: false,
-        date: false,
-        showTimePicker: false,
-        selectedDateEl: false,
-        weekEnds: [0, 6],
         init: function() {
             this.inherited(arguments);
 
-            dojo.connect(this.hourNode, 'onblur', this, this.validateHour);
-            dojo.connect(this.minuteNode, 'onblur', this, this.validateMinute);
+            dojo.connect(this.dayNode,    'onchange', this, this.validate);
+            dojo.connect(this.monthNode,  'onchange', this, this.validate);
+            dojo.connect(this.yearNode,   'onchange', this, this.validate);
+            dojo.connect(this.hourNode,   'onchange', this, this.validate);
+            dojo.connect(this.minuteNode, 'onchange', this, this.validate);
         },
-        validateHour: function(evt, el, o) {
-            var minimum = parseInt(dojo.attr(this.hourField, 'min'), 10),
-                maximum = parseInt(dojo.attr(this.hourField, 'max'), 10);
-            this.validate(this.hourNode, minimum, maximum);
-        },
-        validateMinute: function(evt, el, o) {
-            var minimum = parseInt(dojo.attr(this.minuteField, 'min'), 10),
-                maximum = parseInt(dojo.attr(this.minuteField, 'max'), 10);
 
-            this.validate(this.minuteField, minimum, maximum);
-        },
-        validate: function(field, minimum, maximum) {
-            var value = parseInt(field.value, 10);
-
-            if (isNaN(value) || value < minimum || value > maximum) {
-                dojo.addClass(field, 'field-error');
-            } else {
-                dojo.removeClass(field, 'field-error');
-                field.value = pad(value);
+        validate: function() {
+            this.year = this.yearNode.value;
+            this.month = this.monthNode.value;
+            // adjust dayNode selector from changes to monthNode or leap/non-leap year
+            if (this.dayNode.options.length != this.daysInMonth()) {
+                this.populateSelector(this.dayNode, this.dayNode.selectedIndex + 1, 1, this.daysInMonth());
             }
 
-            if (!this.isValid())
-                this.showValidationSummary();
-            else
-                this.hideValidationSummary();
-        },
-        showValidationSummary: function() {
-            var content = [];
+            this.date = new Date(this.year, this.month, this.dayNode.value),
+                isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : this.meridiemNode.getAttribute('toggled') !== 'true',
+                hours = parseInt(this.hourNode.value, 10),
+                minutes = parseInt(this.minuteNode.value, 10);
+            hours = isPM ? (hours % 12) + 12 : (hours % 12);
+            this.date.setHours(hours);
+            this.date.setMinutes(minutes);
 
-            if (dojo.hasClass(this.hourNode, 'field-error'))
-                content.push(this.validationSummaryItemTemplate.apply({
-                    'message': this.invalidHourErrorText
-                }));
-            if (dojo.hasClass(this.minuteNode, 'field-error'))
-                content.push(this.validationSummaryItemTemplate.apply({
-                    'message': this.invalidMinuteErrorText
-                }));
-
-            this.set('validationContent', content.join(''));
-            dojo.addClass(this.contentNode, 'panel-form-error');
-        },
-        hideValidationSummary: function() {
-            dojo.removeClass(this.hourNode, 'field-error');
-            dojo.removeClass(this.minuteNode, 'field-error');
-
-            dojo.removeClass(this.contentNode, 'panel-form-error');
-            this.set('validationContent', '');
-         },
-        isValid: function() {
-            return !(dojo.hasClass(this.hourNode, 'field-error') || dojo.hasClass(this.minuteNode, 'field-error'));
+            this.updateDatetimeCaption();
         },
         toggleMeridiem: function(params) {
             var el = params.$source,
-                toggledValue = el && (dojo.attr(el, 'toggled') !== 'true');
+                toggledValue = el && (el.getAttribute('toggled') !== 'true');
 
-            if (el) dojo.attr(el, 'toggled', toggledValue);
+            if (el) el.setAttribute('toggled', toggledValue);
+            this.updateDatetimeCaption();
+        },
+        populateSelector: function(el, val, min, max) {
+            if (val > max) { val = max; }
+            el.options.length = 0;
+            for (var i=min; i <= max; i++) {
+                opt = new Option((this.monthNode == el) ? uCase(this.months[i]) : pad(i), i);
+                opt.selected = (i == val);
+                el.options[el.options.length] = opt;
+            }
+        },
+        localizeViewTemplate: function() {
+            var whichTemplate = arguments[0],
+                formatIndex = arguments[1],
+                fields = { y:'year', M:'month', d:'day', h:'hour', H:'hour', m:'minute' };
+            var whichField = fields[ (3 > formatIndex)
+                ? this.dateFormat.split(/[^a-z]/i)[formatIndex].charAt(0)
+                : Date.CultureInfo.formatPatterns.shortTime.split(/[^a-z]/i)[formatIndex - 3].charAt(0)
+                ];
+            var whichFormat = ('selectorTemplate' == whichTemplate)
+                ? whichField
+                : uCase(whichField);
+
+            return dojo.string.substitute(this[whichTemplate], [whichFormat]);
         },
         show: function(options) {
             this.inherited(arguments);
 
+            this.titleText = options.label ? options.label : this.titleText;
+
             this.showTimePicker = this.options && this.options.showTimePicker;
 
-            this.date = (this.options && this.options.date) || new Date();
-            this.year = this.date.getFullYear();
+            this.date  = (this.options && this.options.date) || new Date();
+            this.year  = this.date.getFullYear();
             this.month = this.date.getMonth();
 
-            this.hourNode.value = "" + pad(this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12));
-            this.minuteNode.value = "" + pad(this.date.getMinutes());
-            dojo.attr(this.meridiemNode, 'toggled', this.date.getHours() < 12);
+            var today = new Date();
+            this.populateSelector(this.yearNode, this.year,
+                    (this.year < today.getFullYear() ? this.year : today.getFullYear()),
+                    (10 + today.getFullYear()) // max 10 years into future - arbitrary limit
+            );
+            this.populateSelector(this.monthNode, this.month, 0, 11);
+            this.populateSelector(this.dayNode, this.date.getDate(), 1, this.daysInMonth());
+            this.populateSelector(this.hourNode,
+                this.date.getHours() > 12 && !this.is24hrTimeFormat
+                    ? this.date.getHours() - 12
+                    : (this.date.getHours() || 12),
+                this.is24hrTimeFormat ? 0 : 1,
+                this.is24hrTimeFormat ? 23 : 12
+            );
+            this.populateSelector(this.minuteNode, this.date.getMinutes(), 0, 59);
+            this.meridiemNode.setAttribute('toggled', this.date.getHours() < 12);
 
-            this.hideValidationSummary();
+            this.updateDatetimeCaption();
 
-            this.renderCalendar();
-
-            if (this.showTimePicker)
-                dojo.style(this.timeNode, 'display', 'block');
-            else
-                dojo.style(this.timeNode, 'display', 'none');
-
-        },
-        goToNextMonth: function() {
-            if (this.month == 11)
-            {
-                this.year += 1;
+            if (this.showTimePicker) {
+                this.timeNode.style.display = 'block';
+                // hide meridiem toggle when useing 24hr time format:
+                if (this.is24hrTimeFormat) { this.meridiemNode.parentNode.style.display='none'; }
+            } else {
+                this.timeNode.style.display = 'none';
             }
-            this.month = (this.month + 1) % 12;
+        },
 
-            this.renderCalendar();
+        decrementYear: function() { this.decrement(this.yearNode); },
+        decrementMonth: function() { this.decrement(this.monthNode); },
+        decrementDay: function() { this.decrement(this.dayNode); },
+        decrementHour: function() {
+            this.decrement(this.hourNode);
+            if (11 == this.hourNode.value % 12) {
+                this.toggleMeridiem({$source:this.meridiemNode});
+            }
         },
-        goToPreviousMonth: function() {
-            if (this.month == 0)
-            {
-                this.year -= 1;
-                this.month = 11;
+        decrementMinute: function() { this.decrement(this.minuteNode, 15); },
+        decrement: function(el, inc) { // all fields are <select> elements
+            var inc = inc || 1;
+            if (0 <= (el.selectedIndex - inc)) {
+                el.selectedIndex = inc * Math.floor((el.selectedIndex -1)/ inc);
+            } else {
+                if (el == this.yearNode)   { return false; }
+                if (el == this.dayNode)    { this.decrementMonth(); }
+                if (el == this.monthNode)  { this.decrementYear();  }
+                if (el == this.minuteNode) { this.decrementHour();  }
+                el.selectedIndex = el.options.length - inc;
             }
-            else
-            {
-                this.month = (this.month - 1) % 12;
-            }
+            this.validate(null,el);
+        },
 
-            this.renderCalendar();
+        incrementYear: function() { this.increment(this.yearNode); },
+        incrementMonth: function() { this.increment(this.monthNode); },
+        incrementDay: function() { this.increment(this.dayNode); },
+        incrementHour: function() {
+            this.increment(this.hourNode);
+            if (this.hourNode.selectedIndex == (this.hourNode.options.length - 1)) {
+                this.toggleMeridiem({$source:this.meridiemNode});
+            }
         },
-        selectDay: function(options, evt, el) {
-            if (this.selectedDateNode) dojo.removeClass(this.selectedDateNode, 'selected');
-            this.selectedDateNode = el;
-            dojo.addClass(el, 'selected');
-            this.date = new Date(this.year, this.month, options.date);
+        incrementMinute: function() { this.increment(this.minuteNode, 15); },
+        increment: function(el, inc) {
+            var inc = inc || 1;
+            if (el.options.length > (el.selectedIndex + inc)) {
+                el.selectedIndex += inc;
+            } else {
+                if (el == this.yearNode) { return false; }
+                if (el == this.dayNode) { this.incrementMonth(); }
+                if (el == this.monthNode)  { this.incrementYear(); }
+                if (el == this.minuteNode) { this.incrementHour(); }
+                el.selectedIndex = 0;
+            }
+            this.validate(null,el);
         },
-        selectToday: function(){
-            var today = dojo.query('.today')[0];
-            if(today) this.selectDay({date: new Date().getDate()}, null, today);
+        updateDatetimeCaption: function() {
+            var t = this.getDateTime();
+            this.datePickControl.caption.innerHTML = t.toString('dddd'); // weekday text
+            if (this.showTimePicker) {
+                this.timePickControl.caption.innerHTML = t.toString(this.timeFormat);
+            }
         },
         getDateTime: function() {
             var result = new Date(this.date.getTime()),
-                isPM = dojo.attr(this.meridiemNode, 'toggled') !== 'true',
+                isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : this.meridiemNode.getAttribute('toggled') !== 'true',
                 hours = parseInt(this.hourNode.value, 10),
                 minutes = parseInt(this.minuteNode.value, 10);
 
@@ -226,75 +264,6 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
             result.setMinutes(minutes);
 
             return result;
-        },
-        renderCalendar: function() {
-            var mm = this.month,
-                yyyy = this.year,
-                firstDay = new Date(yyyy, mm, 1),
-                startingDay = firstDay.getDay(),
-                monthLength = firstDay.getDaysInMonth(),
-                today = new Date(),
-                day = 1, calHTML = [], dayClass = '', selectedClass = '',
-                weekendClass = '', i = 0, j = 0, selectedNode = false,
-                isCurrentMonth =  this.year === Date.today().getFullYear() && this.month === Date.today().getMonth();
-
-            this.monthName = Date.CultureInfo.monthNames[mm];
-
-            calHTML.push(this.calendarStartTemplate);
-            // Month Header
-            calHTML.push(this.calendarMonthHeaderTemplate.apply(this));
-
-            // Week Header
-            calHTML.push(this.calendarWeekHeaderStartTemplate);
-            for(i = 0; i <= 6; i++ ){
-                calHTML.push(dojo.string.substitute(this.calendarWeekHeaderTemplate, [Date.CultureInfo.abbreviatedDayNames[i]]));
-            }
-            calHTML.push(this.calendarWeekHeaderEndTemplate);
-
-            //Weeks
-            for (i = 0; i <= 6; i++)
-            {
-                calHTML.push(this.calendarWeekStartTemplate);
-                //Days
-                for (j = 0; j <= 6; j++)
-                {
-                    if (day <= monthLength && (i > 0 || j >= startingDay))
-                    {
-                        //Check for today
-                        dayClass = (isCurrentMonth === true && day == today.getDate()) ? 'today' : '';
-
-                        //Check for weekends
-                        weekendClass = (this.weekEnds.indexOf(j) !== -1) ? ' weekend' : '';
-
-                        //Check for selected
-                        selectedClass = (this.date.getFullYear() === yyyy &&
-                                        this.date.getMonth() === mm &&
-                                        this.date.getDate() === day)
-                                            ? ' selected'
-                                            : '';
-
-                        calHTML.push(dojo.string.substitute( this.calendarDayTemplate,
-                                                    [day,
-                                                    (dayClass + weekendClass + selectedClass),
-                                                    day]
-                                                   )
-                                    );
-                        day++;
-                    }
-                    else
-                    {
-                        calHTML.push(this.calendarEmptyDayTemplate);
-                    }
-                    
-                }
-                calHTML.push(this.calendarWeekEndTemplate);
-                // stop making rows if we've run out of days
-                if (day > monthLength) break;
-            }
-            calHTML.push(this.calendarEndTemplate);
-
-            this.set('calendarContent', calHTML.join(''));
-            this.selectedDateNode = dojo.query('.selected')[0];
         }
     });
 });
