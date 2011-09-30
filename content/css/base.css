@@ -469,7 +469,7 @@ input.text-input {
     margin-top: 6px;
 }
 
-.time-content > .date-tt
+.time-content .date-tt
 {
     width: 100px;
     height: 18px;
@@ -479,21 +479,14 @@ input.text-input {
     display: inline-block;
 }
 
-.time-content > .date-tt > .toggle
+.time-content .date-tt > .toggle
 {
     height: 28px;
 }
 
-.time-content > .date-tt > .toggle > .thumb
+.time-content .date-tt > .toggle > .thumb
 {
     top: 0px;
-}
-
-.time-content > input.hour-field,
-.time-content > input.minute-field
-{
-    width: 36px;
-    padding-left: 6px;
 }
 
 .calendar-day
@@ -566,7 +559,6 @@ input.text-input {
 
 .time-content > .date-tt > .toggle
 {
-    background-color: #69923A;
     border: 1px solid #1a250f;
     background-color: #69923a;
     background-image: linear-gradient(bottom, #4f6e2c, #35491d);
@@ -593,6 +585,65 @@ input.text-input {
 .ext-webkit .time-content > input.minute-field
 {
     width: 60px;
+}
+
+#datetime-picker { padding-bottom: 2em; }
+#datetime-picker table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    padding: 2px;
+    margin: 0.5em auto 0;
+    text-align:center;
+}
+#datetime-picker div.calendar-content { padding-bottom: 0; }
+#datetime-picker div.date-tt { margin: 0; }
+#datetime-picker table caption { padding: 4px; }
+.ext-webkit #datetime-picker table caption { width: 100%; } /* Webkit caption does not match table width by default */
+#datetime-picker td { padding: 0; margin: 0; border: 0; }
+#datetime-picker td>select {
+    display: block;
+    font-size: 1.5em;
+    width: auto;
+    position: relative; /* Fix android browser issue with -webkit-transform blocking <select> */
+}
+#datetime-picker td>button {
+    display: block;
+    font-size: 1.5em;
+    width: 100%;
+    margin: 0;
+    line-height: 1.75em;
+}
+#datetime-picker .plus td>button {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    background-image: linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
+    background-image: -moz-linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
+    background-image: -o-linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
+    background-image: -webkit-linear-gradient(top, #e6e6e6, #f2f2f2, #ccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(0.5, #f2f2f2),
+        color-stop(2, #cccccc)
+    );
+}
+#datetime-picker .minus td>button {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-image: linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
+    background-image: -moz-linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
+    background-image: -o-linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
+    background-image: -webkit-linear-gradient(top, #ccc, #f2f2f2, #e6e6e6);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #ccc),
+        color-stop(0.5, #f2f2f2),
+        color-stop(2, #e6e6e6)
+    );
 }
 
 .collapsed

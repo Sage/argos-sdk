@@ -189,7 +189,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
 
             if (this.showTimePicker) {
                 this.timeNode.style.display = 'block';
-                // hide meridiem toggle when useing 24hr time format:
+                // hide meridiem toggle when using 24hr time format:
                 if (this.is24hrTimeFormat) { this.meridiemNode.parentNode.style.display='none'; }
             } else {
                 this.timeNode.style.display = 'none';
