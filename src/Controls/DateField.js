@@ -83,8 +83,8 @@ define('Sage/Platform/Mobile/Controls/DateField', ['Sage/Platform/Mobile/Control
             dojo.removeClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
         },
         validate: function() {
-            if (this.el.dom.value !== '' && !this.currentValue)
-                return String.format(this.invalidDateFormatErrorText, this.label);
+            if (this.inputNode.value !== '' && !this.currentValue)
+                return dojo.string.substitute(this.invalidDateFormatErrorText, [this.label]);
 
             return this.inherited(arguments);
         }
