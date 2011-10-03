@@ -626,7 +626,7 @@ input.text-input {
         left bottom,
         color-stop(0, #e6e6e6),
         color-stop(0.5, #f2f2f2),
-        color-stop(2, #cccccc)
+        color-stop(1, #cccccc)
     );
 }
 #datetime-picker .minus td>button {
@@ -642,7 +642,7 @@ input.text-input {
         left bottom,
         color-stop(0, #ccc),
         color-stop(0.5, #f2f2f2),
-        color-stop(2, #e6e6e6)
+        color-stop(1, #e6e6e6)
     );
 }
 
