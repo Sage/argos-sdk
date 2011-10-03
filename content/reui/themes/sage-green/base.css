@@ -246,6 +246,10 @@ input:not([type|=radio]):not([type|=checkbox]) {
     position: relative;
     border-bottom: solid 1px #ddd;
 }
+.list-content > li:last-child
+{
+    border-bottom: none;
+}
 
 .list-content > li
 {
