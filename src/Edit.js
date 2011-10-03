@@ -162,7 +162,7 @@ define('Sage/Platform/Mobile/Edit',
         },
         hasAction: function(name, evt, el) {
             var fieldEl = el && dojo.query(el, this.contentNode).parents('[data-field]'),
-                field = this.fields[fieldEl.length>0 && dojo.attr(fieldEl[0], 'data-field')];
+                field = fieldEl && this.fields[fieldEl.length>0 && dojo.attr(fieldEl[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
                 return true;
@@ -696,10 +696,10 @@ define('Sage/Platform/Mobile/Edit',
                 content.push(this.validationSummaryItemTemplate.apply(this.errors[i], this.fields[this.errors[i].name]));
 
             this.set('validationContent', content.join(''));
-            dojo.addClass(this.contentNode, 'panel-form-error');
+            dojo.addClass(this.domNode, 'panel-form-error');
         },
         hideValidationSummary: function() {
-            dojo.removeClass(this.contentNode, 'panel-form-error');
+            dojo.removeClass(this.domNode, 'panel-form-error');
             this.set('validationContent', '');
         },
         save: function() {
