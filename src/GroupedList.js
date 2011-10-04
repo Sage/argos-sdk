@@ -16,6 +16,10 @@
 define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], function() {
 
     dojo.declare('Sage.Platform.Mobile.GroupedList', [Sage.Platform.Mobile.List], {
+        // Localization
+        toggleCollapseText: 'toggle collapse',
+
+
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list grouped-list{%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
             '{%! $.searchTemplate %}',
@@ -31,7 +35,6 @@ define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], functi
             '</h2>',
             '<ul data-group="{%= $.tag %}" class="list-content {%= $.cls %}"></ul>'
         ]),
-        toggleCollapseText: 'toggle collapse',
         _currentGroup: null,
         _currentGroupNode: null,
         getGroupForEntry: function(entry) {
@@ -41,9 +44,9 @@ define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], functi
             };
         },
         toggleGroup: function(params) {
-            var el = Ext.get(params.$source);
-            if (el)
-                el.toggleClass('collapsed');
+            var node = dojo.query(params.$source);
+            if (node)
+                node.toggleClass('collapsed');
         },
         processFeed: function(feed) {
             /// <summary>
