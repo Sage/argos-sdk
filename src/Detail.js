@@ -110,7 +110,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
         postCreate: function() {
             this.inherited(arguments);
-            this.connect(App, App.onRefresh, this._onRefresh);
+            this.connect(App, 'onRefresh', this._onRefresh);
             this.clear();
         },
         createToolLayout: function() {

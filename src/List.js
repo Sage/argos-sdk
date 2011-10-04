@@ -431,7 +431,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
 
             if (this._selectionModel == null) this.set('selectionModel', new Sage.Platform.Mobile.ConfigurableSelectionModel());
 
-            this.connect(App, App.onRefresh, this._onRefresh);
+            this.connect(App, 'onRefresh', this._onRefresh);
 
             this.clear();
         },
