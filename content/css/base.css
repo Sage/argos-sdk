@@ -666,7 +666,7 @@ h2 > .collapsed-indicator
 
 .collapsed + ul,
 .collapsed + fieldset,
-.collapsed ~ div
+.collapsed + div
 {
     display: none !important;
 }
