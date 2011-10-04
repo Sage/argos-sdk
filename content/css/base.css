@@ -666,9 +666,9 @@ h2 > .collapsed-indicator
 
 .collapsed + ul,
 .collapsed + fieldset,
-.collapsed + div
+.collapsed ~ div
 {
-    display: none;
+    display: none !important;
 }
 
 .action-list > li > a.disabled
