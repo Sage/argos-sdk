@@ -613,7 +613,7 @@ define('Sage/Platform/Mobile/Edit',
         onInsertSuccess: function(entry) {
             this.enable();
 
-            this.refresh({
+            App.onRefresh({
                 resourceKind: this.resourceKind
             });
 
@@ -662,7 +662,7 @@ define('Sage/Platform/Mobile/Edit',
         onUpdateSuccess: function(entry) {
             this.enable();
 
-            this.refresh({
+            App.onRefresh({
                 resourceKind: this.resourceKind,
                 key: entry['$key'],
                 data: entry
