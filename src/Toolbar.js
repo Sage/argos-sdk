@@ -93,6 +93,8 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
         },
         showTools: function(tools) {
             this.tools = {};
+            // fix until all views correctly return a tools object
+            if(!tools) return;
 
             for (var i = 0; i < tools.length; i++)
                 this.tools[tools[i].id] = {
