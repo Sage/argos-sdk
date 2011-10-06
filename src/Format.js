@@ -132,4 +132,3 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
         };
     })();
 });
-

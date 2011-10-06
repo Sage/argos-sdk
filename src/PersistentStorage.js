@@ -16,7 +16,7 @@
 define('Sage/Platform/Mobile/PersistentStorage', ['dojo', 'dojo/string', 'Sage/Platform/Mobile/Convert', 'Sage/Platform/Mobile/Utility'], function() {
 
     var sosCache = {};
-    dojo.declare('Sage.Platform.Mobile.PersistentStorage', null, {
+    return dojo.declare('Sage.Platform.Mobile.PersistentStorage', null, {
 
         name: false,
         singleObjectStore: false,

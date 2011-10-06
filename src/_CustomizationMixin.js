@@ -22,7 +22,7 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
             return expression;
     };
 
-    dojo.declare('Sage.Platform.Mobile._CustomizationMixin', null, {
+    return dojo.declare('Sage.Platform.Mobile._CustomizationMixin', null, {
         _layoutCompiled: null,
         _layoutCompiledFrom: null,
         id: null,
@@ -168,5 +168,4 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
             return output;
         }
     });
-
 });

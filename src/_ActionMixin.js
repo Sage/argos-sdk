@@ -15,7 +15,7 @@
 
 define('Sage/Platform/Mobile/_ActionMixin', ['dojo', 'dojo/NodeList-traverse'], function() {
 
-    dojo.declare('Sage.Platform.Mobile._ActionMixin', null, {
+    return dojo.declare('Sage.Platform.Mobile._ActionMixin', null, {
         actionsFrom: 'click',
         postCreate: function() {
             // todo: add delegation

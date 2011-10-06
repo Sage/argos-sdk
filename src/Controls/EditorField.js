@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Controls/Field'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.EditorField', [Sage.Platform.Mobile.Controls.Field], {
+
+    return dojo.declare('Sage.Platform.Mobile.Controls.EditorField', [Sage.Platform.Mobile.Controls.Field], {
         // Localization
         lookupLabelText: 'edit',
         lookupText: '...',

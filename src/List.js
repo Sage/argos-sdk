@@ -117,7 +117,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
      * @extends Sage.Platform.Mobile.View
      * @param {Object} options The options for the view
      */
-    dojo.declare('Sage.Platform.Mobile.List', [Sage.Platform.Mobile.View], {
+    return dojo.declare('Sage.Platform.Mobile.List', [Sage.Platform.Mobile.View], {
         attributeMap: {
             listContent: {node: 'contentNode', type: 'innerHTML'},
             remainingContent: {node: 'remainingContentNode', type: 'innerHTML'}
@@ -860,5 +860,4 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             this.set('listContent', this.loadingTemplate.apply(this));
         }
     });
-    
 });

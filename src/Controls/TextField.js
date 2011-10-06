@@ -99,8 +99,6 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         },
         onClearPress: function(evt){
             this.clearValue();
-            this.inputNode.focus();
-            this.onFocus();
         },
         onNotificationTrigger: function(evt, el, o) {
             var currentValue = this.getValue();

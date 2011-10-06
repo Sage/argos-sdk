@@ -29,7 +29,7 @@ define('Sage/Platform/Mobile/Controls/Field', ['dojo', 'dojo/string', 'dojo/Node
         };
     })();
 
-    dojo.declare('Sage.Platform.Mobile.Controls.Field', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
+    return dojo.declare('Sage.Platform.Mobile.Controls.Field', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
         owner: false,
         applyTo: false,
         alwaysUseValue: false,

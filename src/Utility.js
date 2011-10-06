@@ -14,6 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Utility', ['dojo'], function() {
+
     dojo.declare('Sage.Platform.Mobile.Utility', null, {});
     Sage.Platform.Mobile.Utility = (function(){
     var nameToPathCache = {};
@@ -78,4 +79,3 @@ define('Sage/Platform/Mobile/Utility', ['dojo'], function() {
     };
     })();
 });
-

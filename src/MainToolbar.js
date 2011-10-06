@@ -15,7 +15,7 @@
 
 define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], function() {
 
-    dojo.declare('Sage.Platform.Mobile.MainToolbar', [Sage.Platform.Mobile.Toolbar], {
+    return dojo.declare('Sage.Platform.Mobile.MainToolbar', [Sage.Platform.Mobile.Toolbar], {
         attributeMap: {
             'title': {
                 node: 'titleNode',
@@ -68,5 +68,4 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
             }
         }
     });
-    
 });

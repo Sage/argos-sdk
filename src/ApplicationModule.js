@@ -15,7 +15,7 @@
 
 define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Application'], function() {
 
-    dojo.declare('Sage.Platform.Mobile.ApplicationModule', null, {
+    return dojo.declare('Sage.Platform.Mobile.ApplicationModule', null, {
         _connects: null,
         _subscribes: null,
         application: null,
@@ -65,5 +65,4 @@ define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Applicat
                 this.application.registerCustomization(set, id, spec);
         }
     });
-
 });

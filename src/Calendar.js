@@ -18,7 +18,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
     var pad = function(n) { return n < 10 ? '0' + n : n };
     var uCase = function (str) { return str.charAt(0).toUpperCase() + str.substring(1); }
 
-    dojo.declare('Sage.Platform.Mobile.Calendar', [Sage.Platform.Mobile.View], {
+    return dojo.declare('Sage.Platform.Mobile.Calendar', [Sage.Platform.Mobile.View], {
         // Localization
         titleText: 'Calendar',
         amText: 'AM',

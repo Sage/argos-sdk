@@ -15,7 +15,7 @@
 
 define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Utility', 'Mobile/SalesLogix/Format'], function() {
 
-    dojo.declare('Sage.Platform.Mobile.Detail', [Sage.Platform.Mobile.View], {
+    return dojo.declare('Sage.Platform.Mobile.Detail', [Sage.Platform.Mobile.View], {
         attributeMap: {
             detailContent: {node: 'contentNode', type: 'innerHTML'}
         },

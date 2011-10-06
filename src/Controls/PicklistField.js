@@ -16,82 +16,79 @@
 // todo: move to argos-saleslogix; this does not belong here.
 
 define('Sage/Platform/Mobile/Controls/PicklistField', ['Sage/Platform/Mobile/Controls/LookupField', 'Mobile/SalesLogix/Views/PickList'], function() {
+    var viewsByName = {},
+        viewsByNameCount = 0;
 
-    (function() {
-        var viewsByName = {},
-            viewsByNameCount = 0;
+    var getOrCreateViewFor = function(name) {
+        if (viewsByName[name])
+            return viewsByName[name];
 
-        var getOrCreateViewFor = function(name) {
-            if (viewsByName[name])
-                return viewsByName[name];
-
-            var view = new Mobile.SalesLogix.Views.PickList({
-                id: 'pick_list_' + viewsByNameCount++,
-                expose: false
-            });
-
-            App.registerView(view);
-
-            return (viewsByName[name] = view);
-        };
-
-        dojo.declare('Sage.Platform.Mobile.Controls.PicklistField', [Sage.Platform.Mobile.Controls.LookupField], {
-            picklist: false,
-            orderBy: 'number asc',
-            storageMode: 'text',
-            requireSelection: false,
-            valueKeyProperty: false,
-            valueTextProperty: false,
-            constructor: function(options) {
-                switch (this.storageMode)
-                {
-                    case 'text':
-                        this.keyProperty = 'text';
-                        this.textProperty = 'text';
-                        break;
-                    case 'code':
-                        this.keyProperty = 'code';
-                        this.textProperty = 'text';
-                        this.requireSelection = typeof options.requireSelection !== 'undefined'
-                            ? options.requireSelection
-                            : true;
-                        break;
-                    case 'id':
-                        this.keyProperty = '$key';
-                        this.textProperty = 'text';
-                        this.requireSelection = typeof options.requireSelection !== 'undefined'
-                            ? options.requireSelection
-                            : true;
-                        break;
-                }
-            },
-            isReadOnly: function() {
-                return !this.picklist;
-            },
-            formatResourcePredicate: function(name) {
-                return dojo.string.substitute('name eq "${0}"', [name]);
-            },
-            createNavigationOptions: function() {
-                var options = this.inherited(arguments);
-
-                if (this.picklist)
-                    options.resourcePredicate = this.formatResourcePredicate(
-                        this.dependsOn // only pass dependentValue if there is a dependency
-                            ? this.expandExpression(this.picklist, options.dependentValue)
-                            : this.expandExpression(this.picklist)
-                    );
-
-                return options;
-            },
-            navigateToListView: function() {
-                var options = this.createNavigationOptions(),
-                    view = App.getView(this.view) || getOrCreateViewFor(this.picklist);
-
-                if (view && options)
-                    view.show(options);
-            }
+        var view = new Mobile.SalesLogix.Views.PickList({
+            id: 'pick_list_' + viewsByNameCount++,
+            expose: false
         });
 
-        Sage.Platform.Mobile.Controls.FieldManager.register('picklist', Sage.Platform.Mobile.Controls.PicklistField);
-    })();
+        App.registerView(view);
+
+        return (viewsByName[name] = view);
+    };
+
+    dojo.declare('Sage.Platform.Mobile.Controls.PicklistField', [Sage.Platform.Mobile.Controls.LookupField], {
+        picklist: false,
+        orderBy: 'number asc',
+        storageMode: 'text',
+        requireSelection: false,
+        valueKeyProperty: false,
+        valueTextProperty: false,
+        constructor: function(options) {
+            switch (this.storageMode)
+            {
+                case 'text':
+                    this.keyProperty = 'text';
+                    this.textProperty = 'text';
+                    break;
+                case 'code':
+                    this.keyProperty = 'code';
+                    this.textProperty = 'text';
+                    this.requireSelection = typeof options.requireSelection !== 'undefined'
+                        ? options.requireSelection
+                        : true;
+                    break;
+                case 'id':
+                    this.keyProperty = '$key';
+                    this.textProperty = 'text';
+                    this.requireSelection = typeof options.requireSelection !== 'undefined'
+                        ? options.requireSelection
+                        : true;
+                    break;
+            }
+        },
+        isReadOnly: function() {
+            return !this.picklist;
+        },
+        formatResourcePredicate: function(name) {
+            return dojo.string.substitute('name eq "${0}"', [name]);
+        },
+        createNavigationOptions: function() {
+            var options = this.inherited(arguments);
+
+            if (this.picklist)
+                options.resourcePredicate = this.formatResourcePredicate(
+                    this.dependsOn // only pass dependentValue if there is a dependency
+                        ? this.expandExpression(this.picklist, options.dependentValue)
+                        : this.expandExpression(this.picklist)
+                );
+
+            return options;
+        },
+        navigateToListView: function() {
+            var options = this.createNavigationOptions(),
+                view = App.getView(this.view) || getOrCreateViewFor(this.picklist);
+
+            if (view && options)
+                view.show(options);
+        }
+    });
+
+    Sage.Platform.Mobile.Controls.FieldManager.register('picklist', Sage.Platform.Mobile.Controls.PicklistField);
 });

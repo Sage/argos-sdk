@@ -15,10 +15,9 @@
 
 define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], function() {
 
-    dojo.declare('Sage.Platform.Mobile.GroupedList', [Sage.Platform.Mobile.List], {
+    return dojo.declare('Sage.Platform.Mobile.GroupedList', [Sage.Platform.Mobile.List], {
         // Localization
         toggleCollapseText: 'toggle collapse',
-
 
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list grouped-list{%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
@@ -105,6 +104,4 @@ define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], functi
             this._currentGroupNode = null;
         }
     });
-
-
 });

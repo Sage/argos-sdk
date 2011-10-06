@@ -15,7 +15,7 @@
 
 define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_Templated'], function() {
 
-    dojo.declare('Sage.Platform.Mobile.Toolbar', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
+    return dojo.declare('Sage.Platform.Mobile.Toolbar', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
         widgetTemplate: new Simplate([
             '<div class="toolbar">',
             '</div>'
@@ -105,4 +105,3 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
         }
     });
 });
-

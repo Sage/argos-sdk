@@ -14,7 +14,9 @@
  */
 
 define('Sage/Platform/Mobile/Convert', ['dojo'], function() {
-    dojo.declare('Sage.Platform.Mobile.Convert', null, {});
+
+    dojo.setObject('Sage.Platform.Mobile.Convert', null);
+
     Sage.Platform.Mobile.Convert = (function() {
     var trueRE = /^(true|T)$/i,
         isoDate = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|(-|\+)(\d{2}):(\d{2}))/,

@@ -15,7 +15,7 @@
 
 define('Sage/Platform/Mobile/_ServiceMixin', [], function() {
 
-    dojo.declare('Sage.Platform.Mobile._ServiceMixin', null, {
+    return dojo.declare('Sage.Platform.Mobile._ServiceMixin', null, {
         serviceMap: null,
         constructor: function() {
             var map = this.serviceMap;
@@ -36,5 +36,4 @@ define('Sage/Platform/Mobile/_ServiceMixin', [], function() {
             return App.getService(specification);
         }
     });
-
 });

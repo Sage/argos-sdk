@@ -33,7 +33,7 @@ define('Sage/Platform/Mobile/Edit',
         'Sage/Platform/Mobile/Controls/TextAreaField'
     ], function() {
 
-    dojo.declare('Sage.Platform.Mobile.Edit', [Sage.Platform.Mobile.View], {
+    return dojo.declare('Sage.Platform.Mobile.Edit', [Sage.Platform.Mobile.View], {
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="edit panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',            
             '{%! $.loadingTemplate %}',
