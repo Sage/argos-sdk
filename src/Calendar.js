@@ -36,8 +36,8 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
         date: false,
         showTimePicker: false,
         selectorTemplate:  '<select id="${0}-field" data-dojo-attach-point="${0}Node"></select>',
-        incrementTemplate: '<button data-action="increment${0}">+</button>',
-        decrementTemplate: '<button data-action="decrement${0}">-</button>',
+        incrementTemplate: '<button data-action="increment${0}" class="button">+</button>',
+        decrementTemplate: '<button data-action="decrement${0}" class="button">-</button>',
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
                 '<div class="panel-content" id="datetime-picker">',
@@ -49,7 +49,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
                             '<td>{%= $.localizeViewTemplate("incrementTemplate", 1) %}</td>',
                             '<td>{%= $.localizeViewTemplate("incrementTemplate", 2) %}</td>',
                         '</tr>',
-                        '<tr>',
+                        '<tr class="datetime-selects">',
                             '<td>{%= $.localizeViewTemplate("selectorTemplate", 0) %}</td>',
                             '<td>{%= $.localizeViewTemplate("selectorTemplate", 1) %}</td>',
                             '<td>{%= $.localizeViewTemplate("selectorTemplate", 2) %}</td>',
@@ -68,10 +68,10 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
                                 '<td>{%= $.localizeViewTemplate("incrementTemplate", 3) %}</td>',
                                 '<td>{%= $.localizeViewTemplate("incrementTemplate", 4) %}</td>',
                             '</tr>',
-                            '<tr>',
+                            '<tr class="datetime-selects">',
                                 '<td>{%= $.localizeViewTemplate("selectorTemplate", 3) %}</td>',
                                 '<td>{%= $.localizeViewTemplate("selectorTemplate", 4) %}</td>',
-                                '<td>',
+                                '<td class="datetime-tt">',
                                     '<div class="date-tt">',
                                         '<div class="toggle meridiem-field" data-action="toggleMeridiem" data-dojo-attach-point="meridiemNode">',
                                             '<span class="thumb"></span>',
@@ -87,6 +87,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
                             '</tr>',
                         '</table>',
                     '</div>',
+                    '<div style="clear:both"></div>',
                 '</div>',
             '</div>'
         ]),
@@ -188,11 +189,11 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
             this.updateDatetimeCaption();
 
             if (this.showTimePicker) {
-                this.timeNode.style.display = 'block';
+                dojo.removeClass(this.timeNode, 'time-content-hidden');
                 // hide meridiem toggle when using 24hr time format:
                 if (this.is24hrTimeFormat) { this.meridiemNode.parentNode.style.display='none'; }
             } else {
-                this.timeNode.style.display = 'none';
+                dojo.addClass(this.timeNode, 'time-content-hidden');
             }
         },
 
