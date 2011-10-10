@@ -46,6 +46,7 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
         view: false,
         keyProperty: '$key',
         textProperty: '$descriptor',
+        multi: null,
         textTemplate: null,
         textRenderer: null,
         valueKeyProperty: null,
@@ -107,6 +108,8 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
                 resourcePredicate: this.resourcePredicate,
                 where: this.where,
                 orderBy: this.orderBy,
+                multi: this.multi,
+                selections: this.multi ? this.createSelections() : null,
                 tools: {
                     tbar: [{
                         id: 'complete',                       
@@ -148,6 +151,13 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
             options.title = this.title;
 
             return options;
+        },
+        createSelections: function(){
+            var value = this.getText(),
+                selections = value.indexOf(', ') !== -1
+                    ? value.split(', ')
+                    : [value];
+            return selections;
         },
         navigateToListView: function() {
             var view = App.getView(this.view),
@@ -214,6 +224,11 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
                 // requests created in this state (the pre-flight request is made, and the request ends with status 0).
                 // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
                 if (success) setTimeout(this.onChange.bindDelegate(this), 0);
+            }
+
+            if(view && view.multi){
+                selections = view.getSelections();
+                this.setText(selections.join(', '));
             }
         },
         onChange: function() {
