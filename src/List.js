@@ -654,7 +654,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
             var view = App.getView(this.detailView);
             if (view)
-                if (App._checkForSecuredAction(App.getPrimaryActiveView().domNode.title.replace(/ies$/,'y').replace(/s$/,''), 'view')) {
+                if (App._checkForSecuredAction(App.getPrimaryActiveView().domNode.title.toSingular(), 'view')) {
                     view.show({
                         descriptor: descriptor,
                         key: key
@@ -667,7 +667,7 @@ console.log('CAUGHT:',App.getPrimaryActiveView().domNode.title.toSingular(), 'De
             var view = App.getView(this.insertView || this.editView);
             if (view)
             {
-                if (App._checkForSecuredAction(App.getPrimaryActiveView().domNode.title.replace(/ies$/,'y').replace(/s$/,''), 'new')) {
+                if (App._checkForSecuredAction(App.getPrimaryActiveView().domNode.title.toSingular(), 'new')) {
                     view.show({
                         returnTo: this.id,
                         insert: true
