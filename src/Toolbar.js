@@ -93,15 +93,20 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
         },
         showTools: function(tools) {
             this.tools = {};
+            var enabled;
             // fix until all views correctly return a tools object
             if(!tools) return;
 
-            for (var i = 0; i < tools.length; i++)
+            for (var i = 0; i < tools.length; i++) {
+                // App.getPrimaryActiveView().title.replace(/s$/,'') // here not really reliable way to disable tool
+                enabled = App._checkForSecuredAction(App.getPrimaryActiveView().domNode.title.toSingular(), tools[i].id);
+if (!enabled) { console.log('Not enabled!', App.getPrimaryActiveView().domNode.title, tools[i].id); }
                 this.tools[tools[i].id] = {
                     busy: false,
-                    enabled: true,
+                    enabled: enabled,
                     source: tools[i]
                 };
+            }
         }
     });
 });
