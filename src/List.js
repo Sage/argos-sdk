@@ -654,27 +654,19 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
             var view = App.getView(this.detailView);
             if (view)
-                if (App._checkForSecuredAction(App.getPrimaryActiveView().domNode.title.toSingular(), 'view')) {
-                    view.show({
-                        descriptor: descriptor,
-                        key: key
-                    });
-                } else {
-console.log('CAUGHT:',App.getPrimaryActiveView().domNode.title.toSingular(), 'Detail view NOT permitted');
-                }
+                view.show({
+                    descriptor: descriptor,
+                    key: key
+                });
         },
         navigateToInsertView: function() {
             var view = App.getView(this.insertView || this.editView);
             if (view)
             {
-                if (App._checkForSecuredAction(App.getPrimaryActiveView().domNode.title.toSingular(), 'new')) {
-                    view.show({
-                        returnTo: this.id,
-                        insert: true
-                    });
-                } else {
-console.log('CAUGHT:',App.getPrimaryActiveView().domNode.title.toSingular(), 'Insert NOT permitted');
-                }
+                view.show({
+                    returnTo: this.id,
+                    insert: true
+                });
             }
         },
         processFeed: function(feed) {

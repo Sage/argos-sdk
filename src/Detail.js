@@ -240,7 +240,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 context = {},
                 template,
                 i;
-
+console.log(layout, layoutOptions);
             for (i = 0; i < layoutLength; i+=1) {
                 current = layout[i];
                 include = this.expandExpression(current['include'], entry);
@@ -354,7 +354,11 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
             if (this.entry)
             {
-                this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
+                if (this.securedAction && App.hasSecurity(this.securedAction)) {
+                    this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
+                } else {
+                    this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.noAccessText);
+                }
             }
             else
             {
