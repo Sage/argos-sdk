@@ -114,12 +114,15 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             this.clear();
         },
         createToolLayout: function() {
-            return this.tools || (this.tools = {
-                'tbar': [{
-                    id: 'edit',
-                    action: 'navigateToEditView'
-                }]
-            });
+            if (!this.securedAction || App.hasSecurity(this.securedAction.replace('View', 'Edit')))
+                return this.tools || (this.tools = {
+                    'tbar': [{
+                        id: 'edit',
+                        action: 'navigateToEditView'
+                    }]
+                });
+
+            return (this.tools = {});
         },
         invokeAction: function(name, parameters, evt, el) {
             if (parameters && /true/i.test(parameters['disableAction']))
@@ -240,7 +243,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 context = {},
                 template,
                 i;
-console.log(layout, layoutOptions);
+
             for (i = 0; i < layoutLength; i+=1) {
                 current = layout[i];
                 include = this.expandExpression(current['include'], entry);
@@ -354,10 +357,14 @@ console.log(layout, layoutOptions);
 
             if (this.entry)
             {
-                if (this.securedAction && App.hasSecurity(this.securedAction)) {
+                if (!this.securedAction || App.hasSecurity(this.securedAction)) {
                     this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
+
                 } else {
-                    this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.noAccessText);
+                    this.notAvailableText = this.noAccessText;
+                    dojo.query(this.contentNode).append(this.notAvailableTemplate.apply(this));
+                    // Also need to disable (edit) toolbar
+                    // for now doing it at this.createToolLayout
                 }
             }
             else
