@@ -114,15 +114,12 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             this.clear();
         },
         createToolLayout: function() {
-            if (!this.securedAction || App.hasSecurity(this.securedAction.replace('View', 'Edit')))
-                return this.tools || (this.tools = {
-                    'tbar': [{
-                        id: 'edit',
-                        action: 'navigateToEditView'
-                    }]
-                });
-
-            return (this.tools = {});
+            return this.tools || (this.tools = {
+                'tbar': [{
+                    id: 'edit',
+                    action: 'navigateToEditView'
+                }]
+            });
         },
         invokeAction: function(name, parameters, evt, el) {
             if (parameters && /true/i.test(parameters['disableAction']))
@@ -361,10 +358,11 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                     this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
 
                 } else {
-                    this.notAvailableText = this.noAccessText;
-                    dojo.query(this.contentNode).append(this.notAvailableTemplate.apply(this));
-                    // Also need to disable (edit) toolbar
-                    // for now doing it at this.createToolLayout
+                    this.contentNode.innerHTML = '<div class="not-available">' + this.noAccessText + '</div>';
+
+                    // disable Edit button in toolbar
+                    if (this.securedAction && !App.hasSecurity(this.securedAction.replace('View', 'Edit')))
+                        dojo.query('[data-tool=edit]').addClass('invisible');
                 }
             }
             else

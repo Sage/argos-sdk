@@ -424,6 +424,14 @@ define('Sage/Platform/Mobile/Edit',
         processEntry: function(entry) {
             this.entry = this.convertEntry(entry || {});
             dojo.removeClass(this.contentNode, 'panel-loading');
+
+            // ** maybe this isn't the best place for this?
+            if (this.securedAction && !App.hasSecurity(this.securedAction)) {
+                this.contentNode.innerHTML = '<div class="not-available">' + this.noAccessText + '</div>';
+
+                // disable 'Save' button in toolbar
+                dojo.query('[data-tool=save]').addClass('invisible')
+            }
         },
         applyContext: function(templateEntry) {
         },

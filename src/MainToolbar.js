@@ -28,7 +28,7 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
             '</div>'
         ]),
         toolTemplate: new Simplate([
-            '<button class="button toolButton toolButton-{%= $.side || "right" %} {%= $.enabled || "hidden" %} {%= $.cls %}"',
+            '<button class="button toolButton toolButton-{%= $.side || "right" %} {%= $.cls %}"',
                     'data-action="invokeTool" data-tool="{%= $.id %}"',
                     'aria-label="{%: $.title || $.id %}">',
                 '{% if ($.icon) { %}',
