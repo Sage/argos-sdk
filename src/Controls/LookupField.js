@@ -211,7 +211,7 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
                         break;
                     }
                 }
-                if(values.length > 0)
+                if(view.multi)
                     this.setText(values.join(', '));
 
                 ReUI.back();

@@ -470,7 +470,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             if (el) dojo.addClass(el, 'list-item-selected');
         },
         _onSelectionModelDeselect: function(key, data, tag) {
-            var el = dojo.byId(tag);
+            var el = dojo.byId(tag) || dojo.query('li[data-key="'+key+'"]', this.domNode)[0];
             if (el) dojo.removeClass(el, 'list-item-selected');
         },
         _onSelectionModelClear: function() {
