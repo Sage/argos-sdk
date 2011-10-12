@@ -424,14 +424,6 @@ define('Sage/Platform/Mobile/Edit',
         processEntry: function(entry) {
             this.entry = this.convertEntry(entry || {});
             dojo.removeClass(this.contentNode, 'panel-loading');
-
-            // ** maybe this isn't the best place for this?
-            if (this.securedAction && !App.hasSecurity(this.securedAction)) {
-                this.contentNode.innerHTML = '<div class="not-available">' + this.noAccessText + '</div>';
-
-                // disable 'Save' button in toolbar
-                dojo.query('[data-tool=save]').addClass('invisible')
-            }
         },
         applyContext: function(templateEntry) {
         },
@@ -760,17 +752,17 @@ define('Sage/Platform/Mobile/Edit',
 
             if (this.inserting)
             {
-                if (this.options.template)                
+                if (this.options.template)
                     this.processTemplateEntry(this.options.template);
                 else
-                    this.requestTemplate();                
+                    this.requestTemplate();
             }
             else
             {
                 // apply entry as non-modified data
                 if (this.options.entry)
                 {
-                    this.processEntry(this.options.entry);                  
+                    this.processEntry(this.options.entry);
                     this.setValues(this.entry, true);
                 }
 
@@ -782,6 +774,39 @@ define('Sage/Platform/Mobile/Edit',
                     this.setValues(this.changes);
                 }
             }
+
+            // check user role for access to Edit/Add
+            if (this.securedAction && !App.hasSecurity(
+                    this.inserting
+                        ? this.securedAction.add
+                        : this.securedAction.edit
+                )) {
+
+                if (!dojo.query('.not-available', this.contentNode).pop()) {
+                    dojo.query(this.contentNode).append('<div class="not-available"></div>');
+                }
+                dojo.query('.not-available', this.contentNode)[0].innerHTML = this.inserting
+                        ? this.noAccessAddText
+                        : this.noAccessEditText
+                        ;
+
+                // hide panel heading and fields
+                dojo.query('h2', this.domNode).addClass('row-hidden');
+                dojo.query('fieldset', this.domNode).addClass('row-hidden');
+                // reveal no Access message
+                dojo.query('.not-available', this.domNode).removeClass('row-hidden');
+
+                // disable 'Save' button in toolbar
+                dojo.query('[data-tool=save]').addClass('invisible');
+
+            } else {
+                // reveal heading(s) and fields 
+                dojo.query('h2', this.domNode).removeClass('row-hidden');
+                dojo.query('fieldset', this.domNode).removeClass('row-hidden');
+                // hide no Access message
+                dojo.query('.not-available', this.domNode).addClass('row-hidden');
+            }
+
         },
         transitionTo: function() {
             Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this);
