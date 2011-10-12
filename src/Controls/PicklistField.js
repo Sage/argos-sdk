@@ -69,15 +69,30 @@ define('Sage/Platform/Mobile/Controls/PicklistField', ['Sage/Platform/Mobile/Con
         formatResourcePredicate: function(name) {
             return dojo.string.substitute('name eq "${0}"', [name]);
         },
+        createSelections: function(){
+            var value = this.getText(),
+                selections = (value)
+                    ? value.indexOf(', ') !== -1
+                        ? value.split(', ')
+                        : [value]
+                    : [];
+            return selections;
+        },
         createNavigationOptions: function() {
             var options = this.inherited(arguments);
 
-            if (this.picklist)
+            if (this.picklist) {
                 options.resourcePredicate = this.formatResourcePredicate(
                     this.dependsOn // only pass dependentValue if there is a dependency
                         ? this.expandExpression(this.picklist, options.dependentValue)
                         : this.expandExpression(this.picklist)
                 );
+                options.multi = this.multi;
+                options.singleSelect = !options.multi;
+                options.previousSelections = this.multi ? this.createSelections() : null;
+                options.pickListType = this.storageMode;
+            }
+            console.log(options.previousSelections);
 
             return options;
         },

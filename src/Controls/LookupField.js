@@ -191,7 +191,8 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
         complete: function() {
             // todo: should there be a better way?
             var view = App.getPrimaryActiveView(),
-                selections;
+                selections,
+                values = [];
 
             if (view && view._selectionModel) {
                 selections = view._selectionModel.getSelections();
@@ -203,9 +204,15 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
                     var val = selections[selectionKey].data,
                         success = true;
 
-                    this.setSelection(val, selectionKey);
-                    break;
+                    if(view.multi){
+                        values.push(val);
+                    } else {
+                        this.setSelection(val, selectionKey);
+                        break;
+                    }
                 }
+                if(values.length > 0)
+                    this.setText(values.join(', '));
 
                 ReUI.back();
 

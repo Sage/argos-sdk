@@ -493,7 +493,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             {
                 if (this._selectionModel && this.isNavigationDisabled())
                 {
-                    this._selectionModel.toggle(params.key, this.entries[params.key], params.$source);
+                    this._selectionModel.toggle(params.key, this.entries[params.key] || params.descriptor, params.$source);
                     if (this.options.singleSelect && this.options.singleSelectAction)
                     {
                         if (App.bars['tbar'])
