@@ -466,7 +466,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             }
         },
         _onSelectionModelSelect: function(key, data, tag) {
-            var el = dojo.byId(tag);
+            var el = dojo.byId(tag) || dojo.query('li[data-key="'+key+'"]', this.domNode)[0];
             if (el) dojo.addClass(el, 'list-item-selected');
         },
         _onSelectionModelDeselect: function(key, data, tag) {
@@ -474,6 +474,22 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             if (el) dojo.removeClass(el, 'list-item-selected');
         },
         _onSelectionModelClear: function() {
+        },
+        loadPreviousSelections: function(){
+            if(!this.options || !this.options.previousSelections)
+                return false;
+
+            var selections = this.options.previousSelections,
+                selectionsLength = selections.length,
+                i,
+                data,
+                key;
+
+            for(i = 0; i < selectionsLength; i += 1){
+                data = selections[i];
+                key = data;
+                this._selectionModel.select(key, data);
+            }
         },
         _onRefresh: function(options) {
             if (this.resourceKind && options.resourceKind === this.resourceKind)
@@ -823,16 +839,24 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             if (this._selectionModel && !this.isSelectionDisabled())
                 this._selectionModel.useSingleSelection(this.options.singleSelect);
 
-            if (this.refreshRequired)
-            {
+            if (this.refreshRequired) {
                 this.clear();
-            }
-            else
-            {
+            } else {
                 // if enabled, clear any pre-existing selections
                 if (this._selectionModel && this.autoClearSelection)
                     this._selectionModel.clear();
             }
+        },
+        transitionTo: function(){
+            if(this._selectionModel && this.options){
+                this.loadPreviousSelections();
+            }
+            this.inherited(arguments);
+        },
+        beforeTransitionAway: function(){
+            if(this._selectionModel)
+                this._selectionModel.clear();
+            this.inherited(arguments);
         },
         refresh: function() {
             this.requestData();
