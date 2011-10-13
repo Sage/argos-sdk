@@ -206,13 +206,15 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
 
                     if(view.multi){
                         values.push(val);
+
                     } else {
                         this.setSelection(val, selectionKey);
                         break;
                     }
                 }
-                if(view.multi)
+                if(view.multi) {
                     this.setText(values.join(', '));
+                }
 
                 ReUI.back();
 
@@ -351,8 +353,14 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
                     ? this.valueTextProperty || this.textProperty
                     : false;
 
-            if (keyProperty || textProperty)
-            {
+            if (typeof val === 'undefined' || val == null) {
+                this.currentValue = false;
+                if (initial) this.originalValue = this.currentValue;
+                this.setText(this.requireSelection ? this.emptyText : '');
+                return false;
+            }
+
+            if (keyProperty || textProperty) {
                 if (keyProperty)
                     key = U.getValue(val, keyProperty);
 
@@ -364,8 +372,7 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
                 else if (this.textRenderer)
                     text = this.textRenderer.call(this, val, key, text);
 
-                if (key || text)
-                {
+                if (key || text) {
                     this.currentValue = {
                         key: key || text,
                         text: text || key
@@ -374,46 +381,31 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
                     if (initial) this.originalValue = this.currentValue;
 
                     this.setText(this.currentValue.text);
-                }
-                else
-                {
+                } else {
                     this.currentValue = false;
 
                     if (initial) this.originalValue = this.currentValue;
 
                     this.setText(this.requireSelection ? this.emptyText : '');    
                 }
+            } else {
+                key = val;
+                text = val;
+
+                if (text && this.textTemplate)
+                    text = this.textTemplate.apply(text, this);
+                else if (this.textRenderer)
+                    text = this.textRenderer.call(this, val, key, text);
+
+                this.currentValue = {
+                    key: key,
+                    text: text
+                };
+
+                if (initial) this.originalValue = this.currentValue;
+
+                this.setText(text);
             }
-            else
-            {
-                if (val !== undefined && val !== null)
-                {
-                    key = val;
-                    text = val;
-
-                    if (text && this.textTemplate)
-                        text = this.textTemplate.apply(text, this);
-                    else if (this.textRenderer)
-                        text = this.textRenderer.call(this, val, key, text);
-
-                    this.currentValue = {
-                        key: key,
-                        text: text
-                    };
-
-                    if (initial) this.originalValue = this.currentValue;
-
-                    this.setText(text);
-                }
-                else
-                {
-                    this.currentValue = false;
-
-                    if (initial) this.originalValue = this.currentValue;
-
-                    this.setText(this.requireSelection ? this.emptyText : '');                
-                }
-            }        
         },
         clearValue: function(flag) {
             var initial = flag !== true;
