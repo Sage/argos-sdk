@@ -99,7 +99,7 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
             for (var i = 0; i < tools.length; i++) {
                 this.tools[tools[i].id] = {
                     busy: false,
-                    enabled: true, // tools[i].enabled,
+                    enabled: (false === tools[i].enabled) ? false : true,
                     source: tools[i]
                 };
             }

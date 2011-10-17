@@ -117,7 +117,8 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             return this.tools || (this.tools = {
                 'tbar': [{
                     id: 'edit',
-                    action: 'navigateToEditView'
+                    action: 'navigateToEditView',
+                    enabled: App.hasSecurity(this.securedAction.replace('View', 'Edit')) ? true : false
                 }]
             });
         },

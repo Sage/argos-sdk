@@ -439,7 +439,10 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             return this.tools || (this.tools = {
                 'tbar': [{
                     id: 'new',
-                    action: 'navigateToInsertView'
+                    action: 'navigateToInsertView',
+                    enabled: App.hasSecurity('Entities/' + App.getPrimaryActiveView().title.replace(/ies$/,'y').replace(/s$/,'') + '/Add')
+                        ? true
+                        : ('Calendar' == App.getPrimaryActiveView().title) // Calendar always enabled
                 }]
             });
         },
