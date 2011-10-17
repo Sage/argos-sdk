@@ -600,7 +600,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
         formatRelatedQuery: function(entry, fmt, property) {
             var property = property || '$key';
 
-            return String.format(fmt, Sage.Platform.Mobile.Utility.getValue(entry, property));
+            return dojo.string.substitute(fmt, [Sage.Platform.Mobile.Utility.getValue(entry, property)]);
         },
         createRequest:function() {
             /// <summary>
