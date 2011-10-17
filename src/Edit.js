@@ -28,6 +28,7 @@ define('Sage/Platform/Mobile/Edit',
         'Sage/Platform/Mobile/Controls/BooleanField',
         'Sage/Platform/Mobile/Controls/DateField',
         'Sage/Platform/Mobile/Controls/DecimalField',
+        'Sage/Platform/Mobile/Controls/DurationField',
         'Sage/Platform/Mobile/Controls/HiddenField',
         'Sage/Platform/Mobile/Controls/NoteField',
         'Sage/Platform/Mobile/Controls/TextAreaField'
