@@ -93,7 +93,7 @@
             o.params = S.apply({}, o.params);
             o.headers = S.apply({}, o.headers);
 
-            if (o.cache !== false)
+            if (o.cache !== true)
                 o.params[o.cacheParam || '_t'] = (new Date()).getTime();
 
             o.method = o.method || 'GET';
@@ -190,6 +190,10 @@
                 this.uri.setPort(this.service.getPort());
             }
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataBaseRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         setRequestHeader: function(name, value) {
             this.completeHeaders[name] = value;
         },
@@ -270,6 +274,9 @@
         },
         build: function(excludeQuery) {
             return this.uri.build(excludeQuery);
+        },
+        toString: function(excludeQuery) {
+            return this.build(excludeQuery);
         }
     });
 })();
@@ -302,6 +309,10 @@
                 this.uri.setContract(this.service.getContractName() ? this.service.getContractName() : '-');
                 this.uri.setCompanyDataset(this.service.getDataSet() ? this.service.getDataSet() : '-');
             }
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataApplicationRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
         },
         getApplicationName: function() {
             return this.uri.getProduct();
@@ -357,6 +368,10 @@
         constructor: function() {
             this.base.apply(this, arguments);
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataResourceCollectionRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         getCount: function() {
             return this.uri.getCount();
         },
@@ -404,6 +419,10 @@
                 C.SDataUri.NamedQuerySegment
             );
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataNamedQueryRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         getQueryName: function() {
             return this.uri.getPathSegment(C.SDataUri.ResourcePropertyIndex + 1);
         },
@@ -438,6 +457,10 @@
     Sage.SData.Client.SDataSingleResourceRequest = Sage.SData.Client.SDataApplicationRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataSingleResourceRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
         },
         read: function(options) {
             return this.service.readEntry(this, options);
@@ -482,7 +505,11 @@
     Sage.SData.Client.SDataResourcePropertyRequest = Sage.SData.Client.SDataSingleResourceRequest.extend({
         constructor: function() {
             this.base.apply(this, arguments);
-        },       
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataResourcePropertyRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         readFeed: function(options) {
             return this.service.readFeed(this, options);
         },
@@ -522,6 +549,10 @@
                 Sage.SData.Client.SDataUri.ProductPathIndex,
                 Sage.SData.Client.SDataUri.SystemSegment
             );
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataSystemRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
         },
         getCategory: function() {
             this.uri.getPathSegment(Sage.SData.Client.SDataUri.ContractTypePathIndex);
@@ -563,6 +594,10 @@
                 Sage.SData.Client.SDataUri.TemplateSegment
             );
         },
+        clone: function() {
+            return new Sage.SData.Client.SDataTemplateResourceRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
+        },
         read: function(options) {
             return this.service.readEntry(this, options);
         }
@@ -595,6 +630,10 @@
                 C.SDataUri.ResourcePropertyIndex,
                 C.SDataUri.ServiceMethodSegment
             );
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataServiceOperationRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri));
         },
         execute: function(entry, options) {
             return this.service.executeServiceOperation(this, entry, options);
@@ -637,6 +676,18 @@
                 Sage.SData.Client.SDataUri.ResourcePropertyIndex,
                 Sage.SData.Client.SDataUri.BatchSegment
             );
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataBatchRequest(this.service)
+                .setUri(new Sage.SData.Client.SDataUri(this.uri))
+                .setItems(this.items.slice(0));
+        },
+        getItems: function() {
+            return this.items;
+        },
+        setItems: function(value) {
+            this.items = value;
+            return this;
         },
         using: function(fn, scope) {
             if (this.service)
@@ -704,6 +755,9 @@
             this.queryArgs = S.apply({}, uri && uri.queryArgs);
             this.pathSegments = (uri && uri.pathSegments && uri.pathSegments.slice(0)) || [];
             this.version = (uri && uri.version && S.apply({}, uri.version)) || { major: 1, minor: 0 };
+        },
+        clone: function() {
+            return new Sage.SData.Client.SDataUri(this);
         },
         getVersion: function() {
             return this.version;
@@ -870,6 +924,9 @@
 
             return this;
         },
+        toString: function(excludeQuery) {
+            return this.build(excludeQuery);
+        },
         build: function(excludeQuery) {
             var url = [];
 
@@ -1021,7 +1078,13 @@
 (function(){
     var S = Sage,
         C = Sage.namespace('Sage.SData.Client'),
-        isDefined = function(value) { return typeof value !== 'undefined' };
+        isDefined = function(value) { return typeof value !== 'undefined' },
+        unwrap = function(value) {
+            return value && value['#text']
+                ? value['#text']
+                : value;
+        },
+        nsRE = /^(.+?):(.*)$/;
 
     Sage.SData.Client.SDataService = Sage.Evented.extend({
         uri: null,
@@ -1188,10 +1251,15 @@
         },
         executeRequest: function(request, options, ajax) {
             /// <param name="request" type="Sage.SData.Client.SDataBaseRequest">request object</param>
+            
+            // todo: temporary fix for SalesLogix Dynamic Adapter only supporting json selector in format parameter
+            if (this.json) request.setQueryArg('format', 'json');
+
             var o = S.apply({
+                async: options.async,
                 headers: {},
                 method: 'GET',
-                async: options.async
+                url: request.build()
             }, {
                 scope: this,
                 success: function(response, opt) {
@@ -1228,11 +1296,6 @@
                 o.password = this.password;
             }
 
-            // todo: temporary fix for SalesLogix Dynamic Adapter only supporting json selector in format parameter
-            if (this.json) request.setQueryArg('format', 'json');
-
-            o.url = request.build();
-
             this.fireEvent('beforerequest', request, o);
 
             /* if the event provided its own result, do not execute the ajax call */
@@ -1253,13 +1316,37 @@
             /// <param name="request" type="Sage.SData.Client.SDataResourceCollectionRequest">request object</param>
             options = options || {};
 
-            return this.executeRequest(request, options, {
+            if (this.batchScope)
+            {
+                this.batchScope.add({
+                    url: request.build(),
+                    method: 'GET'
+                });
+
+                return;
+            }
+
+            var ajax = {
                 headers: {
                     'Accept': this.json
                         ? 'application/json,*/*'
                         : 'application/atom+xml;type=feed,*/*'
                 }
-            });
+            };
+
+            if (options.httpMethodOverride)
+            {
+                // todo: temporary fix for SalesLogix Dynamic Adapter only supporting json selector in format parameter
+                // todo: temporary fix for `X-HTTP-Method-Override` and the SalesLogix Dynamic Adapter
+                if (this.json) request.setQueryArg('format', 'json');
+
+                ajax.headers['X-HTTP-Method-Override'] = 'GET';
+                ajax.method = 'POST';
+                ajax.body = request.build();
+                ajax.url = request.build(true); // exclude query
+            }
+
+            return this.executeRequest(request, options, ajax);
         },
         readEntry: function(request, options) {
             /// <param name="request" type="Sage.SData.Client.SDataSingleResourceRequest">request object</param>
@@ -1477,15 +1564,16 @@
         commitBatch: function(request, options) {
             options = options || {};
 
-            var item,
+            var items = request.getItems(),
+                item,
                 entry,
                 feed = {
                     '$resources': []
                 };
 
-            for (var i = 0; i < request.items.length; i++)
+            for (var i = 0; i < items.length; i++)
             {
-                item = request.items[i];
+                item = items[i];
                 entry = S.apply({}, item.entry); /* only need a shallow copy as only top-level properties will be modified */
 
                 if (item.url) entry['$url'] = item.url;
@@ -1545,6 +1633,8 @@
 
             for (var fqPropertyName in value)
             {
+                if (fqPropertyName.charAt(0) === '@') continue;
+                
                 firstChild = value[fqPropertyName];
                 break; // will always ever be one property, either an entity, or an array of
             }
@@ -1569,77 +1659,74 @@
             applyTo['$url'] = entity['@sdata:uri'];
             applyTo['$uuid'] = entity['@sdata:uuid'];
 
-            var prefix = ns ? ns + ':' : false;
-
             for (var fqPropertyName in entity)
             {
-                if (fqPropertyName[0] === '@') continue;
+                if (fqPropertyName.charAt(0) === '@') continue;
 
-                if (!prefix || fqPropertyName.indexOf(prefix) === 0)
+                var hasNS = nsRE.exec(fqPropertyName),
+                    propertyNS = hasNS ? hasNS[1] : false,
+                    propertyName = hasNS ? hasNS[2] : fqPropertyName,
+                    value = entity[fqPropertyName];
+
+                if (typeof value === 'object')
                 {
-                    var propertyName = prefix ? fqPropertyName.substring(prefix.length) : fqPropertyName,
-                        value = entity[fqPropertyName];
-
-                    if (typeof value === 'object')
+                    if (value.hasOwnProperty('@xsi:nil')) // null
                     {
-                        if (value.hasOwnProperty('@xsi:nil')) // null
-                        {
-                            var converted = null;
-                        }
-                        else if (this.isIncludedReference(ns, propertyName, value)) // included reference
-                        {
-                            var converted = this.convertEntity(ns, propertyName, value);
-                        }
-                        else if (this.isIncludedCollection(ns, propertyName, value)) // included collection
-                        {
-                            var converted = this.convertEntityCollection(ns, propertyName, value);
-                        }
-                        else // no conversion, read only
-                        {                            
-                            converted = this.convertCustomEntityProperty(ns, propertyName, value);
-                        }
-
-                        value = converted;
+                        var converted = null;
+                    }
+                    else if (this.isIncludedReference(propertyNS, propertyName, value)) // included reference
+                    {
+                        var converted = this.convertEntity(propertyNS, propertyName, value);
+                    }
+                    else if (this.isIncludedCollection(propertyNS, propertyName, value)) // included collection
+                    {
+                        var converted = this.convertEntityCollection(propertyNS, propertyName, value);
+                    }
+                    else // no conversion, read only
+                    {
+                        converted = this.convertCustomEntityProperty(propertyNS, propertyName, value);
                     }
 
-                    applyTo[propertyName] = value;
+                    value = converted;
                 }
+
+                applyTo[propertyName] = value;
             }
 
             return applyTo;
         },
         convertEntityCollection: function(ns, name, collection) {
-            var prefix = ns ? ns + ':' : false;
-
             for (var fqPropertyName in collection)
             {
-                if (!prefix || fqPropertyName.indexOf(prefix) === 0)
+                if (fqPropertyName.charAt(0) === '@') continue;
+
+                var hasNS = nsRE.exec(fqPropertyName),
+                    propertyNS = hasNS ? hasNS[1] : false,
+                    propertyName = hasNS ? hasNS[2] : fqPropertyName,
+                    value = collection[fqPropertyName];
+
+                if (S.isArray(value))
                 {
-                    var propertyName = prefix ? fqPropertyName.substring(prefix.length) : fqPropertyName,
-                        value = collection[fqPropertyName];
+                    var converted = [];
 
-                    if (S.isArray(value))
-                    {
-                        var converted = [];
+                    for (var i = 0; i < value.length; i++)
+                        converted.push(this.convertEntity(ns, propertyName, value[i]));
 
-                        for (var i = 0; i < value.length; i++)
-                            converted.push(this.convertEntity(ns, propertyName, value[i]));
-
-                        return {
-                            '$resources': converted
-                        };
-                    }
-                    else
-                    {
-                        return {
-                            '$resources': [
-                                this.convertEntity(ns, propertyName, value)
-                            ]
-                        };
-                    }
-
-                    break; // will always ever be one property, either an entity, or an array of
+                    return {
+                        '$resources': converted
+                    };
                 }
+                else
+                {
+                    return {
+                        '$resources': [
+                            this.convertEntity(ns, propertyName, value)
+                        ]
+                    };
+                }
+
+                break; // will always ever be one property, either an entity, or an array of
+
             }
 
             return null;
@@ -1659,7 +1746,7 @@
 
             for (var propertyName in entity)
             {
-                if (propertyName[0] === '$') continue;
+                if (propertyName.charAt(0) === '$') continue;
 
                 var value = entity[propertyName];
 
@@ -1707,6 +1794,7 @@
 
             for (var key in payload)
             {
+                if (key.charAt(0) === '@') continue;
                 if (payload.hasOwnProperty(key) == false) continue;
 
                 var parts = key.split(':'),
@@ -1763,13 +1851,13 @@
             var result = {};
 
             if (feed['opensearch:totalResults'])
-                result['$totalResults'] = parseInt(feed['opensearch:totalResults']);
+                result['$totalResults'] = parseInt(unwrap(feed['opensearch:totalResults']));
 
             if (feed['opensearch:startIndex'])
-                result['$startIndex'] = parseInt(feed['opensearch:startIndex']);
+                result['$startIndex'] = parseInt(unwrap(feed['opensearch:startIndex']));
 
             if (feed['opensearch:itemsPerPage'])
-                result['$itemsPerPage'] = parseInt(feed['opensearch:itemsPerPage']);
+                result['$itemsPerPage'] = parseInt(unwrap(feed['opensearch:itemsPerPage']));
 
             if (feed['link'])
             {
