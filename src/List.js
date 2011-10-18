@@ -17,11 +17,10 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
 
     dojo.declare('Sage.Platform.Mobile.SelectionModel', null, {
         count: 0,
-        selections: null,
+        selections: {},
         clearAsDeselect: true,
         _fireEvents: true,
         constructor: function(options) {
-
             dojo.mixin(this, options);
         },
         suspendEvents: function() {
@@ -76,7 +75,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             if (this._fireEvents) this.onClear(this);
         },
         isSelected: function(key) {
-            return !!this.selections[key];
+            return this.selections[key];
         },
         getSelectionCount: function() {
             return this.count;
@@ -118,7 +117,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
      * @extends Sage.Platform.Mobile.View
      * @param {Object} options The options for the view
      */
-    dojo.declare('Sage.Platform.Mobile.List', [Sage.Platform.Mobile.View], {
+    return dojo.declare('Sage.Platform.Mobile.List', [Sage.Platform.Mobile.View], {
         attributeMap: {
             listContent: {node: 'contentNode', type: 'innerHTML'},
             remainingContent: {node: 'remainingContentNode', type: 'innerHTML'}
@@ -405,6 +404,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
          * @type {String}
          */
         requestErrorText: 'A server error occurred while requesting data.',
+        customizationSet: 'list',
         _selectionModel: null,
         _selectionConnects: null,
         _setSelectionModelAttr: function(selectionModel) {
@@ -431,7 +431,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
 
             if (this._selectionModel == null) this.set('selectionModel', new Sage.Platform.Mobile.ConfigurableSelectionModel());
 
-            this.connect(App, App.onRefresh, this._onRefresh);
+            this.connect(App, 'onRefresh', this._onRefresh);
 
             this.clear();
         },
@@ -466,14 +466,30 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             }
         },
         _onSelectionModelSelect: function(key, data, tag) {
-            var el = dojo.byId(tag);
+            var el = dojo.byId(tag) || dojo.query('li[data-key="'+key+'"]', this.domNode)[0];
             if (el) dojo.addClass(el, 'list-item-selected');
         },
         _onSelectionModelDeselect: function(key, data, tag) {
-            var el = dojo.byId(tag);
+            var el = dojo.byId(tag) || dojo.query('li[data-key="'+key+'"]', this.domNode)[0];
             if (el) dojo.removeClass(el, 'list-item-selected');
         },
         _onSelectionModelClear: function() {
+        },
+        loadPreviousSelections: function(){
+            if(!this.options || !this.options.previousSelections)
+                return false;
+
+            var selections = this.options.previousSelections,
+                selectionsLength = selections.length,
+                i,
+                data,
+                key;
+
+            for(i = 0; i < selectionsLength; i += 1){
+                data = selections[i];
+                key = data;
+                this._selectionModel.select(key, data);
+            }
         },
         _onRefresh: function(options) {
             if (this.resourceKind && options.resourceKind === this.resourceKind)
@@ -493,8 +509,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             {
                 if (this._selectionModel && this.isNavigationDisabled())
                 {
-                    this._selectionModel.toggle(params.key, this.entries[params.key], params.$source);
-
+                    this._selectionModel.toggle(params.key, this.entries[params.key] || params.descriptor, params.$source);
                     if (this.options.singleSelect && this.options.singleSelectAction)
                     {
                         if (App.bars['tbar'])
@@ -585,7 +600,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
         formatRelatedQuery: function(entry, fmt, property) {
             var property = property || '$key';
 
-            return String.format(fmt, Sage.Platform.Mobile.Utility.getValue(entry, property));
+            return dojo.string.substitute(fmt, [Sage.Platform.Mobile.Utility.getValue(entry, property)]);
         },
         createRequest:function() {
             /// <summary>
@@ -678,7 +693,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             if (!this.feed) this.set('listContent', '');
 
             this.feed = feed;
-
             if (this.feed['$totalResults'] === 0)
             {
                 this.set('listContent', this.noDataTemplate.apply(this));                
@@ -825,16 +839,24 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             if (this._selectionModel && !this.isSelectionDisabled())
                 this._selectionModel.useSingleSelection(this.options.singleSelect);
 
-            if (this.refreshRequired)
-            {
+            if (this.refreshRequired) {
                 this.clear();
-            }
-            else
-            {
+            } else {
                 // if enabled, clear any pre-existing selections
                 if (this._selectionModel && this.autoClearSelection)
                     this._selectionModel.clear();
             }
+        },
+        transitionTo: function(){
+            if(this._selectionModel && this.options){
+                this.loadPreviousSelections();
+            }
+            this.inherited(arguments);
+        },
+        beforeTransitionAway: function(){
+            if(this._selectionModel)
+                this._selectionModel.clear();
+            this.inherited(arguments);
         },
         refresh: function() {
             this.requestData();
@@ -862,5 +884,4 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             this.set('listContent', this.loadingTemplate.apply(this));
         }
     });
-    
 });

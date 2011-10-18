@@ -318,6 +318,7 @@
 }
 
 /* edit/insert */
+.row > div > input:not([type|=radio]):not([type|=checkbox]),
 .row > input:not([type|=radio]):not([type|=checkbox])
 {
     height: auto;
@@ -330,6 +331,9 @@
     display: none;
 }
 
+.row-disabled > div > button,
+.row-disabled > div > input,
+.row-disabled > div > div,
 .row-disabled > button,
 .row-disabled > input,
 .row-disabled > div
@@ -338,6 +342,13 @@
     cursor: default;
 }
 
+.row-edit[data-field-type="picklist"] > div > .button,
+.row-edit[data-field-type="lookup"] > div > .button,
+.row-edit[data-field-type="select"] > div > .button,
+.row-edit[data-field-type="address"] > div > .button,
+.row-edit[data-field-type="name"] > div > .button,
+.row-edit[data-field-type="date"] > div > .button,
+.row-edit[data-field-type="note"] > div > .button,
 .row-edit[data-field-type="picklist"] > .button,
 .row-edit[data-field-type="lookup"] > .button,
 .row-edit[data-field-type="select"] > .button,
@@ -352,6 +363,12 @@
     right: 4px;
 }
 
+.row-edit[data-field-type="picklist"] > div > input,
+.row-edit[data-field-type="lookup"] > div > input,
+.row-edit[data-field-type="select"] > div > input,
+.row-edit[data-field-type="name"] > div > input,
+.row-edit[data-field-type="date"] > div > input,
+.row-edit[data-field-type="note"] > div > input,
 .row-edit[data-field-type="picklist"] > input,
 .row-edit[data-field-type="lookup"] > input,
 .row-edit[data-field-type="select"] > input,
@@ -362,14 +379,27 @@
     padding: 8px 34px 8px 110px !important;
 }
 
+.row-edit[data-field-type="note"] > div > textarea,
 .row-edit[data-field-type="note"] > textarea
 {
     padding: 8px 34px 8px 110px !important;
     height: 5em;
     overflow: hidden;
 }
-
-.row-edit[data-field-type="address"] > div
+.row-edit[data-field-type="duration"] > div > input
+{
+    margin-left: 110px !important;
+    padding: 3px !important;
+    width: 50px !important;
+    border: 1px solid #000 !important;
+}
+.row-edit[data-field-type="duration"] > div > select
+{
+    height: 30px;
+    display: inline-block;
+    margin-left: 12px;
+}
+.row-edit[data-field-type="address"] > div > div
 {
     min-height: 1.5em !important;
     padding: 4px 34px 4px 110px !important;
@@ -451,7 +481,7 @@ input.text-input {
     margin-top: 6px;
 }
 
-.time-content > .date-tt
+.time-content .date-tt
 {
     width: 100px;
     height: 18px;
@@ -461,21 +491,14 @@ input.text-input {
     display: inline-block;
 }
 
-.time-content > .date-tt > .toggle
+.time-content .date-tt > .toggle
 {
     height: 28px;
 }
 
-.time-content > .date-tt > .toggle > .thumb
+.time-content .date-tt > .toggle > .thumb
 {
     top: 0px;
-}
-
-.time-content > input.hour-field,
-.time-content > input.minute-field
-{
-    width: 36px;
-    padding-left: 6px;
 }
 
 .calendar-day
@@ -548,7 +571,6 @@ input.text-input {
 
 .time-content > .date-tt > .toggle
 {
-    background-color: #69923A;
     border: 1px solid #1a250f;
     background-color: #69923a;
     background-image: linear-gradient(bottom, #4f6e2c, #35491d);
@@ -576,7 +598,94 @@ input.text-input {
 {
     width: 60px;
 }
+body.landscape > #generic_calendar > #datetime-picker {
+    width:100%;
+    text-align:center;
+}
 
+body.landscape > #generic_calendar > #datetime-picker > .calendar-content,
+body.landscape > #generic_calendar > #datetime-picker > .time-content
+{
+    display:inline-block;
+    padding: 0px !important;
+}
+body.landscape > #generic_calendar > #datetime-picker > .time-content
+{
+    margin-left: 18px;
+}
+
+#datetime-picker { padding-bottom: 2em; }
+
+#datetime-picker div.time-content-hidden {
+    display:none !important;
+}
+#datetime-picker table {
+    border-spacing: 6px 0px;
+    padding: 2px;
+    margin: 0.5em auto 0;
+    text-align:center;
+}
+#datetime-picker div.calendar-content { padding-bottom: 0; }
+#datetime-picker div.date-tt { margin: 0; }
+#datetime-picker table caption { padding: 4px; }
+.ext-webkit #datetime-picker table caption { width: 100%; } /* Webkit caption does not match table width by default */
+#datetime-picker td
+{
+    padding: 0;
+    margin: 0;
+    border: 0;
+    text-align:center;
+    width: 64px;
+}
+#datetime-picker td>select {
+    font-size: 1.5em;
+    height: 34px;
+    line-height: 34px;
+    border: none;
+    margin: 0;
+    padding:0;
+    -webkit-appearance: listbox;
+    -moz-appearance: listbox;
+    appearance: listbox;
+    position: relative; /* Fix android browser issue with -webkit-transform blocking <select> */
+}
+#datetime-picker .datetime-selects td {
+    border: none;
+    border-left: 1px solid #b3b3b3;
+    border-right: 1px solid #b3b3b3;
+}
+#datetime-picker td>button {
+    display: block;
+    font-size: 1.5em;
+    width: 100%;
+    margin: 0;
+    height: 46px;
+    line-height: 44px;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+}
+#datetime-picker .plus > td > button
+{
+    -moz-border-radius-topleft: 3px;
+    -moz-border-radius-topright: 3px;
+    -moz-border-radius-bottomright: 0px;
+    -moz-border-radius-bottomleft: 0px;
+    -webkit-border-radius: 3px 3px 0px 0px;
+    border-radius: 3px 3px 0px 0px;
+}
+#datetime-picker .minus > td > button
+{
+    -moz-border-radius-topleft: 0px;
+    -moz-border-radius-topright: 0px;
+    -moz-border-radius-bottomright: 3px;
+    -moz-border-radius-bottomleft: 3px;
+    -webkit-border-radius: 0px 0px 3px 3px;
+    border-radius: 0px 0px 3px 3px;
+}
+#datetime-picker .datetime-tt {
+    border: none !important;
+}
 .collapsed
 {
     margin-bottom: -1px !important;
@@ -599,7 +708,7 @@ h2 > .collapsed-indicator
 .collapsed + fieldset,
 .collapsed + div
 {
-    display: none;
+    display: none !important;
 }
 
 .action-list > li > a.disabled

@@ -12,43 +12,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Controls/Field'], function() {
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
-    Sage.Platform.Mobile.Controls.EditorField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {
-        template: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<input type="text" />'
-        ]),
+    return dojo.declare('Sage.Platform.Mobile.Controls.EditorField', [Sage.Platform.Mobile.Controls.Field], {
+        // Localization
         lookupLabelText: 'edit',
         lookupText: '...',
         emptyText: 'empty',
         completeText: 'Ok',
+
+        widgetTemplate: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
+            '<input data-dojo-attach-point="inputNode" type="text" />'
+        ]),
+        attributeMap: {
+            inputValue: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'value'
+            }
+        },
         formatValue: function(val) {
             return '';
         },
         init: function() {
-            Sage.Platform.Mobile.Controls.EditorField.superclass.init.apply(this, arguments);
-
-            this.containerEl.on('click', this.onClick, this, {stopEvent: true});
+            this.inherited(arguments);
+            dojo.connect(this.containerNode, "onclick", this, this.onClick, true);
         },
         enable: function() {
-            Sage.Platform.Mobile.Controls.EditorField.superclass.enable.apply(this, arguments);
-
+            this.inherited(arguments);
             this._enableTextElement();
         },
         _enableTextElement: function() {
-            this.el.dom.disabled = false;
+            this.inputNode.disabled = false;
         },
         disable: function() {
-            Sage.Platform.Mobile.Controls.EditorField.superclass.disable.apply(this, arguments);
-
+            this.inherited(arguments);
             this._disableTextElement();
         },
         _disableTextElement: function() {
-            this.el.dom.disabled = true;
+            this.inputNode.disabled = true;
         },
         createNavigationOptions: function() {
             return {
@@ -81,9 +85,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 view.show(options);
             }
         },
-        onClick: function(evt, el, o) {
-            evt.stopEvent();
-
+        onClick: function(evt) {
+            dojo.stopEvent(evt);
             this.navigateToEditView();
         },
         getValuesFromView: function() {
@@ -127,24 +130,24 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
             // requests created in this state (the pre-flight request is made, and the request ends with status 0).
             // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
-            if (success) setTimeout(this.onChange.createDelegate(this), 0);
+            if (success) setTimeout(dojo.hitch(this, this.onChange), 0);
         },
         onChange: function() {
-            this.fireEvent('change', this.currentValue, this);
+            this.change(this.currentValue);
         },
         setText: function(text) {
-            this.el.dom.value = text;
-        },        
+            this.set('inputValue', text);
+        },
         isDirty: function() {
             return this.originalValue !== this.currentValue;
         },
         getValue: function() {
             return this.currentValue;
         },
-        validate: function(value) {            
+        validate: function(value) {
             return typeof value === 'undefined'
                 ? Sage.Platform.Mobile.Controls.EditorField.superclass.validate.call(this, this.validationValue)
-                : Sage.Platform.Mobile.Controls.EditorField.superclass.validate.apply(this, arguments);
+                : this.inherited(arguments);
         },
         setValue: function(val, initial)
         {            
@@ -169,4 +172,4 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             this.setValue(null, true);
         }
     });
-})();
+});

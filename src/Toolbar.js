@@ -15,7 +15,7 @@
 
 define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_Templated'], function() {
 
-    dojo.declare('Sage.Platform.Mobile.Toolbar', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
+    return dojo.declare('Sage.Platform.Mobile.Toolbar', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
         widgetTemplate: new Simplate([
             '<div class="toolbar">',
             '</div>'
@@ -45,7 +45,7 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
                 {
                     var view = App.getPrimaryActiveView();
                     if (view && view.hasAction(source.action))
-                        view.invokeAction(source.action, Ext.apply(parameters, {'$tool': source}), evt, el);
+                        view.invokeAction(source.action, dojo.mixin(parameters, {'$tool': source}), evt, el);
                 }
             }
         },
@@ -93,6 +93,8 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
         },
         showTools: function(tools) {
             this.tools = {};
+            // fix until all views correctly return a tools object
+            if(!tools) return;
 
             for (var i = 0; i < tools.length; i++)
                 this.tools[tools[i].id] = {
@@ -103,4 +105,3 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
         }
     });
 });
-

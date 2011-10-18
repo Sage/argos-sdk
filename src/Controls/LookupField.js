@@ -12,19 +12,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Controls/Field','Sage/Platform/Mobile/Utility'], function() {
+    dojo.declare('Sage.Platform.Mobile.Controls.LookupField', [Sage.Platform.Mobile.Controls.Field], {
+        // Localization
+        dependentErrorText: "A value for '${0}' must be selected.",
+        emptyText: '',
+        completeText: 'Select',
+        lookupLabelText: 'lookup',
+        lookupText: '...',
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
-    var U = Sage.Platform.Mobile.Utility;
-
-    Sage.Platform.Mobile.Controls.LookupField = Ext.extend(Sage.Platform.Mobile.Controls.Field, {        
-        template: new Simplate([
+        widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',
-            '<input type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
+            '<input data-dojo-attach-point="inputNode" type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
-        dependentErrorText: "A value for '{0}' must be selected.",
+        attributeMap: {
+            inputValue: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'value'
+            },
+            inputDisabled: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'disabled'
+            },
+            inputReadOnly: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'readonly'
+            }
+        },
         view: false,
         keyProperty: '$key',
         textProperty: '$descriptor',
@@ -33,50 +51,42 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         valueKeyProperty: null,
         valueTextProperty: null,
         requireSelection: true,
-        emptyText: '',
-        completeText: 'Select',
-        lookupLabelText: 'lookup',
-        lookupText: '...',
         init: function() {
-            Sage.Platform.Mobile.Controls.LookupField.superclass.init.apply(this, arguments);
+            this.inherited(arguments);
 
-            this.containerEl.on('click', this.onClick, this);
+            dojo.connect(this.containerNode, 'onclick', this, this.onClick);
 
-            if (this.isReadOnly())
-            {
+            if (this.isReadOnly()) {
                 this.disable();
-                this.el.dom.readOnly = true;
-            }
-            else if (!this.requireSelection)
-            {
-                this.el
-                    .on('keyup', this.onKeyUp, this)
-                    .on('blur', this.onBlur, this);
+                this.set('inputReadOnly', true);
+            } else {
+                if (!this.requireSelection) {
+                    dojo.connect(this.inputNode, 'onkeyup', this, this.onKeyUp);
+                    dojo.connect(this.inputNode, 'onblur', this, this.onBlur);
+                }
             }
         },
         enable: function() {
-            Sage.Platform.Mobile.Controls.EditorField.superclass.enable.apply(this, arguments);
+            this.inherited(arguments);
 
-            this.el.dom.disabled = false;
+            this.set('inputDisabled', false);
         },
         disable: function() {
-            Sage.Platform.Mobile.Controls.EditorField.superclass.disable.apply(this, arguments);
+            this.inherited(arguments);
 
-            this.el.dom.disabled = true;
+            this.set('inputDisabled', true);
         },  
         isReadOnly: function() {
             return !this.view;
         },
         getDependentValue: function() {
-            if (this.dependsOn && this.owner)
-            {
+            if (this.dependsOn && this.owner) {
                 var field = this.owner.fields[this.dependsOn];
                 if (field) return field.getValue();
             }
         },
         getDependentLabel: function() {
-            if (this.dependsOn && this.owner)
-            {
+            if (this.dependsOn && this.owner) {
                 var field = this.owner.fields[this.dependsOn];
                 if (field) return field.label;
             }
@@ -108,27 +118,26 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                         fn: ReUI.back,
                         scope: ReUI
                     }]
-                }
-            };
-
-            if (options.singleSelect && options.singleSelectAction) {
-                Ext.each(options.tools.tbar, function(t) {
-                    if( t.id == options.singleSelectAction ) {
-                        t.cls = 'invisible';
                     }
-                });
-            }
-
-            var expand = ['resourceKind', 'resourcePredicate', 'where'],
+                },
+                item,
+                expand = ['resourceKind', 'resourcePredicate', 'where'],
                 dependentValue = this.getDependentValue();
 
-            if (this.dependsOn && !dependentValue)
-            {
-                alert(String.format(this.dependentErrorText, this.getDependentLabel()));
+            if (options.singleSelect && options.singleSelectAction) {
+                for(item in options.tools.tbar){
+                    if( item.id == options.singleSelectAction ) {
+                        item.cls = 'invisible';
+                    }
+                }
+            }
+
+            if (this.dependsOn && !dependentValue) {
+                alert(dojo.string.substitute(this.dependentErrorText, [this.getDependentLabel()]));
                 return false;
             }
 
-            Ext.each(expand, function(item) {
+            dojo.forEach(expand, function(item) {
                 if (this[item])
                     options[item] = this.dependsOn // only pass dependentValue if there is a dependency
                         ? this.expandExpression(this[item], dependentValue)
@@ -147,10 +156,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 view.show(options);
         },
         onClick: function(evt, el, o) {
-            if (!this.isDisabled() && (evt.getTarget('.button') || this.requireSelection))
-            {
-                evt.stopEvent();                
-                
+            // todo: is evt.target always the button or need an ancestor traverser?
+            if (!this.isDisabled() &&
+                ((dojo.hasClass(evt.target, 'button') || dojo.hasClass(evt.target.parentNode, 'button'))
+                    || this.requireSelection)) {
+                dojo.stopEvent(evt);
                 this.navigateToListView();
             }
         },
@@ -166,35 +176,44 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             var currentValue = this.getValue();
 
             if (this.previousValue != currentValue)
-                this.fireEvent('change', currentValue, this);
+                this.change(currentValue, this);
 
             this.previousValue = currentValue;
         },
         setText: function(text) {
-            this.el.dom.value = text;
+            this.set('inputValue', text);
 
             this.previousValue = text;
         },
         getText: function() {
-            return this.el.dom.value;
+            return this.get('inputValue');
         },
         complete: function() {
             // todo: should there be a better way?
-            var view = App.getPrimaryActiveView();
-            if (view && view.selectionModel)
-            {
-                var selections = view.selectionModel.getSelections();
+            var view = App.getPrimaryActiveView(),
+                selections,
+                values = [];
 
-                if (0 == view.selectionModel.getSelectionCount() && view.options.allowEmptySelection)
-                    this.clearValue( true );
+            if (view && view._selectionModel) {
+                selections = view._selectionModel.getSelections();
 
-                for (var selectionKey in selections)
-                {
+                if (0 == view._selectionModel.getSelectionCount() && view.options.allowEmptySelection)
+                    this.clearValue(true);
+
+                for (var selectionKey in selections) {
                     var val = selections[selectionKey].data,
                         success = true;
 
-                    this.setSelection(val, selectionKey);
-                    break;
+                    if(view.multi){
+                        values.push(val);
+
+                    } else {
+                        this.setSelection(val, selectionKey);
+                        break;
+                    }
+                }
+                if(view.multi) {
+                    this.setText(values.join(', '));
                 }
 
                 ReUI.back();
@@ -203,11 +222,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
                 // requests created in this state (the pre-flight request is made, and the request ends with status 0).
                 // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
-                if (success) setTimeout(this.onChange.createDelegate(this), 0);
+                if (success) setTimeout(this.onChange.bindDelegate(this), 0);
             }
         },
         onChange: function() {
-            this.fireEvent('change', this.currentValue, this);
+            this.change(this.currentValue, this);
         },
         isDirty: function() {
             if (this.originalValue && this.currentValue)
@@ -256,7 +275,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     : false,
                 textProperty = this.valueTextProperty !== false
                     ? this.valueTextProperty || this.textProperty
-                    : false;
+                    : false,
+                U = Sage.Platform.Mobile.Utility;
 
             if (keyProperty || textProperty)
             {
@@ -302,7 +322,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return value;
         },
         setSelection: function(val, key) {
-            var key = U.getValue(val, this.keyProperty, val) || key, // if we can extract the key as requested, use it instead of the selection key
+            var U = Sage.Platform.Mobile.Utility,
+                key = U.getValue(val, this.keyProperty, val) || key, // if we can extract the key as requested, use it instead of the selection key
                 text = U.getValue(val, this.textProperty);
 
             if (text && this.textTemplate)
@@ -322,7 +343,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         setValue: function(val, initial) {
             // if valueKeyProperty or valueTextProperty IS NOT EXPLICITLY set to false
             // and IS NOT defined use keyProperty or textProperty in its place.
-            var key,
+            var U = Sage.Platform.Mobile.Utility,
+                key,
                 text,
                 keyProperty = this.valueKeyProperty !== false
                     ? this.valueKeyProperty || this.keyProperty
@@ -331,8 +353,14 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     ? this.valueTextProperty || this.textProperty
                     : false;
 
-            if (keyProperty || textProperty)
-            {
+            if (typeof val === 'undefined' || val == null) {
+                this.currentValue = false;
+                if (initial) this.originalValue = this.currentValue;
+                this.setText(this.requireSelection ? this.emptyText : '');
+                return false;
+            }
+
+            if (keyProperty || textProperty) {
                 if (keyProperty)
                     key = U.getValue(val, keyProperty);
 
@@ -344,8 +372,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 else if (this.textRenderer)
                     text = this.textRenderer.call(this, val, key, text);
 
-                if (key || text)
-                {
+                if (key || text) {
                     this.currentValue = {
                         key: key || text,
                         text: text || key
@@ -354,46 +381,31 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     if (initial) this.originalValue = this.currentValue;
 
                     this.setText(this.currentValue.text);
-                }
-                else
-                {
+                } else {
                     this.currentValue = false;
 
                     if (initial) this.originalValue = this.currentValue;
 
                     this.setText(this.requireSelection ? this.emptyText : '');    
                 }
+            } else {
+                key = val;
+                text = val;
+
+                if (text && this.textTemplate)
+                    text = this.textTemplate.apply(text, this);
+                else if (this.textRenderer)
+                    text = this.textRenderer.call(this, val, key, text);
+
+                this.currentValue = {
+                    key: key,
+                    text: text
+                };
+
+                if (initial) this.originalValue = this.currentValue;
+
+                this.setText(text);
             }
-            else
-            {
-                if (val !== undefined && val !== null)
-                {
-                    key = val;
-                    text = val;
-
-                    if (text && this.textTemplate)
-                        text = this.textTemplate.apply(text, this);
-                    else if (this.textRenderer)
-                        text = this.textRenderer.call(this, val, key, text);
-
-                    this.currentValue = {
-                        key: key,
-                        text: text
-                    };
-
-                    if (initial) this.originalValue = this.currentValue;
-
-                    this.setText(text);
-                }
-                else
-                {
-                    this.currentValue = false;
-
-                    if (initial) this.originalValue = this.currentValue;
-
-                    this.setText(this.requireSelection ? this.emptyText : '');                
-                }
-            }        
         },
         clearValue: function(flag) {
             var initial = flag !== true;
@@ -403,4 +415,4 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('lookup', Sage.Platform.Mobile.Controls.LookupField);
-})();
+});

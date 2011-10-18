@@ -13,23 +13,21 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
-    Sage.Platform.Mobile.Controls.HiddenField = Ext.extend(Sage.Platform.Mobile.Controls.TextField, {
+define('Sage/Platform/Mobile/Controls/HiddenField', ['Sage/Platform/Mobile/Controls/TextField'], function() {
+    dojo.declare('Sage.Platform.Mobile.Controls.HiddenField', [Sage.Platform.Mobile.Controls.TextField], {
         propertyTemplate: new Simplate([
             '<div style="display: none;" data-field="{%= $.name %}" data-field-type="{%= $.type %}">',
             '</div>'
         ]),
-        template: new Simplate([
-            '<input type="hidden">'
+        widgetTemplate: new Simplate([
+            '<input data-dojo-attach-point="inputNode" type="hidden">'
         ]),
         enableClearButton: false,
         bind: function() {
             // call field's bind. we don't want event handlers for this.
-            Sage.Platform.Mobile.Controls.Field.prototype.bind.apply(this, arguments);
-        }       
+            this.inherited(arguments);
+        }
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('hidden', Sage.Platform.Mobile.Controls.HiddenField);
-})();
+});

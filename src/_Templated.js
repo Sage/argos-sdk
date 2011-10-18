@@ -17,7 +17,7 @@ define('Sage/Platform/Mobile/_Templated', ['dojo', 'dijit/_Widget'], function() 
 
     // not inheriting from dijit._Templated, but using similar functionality.
     // this is required for contentTemplate to work property.
-    dojo.declare('Sage.Platform.Mobile._Templated', null, {
+    return dojo.declare('Sage.Platform.Mobile._Templated', null, {
         constructor: function() {
             this._attachPoints = [];
             this._attachEvents = [];
@@ -37,8 +37,11 @@ define('Sage/Platform/Mobile/_Templated', ['dojo', 'dijit/_Widget'], function() 
             {
                 var root = dojo._toDom(this.widgetTemplate.apply(this));
 
+                if (root.nodeType === 11)
+                    root = dojo._toDom(['<div>', this.widgetTemplate.apply(this), '</div>'].join(''));
+
                 if (root.nodeType !== 1)
-                    throw new Error('Invalid template.');
+                    throw new Error('Invalid template. Node type is: '+root.nodeType);
 
                 this.domNode = root;
 
@@ -216,5 +219,4 @@ define('Sage/Platform/Mobile/_Templated', ['dojo', 'dijit/_Widget'], function() 
             this.inherited(arguments);
         }
     });
-
 });

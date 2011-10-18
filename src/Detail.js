@@ -13,17 +13,20 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile');
+define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Utility', 'Mobile/SalesLogix/Format'], function() {
 
-(function() {
-    Sage.Platform.Mobile.Detail = Ext.extend(Sage.Platform.Mobile.View, {
-        attachmentPoints: {
-            contentEl: '.panel-content'
+    return dojo.declare('Sage.Platform.Mobile.Detail', [Sage.Platform.Mobile.View], {
+        attributeMap: {
+            detailContent: {node: 'contentNode', type: 'innerHTML'}
         },
-        viewTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="detail panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
+        /**
+         * The template used to render the view's main DOM element when the view is initialized.
+         * This template includes {@link #searchTemplate} and {@link #moreTemplate}.
+         */
+        widgetTemplate: new Simplate([
+            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="detail panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
             '{%! $.loadingTemplate %}',
-            '<div class="panel-content"></div>',
+            '<div class="panel-content" dojoAttachPoint="contentNode"></div>',
             '</div>'
         ]),
         emptyTemplate: new Simplate([
@@ -32,7 +35,7 @@ Ext.namespace('Sage.Platform.Mobile');
             '<div class="panel-loading-indicator">',
             '<div class="row"><div>{%: $.loadingText %}</div></div>',
             '</div>'
-        ]),     
+        ]),
         sectionBeginTemplate: new Simplate([
             '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">',
             '{%: $.title %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
@@ -94,9 +97,6 @@ Ext.namespace('Sage.Platform.Mobile');
         ]),
         id: 'generic_detail',
         layout: null,
-        layoutCompiled: null,
-        layoutCompiledFrom: null,
-        enableCustomizations: true,
         customizationSet: 'detail',
         expose: false,
         editText: 'Edit',
@@ -107,35 +107,33 @@ Ext.namespace('Sage.Platform.Mobile');
         requestErrorText: 'A server error occurred while requesting data.',
         notAvailableText: 'The requested entry is not available.',
         editView: false,
-        init: function() {
-            Sage.Platform.Mobile.Detail.superclass.init.call(this);
 
-            this.tools.tbar = [{
-                id: 'edit',
-                action: 'navigateToEditView'
-            }];
-
+        postCreate: function() {
+            this.inherited(arguments);
+            this.connect(App, 'onRefresh', this._onRefresh);
             this.clear();
         },
-        initEvents: function() {
-            Sage.Platform.Mobile.Detail.superclass.initEvents.call(this);
-
-            App.on('refresh', this._onRefresh, this);
+        createToolLayout: function() {
+            return this.tools || (this.tools = {
+                'tbar': [{
+                    id: 'edit',
+                    action: 'navigateToEditView'
+                }]
+            });
         },
         invokeAction: function(name, parameters, evt, el) {
             if (parameters && /true/i.test(parameters['disableAction']))
                 return;
 
-            return Sage.Platform.Mobile.Detail.superclass.invokeAction.apply(this, arguments);
+            return this.inherited(arguments);
         },
         _onRefresh: function(o) {
-            if (this.options && this.options.key === o.key)
-            {
+            var descriptor = o.data && o.data['$descriptor'];
+
+            if (this.options && this.options.key === o.key) {
                 this.refreshRequired = true;
 
-                var descriptor = o.data && o.data['$descriptor'];
-                if (descriptor)
-                {
+                if (descriptor) {
                     this.options.title = descriptor;
                     this.set('title', descriptor);
                 }
@@ -144,18 +142,20 @@ Ext.namespace('Sage.Platform.Mobile');
         formatRelatedQuery: function(entry, fmt, property) {
             var property = property || '$key';
 
-            return String.format(fmt, Sage.Platform.Mobile.Utility.getValue(entry, property));
+            return dojo.string.substitute(fmt, [Sage.Platform.Mobile.Utility.getValue(entry, property)]);
         },
         toggleSection: function(params) {
-            var el = Ext.get(params.$source);
+            var el = dojo.byId(params.$source);
             if (el)
-                el.toggleClass('collapsed');
+                dojo.toggleClass(el, 'collapsed');
         },
         activateRelatedEntry: function(params) {
-            if (params.context) this.navigateToRelatedView(params.view, Ext.decode(params.context), params.descriptor);
+            if (params.context)
+                this.navigateToRelatedView(params.view, dojo.fromJson(params.context), params.descriptor);
         },
         activateRelatedList: function(params) {
-            if (params.context) this.navigateToRelatedView(params.view, Ext.decode(params.context), params.descriptor);
+            if (params.context)
+                this.navigateToRelatedView(params.view, dojo.fromJson(params.context), params.descriptor);
         },
         navigateToEditView: function() {
             var view = App.getView(this.editView);
@@ -163,23 +163,23 @@ Ext.namespace('Sage.Platform.Mobile');
                 view.show({entry: this.entry});
         },
         navigateToRelatedView: function(view, o, descriptor) {
-            if (typeof o === 'string')
-                var context = {
+            var context,
+                targetView;
+            if (typeof o === 'string') {
+                context = {
                     key: o,
                     descriptor: descriptor
                 };
-            else
-            {
-                var context = o;
+            } else {
+                context = o;
 
                 if (descriptor) context['descriptor'] = descriptor;
             }
 
-            if (context)
-            {
-                var v = App.getView(view);
-                if (v)
-                    v.show(context);
+            if (context) {
+                targetView = App.getView(view);
+                if (targetView)
+                    targetView.show(context);
             }
         },
         createRequest: function() {
@@ -190,7 +190,7 @@ Ext.namespace('Sage.Platform.Mobile');
             if (/(\s+)/.test(this.options.key))
                 request.setResourceSelector(this.options.key);
             else
-                request.setResourceSelector(String.format("'{0}'", this.options.key));
+                request.setResourceSelector(dojo.string.substitute("'${0}'", [this.options.key]));
 
             if (this.resourceKind)
                 request.setResourceKind(this.resourceKind);
@@ -225,20 +225,31 @@ Ext.namespace('Sage.Platform.Mobile');
         processLayout: function(layout, layoutOptions, entry)
         {
             var sectionQueue = [],
+                sectionQueueLength,
                 sectionStarted = false,
-                content = [];
+                content = [],
+                layoutLength = layout.length,
+                current,
+                include,
+                exclude,
+                provider,
+                value,
+                rendered,
+                formatted,
+                options = {},
+                context = {},
+                template,
+                i;
 
-            for (var i = 0; i < layout.length; i++)
-            {
-                var current = layout[i];
-                var include = this.expandExpression(current['include'], entry),
+            for (i = 0; i < layoutLength; i+=1) {
+                current = layout[i];
+                include = this.expandExpression(current['include'], entry);
                     exclude = this.expandExpression(current['exclude'], entry);
 
                 if (include !== undefined && !include) continue;
                 if (exclude !== undefined && exclude) continue;
 
-                if (current['as'])
-                {
+                if (current['as']) {
                     if (sectionStarted)
                         sectionQueue.push(current);
                     else
@@ -247,44 +258,40 @@ Ext.namespace('Sage.Platform.Mobile');
                     continue;
                 }
 
-                if (!sectionStarted)
-                {
+                if (!sectionStarted) {
                     sectionStarted = true;
                     content.push(this.sectionBeginTemplate.apply(layoutOptions, this));
                 }
 
-                var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue,
+                provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue;
                     value = typeof current['value'] === 'undefined'
                         ? provider(entry, current['name'])
                         : current['value'];
 
-                if (current['template'] || current['tpl'])
-                {
-                    var rendered = (current['template'] || current['tpl']).apply(value, this),
+                if (current['template'] || current['tpl']) {
+                    rendered = (current['template'] || current['tpl']).apply(value, this);
                         formatted = current['encode'] === true
                             ? Sage.Platform.Mobile.Format.encode(rendered)
                             : rendered;
                 }
-                else if (current['renderer'] && typeof current['renderer'] === 'function')
-                {
-                    var rendered = current['renderer'].call(this, value),
+                else if (current['renderer'] && typeof current['renderer'] === 'function') {
+                    rendered = current['renderer'].call(this, value);
                         formatted = current['encode'] === true
                             ? Sage.Platform.Mobile.Format.encode(rendered)
                             : rendered;
                 }
-                else
-                {
-                    var formatted = current['encode'] !== false
+                else {
+                    formatted = current['encode'] !== false
                         ? Sage.Platform.Mobile.Format.encode(value)
                         : value;
                 }
 
-                var options = Ext.apply({}, {
+                options = dojo.mixin({}, {
                     entry: entry,
                     value: formatted,
                     raw: value
                 }, current);
-        
+
                 if (current['descriptor'])
                     options['descriptor'] = typeof current['descriptor'] === 'function'
                         ? this.expandExpression(current['descriptor'], entry, value)
@@ -296,9 +303,8 @@ Ext.namespace('Sage.Platform.Mobile');
                 if (current['disabled'])
                     options['disabled'] = this.expandExpression(current['disabled'], entry, value);
 
-                if (current['view'])
-                {
-                    var context = {};
+                if (current['view']) {
+                    context = {};
                     if (current['key'])
                         context['key'] = typeof current['key'] === 'function'
                         ? this.expandExpression(current['key'], entry)
@@ -313,11 +319,11 @@ Ext.namespace('Sage.Platform.Mobile');
                         context['resourcePredicate'] = this.expandExpression(current['resourcePredicate'], entry);
 
                     options['view'] = current['view'];
-                    options['context'] = Ext.util.JSON.encode(context);
+                    options['context'] = dojo.toJson(context);
                 }
 
                 // priority: wrap > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
-                var template = current['wrap']
+                template = current['wrap']
                     ? current['wrap']
                     : current['view']
                         ? current['property'] === true
@@ -332,100 +338,15 @@ Ext.namespace('Sage.Platform.Mobile');
                 content.push(template.apply(options, this));
             }
 
-            if (sectionStarted) content.push(this.sectionEndTemplate.apply(layoutOptions, this));
+            if (sectionStarted)
+                content.push(this.sectionEndTemplate.apply(layoutOptions, this));
 
-            Ext.DomHelper.append(this.contentEl, content.join(''));
+            dojo.query(this.contentNode).append(content.join(''));
 
-            for (var i = 0; i < sectionQueue.length; i++)
-            {
-                var current = sectionQueue[i];
-
+            sectionQueueLength = sectionQueue.length;
+            for (i = 0; i < sectionQueueLength; i+=1) {
+                current = sectionQueue[i];
                 this.processLayout(current['as'], current['options'], entry);
-            }
-        },
-        compileLayout: function() {
-            var layout = this.createLayout(),
-                source = layout;
-            if (source === this.layoutCompiledFrom && this.layoutCompiled)
-                return this.layoutCompiled; // same layout, no changes
-      
-            if (this.enableCustomizations)
-            {
-                var customizations = App.getCustomizationsFor(this.customizationSet, this.id);
-                if (customizations && customizations.length > 0)
-                {
-                    layout = [];
-                    this.applyCustomizationsToLayout(source, customizations, layout);
-                }
-            }
-
-            this.layoutCompiled = layout;
-            this.layoutCompiledFrom = source;
-
-            return layout;
-        },
-        applyCustomizationsToLayout: function(layout, customizations, output) {
-            for (var i = 0; i < layout.length; i++)
-            {
-                var row = layout[i],
-                    insertRowsBefore = [],
-                    insertRowsAfter = [];
-
-                for (var j = 0; j < customizations.length; j++)
-                {
-                    var customization = customizations[j],
-                        stop = false;
-
-                    if (customization.at(row))
-                    {
-                        switch (customization.type)
-                        {
-                            case 'remove':
-                                // full stop
-                                stop = true;
-                                row = null;
-                                break;
-                            case 'replace':
-                                // full stop
-                                stop = true;
-                                row = this.expandExpression(customization.value, row);
-                                break;
-                            case 'modify':
-                                // make a shallow copy if we haven't already
-                                if (row === layout[i])
-                                    row = Ext.apply({}, row);
-                                row = Ext.apply(row, this.expandExpression(customization.value, row));
-                                break;
-                            case 'insert':
-                                (customization.where !== 'before'
-                                    ? insertRowsAfter
-                                    : insertRowsBefore
-                                ).push(this.expandExpression(customization.value, row));
-                                break;
-                        }
-                    }
-
-                    if (stop) break;
-                }
-
-                output.push.apply(output, insertRowsBefore);
-                if (row)
-                {
-                    if (row['as'])
-                    {
-                        // make a shallow copy if we haven't already
-                        if (row === layout[i])
-                            row = Ext.apply({}, row);
-
-                        var subLayout = row['as'],
-                            subLayoutOutput = (row['as'] = []);
-
-                        this.applyCustomizationsToLayout(subLayout, customizations, subLayoutOutput);
-                    }
-
-                    output.push(row);
-                }
-                output.push.apply(output, insertRowsAfter);
             }
         },
         processEntry: function(entry) {
@@ -433,27 +354,31 @@ Ext.namespace('Sage.Platform.Mobile');
 
             if (this.entry)
             {
-                this.processLayout(this.compileLayout(), {title: this.detailsText}, this.entry);
+                this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
+            }
+            else
+            {
+                this.set('detailContent', '');
             }
         },
         onRequestDataFailure: function(response, o) {
             if (response && response.status == 404)
-                Ext.DomHelper.append(this.contentEl, this.notAvailableTemplate.apply(this));
+                dojo.query(this.contentNode).append(this.notAvailableTemplate.apply(this));
             else
-                alert(String.format(this.requestErrorText, response, o));            
+                alert(dojo.string.substitute(this.requestErrorText, [response, o]));
 
-            this.el.removeClass('panel-loading');
+            dojo.removeClass(this.domNode, 'panel-loading');
         },
         onRequestDataAborted: function(response, o) {
             this.options = false; // force a refresh
-            this.el.removeClass('panel-loading');
+            dojo.removeClass(this.domNode, 'panel-loading');
         },
         onRequestDataSuccess: function(entry) {
             this.processEntry(entry);
-            this.el.removeClass('panel-loading');
+            dojo.removeClass(this.domNode, 'panel-loading');
         },
         requestData: function() {
-            this.el.addClass('panel-loading');
+            dojo.removeClass(this.domNode, 'panel-loading');
 
             var request = this.createRequest();
             if (request)
@@ -465,44 +390,40 @@ Ext.namespace('Sage.Platform.Mobile');
                 });
         },
         refreshRequiredFor: function(options) {
-            if (this.options)
-            {
-                if (options)
-                {
+            if (this.options) {
+                if (options) {
                     if (this.options.key !== options.key) return true;
                 }
-
                 return false;
             }
             else
-                return Sage.Platform.Mobile.Detail.superclass.refreshRequiredFor.call(this, options);
+                return this.inherited(arguments);
         },
         activate: function(tag, data) {
             var options = data && data.options;
             if (options && options.descriptor)
                 options.title = options.title || options.descriptor;
 
-            Sage.Platform.Mobile.Detail.superclass.activate.apply(this, arguments);
+            this.inherited(arguments);
         },
         show: function(options) {
-            // if a descriptor is specified, and no title, use the descriptor instead.
             if (options && options.descriptor)
                 options.title = options.title || options.descriptor;
 
-            Sage.Platform.Mobile.Detail.superclass.show.apply(this, arguments);
+            this.inherited(arguments);
         },
         getTag: function() {
             return this.options && this.options.key;
         },
         getContext: function() {
-            return Ext.apply(Sage.Platform.Mobile.Detail.superclass.getContext.call(this), {
+            return dojo.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
                 key: this.options.key,
                 descriptor: this.options.descriptor
             });
         },
         beforeTransitionTo: function() {
-            Sage.Platform.Mobile.Detail.superclass.beforeTransitionTo.call(this);
+            this.inherited(arguments);
 
             this.canEdit = this.editor ? true : false;
 
@@ -515,11 +436,11 @@ Ext.namespace('Sage.Platform.Mobile');
             this.requestData();
         },
         transitionTo: function() {
-            Sage.Platform.Mobile.Detail.superclass.transitionTo.call(this);
+            this.inherited(arguments);
         },
         clear: function() {
-            this.contentEl.update(this.emptyTemplate.apply(this));
+            this.set('detailContent', this.emptyTemplate.apply(this));
             this.context = false;
         }
     });
-})();
+});

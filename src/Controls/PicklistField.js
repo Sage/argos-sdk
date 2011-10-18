@@ -15,17 +15,15 @@
 
 // todo: move to argos-saleslogix; this does not belong here.
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
-
-(function() {
+define('Sage/Platform/Mobile/Controls/PicklistField', ['Sage/Platform/Mobile/Controls/LookupField', 'Mobile/SalesLogix/Views/PickList'], function() {
     var viewsByName = {},
-        viewsByNameCount = 0;         
+        viewsByNameCount = 0;
 
     var getOrCreateViewFor = function(name) {
         if (viewsByName[name])
             return viewsByName[name];
 
-        var view = new Mobile.SalesLogix.PickList({
+        var view = new Mobile.SalesLogix.Views.PickList({
             id: 'pick_list_' + viewsByNameCount++,
             expose: false
         });
@@ -35,7 +33,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         return (viewsByName[name] = view);
     };
 
-    Sage.Platform.Mobile.Controls.PicklistField = Ext.extend(Sage.Platform.Mobile.Controls.LookupField, {
+    dojo.declare('Sage.Platform.Mobile.Controls.PicklistField', [Sage.Platform.Mobile.Controls.LookupField], {
         picklist: false,
         orderBy: 'number asc',
         storageMode: 'text',
@@ -43,13 +41,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         valueKeyProperty: false,
         valueTextProperty: false,
         constructor: function(options) {
-            Sage.Platform.Mobile.Controls.PicklistField.superclass.constructor.apply(this, arguments);
-
             switch (this.storageMode)
             {
                 case 'text':
                     this.keyProperty = 'text';
-                    this.textProperty = 'text';                    
+                    this.textProperty = 'text';
                     break;
                 case 'code':
                     this.keyProperty = 'code';
@@ -63,7 +59,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     this.textProperty = 'text';
                     this.requireSelection = typeof options.requireSelection !== 'undefined'
                         ? options.requireSelection
-                        : true; 
+                        : true;
                     break;
             }
         },
@@ -71,28 +67,42 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             return !this.picklist;
         },
         formatResourcePredicate: function(name) {
-            return String.format('name eq "{0}"', name);
+            return dojo.string.substitute('name eq "${0}"', [name]);
+        },
+        createSelections: function(){
+            var value = this.getText(),
+                selections = (value)
+                    ? (value.indexOf(', ') !== -1)
+                        ? value.split(', ')
+                        : [value]
+                    : [];
+            return selections;
         },
         createNavigationOptions: function() {
-            var options = Sage.Platform.Mobile.Controls.PicklistField.superclass.createNavigationOptions.apply(this, arguments);
+            var options = this.inherited(arguments);
 
-            if (this.picklist)
+            if (this.picklist) {
                 options.resourcePredicate = this.formatResourcePredicate(
                     this.dependsOn // only pass dependentValue if there is a dependency
                         ? this.expandExpression(this.picklist, options.dependentValue)
                         : this.expandExpression(this.picklist)
                 );
-          
+                options.multi = this.multi;
+                options.singleSelect = !options.multi;
+                options.previousSelections = this.multi ? this.createSelections() : null;
+                options.pickListType = this.storageMode;
+            }
+
             return options;
         },
         navigateToListView: function() {
             var options = this.createNavigationOptions(),
                 view = App.getView(this.view) || getOrCreateViewFor(this.picklist);
-           
+
             if (view && options)
                 view.show(options);
         }
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('picklist', Sage.Platform.Mobile.Controls.PicklistField);
-})();
+});

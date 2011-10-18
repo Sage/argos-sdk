@@ -267,19 +267,24 @@ textarea:focus
     border-top: none 0px black;
 }
 
-.panel-content > fieldset > .row > label,
+.panel-content > fieldset > .row > div > label,
+.panel-content > div > .row > div > label,
 .panel-content > div > .row > label
 {
     font-weight: bold;    
     color: #0079A7;
 }
 
-.panel-content > fieldset > .row-edit > textarea
+.panel-content > fieldset > .row-edit > div > textarea,
+.panel-content > fieldset > .row-edit > textarea,
+
 {
     font-family: Helvetica, Arial;
     font-size: 16px;
 }
 
+.panel-content > fieldset >.row-edit > div > input:focus,
+.panel-content > fieldset >.row-edit > div > textarea:focus,
 .panel-content > fieldset >.row-edit > input:focus,
 .panel-content > fieldset >.row-edit > textarea:focus
 {

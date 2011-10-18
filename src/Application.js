@@ -14,26 +14,72 @@
  */
 
 define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
+    
+    dojo.extend(Function, {
+        bindDelegate: function(scope) {
+            var fn = this;
 
-    dojo.declare('Sage.Platform.Mobile.Application', null, {
+            if (arguments.length == 1) return function() {
+                return fn.apply(scope || this, arguments);
+            };
+
+            var optional = Array.prototype.slice.call(arguments, 1);
+            return function() {
+                var called = Array.prototype.slice.call(arguments, 0);
+                return fn.apply(scope || this, called.concat(optional));
+            };
+        }
+    });
+
+    var applyLocalizationTo = function(object, localization) {
+            var target = object.prototype || object;
+            for(var key in localization)
+            {
+                if(dojo.isObject(localization[key]))
+                    applyLocalizationTo(target[key], localization[key]);
+                else
+                    target[key] = localization[key];
+            }
+        },
+        localize = function(name, localization) {
+            var target = dojo.getObject(name);
+            if (target && target.prototype) target = target.prototype;
+            if (target) applyLocalizationTo(target, localization);
+        },
+        mergeConfiguration = function(baseConfiguration, moduleConfiguration) {
+            if (baseConfiguration)
+            {
+                if (baseConfiguration.modules && moduleConfiguration.modules)
+                    baseConfiguration.modules = baseConfiguration.modules.concat(moduleConfiguration.modules);
+
+                if (baseConfiguration.connections && moduleConfiguration.connections)
+                    baseConfiguration.connections = dojo.mixin(baseConfiguration.connections, moduleConfiguration.connections);
+            }
+
+            return baseConfiguration;
+        };
+
+    dojo.mixin(dojo.global, {
+        'localize': localize,
+        'mergeConfiguration': mergeConfiguration
+    });
+    
+    return dojo.declare('Sage.Platform.Mobile.Application', null, {
         _connects: null,
         _subscribes: null,
-        environment: 'production',
-        started: false,
-        enableCaching: false,
-        defaultService: null,
-        customizationsForSet: null,
-        customizationsForId: null,
+        _started: false,
+        customizations: null,
         services: null,
         modules: null,
         views: null,
         bars: null,
+        enableCaching: false,
+        defaultService: null,
         constructor: function(options) {
             this._connects = [];
             this._subscribes = [];
             
-            this.customizationsForSet = {};
-            this.customizationsForId = {};
+            this.customizations = {};
             this.services = {};
             this.modules = [];
             this.views = {};
@@ -57,29 +103,6 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         uninitialize: function() {
 
         },
-        initConfiguration: function() {
-            var config = window['Configuration'] && window['Configuration'][this.environment],
-                filter = /^(?:modules|connections)$/;
-
-            if (config)
-            {
-                if (config.modules)
-                {
-                    this.modules = this.modules.concat(config.modules);
-                }
-
-                if (config.connections)
-                {
-                    for (var n in config.connections)
-                        if (config.connections.hasOwnProperty(n))
-                            this.registerService(n, config.connections[n]);
-                }
-
-                for (var property in config)
-                    if (!filter.test(property))
-                        this[property] = config[property];
-            }
-        },
         initReUI: function() {
             // prevent ReUI from attempting to load the URLs view as we handle that ourselves.
             // todo: add support for handling the URL?
@@ -100,6 +123,9 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             this._connects.push(dojo.connect(dojo.body(), 'aftertransition', this, this._onAfterTransition));
             this._connects.push(dojo.connect(dojo.body(), 'activate', this, this._onActivate));
         },
+        initServices: function() {
+            for (var name in this.connections) this.registerService(name, this.connections[name]);
+        },
         initModules: function() {
             for (var i = 0; i < this.modules.length; i++)
                 this.modules[i].init(this);
@@ -117,16 +143,16 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             /// <summary>
             ///     Initializes this application as well as the toolbar and all currently registered views.
             /// </summary>
-            this.initConfiguration();
             this.initConnects();
             this.initCaching();
+            this.initServices();
             this.initModules();
             this.initToolbars();
             this.initViews();
             this.initReUI();
         },
         run: function() {
-            this.started = true;
+            this._started = true;
         },
         isOnline: function() {
             return window.navigator.onLine;
@@ -209,7 +235,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             /// <param name="view" type="Sage.Platform.Mobile.View">The view to be registered.</param>
             this.views[view.id] = view;
 
-            if (this.started) view.init();
+            if (this._started) view.init();
 
             view.placeAt(dojo.body(), 'first');
 
@@ -227,7 +253,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
 
             this.bars[name] = tbar;
 
-            if (this.started) tbar.init();
+            if (this._started) tbar.init();
 
             tbar.placeAt(dojo.body(), 'last');
 
@@ -344,7 +370,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         _viewTransitionTo: function(view) {
             this.onViewTransitionTo(view);
 
-            var tools = (view.options && view.options.tools) || view.createToolLayout() || {};
+            var tools = (view.options && view.options.tools) || view.get('tools') || {};
 
             for (var n in this.bars)
                 if (this.bars[n].managed)
@@ -387,25 +413,64 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
                         return o;
             });
         },
-        registerCustomization: function(set, id, spec) {
-            var key = id || set,
-                container = id ? this.customizationsForId : this.customizationsForSet,
-                list = container[key] || (container[key] = []);
+        /**
+         * legacy: registerCustomization(set, id, spec);
+         */
+        registerCustomization: function(path, spec) {
+            if (arguments.length > 2)
+            {
+                var customizationSet = arguments[0],
+                    id = arguments[1];
 
-            if (list)
-                list.push(spec);
+                spec = arguments[2];
+                path = id
+                    ? customizationSet + '#' + id
+                    : customizationSet;
+            }
+            
+            var container = this.customizations[path] || (this.customizations[path] = []);
+            if (container) container.push(spec);
         },
-        getCustomizationsFor: function(set, id) {
-            // { action: 'remove|modify|insert|replace', at: (index|fn), where: 'before|after', value: {} }
+        /**
+         * legacy: getCustomizationsFor(set, id);
+         * { action: 'remove|modify|insert|replace', at: (index|fn), or: (fn), where: 'before|after', value: {} }
+         */
+        getCustomizationsFor: function(path) {
+            if (arguments.length > 1)
+            {
+                path = arguments[1]
+                    ? arguments[0] + '#' + arguments[1]
+                    : arguments[0];
+            }
 
-            var forSet = (set && this.customizationsForSet[set]) || [];
-            var forId = (id && this.customizationsForId[id]) || [];
+            var segments = path.split('#'),
+                customizationSet = segments[0];
 
-            return forSet.concat(forId);
+            var forPath = this.customizations[path] || [],
+                forSet = this.customizations[customizationSet] || [];
+
+            return forPath.concat(forSet);
+        },
+        frontHitchArgs: function(scope, method){
+            var pre = dojo._toArray(arguments,2);
+            return function(){
+                var args = dojo._toArray(arguments);
+                return method.apply(scope||this, args.concat(pre));
+            }
+        },
+        frontHitch: function(scope, method){
+            if(arguments.length>2)
+                return this.frontHitchArgs.apply(dojo, arguments);
+            return !scope
+                ? method
+                : function(){
+                    return method.apply(scope, arguments || []);
+                };
         }
     });
 
     /* todo: convert swipe */
+    /* todo: move to top */
     /*
     Ext.onReady(function(){
         var isApple = /(iphone|ipad|ipod)/i.test(navigator.userAgent),

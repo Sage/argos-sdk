@@ -13,53 +13,37 @@
  * limitations under the License.
  */
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
+define('Sage/Platform/Mobile/Controls/Field', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_Templated'], function() {
+    dojo.setObject('Sage.Platform.Mobile.Controls.FieldManager', null);
+    
+    Sage.Platform.Mobile.Controls.FieldManager = (function() {
+        var types = {};
+        return {
+            types: types,
+            register: function(name, ctor) {
+                types[name] = ctor;
+            },
+            get: function(name) {
+                return types[name];
+            }
+        };
+    })();
 
-Sage.Platform.Mobile.Controls.FieldManager = (function() {
-    var types = {};
-    return {
-        types: types,
-        register: function(name, ctor) {
-            types[name] = ctor;
-        },
-        get: function(name) {
-            return types[name];
-        }
-    };
-})();
-
-(function() {
-    Sage.Platform.Mobile.Controls.Field = Ext.extend(Ext.util.Observable, {
-        attachmentPoints: {},
+    return dojo.declare('Sage.Platform.Mobile.Controls.Field', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
         owner: false,
         applyTo: false,
         alwaysUseValue: false,
         disabled: false,
         hidden: false,
+        widgetTemplate: new Simplate([
+            '<input data-dojo-attach-point="inputNode">'
+        ]),
         constructor: function(o) {
-            Ext.apply(this, o);
-
-            this.addEvents(
-                'change',
-                'show',
-                'hide',
-                'enable',
-                'disable'
-            );
-
-            Sage.Platform.Mobile.Controls.Field.superclass.constructor.apply(this, arguments);
-        },       
-        renderTo: function(el) {
-            this.containerEl = el; // todo: should el actually be containerEl instead of last rendered node?
-            this.el = Ext.DomHelper.append(
-                el,
-                this.template.apply(this),
-                true
-            );
-
-            for (var n in this.attachmentPoints)
-                if (this.attachmentPoints.hasOwnProperty(n))
-                    this[n] = el.child(String.format(this.attachmentPoints[n], this.name));
+            dojo.mixin(this, o);
+        },
+        renderTo: function(node) {
+            this.containerNode = node; // todo: should node actually be containerNode instead of last rendered node?
+            this.placeAt(node);
         },
         init: function() {
         },
@@ -68,22 +52,20 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
         },
         enable: function() {
             this.disabled = false;
-            this.fireEvent('enable', this);
         },
         disable: function() {
             this.disabled = true;
-            this.fireEvent('disable', this);
         },
         isDisabled: function() {
             return this.disabled;
         },
         show: function() {
             this.hidden = false;
-            this.fireEvent('show', this);
         },
         hide: function() {
             this.hidden = true;
-            this.fireEvent('hide', this);
+        },
+        change: function(){
         },
         isHidden: function() {
             return this.hidden;
@@ -98,11 +80,12 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
             if (typeof this.validator === 'undefined')
                 return false;
 
-            var all = Ext.isArray(this.validator) ? this.validator : [this.validator],
+            var all = dojo.isArray(this.validator) ? this.validator : [this.validator],
+                allLength = all.length,
                 current,
                 definition;
 
-            for (var i = 0; i < all.length; i++)
+            for (var i = 0; i < allLength; i++)
             {
                 current = all[i];
 
@@ -117,7 +100,7 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
                 else
                     definition = current;
 
-                var value = typeof value === 'undefined'
+                value = typeof value === 'undefined'
                     ? this.getValue()
                     : value;
 
@@ -127,18 +110,16 @@ Sage.Platform.Mobile.Controls.FieldManager = (function() {
                         ? !definition.test.test(value)
                         : false;
 
-                if (result)
-                {
+                if (result) {
                     if (definition.message)
                         result = typeof definition.message === 'function'
                             ? definition.message.call(definition.scope || this, value, this, this.owner)
-                            : String.format(definition.message, value, this.name, this.label);
+                            : dojo.string.substitute(definition.message, [value, this.name, this.label]);
 
                     return result;
                 }
             }
-
             return false;
         }
     });
-})();
+});

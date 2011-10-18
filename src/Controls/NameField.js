@@ -15,18 +15,18 @@
 
 // todo: move to argos-saleslogix; this does not belong here.
 
-Ext.namespace('Sage.Platform.Mobile.Controls');
+define('Sage/Platform/Mobile/Controls/NameField', ['Sage/Platform/Mobile/Controls/EditorField'], function() {
+    dojo.declare('Sage.Platform.Mobile.Controls.NameField', [Sage.Platform.Mobile.Controls.EditorField], {
+        // Localization
+        emptyText: 'no name',
 
-(function() {
-    Sage.Platform.Mobile.Controls.NameField = Ext.extend(Sage.Platform.Mobile.Controls.EditorField, {
-        template: new Simplate([
+        widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<input readonly="readonly" type="text" />'
+            '<input data-dojo-attach-point="inputNode" readonly="readonly" type="text" />'
         ]),
-        emptyText: 'no name',
         createNavigationOptions: function() {
-            var options = Sage.Platform.Mobile.Controls.NameField.superclass.createNavigationOptions.apply(this, arguments);
+            var options = this.inherited(arguments);
             //Name does not have an entity.
             delete options.entityName;
 
@@ -35,4 +35,4 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('name', Sage.Platform.Mobile.Controls.NameField);
-})();
+});
