@@ -29,7 +29,6 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
         ]),
         toolTemplate: new Simplate([
             '<button class="button toolButton toolButton-{%= $.side || "right" %} {%= (false === $.enabled) ? "disabled" : "" %} {%= $.cls %}"',
-                    'title="{%= (false === $.enabled) ? "Disabled. No access to this feature" : "" %}"',
                     'data-action="invokeTool" data-tool="{%= $.id %}"',
                     'aria-label="{%: $.title || $.id %}">',
                 '{% if ($.icon) { %}',

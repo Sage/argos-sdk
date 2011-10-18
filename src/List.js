@@ -436,13 +436,12 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             this.clear();
         },
         createToolLayout: function() {
+            var editView = App.views[this.id.replace(/list$/, 'edit')];
             return this.tools || (this.tools = {
                 'tbar': [{
                     id: 'new',
                     action: 'navigateToInsertView',
-                    enabled: App.hasSecurity('Entities/' + App.getPrimaryActiveView().title.replace(/ies$/,'y').replace(/s$/,'') + '/Add')
-                        ? true
-                        : ('Calendar' == App.getPrimaryActiveView().title) // Calendar always enabled
+                    enabled: App.hasSecurity(editView && editView.securedAction && editView.securedAction.add)
                 }]
             });
         },
@@ -678,9 +677,9 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
                     key: key
                 });
         },
-        navigateToInsertView: function() {
+        navigateToInsertView: function(el) {
             var view = App.getView(this.insertView || this.editView);
-            if (view)
+            if (view && el.$tool.enabled)
             {
                 view.show({
                     returnTo: this.id,

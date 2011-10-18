@@ -158,9 +158,9 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             if (params.context)
                 this.navigateToRelatedView(params.view, dojo.fromJson(params.context), params.descriptor);
         },
-        navigateToEditView: function() {
+        navigateToEditView: function(el) {
             var view = App.getView(this.editView);
-            if (view)
+            if (view && el.$tool.enabled)
                 view.show({entry: this.entry});
         },
         navigateToRelatedView: function(view, o, descriptor) {
