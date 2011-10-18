@@ -386,7 +386,19 @@
     height: 5em;
     overflow: hidden;
 }
-
+.row-edit[data-field-type="duration"] > div > input
+{
+    margin-left: 110px !important;
+    padding: 3px !important;
+    width: 50px !important;
+    border: 1px solid #000 !important;
+}
+.row-edit[data-field-type="duration"] > div > select
+{
+    height: 30px;
+    display: inline-block;
+    margin-left: 12px;
+}
 .row-edit[data-field-type="address"] > div > div
 {
     min-height: 1.5em !important;
