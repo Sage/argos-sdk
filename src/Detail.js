@@ -117,7 +117,8 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             return this.tools || (this.tools = {
                 'tbar': [{
                     id: 'edit',
-                    action: 'navigateToEditView'
+                    action: 'navigateToEditView',
+                    enabled: App.hasSecurity(this.securedAction.replace('View', 'Edit')) ? true : false
                 }]
             });
         },
@@ -157,9 +158,9 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             if (params.context)
                 this.navigateToRelatedView(params.view, dojo.fromJson(params.context), params.descriptor);
         },
-        navigateToEditView: function() {
+        navigateToEditView: function(el) {
             var view = App.getView(this.editView);
-            if (view)
+            if (view && el.$tool.enabled)
                 view.show({entry: this.entry});
         },
         navigateToRelatedView: function(view, o, descriptor) {
@@ -354,7 +355,16 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
             if (this.entry)
             {
-                this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
+                if (!this.securedAction || App.hasSecurity(this.securedAction)) {
+                    this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
+
+                } else {
+                    this.contentNode.innerHTML = '<div class="not-available">' + this.noAccessText + '</div>';
+
+                    // disable Edit button in toolbar
+                    if (this.securedAction && !App.hasSecurity(this.securedAction.replace('View', 'Edit')))
+                        dojo.query('[data-tool=edit]').addClass('invisible');
+                }
             }
             else
             {
