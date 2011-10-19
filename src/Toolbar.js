@@ -96,12 +96,13 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
             // fix until all views correctly return a tools object
             if(!tools) return;
 
-            for (var i = 0; i < tools.length; i++)
+            for (var i = 0; i < tools.length; i++) {
                 this.tools[tools[i].id] = {
                     busy: false,
-                    enabled: true,
+                    enabled: (false === tools[i].enabled) ? false : true,
                     source: tools[i]
                 };
+            }
         }
     });
 });
