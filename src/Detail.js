@@ -118,7 +118,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 'tbar': [{
                     id: 'edit',
                     action: 'navigateToEditView',
-                    enabled: App.hasSecurity(this.securedAction.replace('View', 'Edit')) ? true : false
+                    enabled: App.hasSecurity(this.securedAction ? this.securedAction.replace('View', 'Edit') : null)
                 }]
             });
         },
