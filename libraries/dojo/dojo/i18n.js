@@ -1,260 +1,103 @@
-define("dojo/i18n", ["require", "dojo"], function(require, dojo){
-dojo.getObject("i18n", true, dojo);
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
 
-/*=====
-dojo.i18n = {
-	// summary: Utility classes to enable loading of resources for internationalization (i18n)
+//>>built
+define("dojo/i18n",["./_base/kernel","require","./has","./_base/array","./_base/lang","./_base/xhr"],function(_1,_2,_3,_4,_5){
+var _6=_1.i18n={},_7=/(^.*(^|\/)nls)(\/|$)([^\/]*)\/?([^\/]*)/,_8=function(_9,_a,_b,_c){
+for(var _d=[_b+_c],_e=_a.split("-"),_f="",i=0;i<_e.length;i++){
+_f+=(_f?"-":"")+_e[i];
+if(!_9||_9[_f]){
+_d.push(_b+_f+"/"+_c);
+}
+}
+return _d;
+},_10={},_11=_1.getL10nName=function(_12,_13,_14){
+_14=_14?_14.toLowerCase():_1.locale;
+_12="dojo/i18n!"+_12.replace(/\./g,"/");
+_13=_13.replace(/\./g,"/");
+return (/root/i.test(_14))?(_12+"/nls/"+_13):(_12+"/nls/"+_14+"/"+_13);
+},_15=function(_16,_17,_18,_19,_1a,_1b){
+_16([_17],function(_1c){
+var _1d=_10[_17+"/"]=_5.clone(_1c.root),_1e=_8(!_1c._v1x&&_1c,_1a,_18,_19);
+_16(_1e,function(){
+for(var i=1;i<_1e.length;i++){
+_10[_1e[i]]=_1d=_5.mixin(_5.clone(_1d),arguments[i]);
+}
+var _1f=_17+"/"+_1a;
+_10[_1f]=_1d;
+_1b&&_1b(_5.delegate(_1d));
+});
+});
+},_20=function(id,_21){
+var _22=_7.exec(id),_23=_22[1];
+return /^\./.test(_23)?_21(_23)+"/"+id.substring(_23.length):id;
 };
-=====*/
-
-// when using a real AMD loader, dojo.i18n.getLocalization is already defined by dojo/lib/backCompat
-dojo.i18n.getLocalization = dojo.i18n.getLocalization || function(/*String*/packageName, /*String*/bundleName, /*String?*/locale){
-	//	summary:
-	//		Returns an Object containing the localization for a given resource
-	//		bundle in a package, matching the specified locale.
-	//	description:
-	//		Returns a hash containing name/value pairs in its prototypesuch
-	//		that values can be easily overridden.  Throws an exception if the
-	//		bundle is not found.  Bundle must have already been loaded by
-	//		`dojo.requireLocalization()` or by a build optimization step.  NOTE:
-	//		try not to call this method as part of an object property
-	//		definition (`var foo = { bar: dojo.i18n.getLocalization() }`).  In
-	//		some loading situations, the bundle may not be available in time
-	//		for the object definition.  Instead, call this method inside a
-	//		function that is run after all modules load or the page loads (like
-	//		in `dojo.addOnLoad()`), or in a widget lifecycle method.
-	//	packageName:
-	//		package which is associated with this resource
-	//	bundleName:
-	//		the base filename of the resource bundle (without the ".js" suffix)
-	//	locale:
-	//		the variant to load (optional).  By default, the locale defined by
-	//		the host environment: dojo.locale
-
-	locale = dojo.i18n.normalizeLocale(locale);
-
-	// look for nearest locale match
-	var elements = locale.split('-');
-	var module = [packageName,"nls",bundleName].join('.');
-	//>>includeStart("asyncLoader", kwArgs.asynchLoader);
-	if (typeof dojo.global.require !== "undefined") {
-		// XXX: this only works for the default locale
-		var obj = require("i18n!" + [packageName.replace(/\./g, '/'), "nls", bundleName].join('/'));
-		(dojo._loadedModules[module] = dojo._loadedModules[module] || {})[elements.join('_')] = (obj.root || obj);
-	}
-	//>>includeEnd("asyncLoader");
-	var bundle = dojo._loadedModules[module];
-	if(bundle){
-		var localization;
-		for(var i = elements.length; i > 0; i--){
-			var loc = elements.slice(0, i).join('_');
-			if(bundle[loc]){
-				localization = bundle[loc];
-				break;
-			}
-		}
-		if(!localization){
-			localization = bundle.ROOT;
-		}
-
-		// make a singleton prototype so that the caller won't accidentally change the values globally
-		if(localization){
-			var clazz = function(){};
-			clazz.prototype = localization;
-			return new clazz(); // Object
-		}
-	}
-
-	throw new Error("Bundle not found: " + bundleName + " in " + packageName+" , locale=" + locale);
+load=function(id,_24,_25){
+var _26=_7.exec(id),_27=_26[1]+"/",_28=_26[5]||_26[4],_29=_27+_28,_2a=(_26[5]&&_26[4]),_2b=_2a||_1.locale,_2c=_29+"/"+_2b;
+if(_2a){
+if(_10[_2c]){
+_25(_10[_2c]);
+}else{
+_15(_24,_29,_27,_28,_2b,_25);
+}
+return;
+}
+var _2d=_1.config.extraLocale||[];
+_2d=_5.isArray(_2d)?_2d:[_2d];
+_2d.push(_2b);
+_4.forEach(_2d,function(_2e){
+_15(_24,_29,_27,_28,_2e,_2e==_2b&&_25);
+});
 };
-
-dojo.i18n.normalizeLocale = function(/*String?*/locale){
-	//	summary:
-	//		Returns canonical form of locale, as used by Dojo.
-	//
-	//  description:
-	//		All variants are case-insensitive and are separated by '-' as specified in [RFC 3066](http://www.ietf.org/rfc/rfc3066.txt).
-	//		If no locale is specified, the dojo.locale is returned.  dojo.locale is defined by
-	//		the user agent's locale unless overridden by djConfig.
-
-	var result = locale ? locale.toLowerCase() : dojo.locale;
-	if(result == "root"){
-		result = "ROOT";
-	}
-	return result; // String
+true||_3.add("dojo-v1x-i18n-Api",1);
+if(1){
+var _2f=new Function("bundle","var __preAmdResult, __amdResult; function define(bundle){__amdResult= bundle;} __preAmdResult= eval(bundle); return [__preAmdResult, __amdResult];"),_30=function(url,_31,_32){
+return _31?(/nls\/[^\/]+\/[^\/]+$/.test(url)?_31:{root:_31,_v1x:1}):_32;
+},_33=function(_34,_35){
+var _36=[];
+_1.forEach(_34,function(mid){
+var url=_2.toUrl(mid+".js");
+if(_10[url]){
+_36.push(_10[url]);
+}else{
+try{
+var _37=_2(mid);
+if(_37){
+_36.push(_37);
+return;
+}
+}
+catch(e){
+}
+_1.xhrGet({url:url,sync:true,load:function(_38){
+var _39=_2f(_38);
+_36.push(_10[url]=_30(url,_39[0],_39[1]));
+},error:function(){
+_36.push(_10[url]={});
+}});
+}
+});
+_35.apply(null,_36);
 };
-
-dojo.i18n._requireLocalization = function(/*String*/moduleName, /*String*/bundleName, /*String?*/locale, /*String?*/availableFlatLocales){
-	//	summary:
-	//		See dojo.requireLocalization()
-	//	description:
-	// 		Called by the bootstrap, but factored out so that it is only
-	// 		included in the build when needed.
-
-	var targetLocale = dojo.i18n.normalizeLocale(locale);
- 	var bundlePackage = [moduleName, "nls", bundleName].join(".");
-	// NOTE:
-	//		When loading these resources, the packaging does not match what is
-	//		on disk.  This is an implementation detail, as this is just a
-	//		private data structure to hold the loaded resources.  e.g.
-	//		`tests/hello/nls/en-us/salutations.js` is loaded as the object
-	//		`tests.hello.nls.salutations.en_us={...}` The structure on disk is
-	//		intended to be most convenient for developers and translators, but
-	//		in memory it is more logical and efficient to store in a different
-	//		order.  Locales cannot use dashes, since the resulting path will
-	//		not evaluate as valid JS, so we translate them to underscores.
-
-	//Find the best-match locale to load if we have available flat locales.
-	var bestLocale = "";
-	if(availableFlatLocales){
-		var flatLocales = availableFlatLocales.split(",");
-		for(var i = 0; i < flatLocales.length; i++){
-			//Locale must match from start of string.
-			//Using ["indexOf"] so customBase builds do not see
-			//this as a dojo._base.array dependency.
-			if(targetLocale["indexOf"](flatLocales[i]) == 0){
-				if(flatLocales[i].length > bestLocale.length){
-					bestLocale = flatLocales[i];
-				}
-			}
-		}
-		if(!bestLocale){
-			bestLocale = "ROOT";
-		}
-	}
-
-	//See if the desired locale is already loaded.
-	var tempLocale = availableFlatLocales ? bestLocale : targetLocale;
-	var bundle = dojo._loadedModules[bundlePackage];
-	var localizedBundle = null;
-	if(bundle){
-		if(dojo.config.localizationComplete && bundle._built){return;}
-		var jsLoc = tempLocale.replace(/-/g, '_');
-		var translationPackage = bundlePackage+"."+jsLoc;
-		localizedBundle = dojo._loadedModules[translationPackage];
-	}
-
-	if(!localizedBundle){
-		bundle = dojo["provide"](bundlePackage);
-		var syms = dojo._getModuleSymbols(moduleName);
-		var modpath = syms.concat("nls").join("/");
-		var parent;
-
-		dojo.i18n._searchLocalePath(tempLocale, availableFlatLocales, function(loc){
-			var jsLoc = loc.replace(/-/g, '_');
-			var translationPackage = bundlePackage + "." + jsLoc;
-			var loaded = false;
-			if(!dojo._loadedModules[translationPackage]){
-				// Mark loaded whether it's found or not, so that further load attempts will not be made
-				dojo["provide"](translationPackage);
-				var module = [modpath];
-				if(loc != "ROOT"){module.push(loc);}
-				module.push(bundleName);
-				var filespec = module.join("/") + '.js';
-				loaded = dojo._loadPath(filespec, null, function(hash){
-					hash = hash.root || hash;
-					// Use singleton with prototype to point to parent bundle, then mix-in result from loadPath
-					var clazz = function(){};
-					clazz.prototype = parent;
-					bundle[jsLoc] = new clazz();
-					for(var j in hash){ bundle[jsLoc][j] = hash[j]; }
-				});
-			}else{
-				loaded = true;
-			}
-			if(loaded && bundle[jsLoc]){
-				parent = bundle[jsLoc];
-			}else{
-				bundle[jsLoc] = parent;
-			}
-
-			if(availableFlatLocales){
-				//Stop the locale path searching if we know the availableFlatLocales, since
-				//the first call to this function will load the only bundle that is needed.
-				return true;
-			}
-		});
-	}
-
-	//Save the best locale bundle as the target locale bundle when we know the
-	//the available bundles.
-	if(availableFlatLocales && targetLocale != bestLocale){
-		bundle[targetLocale.replace(/-/g, '_')] = bundle[bestLocale.replace(/-/g, '_')];
-	}
+_6.getLocalization=function(_3a,_3b,_3c){
+var _3d,_3e=_11(_3a,_3b,_3c).substring(10);
+load(_3e,(1&&!_2.isXdUrl(_2.toUrl(_3e+".js"))?_33:_2),function(_3f){
+_3d=_3f;
+});
+return _3d;
 };
-
-(function(){
-	// If other locales are used, dojo.requireLocalization should load them as
-	// well, by default.
-	//
-	// Override dojo.requireLocalization to do load the default bundle, then
-	// iterate through the extraLocale list and load those translations as
-	// well, unless a particular locale was requested.
-
-	var extra = dojo.config.extraLocale;
-	if(extra){
-		if(!extra instanceof Array){
-			extra = [extra];
-		}
-
-		var req = dojo.i18n._requireLocalization;
-		dojo.i18n._requireLocalization = function(m, b, locale, availableFlatLocales){
-			req(m,b,locale, availableFlatLocales);
-			if(locale){return;}
-			for(var i=0; i<extra.length; i++){
-				req(m,b,extra[i], availableFlatLocales);
-			}
-		};
-	}
-})();
-
-dojo.i18n._searchLocalePath = function(/*String*/locale, /*Boolean*/down, /*Function*/searchFunc){
-	//	summary:
-	//		A helper method to assist in searching for locale-based resources.
-	//		Will iterate through the variants of a particular locale, either up
-	//		or down, executing a callback function.  For example, "en-us" and
-	//		true will try "en-us" followed by "en" and finally "ROOT".
-
-	locale = dojo.i18n.normalizeLocale(locale);
-
-	var elements = locale.split('-');
-	var searchlist = [];
-	for(var i = elements.length; i > 0; i--){
-		searchlist.push(elements.slice(0, i).join('-'));
-	}
-	searchlist.push(false);
-	if(down){searchlist.reverse();}
-
-	for(var j = searchlist.length - 1; j >= 0; j--){
-		var loc = searchlist[j] || "ROOT";
-		var stop = searchFunc(loc);
-		if(stop){ break; }
-	}
+_6.normalizeLocale=function(_40){
+var _41=_40?_40.toLowerCase():_1.locale;
+if(_41=="root"){
+_41="ROOT";
+}
+return _41;
 };
-
-dojo.i18n._preloadLocalizations = function(/*String*/bundlePrefix, /*Array*/localesGenerated){
-	//	summary:
-	//		Load built, flattened resource bundles, if available for all
-	//		locales used in the page. Only called by built layer files.
-
-	function preload(locale){
-		locale = dojo.i18n.normalizeLocale(locale);
-		dojo.i18n._searchLocalePath(locale, true, function(loc){
-			for(var i=0; i<localesGenerated.length;i++){
-				if(localesGenerated[i] == loc){
-					dojo["require"](bundlePrefix+"_"+loc);
-					return true; // Boolean
-				}
-			}
-			return false; // Boolean
-		});
-	}
-	preload();
-	var extra = dojo.config.extraLocale||[];
-	for(var i=0; i<extra.length; i++){
-		preload(extra[i]);
-	}
-};
-
-return dojo.i18n;
+}
+return _5.mixin(_6,{dynamic:true,normalize:_20,load:load,cache:function(mid,_42){
+_10[mid]=_42;
+}});
 });

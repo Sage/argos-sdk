@@ -1,3 +1,4 @@
+//>>built
 define({ root:
 //begin v1.x content
 ({
@@ -146,6 +147,7 @@ tan: "tan",
 teal: "teal",
 thistle: "thistle",
 tomato: "tomato",
+transparent: "transparent",
 turquoise: "turquoise",
 violet: "violet",
 wheat: "wheat",

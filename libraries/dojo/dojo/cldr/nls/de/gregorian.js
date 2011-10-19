@@ -1,29 +1,12 @@
+//>>built
 define(
 //begin v1.x content
 {
-	"months-format-narrow": [
-		"J",
-		"F",
-		"M",
-		"A",
-		"M",
-		"J",
-		"J",
-		"A",
-		"S",
-		"O",
-		"N",
-		"D"
-	],
 	"field-weekday": "Wochentag",
 	"dateFormatItem-yyQQQQ": "QQQQ yy",
 	"dateFormatItem-yQQQ": "QQQ y",
 	"dateFormatItem-yMEd": "EEE, d.M.y",
 	"dateFormatItem-MMMEd": "E, d. MMM",
-	"eraNarrow": [
-		"v. Chr.",
-		"n. Chr."
-	],
 	"dayPeriods-format-wide-earlyMorning": "morgens",
 	"dayPeriods-format-wide-morning": "vormittags",
 	"dateFormat-long": "d. MMMM y",
@@ -49,20 +32,6 @@ define(
 	"dayPeriods-format-wide-noon": "Mittag",
 	"field-era": "Epoche",
 	"dateFormatItem-yM": "M.y",
-	"months-standAlone-wide": [
-		"Januar",
-		"Februar",
-		"März",
-		"April",
-		"Mai",
-		"Juni",
-		"Juli",
-		"August",
-		"September",
-		"Oktober",
-		"November",
-		"Dezember"
-	],
 	"timeFormat-short": "HH:mm",
 	"quarters-format-wide": [
 		"1. Quartal",
@@ -99,12 +68,12 @@ define(
 	"dateFormatItem-H": "HH 'Uhr'",
 	"field-day-relative+3": "überübermorgen",
 	"months-standAlone-abbr": [
-		"Jan",
-		"Feb",
+		"1",
+		"2",
 		"Mär",
-		"Apr",
-		"Mai",
-		"Jun",
+		"4",
+		"5",
+		"6",
 		"Jul",
 		"Aug",
 		"Sep",
@@ -118,22 +87,7 @@ define(
 		"Q3",
 		"Q4"
 	],
-	"quarters-standAlone-wide": [
-		"1. Quartal",
-		"2. Quartal",
-		"3. Quartal",
-		"4. Quartal"
-	],
 	"dateFormatItem-M": "L",
-	"days-standAlone-wide": [
-		"Sonntag",
-		"Montag",
-		"Dienstag",
-		"Mittwoch",
-		"Donnerstag",
-		"Freitag",
-		"Samstag"
-	],
 	"dateFormatItem-yyMMM": "MMM yy",
 	"timeFormat-medium": "HH:mm:ss",
 	"dateFormatItem-Hm": "HH:mm",
@@ -143,15 +97,6 @@ define(
 	],
 	"field-minute": "Minute",
 	"field-dayperiod": "Tageshälfte",
-	"days-standAlone-abbr": [
-		"So.",
-		"Mo.",
-		"Di.",
-		"Mi.",
-		"Do.",
-		"Fr.",
-		"Sa."
-	],
 	"dayPeriods-format-wide-night": "nachts",
 	"dateFormatItem-d": "d",
 	"dateFormatItem-ms": "mm:ss",
@@ -199,15 +144,6 @@ define(
 	"eraNames": [
 		"v. Chr.",
 		"n. Chr."
-	],
-	"days-format-narrow": [
-		"S",
-		"M",
-		"D",
-		"M",
-		"D",
-		"F",
-		"S"
 	],
 	"field-month": "Monat",
 	"days-standAlone-narrow": [

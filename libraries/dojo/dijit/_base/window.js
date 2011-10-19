@@ -1,9 +1,6 @@
-define("dijit/_base/window", ["dojo", "dijit", "dojo/window"], function(dojo, dijit) {
-
-dijit.getDocumentWindow = function(doc){
-	return dojo.window.get(doc);
+//>>built
+define("dijit/_base/window",["dojo/window",".."],function(_1,_2){
+_2.getDocumentWindow=function(_3){
+return _1.get(_3);
 };
-
-
-return dijit;
 });
