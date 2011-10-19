@@ -14,7 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Controls/Field'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.TextField', [Sage.Platform.Mobile.Controls.Field], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.TextField', [Sage.Platform.Mobile.Controls.Field], {
         notificationTrigger: false,
         validationTrigger: false,
 		inputType: 'text',
@@ -133,4 +133,5 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('text', Sage.Platform.Mobile.Controls.TextField);
+    return control;
 });

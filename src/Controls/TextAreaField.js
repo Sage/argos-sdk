@@ -14,7 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Controls/TextAreaField', ['Sage/Platform/Mobile/Controls/TextField'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.TextAreaField', [Sage.Platform.Mobile.Controls.TextField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.TextAreaField', [Sage.Platform.Mobile.Controls.TextField], {
         rows: 4,
         enableClearButton: false,
         widgetTemplate: new Simplate([
@@ -23,4 +23,5 @@ define('Sage/Platform/Mobile/Controls/TextAreaField', ['Sage/Platform/Mobile/Con
         ])
     });
     Sage.Platform.Mobile.Controls.FieldManager.register('textarea', Sage.Platform.Mobile.Controls.TextAreaField);
+    return control;
 });

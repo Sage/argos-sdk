@@ -33,7 +33,7 @@ define('Sage/Platform/Mobile/Controls/PicklistField', ['Sage/Platform/Mobile/Con
         return (viewsByName[name] = view);
     };
 
-    dojo.declare('Sage.Platform.Mobile.Controls.PicklistField', [Sage.Platform.Mobile.Controls.LookupField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.PicklistField', [Sage.Platform.Mobile.Controls.LookupField], {
         picklist: false,
         orderBy: 'number asc',
         storageMode: 'text',
@@ -105,4 +105,5 @@ define('Sage/Platform/Mobile/Controls/PicklistField', ['Sage/Platform/Mobile/Con
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('picklist', Sage.Platform.Mobile.Controls.PicklistField);
+    return control;
 });

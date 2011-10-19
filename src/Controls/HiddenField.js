@@ -14,7 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Controls/HiddenField', ['Sage/Platform/Mobile/Controls/TextField'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.HiddenField', [Sage.Platform.Mobile.Controls.TextField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.HiddenField', [Sage.Platform.Mobile.Controls.TextField], {
         propertyTemplate: new Simplate([
             '<div style="display: none;" data-field="{%= $.name %}" data-field-type="{%= $.type %}">',
             '</div>'
@@ -30,4 +30,5 @@ define('Sage/Platform/Mobile/Controls/HiddenField', ['Sage/Platform/Mobile/Contr
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('hidden', Sage.Platform.Mobile.Controls.HiddenField);
+    return control;
 });

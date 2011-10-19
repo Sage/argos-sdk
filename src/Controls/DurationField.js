@@ -14,7 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Controls/DurationField', ['Sage/Platform/Mobile/Controls/Field'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.DurationField', [Sage.Platform.Mobile.Controls.Field], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.DurationField', [Sage.Platform.Mobile.Controls.Field], {
         // Localization
         emptyText: '',
         invalidDateFormatErrorText: "Field '${0}' is not a valid number.",
@@ -126,4 +126,5 @@ define('Sage/Platform/Mobile/Controls/DurationField', ['Sage/Platform/Mobile/Con
         }
     });
     Sage.Platform.Mobile.Controls.FieldManager.register('duration', Sage.Platform.Mobile.Controls.DurationField);
+    return control;
 });

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Controls/Field','Sage/Platform/Mobile/Utility'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.LookupField', [Sage.Platform.Mobile.Controls.Field], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.LookupField', [Sage.Platform.Mobile.Controls.Field], {
         // Localization
         dependentErrorText: "A value for '${0}' must be selected.",
         emptyText: '',
@@ -415,4 +415,5 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('lookup', Sage.Platform.Mobile.Controls.LookupField);
+    return control;
 });

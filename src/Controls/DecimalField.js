@@ -14,7 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Controls/DecimalField', ['Sage/Platform/Mobile/Controls/TextField'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.DecimalField', [Sage.Platform.Mobile.Controls.TextField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.DecimalField', [Sage.Platform.Mobile.Controls.TextField], {
         precision: 2,
         enableClearButton: false,
         setValue: function(val) {
@@ -27,4 +27,5 @@ define('Sage/Platform/Mobile/Controls/DecimalField', ['Sage/Platform/Mobile/Cont
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('decimal', Sage.Platform.Mobile.Controls.DecimalField);
+    return control;
 });

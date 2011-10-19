@@ -16,7 +16,7 @@
 // todo: move to argos-saleslogix; this does not belong here.
 
 define('Sage/Platform/Mobile/Controls/NoteField', ['Sage/Platform/Mobile/Controls/EditorField'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.NoteField', [Sage.Platform.Mobile.Controls.EditorField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.NoteField', [Sage.Platform.Mobile.Controls.EditorField], {
         // Localization
         emptyText: '',
 
@@ -71,4 +71,5 @@ define('Sage/Platform/Mobile/Controls/NoteField', ['Sage/Platform/Mobile/Control
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('note', Sage.Platform.Mobile.Controls.NoteField);
+    return control;
 });

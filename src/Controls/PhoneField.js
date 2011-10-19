@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 define('Sage/Platform/Mobile/Controls/PhoneField', ['Sage/Platform/Mobile/Controls/TextField'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.PhoneField', [Sage.Platform.Mobile.Controls.TextField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.PhoneField', [Sage.Platform.Mobile.Controls.TextField], {
         /*
             {0}: original value
             {1}: cleaned value
@@ -91,4 +91,5 @@ define('Sage/Platform/Mobile/Controls/PhoneField', ['Sage/Platform/Mobile/Contro
         }
     });
     Sage.Platform.Mobile.Controls.FieldManager.register('phone', Sage.Platform.Mobile.Controls.PhoneField);
+    return control;
 });

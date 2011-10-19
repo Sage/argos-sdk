@@ -14,7 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Controls/DateField', ['Sage/Platform/Mobile/Controls/EditorField', 'Sage/Platform/Mobile/Calendar'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.DateField', [Sage.Platform.Mobile.Controls.EditorField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.DateField', [Sage.Platform.Mobile.Controls.EditorField], {
         // Localization
         emptyText: '',
         dateFormatText: 'MM/dd/yyyy',
@@ -90,4 +90,5 @@ define('Sage/Platform/Mobile/Controls/DateField', ['Sage/Platform/Mobile/Control
         }
     });
     Sage.Platform.Mobile.Controls.FieldManager.register('date', Sage.Platform.Mobile.Controls.DateField);
+    return control;
 });

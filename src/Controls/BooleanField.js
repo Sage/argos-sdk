@@ -14,7 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Controls/BooleanField', ['Sage/Platform/Mobile/Controls/Field'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.BooleanField', [Sage.Platform.Mobile.Controls.Field], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.BooleanField', [Sage.Platform.Mobile.Controls.Field], {
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<div class="toggle" data-dojo-attach-point="toggleNode" toggled="{%= !!$.checked %}">',
@@ -69,4 +69,6 @@ define('Sage/Platform/Mobile/Controls/BooleanField', ['Sage/Platform/Mobile/Cont
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('boolean', Sage.Platform.Mobile.Controls.BooleanField);
+
+    return control;
 });

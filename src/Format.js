@@ -17,7 +17,7 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
 
     dojo.setObject('Sage.Platform.Mobile.Format', null);
     
-    Sage.Platform.Mobile.Format = (function() {
+    return Sage.Platform.Mobile.Format = (function() {
         function isEmpty(val) {
             if (typeof val !== 'string') return !val;
 

@@ -15,7 +15,7 @@
 
 // todo: move to argos-saleslogix; this does not belong here.
 define('Sage/Platform/Mobile/Controls/AddressField', ['Sage/Platform/Mobile/Controls/EditorField'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.AddressField', [Sage.Platform.Mobile.Controls.EditorField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.AddressField', [Sage.Platform.Mobile.Controls.EditorField], {
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
@@ -41,4 +41,6 @@ define('Sage/Platform/Mobile/Controls/AddressField', ['Sage/Platform/Mobile/Cont
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('address', Sage.Platform.Mobile.Controls.AddressField);
+
+    return control;
 });

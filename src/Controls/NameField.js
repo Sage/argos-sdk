@@ -16,7 +16,7 @@
 // todo: move to argos-saleslogix; this does not belong here.
 
 define('Sage/Platform/Mobile/Controls/NameField', ['Sage/Platform/Mobile/Controls/EditorField'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.NameField', [Sage.Platform.Mobile.Controls.EditorField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.NameField', [Sage.Platform.Mobile.Controls.EditorField], {
         // Localization
         emptyText: 'no name',
 
@@ -35,4 +35,5 @@ define('Sage/Platform/Mobile/Controls/NameField', ['Sage/Platform/Mobile/Control
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('name', Sage.Platform.Mobile.Controls.NameField);
+    return control;
 });

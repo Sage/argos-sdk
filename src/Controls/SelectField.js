@@ -14,7 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Controls/SelectField', ['Sage/Platform/Mobile/Controls/LookupField'], function() {
-    dojo.declare('Sage.Platform.Mobile.Controls.SelectField', [Sage.Platform.Mobile.Controls.LookupField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Controls.SelectField', [Sage.Platform.Mobile.Controls.LookupField], {
         valueKeyProperty: false,
         valueTextProperty: false,
         createNavigationOptions: function() {
@@ -25,4 +25,5 @@ define('Sage/Platform/Mobile/Controls/SelectField', ['Sage/Platform/Mobile/Contr
     });
 
     Sage.Platform.Mobile.Controls.FieldManager.register('select', Sage.Platform.Mobile.Controls.SelectField);
+    return control;
 });
