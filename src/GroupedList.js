@@ -24,7 +24,7 @@ define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], functi
             '{%! $.searchTemplate %}',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',
             '{%! $.emptySelectionTemplate %}',
-            '<div class="group-content" dojoAttachPoint="contentNode"></div>',
+            '<div class="group-content" data-dojo-attach-point="contentNode"></div>',
             '{%! $.moreTemplate %}',
             '</div>'
         ]),

@@ -115,8 +115,8 @@ define('Sage/Platform/Mobile/_Templated', ['dojo', 'dijit/_Widget'], function() 
             //		Map widget properties and functions to the handlers specified in
             //		the dom node and it's descendants. This function iterates over all
             //		nodes and looks for these properties:
-            //			* dojoAttachPoint
-            //			* dojoAttachEvent
+            //			* data-dojo-attach-point
+            //			* data-dojo-attach-event
             //			* waiRole
             //			* waiState
             // rootNode: DomNode|Array[Widgets]
@@ -137,8 +137,8 @@ define('Sage/Platform/Mobile/_Templated', ['dojo', 'dijit/_Widget'], function() 
                 if(this.widgetsInTemplate && (getAttrFunc(baseNode, "dojoType") || getAttrFunc(baseNode, "data-dojo-type"))){
                     continue;
                 }
-                // Process dojoAttachPoint
-                //var attachPoint = getAttrFunc(baseNode, "dojoAttachPoint");
+                // Process data-dojo-attach-point
+                //var attachPoint = getAttrFunc(baseNode, "data-dojo-attach-point");
                 var attachPoint = getAttrFunc(baseNode, "dojoAttachPoint") || getAttrFunc(baseNode, "data-dojo-attach-point");
                 if(attachPoint){
                     var point, points = attachPoint.split(/\s*,\s*/);
@@ -152,8 +152,8 @@ define('Sage/Platform/Mobile/_Templated', ['dojo', 'dijit/_Widget'], function() 
                     }
                 }
 
-                // Process dojoAttachEvent
-                //var attachEvent = getAttrFunc(baseNode, "dojoAttachEvent");
+                // Process data-dojo-attach-event
+                //var attachEvent = getAttrFunc(baseNode, "data-dojo-attach-event");
                 var attachEvent = getAttrFunc(baseNode, "dojoAttachEvent") || getAttrFunc(baseNode, "data-dojo-attach-event");
                 if(attachEvent){
                     // NOTE: we want to support attributes that have the form

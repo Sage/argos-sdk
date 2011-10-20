@@ -50,7 +50,7 @@ define('Sage/Platform/Mobile/Edit',
         validationSummaryTemplate: new Simplate([
             '<div class="panel-validation-summary">',
             '<h2>{%: $.validationSummaryText %}</h2>',
-            '<ul dojoAttachPoint="validationContentNode">',
+            '<ul data-dojo-attach-point="validationContentNode">',
             '</ul>',
             '</div>'
         ]),

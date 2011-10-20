@@ -131,7 +131,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             '{%! $.searchTemplate %}',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',                
             '{%! $.emptySelectionTemplate %}',
-            '<ul class="list-content" dojoAttachPoint="contentNode"></ul>',
+            '<ul class="list-content" data-dojo-attach-point="contentNode"></ul>',
             '{%! $.moreTemplate %}',
             '</div>'
         ]),
@@ -162,8 +162,8 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
          * * more
          */
         moreTemplate: new Simplate([
-            '<div class="list-more" dojoAttachPoint="moreNode">',
-            '<div class="list-remaining"><span dojoAttachPoint="remainingContentNode"></span></div>',
+            '<div class="list-more" data-dojo-attach-point="moreNode">',
+            '<div class="list-remaining"><span data-dojo-attach-point="remainingContentNode"></span></div>',
             '<button class="button" data-action="more">',
             '<span>{%= $.moreText %}</span>',
             '</button>',
@@ -184,7 +184,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
          * * emptySelection
          */
         emptySelectionTemplate: new Simplate([
-            '<div class="list-empty-opt" dojoAttachPoint="emptySelectionNode">',
+            '<div class="list-empty-opt" data-dojo-attach-point="emptySelectionNode">',
             '<button class="button" data-action="emptySelection">',
             '<span>{%= $.emptySelectionText %}</span>',
             '</button>',
@@ -206,11 +206,11 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
          * * clearSearchQuery
          */
         searchTemplate: new Simplate([
-            '<div class="list-search" dojoAttachPoint="searchNode">',
-            '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" dojoAttachPoint="searchQueryNode" dojoAttachEvent="onfocus:_onSearchFocus,onblur:_onSearchFocus,onkeypress:_onSearchKeyPress" />',
+            '<div class="list-search" data-dojo-attach-point="searchNode">',
+            '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="searchQueryNode" data-dojo-attach-event="onfocus:_onSearchFocus,onblur:_onSearchFocus,onkeypress:_onSearchKeyPress" />',
             '<button class="subHeaderButton dismissButton" data-action="clearSearchQuery">X</button>',
             '<button class="subHeaderButton searchButton" data-action="search">{%= $.searchText %}</button>',
-            '<label dojoAttachPoint="searchLabelNode">{%= $.searchText %}</label>',
+            '<label data-dojo-attach-point="searchLabelNode">{%= $.searchText %}</label>',
             '</div>'
         ]),
         /**

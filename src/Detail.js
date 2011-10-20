@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="detail panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
             '{%! $.loadingTemplate %}',
-            '<div class="panel-content" dojoAttachPoint="contentNode"></div>',
+            '<div class="panel-content" data-dojo-attach-point="contentNode"></div>',
             '</div>'
         ]),
         emptyTemplate: new Simplate([
