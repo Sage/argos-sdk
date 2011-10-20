@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
+define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Controls/TextField'], function() {
 
     dojo.declare('Sage.Platform.Mobile.SelectionModel', null, {
         count: 0,
@@ -111,6 +111,109 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
         }
     });
 
+    dojo.declare('Sage.Platform.Mobile.Search', [Sage.Platform.Mobile.Controls.TextField], {
+        // Localization
+        searchText: 'Search',
+
+        widgetTemplate: new Simplate([
+            '<button class="clear-button" data-dojo-attach-point="clearNode"></button>',
+            '<input data-dojo-attach-point="inputNode" type="text" name="query" class="query" autocorrect="off" autocapitalize="off" />',
+            '<button class="subHeaderButton searchButton" data-action="search">{%= $.searchText %}</button>',
+            '<label data-dojo-attach-point="searchLabelNode">{%= $.searchText %}</label>'
+        ]),
+        attributeMap: {
+            inputValue: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'value'
+            }
+        },
+        enableClearButton: true,
+        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
+        view: null,
+
+        init: function(){
+            this.inherited(arguments);
+            dojo.style(this.clearNode, 'visibility', 'visible');
+        },
+        onBlur: function() {
+            var view = this.view || App.getPrimaryActiveView();
+            if (this.inputNode.value == '') {
+                dojo.removeClass(view.searchNode, 'list-search-active');
+            }
+        },
+        onFocus: function() {
+            var view = this.view || App.getPrimaryActiveView();
+            dojo.addClass(view.searchNode, 'list-search-active');
+        },
+        onKeyUp: function(evt) {
+            if (evt.keyCode == 13 || evt.keyCode == 10)
+            {
+                dojo.stopEvent(evt);
+                this.inputNode.blur();
+                this.search();
+            }
+        },
+        search: function() {
+            var search = this.inputNode.value.length > 0 ? this.inputNode.value : false,
+                view = this.view || App.getPrimaryActiveView(),
+                customMatch = search && view.customSearchRE.exec(search),
+                hashTagMatches = search && this.hashTagSearchRE.exec(search),
+                query = false,
+                hashTagQueries = view.hashTagQueries,
+                hashTagQueriesText = view.hashTagQueriesText;
+
+            view.clear();
+
+            if (customMatch) {
+                query = search.replace(view.customSearchRE, '');
+            } else {
+                if (hashTagMatches && hashTagQueries) {
+                    var hashLookup = {},
+                        hashQueries = [],
+                        hashQueryExpression,
+                        match,
+                        hashTag,
+                        additionalSearch = search.replace(hashTagMatches[0],'');
+
+                    // localize
+                    for (var key in hashTagQueriesText) hashLookup[hashTagQueriesText[key]] = key;
+
+                    // add initial hash caught for if test
+                    hashTag = hashTagMatches[1];
+                    hashQueryExpression = hashTagQueries[hashLookup[hashTag] || hashTag];
+                    hashQueries.push(this.expandExpression(hashQueryExpression));
+
+                    while (match = this.hashTagSearchRE.exec(search))
+                    {
+                        hashTag = match[1];
+
+                        hashQueryExpression = hashTagQueries[hashLookup[hashTag] || hashTag];
+                        hashQueries.push(this.expandExpression(hashQueryExpression));
+
+                        additionalSearch = additionalSearch.replace(match[0], '');
+                    }
+
+                    query = '(' + hashQueries.join(') and (') + ')';
+
+                    additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
+
+                    if (additionalSearch != '') {
+                        query += ' and (' + view.formatSearchQuery(additionalSearch) + ')';
+                    }
+                } else {
+                    if (search) {
+                        query = view.formatSearchQuery(search);
+                    }
+                }
+            }
+
+            view.searchQuery = query;
+            view.requestData();
+        }
+    });
+
+
     /**
      * A base list view.
      * @constructor
@@ -207,10 +310,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
          */
         searchTemplate: new Simplate([
             '<div class="list-search" data-dojo-attach-point="searchNode">',
-            '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="searchQueryNode" data-dojo-attach-event="onfocus:_onSearchFocus,onblur:_onSearchFocus,onkeypress:_onSearchKeyPress" />',
-            '<button class="subHeaderButton dismissButton" data-action="clearSearchQuery">X</button>',
-            '<button class="subHeaderButton searchButton" data-action="search">{%= $.searchText %}</button>',
-            '<label data-dojo-attach-point="searchLabelNode">{%= $.searchText %}</label>',
             '</div>'
         ]),
         /**
@@ -247,8 +346,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
         ]),
         contentNode:null,
         searchNode: null,
-        searchQueryNode: null,
-        searchLabelNode: null,
         emptySelectionNode: null,
         remainingNode: null,
         moreNode: null,
@@ -348,11 +445,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
          */
         customSearchRE: /^#!/,
         /**
-         * The regular expression used to determine if a search query is a hash tag search.
-         * @type {Object}
-         */
-        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
-        /**
          * The text displayed in the more button.
          * @type {String}
          */
@@ -372,11 +464,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
          * @type {String}
          */
         remainingText: '${0} records remaining',
-        /**
-         * The text displayed as the watermark in the search text box.
-         * @type {String}
-         */
-        searchText: 'Search',
         /**
          * The text displayed on the cancel button.
          * @type {String}
@@ -433,6 +520,12 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
 
             this.connect(App, 'onRefresh', this._onRefresh);
 
+            if(!this.hideSearch){
+                var search = new Sage.Platform.Mobile.Search({owner: this});
+                search.renderTo(this.searchNode);
+                search.init();
+            }
+
             this.clear();
         },
         createToolLayout: function() {
@@ -451,22 +544,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
         isSelectionDisabled: function() {
             return !((this.options && this.options.selectionOnly) || (this.allowSelection));
         },        
-        _onSearchBlur: function() {
-            if (this.searchQueryNode.value == '') dojo.removeClass(this.searchNode, 'list-search-active');
-        },
-        _onSearchFocus: function() {
-            dojo.addClass(this.searchNode, 'list-search-active');
-        },
-        _onSearchKeyPress: function(evt) {
-            if (evt.keyCode == 13 || evt.keyCode == 10)
-            {
-                dojo.stopEvent(evt);
-
-                this.searchQueryNode.blur();
-
-                this.search();
-            }
-        },
         _onSelectionModelSelect: function(key, data, tag) {
             var el = dojo.byId(tag) || dojo.query('li[data-key="'+key+'"]', this.domNode)[0];
             if (el) dojo.addClass(el, 'list-item-selected');
@@ -526,68 +603,10 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
                 }
             }
         },
-        clearSearchQuery: function() {
-            dojo.removeClass(this.searchNode, 'list-search-active');
-            this.searchQueryNode.value = '';
-        },
-        search: function() {
-            /// <summary>
-            ///     Called when a new search is activated.  This method sets up the SData query, clears the content
-            ///     of the view, and fires a request for updated data.
-            /// </summary>
-            /// <param name="searchText" type="String">The search query.</param>
-            var search = this.searchQueryNode.value.length > 0 ? this.searchQueryNode.value : false,
-                customMatch = search && this.customSearchRE.exec(search),
-                hashTagMatches = search && this.hashTagSearchRE.exec(search);
+        formatRelatedQuery: function(entry, fmt, property) {
+            var property = property || '$key';
 
-            this.clear();
-
-            this.queryText = search;
-            this.query = false;
-
-            if (customMatch)
-            {
-                this.query = search.replace(this.customSearchRE, '');
-            }
-            else if (hashTagMatches && this.hashTagQueries)
-            {
-                var hashLookup = {},
-                    hashQueries = [],
-                    hashQueryExpression,
-                    match,
-                    hashTag,
-                    additionalSearch = search.replace(hashTagMatches[0],'');
-
-                // localize
-                for (var key in this.hashTagQueriesText) hashLookup[this.hashTagQueriesText[key]] = key;
-
-                // add initial hash caught for if test
-                hashTag = hashTagMatches[1];
-                hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
-                hashQueries.push(this.expandExpression(hashQueryExpression));
-
-                while (match = this.hashTagSearchRE.exec(search))
-                {
-                    hashTag = match[1];
-
-                    hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
-                    hashQueries.push(this.expandExpression(hashQueryExpression));
-
-                    additionalSearch = additionalSearch.replace(match[0], '');
-                }
-
-                this.query = '(' + hashQueries.join(') and (') + ')';
-
-                additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
-
-                if (additionalSearch != '') this.query += ' and (' + this.formatSearchQuery(additionalSearch) + ')';
-            }
-            else if (search)
-            {
-                this.query = this.formatSearchQuery(search);
-            }
-
-            this.requestData();
+            return dojo.string.substitute(fmt, [Sage.Platform.Mobile.Utility.getValue(entry, property)]);
         },
         formatSearchQuery: function(query) {
             /// <summary>
@@ -598,11 +617,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
         },
         escapeSearchQuery: function(query) {
             return (query || '').replace(/"/g, '""');
-        },
-        formatRelatedQuery: function(entry, fmt, property) {
-            var property = property || '$key';
-
-            return dojo.string.substitute(fmt, [Sage.Platform.Mobile.Utility.getValue(entry, property)]);
         },
         createRequest:function() {
             /// <summary>
@@ -655,10 +669,8 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             if (queryWhereExpr)
                 where.push(queryWhereExpr);
 
-            // this is for search
-            // todo: rename to searchQuery
-            if (this.query)
-                where.push(this.query);
+            if (this.searchQuery)
+                where.push(this.searchQuery);
 
             if (where.length > 0)
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Where, where.join(' and '));
@@ -835,7 +847,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             this.inherited(arguments);
 
             dojo.toggleClass(this.domNode, 'list-hide-search', this.hideSearch);
-            dojo.toggleClass(this.searchNode, 'list-search-active', this.searchQueryNode.value != '');
             dojo.toggleClass(this.domNode, 'list-show-selectors', !this.isSelectionDisabled());
 
             if (this._selectionModel && !this.isSelectionDisabled())
@@ -879,7 +890,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View'], function() {
             this.entries = {};
             this.feed = false;
             this.query = false; // todo: rename to searchQuery
-            this.queryText = false; // todo: rename to searchQueryText
 
             dojo.removeClass(this.domNode, 'list-has-more');
 

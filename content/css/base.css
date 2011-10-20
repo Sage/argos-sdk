@@ -422,6 +422,9 @@ input.text-input {
     width:30px;
     height:30px;
 }
+.list-search button.clear-button {
+    right: 70px;
+}
 
 /* TODO: Move color specifics to theme folder */
 /* Calendar */
