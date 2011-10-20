@@ -99,6 +99,11 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         },
         onClearPress: function(evt){
             this.clearValue();
+            dojo.stopEvent(evt);
+            // Mobile browsers listen to either or both events
+            // to show keyboard
+            this.inputNode.focus();
+            this.inputNode.click();
         },
         onNotificationTrigger: function(evt, el, o) {
             var currentValue = this.getValue();
