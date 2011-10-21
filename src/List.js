@@ -132,10 +132,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
         view: null,
 
-        init: function(){
-            this.inherited(arguments);
-            dojo.style(this.clearNode, 'visibility', 'visible');
-        },
         onBlur: function() {
             var view = this.view || App.getPrimaryActiveView();
             if (this.inputNode.value == '') {
@@ -521,7 +517,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             this.connect(App, 'onRefresh', this._onRefresh);
 
             if(!this.hideSearch){
-                var search = new Sage.Platform.Mobile.Search({owner: this});
+                var search = new Sage.Platform.Mobile.Search({view: this});
                 search.renderTo(this.searchNode);
                 search.init();
             }
