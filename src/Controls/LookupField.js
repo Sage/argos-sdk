@@ -186,7 +186,7 @@ define('Sage/Platform/Mobile/Controls/LookupField', ['Sage/Platform/Mobile/Contr
             this.previousValue = text;
         },
         getText: function() {
-            return this.get('inputValue');
+            return this.inputNode.value;
         },
         complete: function() {
             // todo: should there be a better way?
