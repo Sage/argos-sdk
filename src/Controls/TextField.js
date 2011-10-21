@@ -31,7 +31,7 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '{% if($.enableClearButton) { %}',
-                '<button class="clear-button" data-dojo-attach-point="clearNode"></button>',
+                '<button class="clear-button" data-dojo-attach-point="clearNode" data-dojo-attach-event="onclick: onClearPress"></button>',
             '{% } %}',
             '<input data-dojo-attach-point="inputNode" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),
@@ -45,8 +45,6 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         },
         renderTo: function(){
             this.inherited(arguments);
-            if(this.enableClearButton && this.clearNode)
-                dojo.connect(this.clearNode, 'click', this, this.onClearPress);
         },
         enable: function() {
             this.inherited(arguments);

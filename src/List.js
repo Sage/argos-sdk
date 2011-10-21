@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Controls/TextField'], function() {
+define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Controls/Search'], function() {
 
     dojo.declare('Sage.Platform.Mobile.SelectionModel', null, {
         count: 0,
@@ -111,105 +111,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         }
     });
 
-    dojo.declare('Sage.Platform.Mobile.Search', [Sage.Platform.Mobile.Controls.TextField], {
-        // Localization
-        searchText: 'Search',
-
-        widgetTemplate: new Simplate([
-            '<button class="clear-button" data-dojo-attach-point="clearNode"></button>',
-            '<input data-dojo-attach-point="inputNode" type="text" name="query" class="query" autocorrect="off" autocapitalize="off" />',
-            '<button class="subHeaderButton searchButton" data-action="search">{%= $.searchText %}</button>',
-            '<label data-dojo-attach-point="searchLabelNode">{%= $.searchText %}</label>'
-        ]),
-        attributeMap: {
-            inputValue: {
-                node: 'inputNode',
-                type: 'attribute',
-                attribute: 'value'
-            }
-        },
-        enableClearButton: true,
-        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
-        view: null,
-
-        onBlur: function() {
-            var view = this.view || App.getPrimaryActiveView();
-            if (this.inputNode.value == '') {
-                dojo.removeClass(view.searchNode, 'list-search-active');
-            }
-        },
-        onFocus: function() {
-            var view = this.view || App.getPrimaryActiveView();
-            dojo.addClass(view.searchNode, 'list-search-active');
-        },
-        onKeyUp: function(evt) {
-            if (evt.keyCode == 13 || evt.keyCode == 10)
-            {
-                dojo.stopEvent(evt);
-                this.inputNode.blur();
-                this.search();
-            }
-        },
-        search: function() {
-            var search = this.inputNode.value.length > 0 ? this.inputNode.value : false,
-                view = this.view || App.getPrimaryActiveView(),
-                customMatch = search && view.customSearchRE.exec(search),
-                hashTagMatches = search && this.hashTagSearchRE.exec(search),
-                query = false,
-                hashTagQueries = view.hashTagQueries,
-                hashTagQueriesText = view.hashTagQueriesText;
-
-            view.clear();
-
-            if (customMatch) {
-                query = search.replace(view.customSearchRE, '');
-            } else {
-                if (hashTagMatches && hashTagQueries) {
-                    var hashLookup = {},
-                        hashQueries = [],
-                        hashQueryExpression,
-                        match,
-                        hashTag,
-                        additionalSearch = search.replace(hashTagMatches[0],'');
-
-                    // localize
-                    for (var key in hashTagQueriesText) hashLookup[hashTagQueriesText[key]] = key;
-
-                    // add initial hash caught for if test
-                    hashTag = hashTagMatches[1];
-                    hashQueryExpression = hashTagQueries[hashLookup[hashTag] || hashTag];
-                    hashQueries.push(this.expandExpression(hashQueryExpression));
-
-                    while (match = this.hashTagSearchRE.exec(search))
-                    {
-                        hashTag = match[1];
-
-                        hashQueryExpression = hashTagQueries[hashLookup[hashTag] || hashTag];
-                        hashQueries.push(this.expandExpression(hashQueryExpression));
-
-                        additionalSearch = additionalSearch.replace(match[0], '');
-                    }
-
-                    query = '(' + hashQueries.join(') and (') + ')';
-
-                    additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
-
-                    if (additionalSearch != '') {
-                        query += ' and (' + view.formatSearchQuery(additionalSearch) + ')';
-                    }
-                } else {
-                    if (search) {
-                        query = view.formatSearchQuery(search);
-                    }
-                }
-            }
-
-            view.searchQuery = query;
-            view.requestData();
-        }
-    });
-
-
     /**
      * A base list view.
      * @constructor
@@ -305,7 +206,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          * * clearSearchQuery
          */
         searchTemplate: new Simplate([
-            '<div class="list-search" data-dojo-attach-point="searchNode">',
+            '<div data-dojo-attach-point="searchContainerNode">',
             '</div>'
         ]),
         /**
@@ -488,6 +389,8 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          */
         requestErrorText: 'A server error occurred while requesting data.',
         customizationSet: 'list',
+        _searchModel: null,
+        _searchModelClass: Sage.Platform.Mobile.Controls.Search,
         _selectionModel: null,
         _selectionConnects: null,
         _setSelectionModelAttr: function(selectionModel) {
@@ -517,10 +420,9 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             this.connect(App, 'onRefresh', this._onRefresh);
 
             if(!this.hideSearch){
-                var search = new Sage.Platform.Mobile.Search({view: this});
-                search.renderTo(this.searchNode);
-                search.init();
-            }
+                this._searchModel = this._searchModel || new this._searchModelClass({view: this});
+                this._searchModel.placeAt(this.searchContainerNode);
+           }
 
             this.clear();
         },

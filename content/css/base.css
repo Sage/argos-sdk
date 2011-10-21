@@ -422,7 +422,7 @@ input.text-input {
     width:30px;
     height:30px;
 }
-div.list-search-active > div > button.clear-button {
+div.list-search-active > button.clear-button {
     visibility: visible;
 }
 div.list-search button.clear-button {
