@@ -525,12 +525,11 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             this.clear();
         },
         createToolLayout: function() {
-            var editView = App.views[this.id.replace(/list$/, 'edit')];
             return this.tools || (this.tools = {
                 'tbar': [{
                     id: 'new',
                     action: 'navigateToInsertView',
-                    enabled: App.hasSecurity(editView && editView.securedAction && editView.securedAction.add)
+                    enabled: App.hasSecurity(this.securedAction)
                 }]
             });
         },
