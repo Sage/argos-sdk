@@ -591,6 +591,10 @@ textarea:focus
     );
 }
 
+.toolButton-disabled
+{
+    opacity: 0.25;
+}
 
 .subHeaderButton,
 .whiteButton

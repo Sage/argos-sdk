@@ -19,10 +19,6 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         attributeMap: {
             detailContent: {node: 'contentNode', type: 'innerHTML'}
         },
-        /**
-         * The template used to render the view's main DOM element when the view is initialized.
-         * This template includes {@link #searchTemplate} and {@link #moreTemplate}.
-         */
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="detail panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
             '{%! $.loadingTemplate %}',
@@ -97,6 +93,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         ]),
         id: 'generic_detail',
         layout: null,
+        security: false,
         customizationSet: 'detail',
         expose: false,
         editText: 'Edit',
@@ -107,6 +104,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         requestErrorText: 'A server error occurred while requesting data.',
         notAvailableText: 'The requested entry is not available.',
         editView: false,
+        editSecurity: false,
 
         postCreate: function() {
             this.inherited(arguments);
@@ -118,7 +116,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 'tbar': [{
                     id: 'edit',
                     action: 'navigateToEditView',
-                    enabled: App.hasSecurity(this.securedAction ? this.securedAction.replace('View', 'Edit') : null)
+                    security: this.editSecurity
                 }]
             });
         },
@@ -160,7 +158,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         },
         navigateToEditView: function(el) {
             var view = App.getView(this.editView);
-            if (view && el.$tool.enabled)
+            if (view)
                 view.show({entry: this.entry});
         },
         navigateToRelatedView: function(view, o, descriptor) {
@@ -355,16 +353,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
             if (this.entry)
             {
-                if (!this.securedAction || App.hasSecurity(this.securedAction)) {
-                    this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
-
-                } else {
-                    this.contentNode.innerHTML = '<div class="not-available">' + this.noAccessText + '</div>';
-
-                    // disable Edit button in toolbar
-                    if (this.securedAction && !App.hasSecurity(this.securedAction.replace('View', 'Edit')))
-                        dojo.query('[data-tool=edit]').addClass('invisible');
-                }
+                this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
             }
             else
             {
@@ -443,6 +432,12 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             }
         },
         refresh: function() {
+            if (this.security && !App.hasSecurity(this.expandExpression(this.security)))
+            {
+                dojo.query(this.contentNode).append(this.notAvailableTemplate.apply(this));
+                return;
+            }
+
             this.requestData();
         },
         transitionTo: function() {

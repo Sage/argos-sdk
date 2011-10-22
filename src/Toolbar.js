@@ -35,7 +35,7 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
             var id = parameters && parameters.tool,
                 tool = this.tools && this.tools[id],
                 source = tool && tool.source;
-            if (source)
+            if (source && tool.enabled)
             {
                 if (source.fn)
                 {
@@ -93,15 +93,21 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
         },
         showTools: function(tools) {
             this.tools = {};
-            // fix until all views correctly return a tools object
-            if(!tools) return;
+
+            if(typeof tools == 'undefined') return;
 
             for (var i = 0; i < tools.length; i++) {
-                this.tools[tools[i].id] = {
+                var tool = {
                     busy: false,
-                    enabled: (false === tools[i].enabled) ? false : true,
+                    enabled: typeof tools[i].enabled != 'undefined' ? tools[i].enabled : true,
                     source: tools[i]
                 };
+
+                // if tool is enabled, check security
+                if (tool.enabled && tools[i].security)
+                    tool.enabled = App.hasSecurity(this.expandExpression(tools[i].security));
+
+                this.tools[tools[i].id] = tool;
             }
         }
     });

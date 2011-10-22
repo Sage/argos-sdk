@@ -28,7 +28,7 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
             '</div>'
         ]),
         toolTemplate: new Simplate([
-            '<button class="button toolButton toolButton-{%= $.side || "right" %} {%= (false === $.enabled) ? "disabled" : "" %} {%= $.cls %}"',
+            '<button class="button toolButton toolButton-{%= $.side || "right" %} {%= ($$.enabled) ? "" : "toolButton-disabled" %} {%= $.cls %}"',
                     'data-action="invokeTool" data-tool="{%= $.id %}"',
                     'aria-label="{%: $.title || $.id %}">',
                 '{% if ($.icon) { %}',
@@ -60,7 +60,7 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
                 {
                     count[tools[i].side || 'right'] += 1;
 
-                    dojo.query(this.domNode).append(this.toolTemplate.apply(tools[i]));
+                    dojo.query(this.domNode).append(this.toolTemplate.apply(tools[i], this.tools[tools[i].id]));
                 }
 
                 this.size = Math.max(count.left, count.right);

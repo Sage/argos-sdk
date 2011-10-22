@@ -99,6 +99,8 @@ define('Sage/Platform/Mobile/Edit', [
         detailsText: 'Details',
         loadingText: 'loading...',
         requestErrorText: 'A server error occured while requesting data.',
+        insertSecurity: false,
+        updateSecurity: false,
         constructor: function(o) {
             this.fields = {};
             dojo.mixin(this, o);
@@ -123,7 +125,10 @@ define('Sage/Platform/Mobile/Edit', [
             return this.tools || (this.tools = {
                 'tbar': [{
                     id: 'save',
-                    action: 'save'
+                    action: 'save',
+                    security: this.options && this.options.insert
+                        ? this.insertSecurity
+                        : this.updateSecurity
                 },{
                     id: 'cancel',
                     side: 'left',
@@ -775,42 +780,6 @@ define('Sage/Platform/Mobile/Edit', [
                     this.setValues(this.changes);
                 }
             }
-
-            // check user role for access to Edit/Add
-            if (this.securedAction && !App.hasSecurity(
-                    this.inserting
-                        ? this.securedAction.add
-                        : this.securedAction.edit
-                )) {
-
-                if (!dojo.query('.not-available', this.contentNode).pop()) {
-                    dojo.query(this.contentNode).append('<div class="not-available"></div>');
-                }
-                dojo.query('.not-available', this.contentNode)[0].innerHTML = this.inserting
-                        ? this.noAccessAddText
-                        : this.noAccessEditText
-                        ;
-
-                // hide panel heading and fields
-                dojo.query('h2', this.domNode).addClass('row-hidden');
-                dojo.query('fieldset', this.domNode).addClass('row-hidden');
-                // reveal no Access message
-                dojo.query('.not-available', this.domNode).removeClass('row-hidden');
-
-                // disable 'Save' button in toolbar
-                dojo.query('[data-tool=save]').addClass('invisible');
-
-            } else {
-                // reveal heading(s) and fields 
-                dojo.query('h2', this.domNode).removeClass('row-hidden');
-                dojo.query('fieldset', this.domNode).removeClass('row-hidden');
-                // hide no Access message
-                dojo.query('.not-available', this.domNode).addClass('row-hidden');
-            }
-
-        },
-        transitionTo: function() {
-            Sage.Platform.Mobile.Edit.superclass.transitionTo.call(this);
         }
     });
 });

@@ -298,18 +298,20 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          * The id of the detail view to show when a row is clicked.
          * @type {?String}
          */
-        detailView: false,
+        detailView: null,
         /**
          * The view to show, either an id or an instance, if there is no {@link #insertView} specified, when
          * the {@link #navigateToInsertView} action is invoked.
          * @type {?(String|Sage.Platform.Mobile.View)}
          */
-        editView: false,
+        editView: null,
+        editSecurity: null,
         /**
          * The view to show, either an id or an instance, when the {@link #navigateToInsertView} action is invoked.
          * @type {?(String|Sage.Platform.Mobile.View)}
          */
-        insertView: false,
+        insertView: null,
+        insertSecurity: null,
         /**
          * The view to show, either an id or an instance, when the {@link #navigateToContextView} action is invoked.
          * @type {?(String|Sage.Platform.Mobile.View)}
@@ -448,7 +450,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                 'tbar': [{
                     id: 'new',
                     action: 'navigateToInsertView',
-                    enabled: App.hasSecurity(this.securedAction)
+                    security: this.insertSecurity || this.editSecurity
                 }]
             });
         },
@@ -664,7 +666,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         },
         navigateToInsertView: function(el) {
             var view = App.getView(this.insertView || this.editView);
-            if (view && el.$tool.enabled)
+            if (view)
             {
                 view.show({
                     returnTo: this.id,
