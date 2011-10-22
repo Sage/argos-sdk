@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Controls/Search'], function() {
+define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Fields/Search'], function() {
 
     dojo.declare('Sage.Platform.Mobile.SelectionModel', null, {
         count: 0,
@@ -390,7 +390,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         requestErrorText: 'A server error occurred while requesting data.',
         customizationSet: 'list',
         _searchModel: null,
-        _searchModelClass: Sage.Platform.Mobile.Controls.Search,
+        _searchModelClass: Sage.Platform.Mobile.Fields.Search,
         _selectionModel: null,
         _selectionConnects: null,
         _setSelectionModelAttr: function(selectionModel) {
@@ -419,10 +419,11 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             this.connect(App, 'onRefresh', this._onRefresh);
 
+            /*
             if(!this.hideSearch){
                 this._searchModel = this._searchModel || new this._searchModelClass({view: this});
                 this._searchModel.placeAt(this.searchContainerNode);
-           }
+           }*/
 
             this.clear();
         },

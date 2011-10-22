@@ -13,23 +13,18 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Controls/Field', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_Templated'], function() {
-    dojo.setObject('Sage.Platform.Mobile.Controls.FieldManager', null);
+define('Sage/Platform/Mobile/Fields/_Field', [
+    'dojo',
+    'dojo/string',
+    'dojo/NodeList-manipulate',
+    'dojo/NodeList-traverse',
+    'dijit/_Widget',
+    'Sage/Platform/Mobile/FieldManager',
+    'Sage/Platform/Mobile/_ActionMixin',
+    'Sage/Platform/Mobile/_Templated'
+], function() {
     
-    Sage.Platform.Mobile.Controls.FieldManager = (function() {
-        var types = {};
-        return {
-            types: types,
-            register: function(name, ctor) {
-                types[name] = ctor;
-            },
-            get: function(name) {
-                return types[name];
-            }
-        };
-    })();
-
-    return dojo.declare('Sage.Platform.Mobile.Controls.Field', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
+    return dojo.declare('Sage.Platform.Mobile.Fields._Field', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
         owner: false,
         applyTo: false,
         alwaysUseValue: false,

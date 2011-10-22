@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Controls/Field'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Controls.TextField', [Sage.Platform.Mobile.Controls.Field], {
+define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_Field'], function() {
+    var control = dojo.declare('Sage.Platform.Mobile.Fields.TextField', [Sage.Platform.Mobile.Fields._Field], {
         notificationTrigger: false,
         validationTrigger: false,
 		inputType: 'text',
@@ -135,6 +135,5 @@ define('Sage/Platform/Mobile/Controls/TextField', ['Sage/Platform/Mobile/Control
         }
     });
 
-    Sage.Platform.Mobile.Controls.FieldManager.register('text', Sage.Platform.Mobile.Controls.TextField);
-    return control;
+    return Sage.Platform.Mobile.FieldManager.register('text', control);
 });

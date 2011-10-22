@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Controls/DecimalField', ['Sage/Platform/Mobile/Controls/TextField'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Controls.DecimalField', [Sage.Platform.Mobile.Controls.TextField], {
+define('Sage/Platform/Mobile/Fields/DecimalField', ['Sage/Platform/Mobile/Fields/TextField'], function() {
+    var control = dojo.declare('Sage.Platform.Mobile.Fields.DecimalField', [Sage.Platform.Mobile.Fields.TextField], {
         precision: 2,
         enableClearButton: false,
         setValue: function(val) {
@@ -22,10 +22,9 @@ define('Sage/Platform/Mobile/Controls/DecimalField', ['Sage/Platform/Mobile/Cont
             val = isNaN(val)
                 ? dojo.string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.'])
                 : val;
-            Sage.Platform.Mobile.Controls.DecimalField.superclass.setValue.call(this, val);
+            Sage.Platform.Mobile.Fields.DecimalField.superclass.setValue.call(this, val);
         }
     });
 
-    Sage.Platform.Mobile.Controls.FieldManager.register('decimal', Sage.Platform.Mobile.Controls.DecimalField);
-    return control;
+    return Sage.Platform.Mobile.FieldManager.register('decimal', control);
 });

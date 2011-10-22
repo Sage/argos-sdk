@@ -13,17 +13,15 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Controls/SelectField', ['Sage/Platform/Mobile/Controls/LookupField'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Controls.SelectField', [Sage.Platform.Mobile.Controls.LookupField], {
-        valueKeyProperty: false,
-        valueTextProperty: false,
-        createNavigationOptions: function() {
-            var options = this.inherited(arguments);
-            options.data = this.expandExpression(this.data);
-            return options;
-        }        
+define('Sage/Platform/Mobile/Fields/TextAreaField', ['Sage/Platform/Mobile/Fields/TextField'], function() {
+    var control = dojo.declare('Sage.Platform.Mobile.Fields.TextAreaField', [Sage.Platform.Mobile.Fields.TextField], {
+        rows: 4,
+        enableClearButton: false,
+        widgetTemplate: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<textarea data-dojo-attach-point="inputNode" name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %}></textarea>'
+        ])
     });
 
-    Sage.Platform.Mobile.Controls.FieldManager.register('select', Sage.Platform.Mobile.Controls.SelectField);
-    return control;
+    return Sage.Platform.Mobile.FieldManager.register('textarea', control);
 });

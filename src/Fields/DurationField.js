@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Controls/DurationField', ['Sage/Platform/Mobile/Controls/Field'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Controls.DurationField', [Sage.Platform.Mobile.Controls.Field], {
+define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Fields/_Field'], function() {
+    var control = dojo.declare('Sage.Platform.Mobile.Fields.DurationField', [Sage.Platform.Mobile.Fields._Field], {
         // Localization
         emptyText: '',
         invalidDateFormatErrorText: "Field '${0}' is not a valid number.",
@@ -125,6 +125,6 @@ define('Sage/Platform/Mobile/Controls/DurationField', ['Sage/Platform/Mobile/Con
             return this.inherited(arguments);
         }
     });
-    Sage.Platform.Mobile.Controls.FieldManager.register('duration', Sage.Platform.Mobile.Controls.DurationField);
-    return control;
+    
+    return Sage.Platform.Mobile.FieldManager.register('duration', control);
 });

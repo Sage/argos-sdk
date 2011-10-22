@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Controls/Field'], function() {
+define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/_Field'], function() {
 
-    return dojo.declare('Sage.Platform.Mobile.Controls.EditorField', [Sage.Platform.Mobile.Controls.Field], {
+    return dojo.declare('Sage.Platform.Mobile.Fields.EditorField', [Sage.Platform.Mobile.Fields._Field], {
         // Localization
         lookupLabelText: 'edit',
         lookupText: '...',
@@ -146,7 +146,7 @@ define('Sage/Platform/Mobile/Controls/EditorField', ['Sage/Platform/Mobile/Contr
         },
         validate: function(value) {
             return typeof value === 'undefined'
-                ? Sage.Platform.Mobile.Controls.EditorField.superclass.validate.call(this, this.validationValue)
+                ? Sage.Platform.Mobile.Fields.EditorField.superclass.validate.call(this, this.validationValue)
                 : this.inherited(arguments);
         },
         setValue: function(val, initial)

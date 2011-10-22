@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Controls/BooleanField', ['Sage/Platform/Mobile/Controls/Field'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Controls.BooleanField', [Sage.Platform.Mobile.Controls.Field], {
+define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields/_Field'], function() {
+    var control = dojo.declare('Sage.Platform.Mobile.Fields.BooleanField', [Sage.Platform.Mobile.Fields._Field], {
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<div class="toggle" data-dojo-attach-point="toggleNode" toggled="{%= !!$.checked %}">',
@@ -68,7 +68,5 @@ define('Sage/Platform/Mobile/Controls/BooleanField', ['Sage/Platform/Mobile/Cont
         }
     });
 
-    Sage.Platform.Mobile.Controls.FieldManager.register('boolean', Sage.Platform.Mobile.Controls.BooleanField);
-
-    return control;
+    return Sage.Platform.Mobile.FieldManager.register('boolean', control);
 });

@@ -13,25 +13,25 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Edit',
-    ['Sage/Platform/Mobile/View',
-        'Sage/Platform/Mobile/Utility',
-        'Sage/Platform/Mobile/Convert',
-        'Sage/Platform/Mobile/Controls/Field',
-        'Sage/Platform/Mobile/Controls/EditorField',
-        'Sage/Platform/Mobile/Controls/TextField',
-        'Sage/Platform/Mobile/Controls/AddressField',
-        'Sage/Platform/Mobile/Controls/PhoneField',
-        'Sage/Platform/Mobile/Controls/NameField',
-        'Sage/Platform/Mobile/Controls/PicklistField',
-        'Sage/Platform/Mobile/Controls/SelectField',
-        'Sage/Platform/Mobile/Controls/BooleanField',
-        'Sage/Platform/Mobile/Controls/DateField',
-        'Sage/Platform/Mobile/Controls/DecimalField',
-        'Sage/Platform/Mobile/Controls/DurationField',
-        'Sage/Platform/Mobile/Controls/HiddenField',
-        'Sage/Platform/Mobile/Controls/NoteField',
-        'Sage/Platform/Mobile/Controls/TextAreaField'
+define('Sage/Platform/Mobile/Edit', [
+    'Sage/Platform/Mobile/View',
+    'Sage/Platform/Mobile/Utility',
+    'Sage/Platform/Mobile/Convert',
+    'Sage/Platform/Mobile/FieldManager',
+    'Sage/Platform/Mobile/Fields/EditorField',
+    'Sage/Platform/Mobile/Fields/TextField',
+    'Sage/Platform/Mobile/Fields/AddressField',
+    'Sage/Platform/Mobile/Fields/PhoneField',
+    'Sage/Platform/Mobile/Fields/NameField',
+    'Sage/Platform/Mobile/Fields/PicklistField',
+    'Sage/Platform/Mobile/Fields/SelectField',
+    'Sage/Platform/Mobile/Fields/BooleanField',
+    'Sage/Platform/Mobile/Fields/DateField',
+    'Sage/Platform/Mobile/Fields/DecimalField',
+    'Sage/Platform/Mobile/Fields/DurationField',
+    'Sage/Platform/Mobile/Fields/HiddenField',
+    'Sage/Platform/Mobile/Fields/NoteField',
+    'Sage/Platform/Mobile/Fields/TextAreaField'
     ], function() {
 
     return dojo.declare('Sage.Platform.Mobile.Edit', [Sage.Platform.Mobile.View], {
@@ -251,7 +251,7 @@ define('Sage/Platform/Mobile/Edit',
                     content.push(this.sectionBeginTemplate.apply(layoutOptions, this));
                 }                    
 
-                var ctor = Sage.Platform.Mobile.Controls.FieldManager.get(current['type']),
+                var ctor = Sage.Platform.Mobile.FieldManager.get(current['type']),
                     // use either the `alias` property, or the `name` property as the key for the field.
                     field = this.fields[current['alias'] || current['name']] = new ctor(dojo.mixin({
                         owner: this

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Controls/DateField', ['Sage/Platform/Mobile/Controls/EditorField', 'Sage/Platform/Mobile/Calendar'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Controls.DateField', [Sage.Platform.Mobile.Controls.EditorField], {
+define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/EditorField', 'Sage/Platform/Mobile/Calendar'], function() {
+    var control = dojo.declare('Sage.Platform.Mobile.Fields.DateField', [Sage.Platform.Mobile.Fields.EditorField], {
         // Localization
         emptyText: '',
         dateFormatText: 'MM/dd/yyyy',
@@ -89,6 +89,6 @@ define('Sage/Platform/Mobile/Controls/DateField', ['Sage/Platform/Mobile/Control
             return this.inherited(arguments);
         }
     });
-    Sage.Platform.Mobile.Controls.FieldManager.register('date', Sage.Platform.Mobile.Controls.DateField);
-    return control;
+
+    return Sage.Platform.Mobile.FieldManager.register('date', control);
 });

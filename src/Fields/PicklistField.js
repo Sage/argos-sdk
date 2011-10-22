@@ -15,7 +15,7 @@
 
 // todo: move to argos-saleslogix; this does not belong here.
 
-define('Sage/Platform/Mobile/Controls/PicklistField', ['Sage/Platform/Mobile/Controls/LookupField', 'Mobile/SalesLogix/Views/PickList'], function() {
+define('Sage/Platform/Mobile/Fields/PicklistField', ['Sage/Platform/Mobile/Fields/LookupField', 'Mobile/SalesLogix/Views/PickList'], function() {
     var viewsByName = {},
         viewsByNameCount = 0;
 
@@ -33,7 +33,7 @@ define('Sage/Platform/Mobile/Controls/PicklistField', ['Sage/Platform/Mobile/Con
         return (viewsByName[name] = view);
     };
 
-    var control = dojo.declare('Sage.Platform.Mobile.Controls.PicklistField', [Sage.Platform.Mobile.Controls.LookupField], {
+    var control = dojo.declare('Sage.Platform.Mobile.Fields.PicklistField', [Sage.Platform.Mobile.Fields.LookupField], {
         picklist: false,
         orderBy: 'number asc',
         storageMode: 'text',
@@ -104,6 +104,5 @@ define('Sage/Platform/Mobile/Controls/PicklistField', ['Sage/Platform/Mobile/Con
         }
     });
 
-    Sage.Platform.Mobile.Controls.FieldManager.register('picklist', Sage.Platform.Mobile.Controls.PicklistField);
-    return control;
+    return Sage.Platform.Mobile.FieldManager.register('picklist', control);
 });

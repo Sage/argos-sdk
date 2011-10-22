@@ -10,30 +10,35 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License. 
  */
 
 // todo: move to argos-saleslogix; this does not belong here.
-
-define('Sage/Platform/Mobile/Controls/NameField', ['Sage/Platform/Mobile/Controls/EditorField'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Controls.NameField', [Sage.Platform.Mobile.Controls.EditorField], {
-        // Localization
-        emptyText: 'no name',
-
+define('Sage/Platform/Mobile/Fields/AddressField', ['Sage/Platform/Mobile/Fields/EditorField'], function() {
+    var control = dojo.declare('Sage.Platform.Mobile.Fields.AddressField', [Sage.Platform.Mobile.Fields.EditorField], {
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<input data-dojo-attach-point="inputNode" readonly="readonly" type="text" />'
+            '<div data-dojo-attach-point="inputNode"></div>'
         ]),
-        createNavigationOptions: function() {
-            var options = this.inherited(arguments);
-            //Name does not have an entity.
-            delete options.entityName;
+        attributeMap: {
+            addressContent : {
+                node: 'inputNode',
+                type: 'innerHTML'
+            }
+        },
+        rows: 4,
+        lookupLabelText: 'edit',
+        emptyText: 'no address',
 
-            return options;
+        _enableTextElement: function() {
+        },
+        _disableTextElement: function() {
+        },
+        setText: function(text) {
+            this.set('addressContent', text);
         }
     });
 
-    Sage.Platform.Mobile.Controls.FieldManager.register('name', Sage.Platform.Mobile.Controls.NameField);
-    return control;
+    return Sage.Platform.Mobile.FieldManager.register('address', control);
 });
