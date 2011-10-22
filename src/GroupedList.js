@@ -21,7 +21,7 @@ define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], functi
 
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list grouped-list{%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
-            '{%! $.searchTemplate %}',
+            '<div data-dojo-attach-point="searchNode"></div>',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',
             '{%! $.emptySelectionTemplate %}',
             '<div class="group-content" data-dojo-attach-point="contentNode"></div>',

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Fields/Search'], function() {
+define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/SearchWidget'], function() {
 
     dojo.declare('Sage.Platform.Mobile.SelectionModel', null, {
         count: 0,
@@ -128,7 +128,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          */
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
-            '{%! $.searchTemplate %}',
+            '<div data-dojo-attach-point="searchNode"></div>',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',                
             '{%! $.emptySelectionTemplate %}',
             '<ul class="list-content" data-dojo-attach-point="contentNode"></ul>',
@@ -191,25 +191,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             '</div>'
         ]),
         /**
-         * The template used to render the search bar at the top of the view.  This template is not directly rendered, but is
-         * included in {@link #searchTemplate}
-         *
-         * The default template uses the following properties:
-         *
-         *      name                description
-         *      ----------------------------------------------------------------
-         *      searchText          The text to display in the search box.
-         *
-         * The default template invokes the following actions:
-         *
-         * * search
-         * * clearSearchQuery
-         */
-        searchTemplate: new Simplate([
-            '<div data-dojo-attach-point="searchContainerNode">',
-            '</div>'
-        ]),
-        /**
          * The template used to render a row in the view.  This template includes {@link #itemTemplate}.
          */
         rowTemplate: new Simplate([
@@ -242,6 +223,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             '</li>'
         ]),
         contentNode:null,
+        remainingContentNode: null,
         searchNode: null,
         emptySelectionNode: null,
         remainingNode: null,
@@ -294,6 +276,10 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          */
         pageSize: 20,
         /**
+         * True if search is enabled (defaults to true).
+         */
+        enableSearch: true,
+        /**
          * True to hide the search bar (defaults to false).
          * @type {Boolean}
          */
@@ -342,6 +328,11 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          */
         customSearchRE: /^#!/,
         /**
+         * The regular expression used to determine if a search query is a hash tag search.
+         * @type {Object}
+         */
+        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
+        /**
          * The text displayed in the more button.
          * @type {String}
          */
@@ -388,9 +379,9 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          * @type {String}
          */
         requestErrorText: 'A server error occurred while requesting data.',
-        customizationSet: 'list',
-        _searchModel: null,
-        _searchModelClass: Sage.Platform.Mobile.Fields.Search,
+        customizationSet: 'list',                
+        searchWidget: null,
+        searchWidgetClass: Sage.Platform.Mobile.SearchWidget,
         _selectionModel: null,
         _selectionConnects: null,
         _setSelectionModelAttr: function(selectionModel) {
@@ -419,14 +410,39 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             this.connect(App, 'onRefresh', this._onRefresh);
 
-            /*
-            if(!this.hideSearch){
-                this._searchModel = this._searchModel || new this._searchModelClass({view: this});
-                this._searchModel.placeAt(this.searchContainerNode);
-           }*/
+            if (this.enableSearch)
+            {
+                var searchWidgetCtor = dojo.isString(this.searchWidgetClass)
+                    ? dojo.getObject(this.searchWidgetClass, false)
+                    : this.searchWidgetClass;
+
+                this.searchWidget = this.searchWidget || new searchWidgetCtor({
+                    'class': 'list-search',
+                    owner: this,
+                    onSearchQuery: dojo.hitch(this, this._onSearchQuery),
+                    onSearchExpression: dojo.hitch(this, this._onSearchExpression)
+                });
+                this.searchWidget.placeAt(this.searchNode, 'replace');
+            }
+            else
+            {
+                this.searchWidget = null;
+            }
+
+            dojo.toggleClass(this.domNode, 'list-hide-search', this.hideSearch);
 
             this.clear();
         },
+        destroy: function() {
+			if (this.searchWidget)
+            {
+				if(!this.searchWidget._destroyed) this.searchWidget.destroyRecursive();
+
+				delete this.searchWidget;
+			}
+            
+			this.inherited(arguments);
+		},
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'tbar': [{
@@ -502,9 +518,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             }
         },
         formatRelatedQuery: function(entry, fmt, property) {
-            var property = property || '$key';
-
-            return dojo.string.substitute(fmt, [Sage.Platform.Mobile.Utility.getValue(entry, property)]);
+            return dojo.string.substitute(fmt, [dojo.getObject(property || '$key', false, entry)]);
         },
         formatSearchQuery: function(query) {
             /// <summary>
@@ -515,6 +529,67 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         },
         escapeSearchQuery: function(query) {
             return (query || '').replace(/"/g, '""');
+        },
+        _onSearchQuery: function(query) {
+            var customMatch = query && this.customSearchRE.exec(query),
+                hashTagMatches = query && this.hashTagSearchRE.exec(query);
+
+            this.clear(false);
+
+            this.queryText = query;
+            this.query = false;
+
+            if (customMatch)
+            {
+                this.query = query.replace(this.customSearchRE, '');
+            }
+            else if (hashTagMatches && this.hashTagQueries)
+            {
+                var hashLookup = {},
+                    hashQueries = [],
+                    hashQueryExpression,
+                    match,
+                    hashTag,
+                    additionalSearch = query.replace(hashTagMatches[0],'');
+
+                // localize
+                for (var key in this.hashTagQueriesText) hashLookup[this.hashTagQueriesText[key]] = key;
+
+                // add initial hash caught for if test
+                hashTag = hashTagMatches[1];
+                hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                hashQueries.push(this.expandExpression(hashQueryExpression));
+
+                while (match = this.hashTagSearchRE.exec(query))
+                {
+                    hashTag = match[1];
+
+                    hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                    hashQueries.push(this.expandExpression(hashQueryExpression));
+
+                    additionalSearch = additionalSearch.replace(match[0], '');
+                }
+
+                this.query = '(' + hashQueries.join(') and (') + ')';
+
+                additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
+
+                if (additionalSearch != '') this.query += ' and (' + this.formatSearchQuery(additionalSearch) + ')';
+            }
+            else if (query)
+            {
+                this.query = this.formatSearchQuery(query);
+            }
+
+            this.requestData();
+        },
+        _onSearchExpression: function(expression) {
+            this.clear(false);
+
+            this.queryText = '';
+            this.query = expression;
+
+            this.requestData();
         },
         createRequest:function() {
             /// <summary>
@@ -567,8 +642,8 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             if (queryWhereExpr)
                 where.push(queryWhereExpr);
 
-            if (this.searchQuery)
-                where.push(this.searchQuery);
+            if (this.query)
+                where.push(this.query);
 
             if (where.length > 0)
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Where, where.join(' and '));
@@ -759,20 +834,20 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             }
         },
         transitionTo: function(){
-            if(this._selectionModel && this.options){
+            if (this._selectionModel && this.options){
                 this.loadPreviousSelections();
             }
             this.inherited(arguments);
         },
         beforeTransitionAway: function(){
-            if(this._selectionModel)
+            if (this._selectionModel)
                 this._selectionModel.clear();
             this.inherited(arguments);
         },
         refresh: function() {
             this.requestData();
         },
-        clear: function() {
+        clear: function(all) {
             /// <summary>
             ///     Clears the view and re-applies the default content template.
             /// </summary>
@@ -788,6 +863,8 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             this.entries = {};
             this.feed = false;
             this.query = false; // todo: rename to searchQuery
+
+            if (all !== false && this.searchWidget) this.searchWidget.clear();
 
             dojo.removeClass(this.domNode, 'list-has-more');
 

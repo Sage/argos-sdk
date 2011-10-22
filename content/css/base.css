@@ -191,12 +191,12 @@
     font-weight: normal;
 }
 
-.list-search-active label
+.search-active label
 {
     display: none;
 }
 
-.list-search-active .dismissButton
+.search-active .dismissButton
 {
     display: block;
 }
