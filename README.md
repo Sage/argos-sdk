@@ -7,7 +7,7 @@ Installation
 *	None
 
 ### Clone repository
-*	Open a command prompt
+*	Open a command prompt.
 *	change to the base directory where you want to download source code, eg
 
 		cd \projects
