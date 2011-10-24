@@ -20,7 +20,6 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
 		inputType: 'text',
         enableClearButton: true,
         validInputOnly: false,
-        clearNodeHiding: false,
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -31,16 +30,13 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '{% if($.enableClearButton) { %}',
-                '<button class="clear-button" data-dojo-attach-point="clearNode" data-dojo-attach-event="onclick: onClearPress"></button>',
+                '<button class="clear-button" data-dojo-attach-event="onclick:onClearPress"></button>',
             '{% } %}',
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: onKeyUp, onblur: onBlur, onfocus: onFocus" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),
         init: function() {
             if (this.validInputOnly)
                 dojo.connect(this.inputNode, 'onkeypress', this, this.onKeyPress);
-            this.inherited(arguments);
-        },
-        renderTo: function(){
             this.inherited(arguments);
         },
         enable: function() {
@@ -51,56 +47,46 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
             this.inherited(arguments);
             dojo.attr(this.inputNode, 'disabled', true);
         },  
-        onKeyPress: function(evt, el, o) {
+        onKeyPress: function(evt) {
             var v = this.getValue() + String.fromCharCode(evt.getCharCode());
             if (this.validate(v))
             {
-                evt.stopEvent();
-                return;
+                dojo.stopEvent(evt);
+                return false;
             }            
         },
-        onKeyUp: function(evt, el, o) {
+        onKeyUp: function(evt) {
             if (this.validationTrigger == 'keyup')
-                this.onValidationTrigger(evt, el, o);
+                this.onValidationTrigger(evt);
 
             if (this.notificationTrigger == 'keyup')
-                this.onNotificationTrigger(evt, el, o);
+                this.onNotificationTrigger(evt);
         },
-        onFocus: function(evt, el, o){
-            if(this.enableClearButton && this.clearNode){
-                dojo.style(this.clearNode, 'visibility', 'visible');
-            }
+        onFocus: function(evt){
+            dojo.addClass(this.domNode, 'text-field-active');
         },
-        onBlur: function(evt, el, o) {
+        onBlur: function(evt) {
             var scope = this;
 
             if (this.validationTrigger == 'blur')
-                this.onValidationTrigger(evt, el, o);
+                this.onValidationTrigger(evt);
 
             if (this.notificationTrigger == 'blur')
-                this.onNotificationTrigger(evt, el, o);
+                this.onNotificationTrigger(evt);
 
-            if(this.enableClearButton && this.clearNode) {
-                if(!this.clearNodeHiding) {
-                    this.clearNodeHiding = true;
-                    setTimeout(function(){
-                        if(scope.inputNode != document.activeElement) {
-                            dojo.style(scope.clearNode, 'visibility', 'hidden');
-                        }
-                        scope.clearNodeHiding = false;
-                    }, 100);
-                }
-            }
+            setTimeout(function(){
+                if(document.activeElement !== scope.inputNode)
+                    dojo.removeClass(scope.domNode, 'text-field-active');
+            }, 100);
         },
         onClearPress: function(evt){
             this.clearValue();
             dojo.stopEvent(evt);
-            // Mobile browsers listen to either or both events
-            // to show keyboard
+            // Mobile browsers listen to either or both events to show keyboard
             this.inputNode.focus();
             this.inputNode.click();
         },
-        onNotificationTrigger: function(evt, el, o) {
+        onNotificationTrigger: function(evt) {
             var currentValue = this.getValue();
 
             if (this.previousValue != currentValue)
@@ -108,7 +94,7 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
 
             this.previousValue = currentValue;
         },
-        onValidationTrigger: function(evt, el, o) {
+        onValidationTrigger: function(evt) {
             if (this.validate())
                 this.containerNode.addClass('row-error');
             else
