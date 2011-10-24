@@ -38,7 +38,53 @@ define('Sage/Platform/Mobile/SearchWidget', [
             this.set('queryValue', '');
         },
         search: function() {
-            this.onSearchQuery(this.queryNode.value, this);
+            var customMatch = query && this.customSearchRE.exec(query),
+                hashTagMatches = query && this.hashTagSearchRE.exec(query),
+                query = this.queryNode.value;
+
+            if (customMatch)
+            {
+                query = query.replace(this.customSearchRE, '');
+            }
+            else if (hashTagMatches && this.hashTagQueries)
+            {
+                var hashLookup = {},
+                    hashQueries = [],
+                    hashQueryExpression,
+                    match,
+                    hashTag,
+                    additionalSearch = query.replace(hashTagMatches[0],'');
+
+                // localize
+                for (var key in this.hashTagQueriesText) hashLookup[this.hashTagQueriesText[key]] = key;
+
+                // add initial hash caught for if test
+                hashTag = hashTagMatches[1];
+                hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                hashQueries.push(this.expandExpression(hashQueryExpression));
+
+                while (match = this.hashTagSearchRE.exec(query))
+                {
+                    hashTag = match[1];
+
+                    hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                    hashQueries.push(this.expandExpression(hashQueryExpression));
+
+                    additionalSearch = additionalSearch.replace(match[0], '');
+                }
+
+                query = '(' + hashQueries.join(') and (') + ')';
+
+                additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
+
+                if (additionalSearch != '') query += ' and (' + this.formatSearchQuery(additionalSearch) + ')';
+            }
+            else if (query)
+            {
+                query = this.formatSearchQuery(query);
+            }
+
+            this.onSearchExpression(query, this);
         },
         _onClearClick: function(evt){
             dojo.stopEvent(evt);
@@ -62,13 +108,8 @@ define('Sage/Platform/Mobile/SearchWidget', [
                 this.search();
             }
         },
-        /**
-         * The event that fires when the search widget provides a textual search string
-         * @param query
-         * @param widget
-         */
-        onSearchQuery: function(query, widget) {
-
+        escapeSearchQuery: function(query) {
+            return (query || '').replace(/"/g, '""');
         },
         /**
          * The event that fires when the search widget provides an explicit search query
@@ -76,7 +117,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
          * @param widget
          */
         onSearchExpression: function(expression, widget) {
-            
+
         }
     });
 });

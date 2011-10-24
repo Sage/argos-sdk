@@ -420,8 +420,12 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
                 this.searchWidget = this.searchWidget || new searchWidgetCtor({
                     'class': 'list-search',
-                    owner: this,
-                    onSearchQuery: dojo.hitch(this, this._onSearchQuery),
+                    customSearchRE: this.customSearchRE,
+                    hashTagSearchRE: this.hashTagSearchRE,
+                    hashTagQueries: this.hashTagQueries,
+                    expandExpression: this.expandExpression,
+                    formatSearchQuery: this.formatSearchQuery,
+
                     onSearchExpression: dojo.hitch(this, this._onSearchExpression)
                 });
                 this.searchWidget.placeAt(this.searchNode, 'replace');
@@ -528,62 +532,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             /// </summary>
             /// <returns type="String">An SData query compatible search expression.</returns>
             return false;
-        },
-        escapeSearchQuery: function(query) {
-            return (query || '').replace(/"/g, '""');
-        },
-        _onSearchQuery: function(query) {
-            var customMatch = query && this.customSearchRE.exec(query),
-                hashTagMatches = query && this.hashTagSearchRE.exec(query);
-
-            this.clear(false);
-
-            this.queryText = query;
-            this.query = false;
-
-            if (customMatch)
-            {
-                this.query = query.replace(this.customSearchRE, '');
-            }
-            else if (hashTagMatches && this.hashTagQueries)
-            {
-                var hashLookup = {},
-                    hashQueries = [],
-                    hashQueryExpression,
-                    match,
-                    hashTag,
-                    additionalSearch = query.replace(hashTagMatches[0],'');
-
-                // localize
-                for (var key in this.hashTagQueriesText) hashLookup[this.hashTagQueriesText[key]] = key;
-
-                // add initial hash caught for if test
-                hashTag = hashTagMatches[1];
-                hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
-                hashQueries.push(this.expandExpression(hashQueryExpression));
-
-                while (match = this.hashTagSearchRE.exec(query))
-                {
-                    hashTag = match[1];
-
-                    hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
-                    hashQueries.push(this.expandExpression(hashQueryExpression));
-
-                    additionalSearch = additionalSearch.replace(match[0], '');
-                }
-
-                this.query = '(' + hashQueries.join(') and (') + ')';
-
-                additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
-
-                if (additionalSearch != '') this.query += ' and (' + this.formatSearchQuery(additionalSearch) + ')';
-            }
-            else if (query)
-            {
-                this.query = this.formatSearchQuery(query);
-            }
-
-            this.requestData();
         },
         _onSearchExpression: function(expression) {
             this.clear(false);
