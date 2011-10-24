@@ -46,7 +46,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/T
             this.inherited(arguments);
 
             // temporarily added: http://code.google.com/p/android/issues/detail?id=14519
-            this.inputNode.value = this.formatNumberForDisplay(this.inputNode.value, this.getValue());
+            this.set('inputValue', this.formatNumberForDisplay(this.inputNode.value, this.getValue()));
         },
         getValue: function() {
             var value = dojo.attr(this.inputNode, 'value');
@@ -74,9 +74,6 @@ define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/T
                 if ((match = formatter.test.exec(clean)))
                 {
                     return dojo.string.substitute(formatter.format, [number, clean].concat(match));
-                    /*
-                    return String.format.apply(String, [formatter.format, number, clean].concat(match));
-                    */
                 }
             }
 
