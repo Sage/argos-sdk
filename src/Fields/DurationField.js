@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Fields/_Field'], function() {
+define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Fields/_Field', 'Sage/Platform/Mobile/Format'], function() {
     var control = dojo.declare('Sage.Platform.Mobile.Fields.DurationField', [Sage.Platform.Mobile.Fields._Field], {
         // Localization
         emptyText: '',
@@ -21,15 +21,13 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
 
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<input data-dojo-attach-point="inputNode" type="text" />',
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange: onChange" type="text" />',
             '{%! $.selectTemplate %}'
         ]),
         selectTemplate: new Simplate([
-            '<select data-dojo-attach-point="selectNode">',
+            '<select data-dojo-attach-point="selectNode" data-dojo-attach-event="onchange: onSelectChange">',
             '{% for(var key in $.durationMultiplierText) { %}',
-                '<option value="',
-                        '{%: key %}',
-                    '">',
+                '<option value="{%: key %}">',
                     '{%: $.durationMultiplierText[key] %}',
                 '</option>',
             '{% } %}',
@@ -53,11 +51,10 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
             '1440': 'day(s)'
         },
         currentValue: null,
+        selectNode: null,
 
         init: function() {
             this.inherited(arguments);
-            dojo.connect(this.inputNode, 'onchange', this, this.onChange, true);
-            dojo.connect(this.selectNode, 'onchange', this, this.onSelectChange, true);
         },
         getDurationValue: function(){
             return parseFloat(this.selectNode.value, 10) || 0;
@@ -86,18 +83,20 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
             }
         },
         convertUnit: function(val, to){
-            val = val / to;
-            return Sage.Platform.Mobile.Format.fixed(val, 2);
+            var converted =  val / to;
+            return Sage.Platform.Mobile.Format.fixed(converted, 2);
         },
         setInitialUnit: function(val){
-            var stepValue;
+            var initialUnit = 1,
+                stepValue;
             for(var key in this.durationMultiplierText){
                 stepValue = parseFloat(key, 10);
                 if(val / stepValue > 1){
                     val = val / stepValue;
-                    this.set('selectContent', stepValue);
+                    initialUnit = stepValue;
                 }
             }
+            this.set('selectContent', initialUnit);
             return val;
         },
         isDirty: function() {

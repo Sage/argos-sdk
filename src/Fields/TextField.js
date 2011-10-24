@@ -33,15 +33,12 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
             '{% if($.enableClearButton) { %}',
                 '<button class="clear-button" data-dojo-attach-point="clearNode" data-dojo-attach-event="onclick: onClearPress"></button>',
             '{% } %}',
-            '<input data-dojo-attach-point="inputNode" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: onKeyUp, onblur: onBlur, onfocus: onFocus" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),
         init: function() {
             if (this.validInputOnly)
                 dojo.connect(this.inputNode, 'onkeypress', this, this.onKeyPress);
-
-            dojo.connect(this.inputNode, 'onkeyup', this, this.onKeyUp);
-            dojo.connect(this.inputNode, 'onblur', this, this.onBlur);
-            dojo.connect(this.inputNode, 'onfocus', this, this.onFocus);
+            this.inherited(arguments);
         },
         renderTo: function(){
             this.inherited(arguments);

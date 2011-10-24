@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/EditorField', 'Sage/Platform/Mobile/Calendar'], function() {
+define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/EditorField', 'Sage/Platform/Mobile/Calendar', 'Sage/Platform/Mobile/Format'], function() {
     var control = dojo.declare('Sage.Platform.Mobile.Fields.DateField', [Sage.Platform.Mobile.Fields.EditorField], {
         // Localization
         emptyText: '',
@@ -23,7 +23,7 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button data-dojo-attach-point="triggerNode" data-action="navigateToEditView" class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<input data-dojo-attach-point="inputNode" type="text" />'
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange: onChange" type="text" />'
         ]),
         view: 'generic_calendar',
         showTimePicker: false,
@@ -32,9 +32,6 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
         },
         init: function() {
             this.inherited(arguments);
-            
-            dojo.connect(this.inputNode, 'onchange', this, this.onChange, true);
-            dojo.connect(this.triggerNode, 'onmouseup', this, this.onClick, true);
         },
         onChange: function(evt, el, o) {
             if (!el) return;

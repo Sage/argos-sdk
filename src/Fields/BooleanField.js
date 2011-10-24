@@ -17,7 +17,7 @@ define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields
     var control = dojo.declare('Sage.Platform.Mobile.Fields.BooleanField', [Sage.Platform.Mobile.Fields._Field], {
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<div class="toggle" data-dojo-attach-point="toggleNode" toggled="{%= !!$.checked %}">',
+            '<div class="toggle" data-dojo-attach-point="toggleNode" data-dojo-attach-event="onclick:onClick" toggled="{%= !!$.checked %}">',
             '<span class="thumb"></span>',
             '<span class="toggleOn">{%= $.onText %}</span>',
             '<span class="toggleOff">{%= $.offText %}</span>',
@@ -35,9 +35,8 @@ define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields
 
         init: function() {
             this.inherited(arguments);
-            dojo.connect(this.toggleNode, 'onclick', this, this.onClick, true);
         },
-        onClick: function(evt, el, o) {
+        onClick: function(evt) {
             if (this.isDisabled()) return;
 
             var toggledValue = !this.getValue();
