@@ -422,11 +422,11 @@ input.text-input {
     width:30px;
     height:30px;
 }
-div.list-search-active > button.clear-button {
-    visibility: visible;
-}
-div.list-search button.clear-button {
+div.search-widget button.clear-button {
     right: 70px;
+}
+div.search-active > button.clear-button {
+    visibility: visible;
 }
 
 /* TODO: Move color specifics to theme folder */

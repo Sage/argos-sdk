@@ -25,8 +25,8 @@ define('Sage/Platform/Mobile/SearchWidget', [
         widgetTemplate: new Simplate([
             '<div class="search-widget">',
             '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="queryNode" data-dojo-attach-event="onfocus:_onFocus,onblur:_onBlur,onkeypress:_onKeyPress" />',
-            '<button class="subHeaderButton dismissButton" data-dojo-attach-event="click:clear">X</button>',
-            '<button class="subHeaderButton searchButton" data-dojo-attach-event="click:search">{%= $.searchText %}</button>',
+            '<button class="clear-button" data-dojo-attach-event="onclick: _onClearClick"></button>',
+            '<button class="subHeaderButton searchButton" data-dojo-attach-event="click: search">{%= $.searchText %}</button>',
             '<label data-dojo-attach-point="labelNode">{%= $.searchText %}</label>',
             '</div>'
         ]),
@@ -39,6 +39,12 @@ define('Sage/Platform/Mobile/SearchWidget', [
         },
         search: function() {
             this.onSearchQuery(this.queryNode.value, this);
+        },
+        _onClearClick: function(evt){
+            dojo.stopEvent(evt);
+            this.clear();
+            this.queryNode.focus();
+            this.queryNode.click();
         },
         _onBlur: function() {
             dojo.toggleClass(this.domNode, 'search-active', !!this.queryNode.value);
