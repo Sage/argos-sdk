@@ -53,9 +53,6 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
         currentValue: null,
         selectNode: null,
 
-        init: function() {
-            this.inherited(arguments);
-        },
         getDurationValue: function(){
             return parseFloat(this.selectNode.value, 10) || 0;
         },

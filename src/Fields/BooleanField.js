@@ -32,10 +32,6 @@ define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields
                 attribute: 'toggled'
             }
         },
-
-        init: function() {
-            this.inherited(arguments);
-        },
         onClick: function(evt) {
             if (this.isDisabled()) return;
 
