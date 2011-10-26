@@ -104,7 +104,7 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                                 case 'modify':
                                     // make a shallow copy if we haven't already
                                     if (row === layout[i])
-                                        row = Ext.apply({}, row);
+                                        row = dojo.mixin({}, row);
                                     row = dojo.mixin(row, expand(customization.value, row));
                                     break;
                                 case 'insert':
