@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Utility', 'Mobile/SalesLogix/Format'], function() {
+define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Utility', 'Sage/Platform/Mobile/Format'], function() {
 
     return dojo.declare('Sage.Platform.Mobile.Detail', [Sage.Platform.Mobile.View], {
         attributeMap: {
