@@ -38,53 +38,71 @@ define('Sage/Platform/Mobile/SearchWidget', [
             this.set('queryValue', '');
         },
         search: function() {
-            var customMatch = query && this.customSearchRE.exec(query),
-                hashTagMatches = query && this.hashTagSearchRE.exec(query),
-                query = this.queryNode.value;
+            var query = this.queryNode.value,
+                isCustomMatch = query && this.customSearchRE.test(query),
+                isHashTagMatch = query && this.hashTagSearchRE.test(query);
 
-            if (customMatch)
-            {
-                query = query.replace(this.customSearchRE, '');
-            }
-            else if (hashTagMatches && this.hashTagQueries)
-            {
-                var hashLookup = {},
-                    hashQueries = [],
-                    hashQueryExpression,
-                    match,
-                    hashTag,
-                    additionalSearch = query.replace(hashTagMatches[0],'');
-
-                // localize
-                for (var key in this.hashTagQueriesText) hashLookup[this.hashTagQueriesText[key]] = key;
-
-                // add initial hash caught for if test
-                hashTag = hashTagMatches[1];
-                hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
-                hashQueries.push(this.expandExpression(hashQueryExpression));
-
-                while (match = this.hashTagSearchRE.exec(query))
-                {
-                    hashTag = match[1];
-
-                    hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
-                    hashQueries.push(this.expandExpression(hashQueryExpression));
-
-                    additionalSearch = additionalSearch.replace(match[0], '');
-                }
-
-                query = '(' + hashQueries.join(') and (') + ')';
-
-                additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
-
-                if (additionalSearch != '') query += ' and (' + this.formatSearchQuery(additionalSearch) + ')';
-            }
-            else if (query)
-            {
-                query = this.formatSearchQuery(query);
+            switch(true) {
+                case isCustomMatch: query = this.customSearch(query);
+                    break;
+                case isHashTagMatch: query = this.hashTagSearch(query);
+                    break;
+                default: query = this.formatSearchQuery(query);
             }
 
             this.onSearchExpression(query, this);
+        },
+        /**
+         * Returns an unmodified search query which allows a user
+         * to type in their own where clause
+         * @param {string} query Value of search box
+         * @returns {string} query Unformatted query
+         */
+        customSearch: function(query){
+            this.customSearchRE.lastIndex = 0;
+            query = query.replace(this.customSearchRE, '');
+            return query;
+        },
+        /**
+         * Returns the search query based on a hash selector
+         * Any hash tags in the search are replaced by predefined search statements
+         * Remaining text not preceded by a hash will receive
+         * that views normal search formatting
+         * @param {string} query Value of search box
+         * @returns {string} query Hash resolved query
+         */
+        hashTagSearch: function(query){
+            var hashLookup = {},
+                hashQueries = [],
+                hashQueryExpression,
+                match,
+                hashTag,
+                additionalSearch = query;
+
+            // localize
+            for (var key in this.hashTagQueriesText)
+                hashLookup[this.hashTagQueriesText[key]] = key;
+
+            this.hashTagSearchRE.lastIndex = 0;
+
+            while (match = this.hashTagSearchRE.exec(query))
+            {
+                hashTag = match[1];
+
+                hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                hashQueries.push(this.expandExpression(hashQueryExpression));
+
+                additionalSearch = additionalSearch.replace(match[0], '');
+            }
+
+            query = dojo.string.substitute('(${0})', [hashQueries.join(') and (')]);
+
+            additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
+
+            if (additionalSearch !== '')
+                query += dojo.string.substitute(' and (${0})', [this.formatSearchQuery(additionalSearch)]);
+
+            return query;
         },
         _onClearClick: function(evt){
             dojo.stopEvent(evt);
@@ -102,9 +120,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
             if (evt.keyCode == 13 || evt.keyCode == 10)
             {
                 dojo.stopEvent(evt);
-
                 this.queryNode.blur();
-
                 this.search();
             }
         },
