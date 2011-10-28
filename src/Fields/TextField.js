@@ -96,9 +96,9 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
         },
         onValidationTrigger: function(evt) {
             if (this.validate())
-                this.containerNode.addClass('row-error');
+                dojo.addClass(this.containerNode, 'row-error')
             else
-                this.containerNode.removeClass('row-error');
+                dojo.removeClass(this.containerNode, 'row-error')
         },
         getValue: function() {
             return this.inputNode.value;
