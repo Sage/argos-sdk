@@ -13,112 +13,138 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Fields/_Field', 'Sage/Platform/Mobile/Format'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.DurationField', [Sage.Platform.Mobile.Fields._Field], {
+define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Fields/LookupField', 'Sage/Platform/Mobile/Format', 'localization/en'], function() {
+    var control = dojo.declare('Sage.Platform.Mobile.Fields.DurationField', [Sage.Platform.Mobile.Fields.LookupField], {
         // Localization
         emptyText: '',
-        invalidDateFormatErrorText: "Field '${0}' is not a valid number.",
+        invalidDateFormatErrorText: "Field '${0}' is not a valid duration.",
+        autoCompleteText: {
+            'minute(s)': 1,
+            'hour(s)': 60,
+            'day(s)': 1440,
+            'week(s)': 10080
+        },
 
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange: onChange" type="text" />',
-            '{%! $.selectTemplate %}'
-        ]),
-        selectTemplate: new Simplate([
-            '<select data-dojo-attach-point="selectNode" data-dojo-attach-event="onchange: onSelectChange">',
-            '{% for(var key in $.durationMultiplierText) { %}',
-                '<option value="{%: key %}">',
-                    '{%: $.durationMultiplierText[key] %}',
-                '</option>',
-            '{% } %}',
-            '</select>'
+            '<button class="button simpleSubHeaderButton" data-dojo-attach-event="onclick:navigateToListView" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: onKeyUp, onblur: onBlur, onfocus: onFocus" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
+            '<div class="autoComplete-watermark" data-dojo-attach-point="autoCompleteNode"></div>'
         ]),
         attributeMap: {
-            inputContent: {
+            inputValue: {
                 node: 'inputNode',
                 type: 'attribute',
                 attribute: 'value'
             },
-            selectContent: {
-                node: 'selectNode',
+            autoCompleteContent: {
+                node: 'autoCompleteNode',
                 type: 'attribute',
-                attribute: 'value'
+                attribute: 'innerHTML'
             }
         },
-        durationMultiplierText: {
-            '1': 'minute(s)',
-            '60': 'hour(s)',
-            '1440': 'day(s)'
-        },
-        currentValue: null,
-        selectNode: null,
 
-        getDurationValue: function(){
-            return parseFloat(this.selectNode.value, 10) || 0;
+        valueKeyProperty: false,
+        valueTextProperty: false,
+        currentKey: null,
+        currentValue: 0,
+        /**
+         * The first capture group must be non-text part
+         * Second capture is the phrase to be used in auto complete
+         */
+        autoCompletePhraseRE: new RegExp([
+                    '^((?:\\d+(?:\\',
+                    Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
+                    '\\d*)?|\\',
+                    Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
+                    '\\d+)\\s*?)(\\w+)'
+                ].join('')),
+        /**
+         * Only one capture which should correlate to the value portion
+         */
+        autoCompleteValueRE: new RegExp([
+                    '^((?:\\d+(?:\\',
+                    Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
+                    '\\d*)?|\\',
+                    Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
+                    '\\d+))'
+                ].join('')),
+        init: function() {
+            // do not use lookups connects
         },
-        getDuration: function(){
-            var units = this.currentValue,
-                multiplier = this.getDurationValue();
-            return Math.ceil((units * multiplier));
-        },
-        onSelectChange: function(evt){
-            var convertedValue = this.convertUnit(this.currentValue, this.getDurationValue());
-            this.setValue(convertedValue);
-        },
-        getValue: function(){
-            return this.getDuration();
-        },
-        onChange: function(evt) {
-            var val = this.getValue();
-            if (isNaN(val)) {
-                this.validationValue = this.currentValue = null;
-                dojo.addClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
-            } else {
-                this.currentValue = parseFloat(this.inputNode.value, 10);
-                this.validationValue = this.currentValue;
-                dojo.removeClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
+        onKeyUp: function(evt){
+            var val = this.inputNode.value.toString(),
+                match = this.autoCompletePhraseRE.exec(val);
+            if(!match || val.length < 1) {
+                this.hideAutoComplete();
+                return true;
             }
-        },
-        convertUnit: function(val, to){
-            var converted =  val / to;
-            return Sage.Platform.Mobile.Format.fixed(converted, 2);
-        },
-        setInitialUnit: function(val){
-            var initialUnit = 1,
-                stepValue;
-            for(var key in this.durationMultiplierText){
-                stepValue = parseFloat(key, 10);
-                if(val / stepValue > 1){
-                    val = val / stepValue;
-                    initialUnit = stepValue;
+            for(var key in this.autoCompleteText){
+                if(this.isWordMatch(match[2], key)){
+                    this.currentKey = key;
+                    this.showAutoComplete(match[1]+key);
+                    return true;
                 }
             }
-            this.set('selectContent', initialUnit);
-            return val;
+            this.hideAutoComplete();
         },
-        isDirty: function() {
-            return this.originalValue !== this.currentValue;
+        isWordMatch: function(val, word){
+            if (val.length > word.length)
+                val = val.slice(0, word.length);
+            else
+                word = word.slice(0, val.length);
+            return val.toUpperCase() === word.toUpperCase();
         },
-        clearValue: function() {
-            dojo.removeClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
-            this.inherited(arguments);
+        showAutoComplete: function(word){
+            this.set('autoCompleteContent', word);
         },
-        formatValue: function(val){
-            return val || 0;
+        hideAutoComplete: function(){
+            this.set('autoCompleteContent', '');
+        },
+        onBlur: function(evt){
+            var val = this.inputNode.value.toString(),
+                match = this.autoCompleteValueRE.exec(val),
+                multiplier = this.autoCompleteText[this.currentKey],
+                newValue = 0;
+            if(!match || val.length < 1) {
+                return true;
+            }
+            newValue = parseFloat(match[0],10) * multiplier;
+            this.setValue(newValue);
+        },
+        getValue: function(){
+            return this.currentValue;
         },
         setValue: function(val, init){
-            if(init) {
-                this.currentValue = val;
-                val = this.setInitialUnit(val);
+            this.currentValue = val;
+            this.set('inputValue', this.textFormat(val));
+            this.hideAutoComplete();
+        },
+        setSelection: function(val, key){
+            this.setValue(parseFloat(key, 10));
+        },
+        textFormat: function(val){
+            var stepValue,
+                finalUnit = 1,
+                autoCompleteValues = this.autoCompleteText;
+            for(var key in autoCompleteValues){
+                stepValue = autoCompleteValues[key];
+                if(val / stepValue >= 1){
+                    finalUnit = stepValue;
+                    this.currentKey = key;
+                }
             }
-
-            this.set('inputContent', val);
+            return this.convertUnit(val, finalUnit)+' '+this.currentKey;
+        },
+        convertUnit: function(val, to){
+            return Sage.Platform.Mobile.Format.fixed(val/to, 2);
+        },
+        createNavigationOptions: function() {
+            var options = this.inherited(arguments);
+            options.data = this.expandExpression(this.data);
+            return options;
         },
         validate: function() {
-            if (this.inputNode.value !== '' && !this.currentValue || this.currentValue < 0)
-                return dojo.string.substitute(this.invalidDateFormatErrorText, [this.label]);
-
-            return this.inherited(arguments);
         }
     });
     

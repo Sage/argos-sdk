@@ -349,6 +349,7 @@
 .row-edit[data-field-type="name"] > div > .button,
 .row-edit[data-field-type="date"] > div > .button,
 .row-edit[data-field-type="note"] > div > .button,
+.row-edit[data-field-type="duration"] > div > .button,
 .row-edit[data-field-type="picklist"] > .button,
 .row-edit[data-field-type="lookup"] > .button,
 .row-edit[data-field-type="select"] > .button,
@@ -386,19 +387,31 @@
     height: 5em;
     overflow: hidden;
 }
+
+.row-edit[data-field-type="duration"] > div > .button
+{
+    z-index:55;
+}
+
 .row-edit[data-field-type="duration"] > div > input
 {
-    margin-left: 110px !important;
-    padding: 3px !important;
-    width: 50px !important;
-    border: 1px solid #000 !important;
+    position:relative;
+    z-index:50;
 }
-.row-edit[data-field-type="duration"] > div > select
+
+.row-edit[data-field-type="duration"] > div > div.autoComplete-watermark
 {
-    height: 30px;
-    display: inline-block;
-    margin-left: 12px;
+    position:absolute;
+    z-index: 10;
+    color: #999;
+    top:7px;
+    left:115px;
 }
+
+
+
+
+
 .row-edit[data-field-type="address"] > div > div
 {
     min-height: 1.5em !important;
