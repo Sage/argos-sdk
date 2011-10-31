@@ -17,12 +17,13 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
     var control = dojo.declare('Sage.Platform.Mobile.Fields.DurationField', [Sage.Platform.Mobile.Fields.LookupField], {
         // Localization
         emptyText: '',
-        invalidDateFormatErrorText: "Field '${0}' is not a valid duration.",
+        invalidDurationErrorText: "Field '${0}' is not a valid duration.",
         autoCompleteText: {
             'minute(s)': 1,
             'hour(s)': 60,
             'day(s)': 1440,
-            'week(s)': 10080
+            'week(s)': 10080,
+            'year(s)': 525960
         },
 
         widgetTemplate: new Simplate([
@@ -36,6 +37,11 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
                 node: 'inputNode',
                 type: 'attribute',
                 attribute: 'value'
+            },
+            inputDisabled: {
+                node: 'inputNode',
+                type: 'attribute',
+                attribute: 'disabled'
             },
             autoCompleteContent: {
                 node: 'autoCompleteNode',
@@ -69,6 +75,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
                     Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
                     '\\d+))'
                 ].join('')),
+        
         init: function() {
             // do not use lookups connects
         },
@@ -106,9 +113,9 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
                 match = this.autoCompleteValueRE.exec(val),
                 multiplier = this.autoCompleteText[this.currentKey],
                 newValue = 0;
-            if(!match || val.length < 1) {
-                return true;
-            }
+            if(val.length < 1) return true;
+            if(!match) return true;
+
             newValue = parseFloat(match[0],10) * multiplier;
             this.setValue(newValue);
         },
@@ -145,6 +152,18 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
             return options;
         },
         validate: function() {
+            var val = this.inputNode.value.toString(),
+                phraseMatch = this.autoCompletePhraseRE.exec(val);
+           if(!phraseMatch)
+           {
+               dojo.addClass(this.containerNode, 'row-error');
+               return dojo.string.substitute(this.invalidDurationErrorText, [val]);
+           }
+           else
+           {
+               dojo.removeClass(this.containerNode, 'row-error');
+               return false;
+           }
         }
     });
     

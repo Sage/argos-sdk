@@ -152,7 +152,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', ['Sage/Platform/Mobile/Fields/
         navigateToListView: function() {
             var view = App.getView(this.view),
                 options = this.createNavigationOptions();
-            if (view && options)
+            if (view && options && !this.disabled)
                 view.show(options);
         },
         onClick: function(evt, el, o) {
