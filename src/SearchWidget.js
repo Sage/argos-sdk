@@ -92,6 +92,9 @@ define('Sage/Platform/Mobile/SearchWidget', [
                 hashTag,
                 additionalSearch = query;
 
+            if(!this.hashTagQueries)
+                return this.formatSearchQuery(query);
+
             // localize
             for (var key in this.hashTagQueriesText)
                 hashLookup[this.hashTagQueriesText[key]] = key;
@@ -103,8 +106,9 @@ define('Sage/Platform/Mobile/SearchWidget', [
                 hashTag = match[1];
 
                 hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
-                hashQueries.push(this.expandExpression(hashQueryExpression));
+                if(!hashQueryExpression) continue;
 
+                hashQueries.push(this.expandExpression(hashQueryExpression));
                 additionalSearch = additionalSearch.replace(match[0], '');
             }
 
