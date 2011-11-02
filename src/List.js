@@ -324,17 +324,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          */
         hashTagQueries: null,
         /**
-         * The regular expression used to determine if a search query is a custom search expression.  A custom search
-         * expression is not processed, and directly passed to SData.
-         * @type {Object}
-         */
-        customSearchRE: /^#!/,
-        /**
-         * The regular expression used to determine if a search query is a hash tag search.
-         * @type {Object}
-         */
-        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
-        /**
          * The text displayed in the more button.
          * @type {String}
          */
@@ -420,12 +409,10 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
                 this.searchWidget = this.searchWidget || new searchWidgetCtor({
                     'class': 'list-search',
-                    customSearchRE: this.customSearchRE,
-                    hashTagSearchRE: this.hashTagSearchRE,
+                    hashTagQueriesText: this.hashTagQueriesText,
                     hashTagQueries: this.hashTagQueries,
-                    expandExpression: this.expandExpression,
-                    formatSearchQuery: this.formatSearchQuery,
 
+                    formatSearchQuery: dojo.hitch(this, this.formatSearchQuery),
                     onSearchExpression: dojo.hitch(this, this._onSearchExpression)
                 });
                 this.searchWidget.placeAt(this.searchNode, 'replace');
@@ -528,6 +515,9 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             /// </summary>
             /// <returns type="String">An SData query compatible search expression.</returns>
             return false;
+        },
+        escapeSearchQuery: function(query) {
+            return (query || '').replace(/"/g, '""');
         },
         _onSearchExpression: function(expression) {
             this.clear(false);

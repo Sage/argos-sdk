@@ -30,6 +30,19 @@ define('Sage/Platform/Mobile/SearchWidget', [
             '<label data-dojo-attach-point="labelNode">{%= $.searchText %}</label>',
             '</div>'
         ]),
+        /**
+         * The regular expression used to determine if a search query is a custom search expression.  A custom search
+         * expression is not processed, and directly passed to SData.
+         * @type {Object}
+         */
+        customSearchRE: /^#!/,
+        /**
+         * The regular expression used to determine if a search query is a hash tag search.
+         * @type {Object}
+         */
+        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
+
+
         searchText: 'Search',
         queryNode: null,
 
@@ -55,8 +68,8 @@ define('Sage/Platform/Mobile/SearchWidget', [
         /**
          * Returns an unmodified search query which allows a user
          * to type in their own where clause
-         * @param {string} query Value of search box
-         * @returns {string} query Unformatted query
+         * @param {String} query Value of search box
+         * @returns {String} query Unformatted query
          */
         customSearch: function(query){
             this.customSearchRE.lastIndex = 0;
@@ -68,8 +81,8 @@ define('Sage/Platform/Mobile/SearchWidget', [
          * Any hash tags in the search are replaced by predefined search statements
          * Remaining text not preceded by a hash will receive
          * that views normal search formatting
-         * @param {string} query Value of search box
-         * @returns {string} query Hash resolved query
+         * @param {String} query Value of search box
+         * @returns {String} query Hash resolved query
          */
         hashTagSearch: function(query){
             var hashLookup = {},
@@ -104,6 +117,12 @@ define('Sage/Platform/Mobile/SearchWidget', [
 
             return query;
         },
+        expandExpression: function(expression) {
+            if (typeof expression === 'function')
+                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
+            else
+                return expression;
+        },
         _onClearClick: function(evt){
             dojo.stopEvent(evt);
             this.clear();
@@ -123,9 +142,6 @@ define('Sage/Platform/Mobile/SearchWidget', [
                 this.queryNode.blur();
                 this.search();
             }
-        },
-        escapeSearchQuery: function(query) {
-            return (query || '').replace(/"/g, '""');
         },
         /**
          * The event that fires when the search widget provides an explicit search query
