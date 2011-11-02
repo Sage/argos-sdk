@@ -100,7 +100,6 @@ define('Sage/Platform/Mobile/Edit', [
         updateSecurity: false,
         constructor: function(o) {
             this.fields = {};
-            dojo.mixin(this, o);
         },
         postCreate: function() {
             this.inherited(arguments);
@@ -727,6 +726,14 @@ define('Sage/Platform/Mobile/Edit', [
                 insert: this.options.insert,
                 key: this.options.insert ? false : this.options.entry && this.options.entry['$key']
             });
+        },
+        getSecurity: function(access) {
+            var lookup = {
+                'update': this.updateSecurity,
+                'insert': this.insertSecurity
+            };
+
+            return lookup[access];
         },
         beforeTransitionTo: function() {
             Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);

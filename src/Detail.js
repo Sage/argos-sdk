@@ -104,7 +104,6 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         requestErrorText: 'A server error occurred while requesting data.',
         notAvailableText: 'The requested entry is not available.',
         editView: false,
-        editSecurity: false,
 
         postCreate: function() {
             this.inherited(arguments);
@@ -116,7 +115,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 'tbar': [{
                     id: 'edit',
                     action: 'navigateToEditView',
-                    security: this.editSecurity
+                    security: App.getViewSecurity(this.editView, 'update')
                 }]
             });
         },
@@ -432,7 +431,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             }
         },
         refresh: function() {
-            if (this.security && !App.hasSecurity(this.expandExpression(this.security)))
+            if (this.security && !App.hasAccessTo(this.expandExpression(this.security)))
             {
                 dojo.query(this.contentNode).append(this.notAvailableTemplate.apply(this));
                 return;

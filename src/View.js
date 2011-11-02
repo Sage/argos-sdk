@@ -36,10 +36,10 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manip
         id: 'generic_view',
         titleText: 'Generic View',
         tools: null,
+        security: null,
         serviceName: false,
-        constructor: function(options) {
-        },
-        _getToolsAttr: function() {
+ 
+        getTools: function() {
             return this._createCustomizedLayout(this.createToolLayout(), 'tools');
         },
         createToolLayout: function() {
@@ -184,6 +184,9 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manip
         getContext: function() {
             // todo: should we track options?
             return {id: this.id, options: this.options};
+        },
+        getSecurity: function(access) {
+            return this.security;
         }
     });
 });

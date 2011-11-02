@@ -105,7 +105,7 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
 
                 // if tool is enabled, check security
                 if (tool.enabled && tools[i].security)
-                    tool.enabled = App.hasSecurity(this.expandExpression(tools[i].security));
+                    tool.enabled = App.hasAccessTo(this.expandExpression(tools[i].security));
 
                 this.tools[tools[i].id] = tool;
             }

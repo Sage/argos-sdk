@@ -17,10 +17,12 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
     dojo.declare('Sage.Platform.Mobile.SelectionModel', null, {
         count: 0,
-        selections: {},
+        selections: null,
         clearAsDeselect: true,
         _fireEvents: true,
         constructor: function(options) {
+            this.selections = {};
+            
             dojo.mixin(this, options);
         },
         suspendEvents: function() {
@@ -75,7 +77,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             if (this._fireEvents) this.onClear(this);
         },
         isSelected: function(key) {
-            return this.selections[key];
+            return !!this.selections[key];
         },
         getSelectionCount: function() {
             return this.count;
@@ -305,13 +307,11 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          * @type {?(String|Sage.Platform.Mobile.View)}
          */
         editView: null,
-        editSecurity: null,
         /**
          * The view to show, either an id or an instance, when the {@link #navigateToInsertView} action is invoked.
          * @type {?(String|Sage.Platform.Mobile.View)}
          */
         insertView: null,
-        insertSecurity: null,
         /**
          * The view to show, either an id or an instance, when the {@link #navigateToContextView} action is invoked.
          * @type {?(String|Sage.Platform.Mobile.View)}
@@ -454,7 +454,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                 'tbar': [{
                     id: 'new',
                     action: 'navigateToInsertView',
-                    security: this.insertSecurity || this.editSecurity
+                    security: App.getViewSecurity(this.insertView, 'insert')
                 }]
             });
         },
@@ -474,20 +474,16 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         },
         _onSelectionModelClear: function() {
         },
-        loadPreviousSelections: function(){
-            if(!this.options || !this.options.previousSelections)
-                return false;
-
-            var selections = this.options.previousSelections,
-                selectionsLength = selections.length,
-                i,
-                data,
-                key;
-
-            for(i = 0; i < selectionsLength; i += 1){
-                data = selections[i];
-                key = data;
-                this._selectionModel.select(key, data);
+        _loadPreviousSelections: function(){
+            var selections = this.options && this.options.previousSelections;
+            if (selections)
+            {
+                for(var i = 0; i < selections.length; i++)
+                {
+                    var data = selections[i],
+                        key = data;
+                    this._selectionModel.select(key, data);
+                }
             }
         },
         _onRefresh: function(options) {
@@ -775,23 +771,21 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             if (this._selectionModel && !this.isSelectionDisabled())
                 this._selectionModel.useSingleSelection(this.options.singleSelect);
 
-            if (this.refreshRequired) {
+            if (this.refreshRequired)
+            {
                 this.clear();
-            } else {
+            }
+            else
+            {
                 // if enabled, clear any pre-existing selections
                 if (this._selectionModel && this.autoClearSelection)
                     this._selectionModel.clear();
             }
         },
-        transitionTo: function(){
-            if (this._selectionModel && this.options){
-                this.loadPreviousSelections();
-            }
-            this.inherited(arguments);
-        },
-        beforeTransitionAway: function(){
-            if (this._selectionModel)
-                this._selectionModel.clear();
+        transitionTo: function()
+        {
+            if (this._selectionModel) this._loadPreviousSelections();
+
             this.inherited(arguments);
         },
         refresh: function() {

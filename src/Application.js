@@ -121,7 +121,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             this._connects.push(dojo.connect(window, 'resize', this, this.onResize));
             this._connects.push(dojo.connect(dojo.body(), 'beforetransition', this, this._onBeforeTransition));
             this._connects.push(dojo.connect(dojo.body(), 'aftertransition', this, this._onAfterTransition));
-            this._connects.push(dojo.connect(dojo.body(), 'activate', this, this._onActivate));
+            this._connects.push(dojo.connect(dojo.body(), 'show', this, this._onActivate));
         },
         initServices: function() {
             for (var name in this.connections) this.registerService(name, this.connections[name]);
@@ -295,6 +295,10 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             }
             return null;
         },
+        getViewSecurity: function(key, access) {
+            var view = this.getView(key);
+            return (view && view.getSecurity(access));
+        },
         getService: function(name) {
             /// <returns type="Sage.SData.Client.SDataService">The application's SData service instance.</returns>
             if (typeof name === 'string' && this.services[name])
@@ -370,7 +374,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         _viewTransitionTo: function(view) {
             this.onViewTransitionTo(view);
 
-            var tools = (view.options && view.options.tools) || view.get('tools') || {};
+            var tools = (view.options && view.options.tools) || view.getTools() || {};
 
             for (var n in this.bars)
                 if (this.bars[n].managed)
@@ -451,7 +455,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
 
             return forPath.concat(forSet);
         },
-        hasSecurity: function(security) {
+        hasAccessTo: function(security) {
             return true;
         }
     });
