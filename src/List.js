@@ -527,6 +527,15 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             this.requestData();
         },
+        configureSearchOptions: function(o){
+            o = o || {};
+            dojo.mixin(o, {
+                hashTagQueries: this.hashTagQueries,
+                hashTagQueriesText: this.hashTagQueriesText
+            });
+
+            dojo.mixin(this.searchWidget, o);
+        },
         createRequest:function() {
             /// <summary>
             ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.
@@ -775,7 +784,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         transitionTo: function()
         {
             if (this._selectionModel) this._loadPreviousSelections();
-
+            if (this.enableSearch && !!this.searchWidget) this.configureSearchOptions();
             this.inherited(arguments);
         },
         refresh: function() {
