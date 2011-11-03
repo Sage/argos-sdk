@@ -124,6 +124,10 @@ define('Sage/Platform/Mobile/SearchWidget', [
 
             return query;
         },
+        configure: function(viewOptions, context, hashes){
+            this.hashTagQueries = hashes && hashes.hashTagQueries;
+            this.hashTagQueriesText = hashes && hashes.hashTagQueriesText;
+        },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
                 return expression.apply(this, Array.prototype.slice.call(arguments, 1));

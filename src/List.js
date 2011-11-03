@@ -527,14 +527,9 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             this.requestData();
         },
-        configureSearchOptions: function(o){
-            o = o || {};
-            dojo.mixin(o, {
-                hashTagQueries: this.hashTagQueries,
-                hashTagQueriesText: this.hashTagQueriesText
-            });
-
-            dojo.mixin(this.searchWidget, o);
+        configureSearch: function(viewOptions, context, hashes){
+            if(!!this.searchWidget)
+                this.searchWidget.configure(viewOptions, context, hashes);
         },
         createRequest:function() {
             /// <summary>
@@ -783,9 +778,23 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         },
         transitionTo: function()
         {
+            if(this.enableSearch && !!this.searchWidget)
+            {
+                var hashes = (this.options && this.options.hashes) || this.getHashTagQueries() || {};
+                this.configureSearch(this.options, this.getContext(), hashes);
+            }
+
             if (this._selectionModel) this._loadPreviousSelections();
-            if (this.enableSearch && !!this.searchWidget) this.configureSearchOptions();
             this.inherited(arguments);
+        },
+        getHashTagQueries: function(){
+            return this._createCustomizedLayout(this.createHashTagQueries(), 'hashes');
+        },
+        createHashTagQueries: function(){
+            return {
+                hashTagQueries: this.hashTagQueries,
+                hashTagQueriesText: this.hashTagQueriesText
+            };
         },
         refresh: function() {
             this.requestData();
