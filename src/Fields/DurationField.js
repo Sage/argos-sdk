@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Fields/LookupField', 'Sage/Platform/Mobile/Format', 'localization/en'], function() {
+define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Fields/LookupField', 'Sage/Platform/Mobile/Format'], function() {
     var control = dojo.declare('Sage.Platform.Mobile.Fields.DurationField', [Sage.Platform.Mobile.Fields.LookupField], {
         // Localization
         emptyText: '',
@@ -58,26 +58,30 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
          * The first capture group must be non-text part
          * Second capture is the phrase to be used in auto complete
          */
-        autoCompletePhraseRE: new RegExp([
+        autoCompletePhraseRE: /^((?:\d+(?:\.\d*)?|\.\d+)\s*?)(\w+)/,
+        /**
+         * Only one capture which should correlate to the value portion
+         */
+        autoCompleteValueRE: /^((?:\d+(?:\.\d*)?|\.\d+))/,
+        
+        init: function() {
+            // do not use lookups connects
+
+            // apply localization info
+            this.autoCompletePhraseRE = new RegExp([
                     '^((?:\\d+(?:\\',
                     Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
                     '\\d*)?|\\',
                     Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
                     '\\d+)\\s*?)(\\w+)'
-                ].join('')),
-        /**
-         * Only one capture which should correlate to the value portion
-         */
-        autoCompleteValueRE: new RegExp([
+                ].join(''));
+            this.autoCompleteValueRE = new RegExp([
                     '^((?:\\d+(?:\\',
                     Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
                     '\\d*)?|\\',
                     Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
                     '\\d+))'
-                ].join('')),
-        
-        init: function() {
-            // do not use lookups connects
+                ].join(''));
         },
         onKeyUp: function(evt){
             var val = this.inputNode.value.toString(),
