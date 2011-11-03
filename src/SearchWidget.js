@@ -112,6 +112,9 @@ define('Sage/Platform/Mobile/SearchWidget', [
                 additionalSearch = additionalSearch.replace(match[0], '');
             }
 
+            if(hashQueries.length < 1)
+                return this.formatSearchQuery(query);
+
             query = dojo.string.substitute('(${0})', [hashQueries.join(') and (')]);
 
             additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
