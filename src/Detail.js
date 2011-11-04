@@ -241,6 +241,10 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
             for (i = 0; i < layoutLength; i+=1) {
                 current = layout[i];
+
+                if (current.view && !App.hasAccessTo(App.getView(current.view).security))
+                    continue;
+
                 include = this.expandExpression(current['include'], entry);
                     exclude = this.expandExpression(current['exclude'], entry);
 
