@@ -788,13 +788,27 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             this.inherited(arguments);
         },
         getHashTagQueries: function(){
-            return this._createCustomizedLayout(this.createHashTagQueries(), 'hashes');
+            return this._createCustomizedLayout(this.createHashTagLayout(), 'hashes');
         },
-        createHashTagQueries: function(){
-            return {
-                hashTagQueries: this.hashTagQueries,
-                hashTagQueriesText: this.hashTagQueriesText
-            };
+        createHashTagLayout: function(){
+            var hashLayout = {},
+                hashTagQueries = this.objectLayoutToArray(this.hashTagQueries),
+                hashTagQueriesText = this.objectLayoutToArray(this.hashTagQueriesText);
+
+            hashLayout.hashTagQueries = hashTagQueries;
+            hashLayout.hashTagQueriesText = hashTagQueriesText;
+
+            return hashLayout;
+        },
+        objectLayoutToArray: function(obj){
+            var layoutArray = [],
+                layoutItem;
+            for(var key in obj){
+                layoutItem = {};
+                layoutItem[key] = obj[key];
+                layoutArray.push(layoutItem);
+            }
+            return layoutArray;
         },
         refresh: function() {
             this.requestData();

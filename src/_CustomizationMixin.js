@@ -161,8 +161,8 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                 for (var name in layout)
                     if (dojo.isArray(layout[name]))
                         output[name] = this._compileCustomizedLayout(customizations, layout[name], name);
-                    else if (dojo.isObject(layout[name]))
-                        output[name] = dojo.mixin({}, customizations[0][name] || {}, layout[name]);
+                    else
+                        output[name] = layout[name];
             }
 
             return output;

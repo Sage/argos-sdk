@@ -125,8 +125,20 @@ define('Sage/Platform/Mobile/SearchWidget', [
             return query;
         },
         configure: function(viewOptions, context, hashes){
-            this.hashTagQueries = hashes && hashes.hashTagQueries;
-            this.hashTagQueriesText = hashes && hashes.hashTagQueriesText;
+            if(hashes && hashes.hashTagQueries)
+                this.hashTagQueries = this.arrayLayoutToObject(hashes.hashTagQueries);
+
+            if(hashes && hashes.hashTagQueriesText)
+                this.hashTagQueriesText = this.arrayLayoutToObject(hashes.hashTagQueriesText);
+        },
+        arrayLayoutToObject: function(layoutArray){
+            var layoutObject = {};
+
+            dojo.forEach(layoutArray, function(layoutItem){
+                dojo.mixin(layoutObject, layoutItem);
+            });
+
+            return layoutObject;
         },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
