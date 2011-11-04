@@ -242,9 +242,6 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             for (i = 0; i < layoutLength; i+=1) {
                 current = layout[i];
 
-                if (current.view && !App.hasAccessTo(App.getView(current.view).security))
-                    continue;
-
                 include = this.expandExpression(current['include'], entry);
                     exclude = this.expandExpression(current['exclude'], entry);
 
@@ -302,7 +299,11 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 if (current['action'])
                     options['action'] = this.expandExpression(current['action'], entry, value);
 
-                if (current['disabled'])
+                var hasAccess = App.hasAccessTo(current['security']);
+                if (current['security'])
+                    options['disabled'] = !hasAccess;
+
+                if (current['disabled'] && hasAccess)
                     options['disabled'] = this.expandExpression(current['disabled'], entry, value);
 
                 if (current['view']) {
