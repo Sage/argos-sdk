@@ -154,6 +154,10 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                     }
                 }
             }
+            else if (dojo.isFunction(layout))
+            {
+                return this._compileCustomizedLayout(customizations, layout.call(this), name);
+            }
             else if (dojo.isObject(layout))
             {
                 output = {};

@@ -409,11 +409,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
                 this.searchWidget = this.searchWidget || new searchWidgetCtor({
                     'class': 'list-search',
-                    hashTagQueriesText: this.hashTagQueriesText,
-                    hashTagQueries: this.hashTagQueries,
-
-                    formatSearchQuery: dojo.hitch(this, this.formatSearchQuery),
-                    onSearchExpression: dojo.hitch(this, this._onSearchExpression)
+                    'onSearchExpression': dojo.hitch(this, this._onSearchExpression)
                 });
                 this.searchWidget.placeAt(this.searchNode, 'replace');
             }
@@ -778,37 +774,26 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         },
         transitionTo: function()
         {
-            if(this.enableSearch && !!this.searchWidget)
-            {
-                var hashes = (this.options && this.options.hashes) || this.getHashTagQueries() || {};
-                this.configureSearch(this.options, this.getContext(), hashes);
-            }
+            if (this.searchWidget)
+                this.searchWidget.configure({
+                    view: this,
+                    context: this.getContext(),
+                    hashTagQueries: this._createCustomizedLayout(function() {
+                        var layout = [];
+                        for (var name in this.hashTagQueries)
+                            layout.push({
+                                key: name,
+                                tag: this.hashTagQueriesText[name] || name,
+                                query: this.hashTagQueries[name]
+                            });
+                        return layout;
+                    }, 'hashTagQueries'),
+                    formatSearchQuery: dojo.hitch(this, this.formatSearchQuery)
+                });
 
             if (this._selectionModel) this._loadPreviousSelections();
+            
             this.inherited(arguments);
-        },
-        getHashTagQueries: function(){
-            return this._createCustomizedLayout(this.createHashTagLayout(), 'hashes');
-        },
-        createHashTagLayout: function(){
-            var hashLayout = {},
-                hashTagQueries = this.objectLayoutToArray(this.hashTagQueries),
-                hashTagQueriesText = this.objectLayoutToArray(this.hashTagQueriesText);
-
-            hashLayout.hashTagQueries = hashTagQueries;
-            hashLayout.hashTagQueriesText = hashTagQueriesText;
-
-            return hashLayout;
-        },
-        objectLayoutToArray: function(obj){
-            var layoutArray = [],
-                layoutItem;
-            for(var key in obj){
-                layoutItem = {};
-                layoutItem[key] = obj[key];
-                layoutArray.push(layoutItem);
-            }
-            return layoutArray;
         },
         refresh: function() {
             this.requestData();
