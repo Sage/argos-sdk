@@ -1,131 +1,196 @@
 {
-	projectName: 'SData Mobile Application Framework',
-	licenseText: '',
-	deployDir: 'deploy/',
-	pkgs: [{
-		name: 'SData Mobile Application Framework',
-		file: 'content/javascript/argos-sdk.js',
-		isDebug: true,
-		fileIncludes: [{
-			text: 'Application.js',
-			path: '../src/'
-		},{
-			text: 'ApplicationModule.js',
-			path: '../src/'
-		},{
-			text: 'View.js',
-			path: '../src/'
-		},{
-			text: 'List.js',
-			path: '../src/'
-		},{
-			text: 'GroupedList.js',
-			path: '../src/'
-		},{
-			text: 'Detail.js',
-			path: '../src/'
-		},{
-			text: 'Edit.js',
-			path: '../src/'
-		},{
-			text: 'Calendar.js',
-			path: '../src/'
-		},{
-			text: 'Convert.js',
-			path: '../src/'
-		},{
-			text: 'Format.js',
-			path: '../src/'
-		},{
-			text: 'Toolbar.js',
-			path: '../src/'
-		},{
-			text: 'MainToolbar.js',
-			path: '../src/'
-		},{
-			text: 'Utility.js',
-			path: '../src/'
-		},{
-			text: 'Field.js',
-			path: '../src/Controls/'
-		},{
-			text: 'TextField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'TextAreaField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'EditorField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'LookupField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'BooleanField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'HiddenField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'AddressField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'DateField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'NameField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'PhoneField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'PicklistField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'SelectField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'DecimalField.js',
-			path: '../src/Controls/'
-		},{
-			text: 'NoteField.js',
-			path: '../src/Controls/'
-		}]
-	},{
-		name: 'SData Mobile Application Framework Dependencies',
-		file: 'content/javascript/argos-dependencies.js',
-		isDebug: true,
-		fileIncludes: [{
-		    text: 'json2.js',
-		    path: '../libraries/'
-		},{
-			text: 'Simplate.js',
-			path: '../libraries/'
-		},{
-			text: 'sdata-client-dependencies-debug.js',
-			path: '../libraries/sdata/'
-		},{
-			text: 'sdata-client-debug.js',
-			path: '../libraries/sdata/'
-		},{
-			text: 'reui.js',
-			path: '../libraries/reui/'
-		},{
-			text: 'date.js',
-			path: '../libraries/datejs/build/'
-		}]
-	}],
-	resources: [{
-		src: '../libraries/ext',
-		dest: 'content/ext',
-		filters: ".*\\.js"
-	},{
-		src: '../libraries/datejs/src/globalization',
-		dest: 'content/datejs',
-		filters: ".*\\.js"
-	},{
-		src: '../content',
-		dest: 'content',
-		filters: ".*(\\.css|\\.jpg|\\.png|\\.gif)"
-	}]
+  "projectName": "Argos SDK",
+  "licenseText": "",
+  "deployDir": "deploy/",
+  "pkgs": [
+    {
+      "name": "Argos SDK Dependencies",
+      "file": "content/javascript/argos-dependencies.js",
+      "isDebug": true,
+      "fileIncludes": [
+        {
+          "text": "json2.js",
+          "path": "../libraries/"
+        },
+        {
+          "text": "Simplate.js",
+          "path": "../libraries/"
+        },
+        {
+          "text": "sdata-client-dependencies-debug.js",
+          "path": "../libraries/sdata/"
+        },
+        {
+          "text": "sdata-client-debug.js",
+          "path": "../libraries/sdata/"
+        },
+        {
+          "text": "reui.js",
+          "path": "../libraries/reui/"
+        },
+        {
+          "text": "date.js",
+          "path": "../libraries/datejs/build/"
+        }
+      ]
+    },
+    {
+      "name": "Argos SDK",
+      "file": "content/javascript/argos-sdk.js",
+      "isDebug": true,
+      "fileIncludes": [
+        {
+          "text": "Application.js",
+          "path": "../src"
+        },
+        {
+          "text": "ApplicationModule.js",
+          "path": "../src"
+        },
+        {
+          "text": "_ActionMixin.js",
+          "path": "../src"
+        },
+        {
+          "text": "_CustomizationMixin.js",
+          "path": "../src"
+        },
+        {
+          "text": "_Templated.js",
+          "path": "../src"
+        },
+        {
+          "text": "View.js",
+          "path": "../src"
+        },
+        {
+          "text": "Calendar.js",
+          "path": "../src"
+        },
+        {
+          "text": "Convert.js",
+          "path": "../src"
+        },
+        {
+          "text": "Utility.js",
+          "path": "../src"
+        },
+        {
+          "text": "Detail.js",
+          "path": "../src"
+        },
+        {
+          "text": "FieldManager.js",
+          "path": "../src"
+        },
+        {
+          "text": "_Field.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "EditorField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "TextField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "AddressField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "PhoneField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "NameField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "LookupField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "PicklistField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "SelectField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "BooleanField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "Format.js",
+          "path": "../src"
+        },
+        {
+          "text": "DateField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "DecimalField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "DurationField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "HiddenField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "NoteField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "TextAreaField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "Edit.js",
+          "path": "../src"
+        },
+        {
+          "text": "SearchWidget.js",
+          "path": "../src"
+        },
+        {
+          "text": "List.js",
+          "path": "../src"
+        },
+        {
+          "text": "GroupedList.js",
+          "path": "../src"
+        },
+        {
+          "text": "Toolbar.js",
+          "path": "../src"
+        },
+        {
+          "text": "MainToolbar.js",
+          "path": "../src"
+        },
+        {
+          "text": "PersistentStorage.js",
+          "path": "../src"
+        },
+        {
+          "text": "_ServiceMixin.js",
+          "path": "../src"
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "src": "../content",
+      "dest": "content",
+      "filters": ".*(\\.css|\\.jpg|\\.png|\\.gif)"
+    }
+  ]
 }

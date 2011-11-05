@@ -84,10 +84,12 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
 
                     for (var j = 0; j < customizationCount; j++)
                     {
+                        if (applied[j]) continue; // todo: allow a customization to be applied to a layout more than once?
+
                         customization = customizations[j];
                         stop = false;
 
-                        if (customization.at(row, parent, i, layoutCount, customization))
+                        if (expand(customization.at, row, parent, i, layoutCount, customization))
                         {
                             switch (customization.type)
                             {
@@ -148,11 +150,15 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
 
                     customization = customizations[k];
 
-                    if (customization.type == 'insert' && expand(customization.or, parent, customization))
+                    if (customization.type == 'insert' && (expand(customization.or, parent, customization) || (customization.at === true)))
                     {
                         output.push(expand(customization.value, null));
                     }
                 }
+            }
+            else if (dojo.isFunction(layout))
+            {
+                return this._compileCustomizedLayout(customizations, layout.call(this), name);
             }
             else if (dojo.isObject(layout))
             {

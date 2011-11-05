@@ -30,6 +30,9 @@ define('Sage/Platform/Mobile/SearchWidget', [
             '<label data-dojo-attach-point="labelNode">{%= $.searchText %}</label>',
             '</div>'
         ]),
+        
+        searchText: 'Search',
+        
         /**
          * The regular expression used to determine if a search query is a custom search expression.  A custom search
          * expression is not processed, and directly passed to SData.
@@ -41,9 +44,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
          * @type {Object}
          */
         hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
-
-
-        searchText: 'Search',
+        hashTagQueries: null,
         queryNode: null,
 
         clear: function() {
@@ -84,28 +85,25 @@ define('Sage/Platform/Mobile/SearchWidget', [
          * @param {String} query Value of search box
          * @returns {String} query Hash resolved query
          */
-        hashTagSearch: function(query){
-            var hashLookup = {},
+        hashTagSearch: function(query) {
+            var hashLayout = this.hashTagQueries || [],
                 hashQueries = [],
                 hashQueryExpression,
                 match,
                 hashTag,
                 additionalSearch = query;
 
-            if(!this.hashTagQueries)
-                return this.formatSearchQuery(query);
-
-            // localize
-            for (var key in this.hashTagQueriesText)
-                hashLookup[this.hashTagQueriesText[key]] = key;
-
             this.hashTagSearchRE.lastIndex = 0;
-
+            
             while (match = this.hashTagSearchRE.exec(query))
             {
                 hashTag = match[1];
+                hashQueryExpression = null;
 
-                hashQueryExpression = this.hashTagQueries[hashLookup[hashTag] || hashTag];
+                // todo: can optimize later if necessary
+                for (var i = 0; i < hashLayout.length && !hashQueryExpression; i++)
+                    if (hashLayout[i].tag == hashTag) hashQueryExpression = hashLayout[i].query;
+
                 if(!hashQueryExpression) continue;
 
                 hashQueries.push(this.expandExpression(hashQueryExpression));
@@ -119,26 +117,14 @@ define('Sage/Platform/Mobile/SearchWidget', [
 
             additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
 
-            if (additionalSearch !== '')
+            if (additionalSearch)
                 query += dojo.string.substitute(' and (${0})', [this.formatSearchQuery(additionalSearch)]);
 
             return query;
         },
-        configure: function(viewOptions, context, hashes){
-            if(hashes && hashes.hashTagQueries)
-                this.hashTagQueries = this.arrayLayoutToObject(hashes.hashTagQueries);
-
-            if(hashes && hashes.hashTagQueriesText)
-                this.hashTagQueriesText = this.arrayLayoutToObject(hashes.hashTagQueriesText);
-        },
-        arrayLayoutToObject: function(layoutArray){
-            var layoutObject = {};
-
-            dojo.forEach(layoutArray, function(layoutItem){
-                dojo.mixin(layoutObject, layoutItem);
-            });
-
-            return layoutObject;
+        configure: function(options) {
+            // todo: for now, we simply mixin the options
+            dojo.mixin(this, options);
         },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
