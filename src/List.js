@@ -409,6 +409,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
                 this.searchWidget = this.searchWidget || new searchWidgetCtor({
                     'class': 'list-search',
+                    'owner': this,
                     'onSearchExpression': dojo.hitch(this, this._onSearchExpression)
                 });
                 this.searchWidget.placeAt(this.searchNode, 'replace');
@@ -421,6 +422,15 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             dojo.toggleClass(this.domNode, 'list-hide-search', this.hideSearch);
 
             this.clear();
+        },
+        startup: function() {
+            this.inherited(arguments);
+
+            if (this.searchWidget)
+                this.searchWidget.configure({
+                    'hashTagQueries': this._createCustomizedLayout(this.createHashTagQueryLayout(), 'hashTagQueries'),
+                    'formatSearchQuery': dojo.hitch(this, this.formatSearchQuery)
+                });
         },
         destroy: function() {
 			if (this.searchWidget)
@@ -523,9 +533,11 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             this.requestData();
         },
-        configureSearch: function(viewOptions, context, hashes){
-            if(!!this.searchWidget)
-                this.searchWidget.configure(viewOptions, context, hashes);
+        configureSearch: function() {
+            if (this.searchWidget)
+                this.searchWidget.configure({
+                    'context': this.getContext()
+                });
         },
         createRequest:function() {
             /// <summary>
@@ -774,26 +786,23 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         },
         transitionTo: function()
         {
-            if (this.searchWidget)
-                this.searchWidget.configure({
-                    view: this,
-                    context: this.getContext(),
-                    hashTagQueries: this._createCustomizedLayout(function() {
-                        var layout = [];
-                        for (var name in this.hashTagQueries)
-                            layout.push({
-                                key: name,
-                                tag: this.hashTagQueriesText[name] || name,
-                                query: this.hashTagQueries[name]
-                            });
-                        return layout;
-                    }, 'hashTagQueries'),
-                    formatSearchQuery: dojo.hitch(this, this.formatSearchQuery)
-                });
+            this.configureSearch();
 
             if (this._selectionModel) this._loadPreviousSelections();
             
             this.inherited(arguments);
+        },
+        createHashTagQueryLayout: function() {
+            // todo: always regenerate this layout? always regenerating allows for all existing customizations
+            // to still work, at expense of potential (rare) performance issues if many customizations are registered.
+            var layout = [];
+            for (var name in this.hashTagQueries)
+                layout.push({
+                    key: name,
+                    tag: (this.hashTagQueriesText && this.hashTagQueriesText[name]) || name,
+                    query: this.hashTagQueries[name]
+                });
+            return layout;
         },
         refresh: function() {
             this.requestData();

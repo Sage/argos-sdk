@@ -30,6 +30,9 @@ define('Sage/Platform/Mobile/SearchWidget', [
             '<label data-dojo-attach-point="labelNode">{%= $.searchText %}</label>',
             '</div>'
         ]),
+        
+        searchText: 'Search',
+        
         /**
          * The regular expression used to determine if a search query is a custom search expression.  A custom search
          * expression is not processed, and directly passed to SData.
@@ -41,9 +44,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
          * @type {Object}
          */
         hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
-
-
-        searchText: 'Search',
+        hashTagQueries: null,
         queryNode: null,
 
         clear: function() {
@@ -85,13 +86,15 @@ define('Sage/Platform/Mobile/SearchWidget', [
          * @returns {String} query Hash resolved query
          */
         hashTagSearch: function(query) {
-            var hashLayout = this.options['hashTagQueries'] || [],
+            var hashLayout = this.hashTagQueries || [],
                 hashQueries = [],
                 hashQueryExpression,
                 match,
                 hashTag,
                 additionalSearch = query;
 
+            this.hashTagSearchRE.lastIndex = 0;
+            
             while (match = this.hashTagSearchRE.exec(query))
             {
                 hashTag = match[1];
@@ -120,10 +123,8 @@ define('Sage/Platform/Mobile/SearchWidget', [
             return query;
         },
         configure: function(options) {
-            this.options = options || {};
-        },
-        formatSearchQuery: function(query) {
-            return (this.expandExpression(this.options['formatSearchQuery'], query)) || '';
+            // todo: for now, we simply mixin the options
+            dojo.mixin(this, options);
         },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
