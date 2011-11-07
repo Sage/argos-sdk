@@ -1,0 +1,34 @@
+{
+	"projectName": "Argos SDK",
+	"licenseText": "",
+	"deployDir": "deploy/",
+	"pkgs": [{
+		"name": "Argos SDK Dependencies",
+		"file": "content/javascript/argos-dependencies.js",
+		"isDebug": true,
+		"fileIncludes": [{
+		    "text": "json2.js",
+		    "path": "../libraries/"
+		},{
+			"text": "Simplate.js",
+			"path": "../libraries/"
+		},{
+			"text": "sdata-client-dependencies-debug.js",
+			"path": "../libraries/sdata/"
+		},{
+			"text": "sdata-client-debug.js",
+			"path": "../libraries/sdata/"
+		},{
+			"text": "reui.js",
+			"path": "../libraries/reui/"
+		},{
+			"text": "date.js",
+			"path": "../libraries/datejs/build/"
+		}]
+	}],
+	"resources": [{
+		"src": "../content",
+		"dest": "content",
+		"filters": ".*(\\.css|\\.jpg|\\.png|\\.gif)"
+	}]
+}
