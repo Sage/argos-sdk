@@ -223,26 +223,15 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         processLayout: function(layout, layoutOptions, entry)
         {
             var sectionQueue = [],
-                sectionQueueLength,
                 sectionStarted = false,
                 content = [],
-                layoutLength = layout.length,
-                current,
-                include,
-                exclude,
-                provider,
-                value,
                 rendered,
-                formatted,
-                options = {},
-                context = {},
-                template,
-                i;
+                formatted;
 
-            for (i = 0; i < layoutLength; i+=1) {
-                current = layout[i];
+            for (var i = 0; i < layout.length; i++) {
+                var current = layout[i];
 
-                include = this.expandExpression(current['include'], entry);
+                var include = this.expandExpression(current['include'], entry),
                     exclude = this.expandExpression(current['exclude'], entry);
 
                 if (include !== undefined && !include) continue;
@@ -262,7 +251,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                     content.push(this.sectionBeginTemplate.apply(layoutOptions, this));
                 }
 
-                provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue;
+                var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue,
                     value = typeof current['value'] === 'undefined'
                         ? provider(entry, current['name'])
                         : current['value'];
@@ -285,7 +274,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                         : value;
                 }
 
-                options = dojo.mixin({}, {
+                var options = dojo.mixin({}, {
                     entry: entry,
                     value: formatted,
                     raw: value
@@ -307,7 +296,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                     options['disabled'] = this.expandExpression(current['disabled'], entry, value);
 
                 if (current['view']) {
-                    context = {};
+                    var context = {};
                     if (current['key'])
                         context['key'] = typeof current['key'] === 'function'
                         ? this.expandExpression(current['key'], entry)
@@ -326,7 +315,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 }
 
                 // priority: wrap > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
-                template = current['wrap']
+                var template = current['wrap']
                     ? current['wrap']
                     : current['view']
                         ? current['property'] === true
@@ -346,8 +335,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
             dojo.query(this.contentNode).append(content.join(''));
 
-            sectionQueueLength = sectionQueue.length;
-            for (i = 0; i < sectionQueueLength; i+=1) {
+            for (i = 0; i < sectionQueue.length; i++) {
                 current = sectionQueue[i];
                 this.processLayout(current['as'], current['options'], entry);
             }
