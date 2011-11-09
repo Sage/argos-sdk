@@ -46,7 +46,15 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
         disable: function() {
             this.inherited(arguments);
             dojo.attr(this.inputNode, 'disabled', true);
-        },  
+        },
+        hide: function(){
+            this.inherited(arguments);
+            dojo.style(this.containerNode, 'display', 'none');
+        },
+        show: function(){
+            this.inherited(arguments);
+            dojo.style(this.containerNode, 'display', 'block');
+        },
         onKeyPress: function(evt) {
             var v = this.getValue() + String.fromCharCode(evt.getCharCode());
             if (this.validate(v))
