@@ -17,20 +17,21 @@
 
 define('Sage/Platform/Mobile/Fields/NoteField', ['Sage/Platform/Mobile/FieldManager', 'Sage/Platform/Mobile/Fields/EditorField'], function() {
     var control = dojo.declare('Sage.Platform.Mobile.Fields.NoteField', [Sage.Platform.Mobile.Fields.EditorField], {
-        // Localization
-        emptyText: '',
-
-        widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<div data-dojo-attach-point="inputNode" class="note-text"></div>'
-        ]),
         attributeMap: {
             noteText: {
                 node: 'inputNode',
                 type: 'innerHTML'
             }
         },
+        widgetTemplate: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
+            '<div data-dojo-attach-point="inputNode" class="note-text"></div>'
+        ]),
+
+        // Localization
+        emptyText: '',
+        
         noteProperty: 'Notes',
 
         _enableTextElement: function() {

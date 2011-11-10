@@ -14,18 +14,6 @@
  */
 define('Sage/Platform/Mobile/Fields/LookupField', ['Sage/Platform/Mobile/Fields/_Field','Sage/Platform/Mobile/Utility'], function() {
     var control = dojo.declare('Sage.Platform.Mobile.Fields.LookupField', [Sage.Platform.Mobile.Fields._Field], {
-        // Localization
-        dependentErrorText: "A value for '${0}' must be selected.",
-        emptyText: '',
-        completeText: 'Select',
-        lookupLabelText: 'lookup',
-        lookupText: '...',
-
-        widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',
-            '<input data-dojo-attach-point="inputNode" type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
-        ]),
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -43,6 +31,19 @@ define('Sage/Platform/Mobile/Fields/LookupField', ['Sage/Platform/Mobile/Fields/
                 attribute: 'readonly'
             }
         },
+        widgetTemplate: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',
+            '<input data-dojo-attach-point="inputNode" type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
+        ]),
+
+        // Localization
+        dependentErrorText: "A value for '${0}' must be selected.",
+        emptyText: '',
+        completeText: 'Select',
+        lookupLabelText: 'lookup',
+        lookupText: '...',
+        
         view: false,
         keyProperty: '$key',
         textProperty: '$descriptor',
@@ -54,16 +55,17 @@ define('Sage/Platform/Mobile/Fields/LookupField', ['Sage/Platform/Mobile/Fields/
         init: function() {
             this.inherited(arguments);
 
-            dojo.connect(this.containerNode, 'onclick', this, this.onClick);
+            this.connect(this.containerNode, 'onclick', this._onClick);
 
-            if (this.isReadOnly()) {
+            if (this.isReadOnly())
+            {
                 this.disable();
                 this.set('inputReadOnly', true);
-            } else {
-                if (!this.requireSelection) {
-                    dojo.connect(this.inputNode, 'onkeyup', this, this.onKeyUp);
-                    dojo.connect(this.inputNode, 'onblur', this, this.onBlur);
-                }
+            }
+            else if (!this.requireSelection)
+            {
+                this.connect(this.inputNode, 'onkeyup', this._onKeyUp);
+                this.connect(this.inputNode, 'onblur', this._onBlur);
             }
         },
         enable: function() {
@@ -155,28 +157,29 @@ define('Sage/Platform/Mobile/Fields/LookupField', ['Sage/Platform/Mobile/Fields/
             if (view && options && !this.disabled)
                 view.show(options);
         },
-        onClick: function(evt, el, o) {
-            // todo: is evt.target always the button or need an ancestor traverser?
-            if (!this.isDisabled() &&
-                ((dojo.hasClass(evt.target, 'button') || dojo.hasClass(evt.target.parentNode, 'button'))
-                    || this.requireSelection)) {
+        _onClick: function(evt) {
+            var buttonNode = dojo.query(evt.target).closest('.button')[0];
+
+            if (!this.isDisabled() && (buttonNode || this.requireSelection))
+            {
                 dojo.stopEvent(evt);
+
                 this.navigateToListView();
             }
         },
-        onKeyUp: function(evt, el, o) {
+        _onKeyUp: function(evt) {
             if (!this.isDisabled() && this.notificationTrigger == 'keyup')
-                this.onNotificationTrigger(evt, el, o);
+                this.onNotificationTrigger(evt);
         },
-        onBlur: function(evt, el, o) {
+        _onBlur: function(evt) {
             if (!this.isDisabled() && this.notificationTrigger == 'blur')
-                this.onNotificationTrigger(evt, el, o);
+                this.onNotificationTrigger(evt);
         },
-        onNotificationTrigger: function(evt, el, o) {
+        onNotificationTrigger: function(evt) {
             var currentValue = this.getValue();
 
             if (this.previousValue != currentValue)
-                this.change(currentValue, this);
+                this.onChange(currentValue, this);
 
             this.previousValue = currentValue;
         },
@@ -222,11 +225,11 @@ define('Sage/Platform/Mobile/Fields/LookupField', ['Sage/Platform/Mobile/Fields/
                 // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
                 // requests created in this state (the pre-flight request is made, and the request ends with status 0).
                 // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
-                if (success) setTimeout(this.onChange.bindDelegate(this), 0);
+                if (success) setTimeout(dojo.hitch(this, this._onComplete), 0);
             }
         },
-        onChange: function() {
-            this.change(this.currentValue, this);
+        _onComplete: function() {
+            this.onChange(this.currentValue, this);
         },
         isDirty: function() {
             if (this.originalValue && this.currentValue)

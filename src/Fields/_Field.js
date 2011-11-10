@@ -47,20 +47,22 @@ define('Sage/Platform/Mobile/Fields/_Field', [
         },
         enable: function() {
             this.disabled = false;
+            this.onEnable(this);
         },
         disable: function() {
             this.disabled = true;
+            this.onDisable(this);
         },
         isDisabled: function() {
             return this.disabled;
         },
         show: function() {
             this.hidden = false;
+            this.onShow(this);
         },
         hide: function() {
             this.hidden = true;
-        },
-        change: function(){
+            this.onHide(this);
         },
         isHidden: function() {
             return this.hidden;
@@ -75,14 +77,12 @@ define('Sage/Platform/Mobile/Fields/_Field', [
             if (typeof this.validator === 'undefined')
                 return false;
 
-            var all = dojo.isArray(this.validator) ? this.validator : [this.validator],
-                allLength = all.length,
-                current,
-                definition;
+            var all = dojo.isArray(this.validator) ? this.validator : [this.validator];
 
-            for (var i = 0; i < allLength; i++)
+            for (var i = 0; i < all.length; i++)
             {
-                current = all[i];
+                var current = all[i],
+                    definition;
 
                 if (current instanceof RegExp)
                     definition = {
@@ -115,6 +115,16 @@ define('Sage/Platform/Mobile/Fields/_Field', [
                 }
             }
             return false;
+        },
+        onEnable: function(field) {
+        },
+        onDisable: function(field) {
+        },
+        onShow: function(field) {
+        },
+        onHide: function(field) {
+        },
+        onChange: function(value, field) {
         }
     });
 });

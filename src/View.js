@@ -139,6 +139,19 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manip
 
             ReUI.show(this.domNode, dojo.mixin(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
         },
+        expandExpression: function(expression) {
+            /// <summary>
+            ///     Expands the passed expression if it is a function.
+            /// </summary>
+            /// <param name="expression" type="String">
+            ///     1: function - Called on this object and must return a string.
+            ///     2: string - Returned directly.
+            /// </param>
+            if (typeof expression === 'function')
+                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
+            else
+                return expression;
+        },
         beforeTransitionTo: function() {
             /// <summary>
             ///     Called before the view is transitioned (slide animation complete) to.

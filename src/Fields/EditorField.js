@@ -15,17 +15,6 @@
 define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/_Field'], function() {
 
     return dojo.declare('Sage.Platform.Mobile.Fields.EditorField', [Sage.Platform.Mobile.Fields._Field], {
-        // Localization
-        lookupLabelText: 'edit',
-        lookupText: '...',
-        emptyText: 'empty',
-        completeText: 'Ok',
-
-        widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<input data-dojo-attach-point="inputNode" type="text" />'
-        ]),
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -33,15 +22,29 @@ define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/
                 attribute: 'value'
             }
         },
+        widgetTemplate: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
+            '<input data-dojo-attach-point="inputNode" type="text" />'
+        ]),
+
+        // Localization
+        lookupLabelText: 'edit',
+        lookupText: '...',
+        emptyText: 'empty',
+        completeText: 'Ok',
+
         formatValue: function(val) {
             return '';
         },
         init: function() {
             this.inherited(arguments);
-            dojo.connect(this.containerNode, "onclick", this, this.onClick, true);
+
+            this.connect(this.containerNode, "onclick", this._onClick);
         },
         enable: function() {
             this.inherited(arguments);
+
             this._enableTextElement();
         },
         _enableTextElement: function() {
@@ -49,6 +52,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/
         },
         disable: function() {
             this.inherited(arguments);
+            
             this._disableTextElement();
         },
         _disableTextElement: function() {
@@ -85,8 +89,9 @@ define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/
                 view.show(options);
             }
         },
-        onClick: function(evt) {
+        _onClick: function(evt) {
             dojo.stopEvent(evt);
+            
             this.navigateToEditView();
         },
         getValuesFromView: function() {
@@ -130,10 +135,10 @@ define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/
             // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
             // requests created in this state (the pre-flight request is made, and the request ends with status 0).
             // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
-            if (success) setTimeout(dojo.hitch(this, this.onChange), 0);
+            if (success) setTimeout(dojo.hitch(this, this._onComplete), 0);
         },
-        onChange: function() {
-            this.change(this.currentValue);
+        _onComplete: function() {
+            this.onChange(this.currentValue, this);
         },
         setText: function(text) {
             this.set('inputValue', text);
@@ -146,7 +151,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/
         },
         validate: function(value) {
             return typeof value === 'undefined'
-                ? Sage.Platform.Mobile.Fields.EditorField.superclass.validate.call(this, this.validationValue)
+                ? Sage.Platform.Mobile.Fields._Field.prototype.validate.call(this, this.validationValue)
                 : this.inherited(arguments);
         },
         setValue: function(val, initial)

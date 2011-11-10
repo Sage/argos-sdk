@@ -33,13 +33,21 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             '</div>'
         ]),
         sectionBeginTemplate: new Simplate([
-            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">',
-            '{%: $.title %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
+            '<h2 data-action="toggleSection" class="{% if ($.collapsed || $.options.collapsed) { %}collapsed{% } %}">',
+            '{%: ($.title || $.options.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
-            '{% if ($.list) { %}<ul class="{%= $.cls %}">{% } else { %}<div class="{%= $.cls %}">{% } %}'
+            '{% if ($.list || $.options.list) { %}',
+            '<ul class="{%= ($.cls || $.options.cls) %}">',
+            '{% } else { %}',
+            '<div class="{%= ($.cls || $.options.cls) %}">',
+            '{% } %}'
         ]),
         sectionEndTemplate: new Simplate([
-            '{% if ($.list) { %}</ul>{% } else { %}</div>{% } %}'
+            '{% if ($.list || $.options.list) { %}',
+            '</ul>',
+            '{% } else { %}',
+            '</div>',
+            '{% } %}'
         ]),
         propertyTemplate: new Simplate([
             '<div class="row {%= $.cls %}" data-property="{%= $.name %}">',
@@ -143,9 +151,9 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             return dojo.string.substitute(fmt, [Sage.Platform.Mobile.Utility.getValue(entry, property)]);
         },
         toggleSection: function(params) {
-            var el = dojo.byId(params.$source);
-            if (el)
-                dojo.toggleClass(el, 'collapsed');
+            var node = dojo.byId(params.$source);
+            if (node)
+                dojo.toggleClass(node, 'collapsed');
         },
         activateRelatedEntry: function(params) {
             if (params.context)
@@ -204,103 +212,103 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
             return request;
         },
-        expandExpression: function(expression) {
-            /// <summary>
-            ///     Expands the passed expression if it is a function.
-            /// </summary>
-            /// <param name="expression" type="String">
-            ///     1: function - Called on this object and must return a string.
-            ///     2: string - Returned directly.
-            /// </param>
-            if (typeof expression === 'function')
-                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
-            else
-                return expression;
-        },
         createLayout: function() {
             return this.layout || [];
         },
-        processLayout: function(layout, layoutOptions, entry)
+        processLayout: function(layout, entry)
         {
-            var sectionQueue = [],
+            var rows = (layout['children'] || layout['as'] || layout),
+                options = layout['options'] || (layout['options'] = {
+                    title: this.detailsText
+                }),
+                getValue = Sage.Platform.Mobile.Utility.getValue,
+                encodeValue = Sage.Platform.Mobile.Format.encode,
+                sectionQueue = [],
                 sectionStarted = false,
-                content = [],
-                rendered,
-                formatted;
+                content = [];
 
-            for (var i = 0; i < layout.length; i++) {
-                var current = layout[i];
-
-                var include = this.expandExpression(current['include'], entry),
+            for (var i = 0; i < rows.length; i++) {
+                var current = rows[i],
+                    include = this.expandExpression(current['include'], entry),
                     exclude = this.expandExpression(current['exclude'], entry);
 
                 if (include !== undefined && !include) continue;
                 if (exclude !== undefined && exclude) continue;
 
-                if (current['as']) {
+                if (current['children'] || current['as'])
+                {
                     if (sectionStarted)
                         sectionQueue.push(current);
                     else
-                        this.processLayout(current['as'], current['options'], entry);
+                        this.processLayout(current, entry);
 
                     continue;
                 }
 
-                if (!sectionStarted) {
+                if (!sectionStarted)
+                {
                     sectionStarted = true;
-                    content.push(this.sectionBeginTemplate.apply(layoutOptions, this));
+                    content.push(this.sectionBeginTemplate.apply(layout, this));
                 }
 
-                var provider = current['provider'] || Sage.Platform.Mobile.Utility.getValue,
+                var provider = current['provider'] || getValue,
+                    property = typeof current['property'] == 'string'
+                        ? current['property']
+                        : current['name'],
                     value = typeof current['value'] === 'undefined'
-                        ? provider(entry, current['name'])
-                        : current['value'];
+                        ? provider(entry, property)
+                        : current['value'],
+                    rendered,
+                    formatted;
 
-                if (current['template'] || current['tpl']) {
+                if (current['template'] || current['tpl'])
+                {
                     rendered = (current['template'] || current['tpl']).apply(value, this);
-                        formatted = current['encode'] === true
-                            ? Sage.Platform.Mobile.Format.encode(rendered)
-                            : rendered;
+                    formatted = current['encode'] === true
+                        ? encodeValue(rendered)
+                        : rendered;
                 }
-                else if (current['renderer'] && typeof current['renderer'] === 'function') {
+                else if (current['renderer'] && typeof current['renderer'] === 'function')
+                {
                     rendered = current['renderer'].call(this, value);
-                        formatted = current['encode'] === true
-                            ? Sage.Platform.Mobile.Format.encode(rendered)
-                            : rendered;
+                    formatted = current['encode'] === true
+                        ? encodeValue(rendered)
+                        : rendered;
                 }
-                else {
+                else
+                {
                     formatted = current['encode'] !== false
-                        ? Sage.Platform.Mobile.Format.encode(value)
+                        ? encodeValue(value)
                         : value;
                 }
 
-                var options = dojo.mixin({}, {
+                var data = dojo.mixin({}, {
                     entry: entry,
                     value: formatted,
                     raw: value
                 }, current);
 
                 if (current['descriptor'])
-                    options['descriptor'] = typeof current['descriptor'] === 'function'
+                    data['descriptor'] = typeof current['descriptor'] === 'function'
                         ? this.expandExpression(current['descriptor'], entry, value)
                         : provider(entry, current['descriptor']);
 
                 if (current['action'])
-                    options['action'] = this.expandExpression(current['action'], entry, value);
+                    data['action'] = this.expandExpression(current['action'], entry, value);
 
                 var hasAccess = App.hasAccessTo(current['security']);
                 if (current['security'])
-                    options['disabled'] = !hasAccess;
+                    data['disabled'] = !hasAccess;
 
                 if (current['disabled'] && hasAccess)
-                    options['disabled'] = this.expandExpression(current['disabled'], entry, value);
+                    data['disabled'] = this.expandExpression(current['disabled'], entry, value);
 
                 if (current['view']) {
                     var context = {};
                     if (current['key'])
                         context['key'] = typeof current['key'] === 'function'
-                        ? this.expandExpression(current['key'], entry)
-                        : provider(entry, current['key']);
+                            ? this.expandExpression(current['key'], entry)
+                            : provider(entry, current['key']);
                     if (current['where'])
                         context['where'] = this.expandExpression(current['where'], entry);
                     if (current['resourceKind'])
@@ -310,34 +318,36 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                     if (current['resourcePredicate'])
                         context['resourcePredicate'] = this.expandExpression(current['resourcePredicate'], entry);
 
-                    options['view'] = current['view'];
-                    options['context'] = dojo.toJson(context);
+                    data['view'] = current['view'];
+                    data['context'] = dojo.toJson(context);
                 }
 
                 // priority: wrap > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
-                var template = current['wrap']
-                    ? current['wrap']
-                    : current['view']
-                        ? current['property'] === true
-                            ? this.relatedPropertyTemplate
-                            : this.relatedTemplate
-                        : current['action']
-                            ? current['property'] === true
-                                ? this.actionPropertyTemplate
-                                : this.actionTemplate
-                            : this.propertyTemplate;
+                var useListTemplate = (layout['list'] || options['list']),
+                    template = current['use']
+                        ? current['use']
+                        : current['view']
+                            ? useListTemplate
+                                ? this.relatedTemplate
+                                : this.relatedPropertyTemplate
+                            : current['action']
+                                ? useListTemplate
+                                    ? this.actionTemplate
+                                    : this.actionPropertyTemplate
+                                : this.propertyTemplate;
 
-                content.push(template.apply(options, this));
+                content.push(template.apply(data, this));
             }
 
-            if (sectionStarted)
-                content.push(this.sectionEndTemplate.apply(layoutOptions, this));
+            if (sectionStarted) content.push(this.sectionEndTemplate.apply(layout, this));
 
             dojo.query(this.contentNode).append(content.join(''));
 
-            for (i = 0; i < sectionQueue.length; i++) {
-                current = sectionQueue[i];
-                this.processLayout(current['as'], current['options'], entry);
+            for (var i = 0; i < sectionQueue.length; i++)
+            {
+                var current = sectionQueue[i];
+                
+                this.processLayout(current, entry);
             }
         },
         processEntry: function(entry) {
@@ -345,7 +355,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
             if (this.entry)
             {
-                this.processLayout(this._createCustomizedLayout(this.createLayout()), {title: this.detailsText}, this.entry);
+                this.processLayout(this._createCustomizedLayout(this.createLayout()), this.entry);
             }
             else
             {
@@ -369,7 +379,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             dojo.removeClass(this.domNode, 'panel-loading');
         },
         requestData: function() {
-            dojo.removeClass(this.domNode, 'panel-loading');
+            dojo.addClass(this.domNode, 'panel-loading');
 
             var request = this.createRequest();
             if (request)

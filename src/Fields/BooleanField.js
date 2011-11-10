@@ -15,16 +15,6 @@
 
 define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields/_Field'], function() {
     var control = dojo.declare('Sage.Platform.Mobile.Fields.BooleanField', [Sage.Platform.Mobile.Fields._Field], {
-        widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<div class="toggle" data-dojo-attach-point="toggleNode" data-dojo-attach-event="onclick:onClick" toggled="{%= !!$.checked %}">',
-            '<span class="thumb"></span>',
-            '<span class="toggleOn">{%= $.onText %}</span>',
-            '<span class="toggleOff">{%= $.offText %}</span>',
-            '</div>'
-        ]),        
-        onText: 'ON',
-        offText: 'OFF',
         attributeMap: {
             toggled:{
                 node: 'toggleNode',
@@ -32,14 +22,24 @@ define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields
                 attribute: 'toggled'
             }
         },
-        onClick: function(evt) {
+        widgetTemplate: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<div class="toggle" data-dojo-attach-point="toggleNode" data-dojo-attach-event="onclick:_onClick" toggled="{%= !!$.checked %}">',
+            '<span class="thumb"></span>',
+            '<span class="toggleOn">{%= $.onText %}</span>',
+            '<span class="toggleOff">{%= $.offText %}</span>',
+            '</div>'
+        ]),        
+        onText: 'ON',
+        offText: 'OFF',
+        _onClick: function(evt) {
             if (this.isDisabled()) return;
 
             var toggledValue = !this.getValue();
 
             this.setValue(toggledValue);
 
-            this.change(toggledValue, this);
+            this.onChange(toggledValue, this);
         },
         getValue: function() {
             return (dojo.attr(this.toggleNode, 'toggled') === 'true');

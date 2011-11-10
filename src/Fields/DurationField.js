@@ -15,23 +15,6 @@
 
 define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Fields/LookupField', 'Sage/Platform/Mobile/Format'], function() {
     var control = dojo.declare('Sage.Platform.Mobile.Fields.DurationField', [Sage.Platform.Mobile.Fields.LookupField], {
-        // Localization
-        emptyText: '',
-        invalidDurationErrorText: "Field '${0}' is not a valid duration.",
-        autoCompleteText: {
-            'minute(s)': 1,
-            'hour(s)': 60,
-            'day(s)': 1440,
-            'week(s)': 10080,
-            'year(s)': 525960
-        },
-
-        widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button class="button simpleSubHeaderButton" data-dojo-attach-event="onclick:navigateToListView" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',
-            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: onKeyUp, onblur: onBlur, onfocus: onFocus" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
-            '<div class="autoComplete-watermark" data-dojo-attach-point="autoCompleteNode"></div>'
-        ]),
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -48,6 +31,22 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
                 type: 'attribute',
                 attribute: 'innerHTML'
             }
+        },
+        widgetTemplate: new Simplate([
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '<button class="button simpleSubHeaderButton" data-dojo-attach-event="onclick:navigateToListView" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
+            '<div class="autoComplete-watermark" data-dojo-attach-point="autoCompleteNode"></div>'
+        ]),
+        // Localization
+        emptyText: '',
+        invalidDurationErrorText: "Field '${0}' is not a valid duration.",
+        autoCompleteText: {
+            'minute(s)': 1,
+            'hour(s)': 60,
+            'day(s)': 1440,
+            'week(s)': 10080,
+            'year(s)': 525960
         },
 
         valueKeyProperty: false,
@@ -68,22 +67,17 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
             // do not use lookups connects
 
             // apply localization info
-            this.autoCompletePhraseRE = new RegExp([
-                    '^((?:\\d+(?:\\',
-                    Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
-                    '\\d*)?|\\',
-                    Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
-                    '\\d+)\\s*?)(\\w+)'
-                ].join(''));
-            this.autoCompleteValueRE = new RegExp([
-                    '^((?:\\d+(?:\\',
-                    Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
-                    '\\d*)?|\\',
-                    Mobile.CultureInfo.numberFormat.numberDecimalSeparator,
-                    '\\d+))'
-                ].join(''));
+            var numberDecimalSeparator = Mobile.CultureInfo.numberFormat.numberDecimalSeparator;
+
+            this.autoCompletePhraseRE = new RegExp(
+                dojo.string.substitute('^((?:\\d+(?:\\${0}\\d*)?|\\${0}\\d+)\\s*?)(\\w+)', [numberDecimalSeparator])
+            );
+
+            this.autoCompleteValueRE = new RegExp(
+                dojo.string.substitute('^((?:\\d+(?:\\${0}\\d*)?|\\${0}\\d+))', [numberDecimalSeparator])
+            );
         },
-        onKeyUp: function(evt){
+        _onKeyUp: function(evt) {
             var val = this.inputNode.value.toString(),
                 match = this.autoCompletePhraseRE.exec(val);
             if(!match || val.length < 1) {
@@ -112,7 +106,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
         hideAutoComplete: function(){
             this.set('autoCompleteContent', '');
         },
-        onBlur: function(evt){
+        _onBlur: function(evt) {
             var val = this.inputNode.value.toString(),
                 match = this.autoCompleteValueRE.exec(val),
                 multiplier = this.autoCompleteText[this.currentKey],
@@ -126,15 +120,15 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
         getValue: function(){
             return this.currentValue;
         },
-        setValue: function(val, init){
+        setValue: function(val, init) {
             this.currentValue = val;
             this.set('inputValue', this.textFormat(val));
             this.hideAutoComplete();
         },
-        setSelection: function(val, key){
+        setSelection: function(val, key) {
             this.setValue(parseFloat(key, 10));
         },
-        textFormat: function(val){
+        textFormat: function(val) {
             var stepValue,
                 finalUnit = 1,
                 autoCompleteValues = this.autoCompleteText;
@@ -147,7 +141,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
             }
             return this.convertUnit(val, finalUnit)+' '+this.currentKey;
         },
-        convertUnit: function(val, to){
+        convertUnit: function(val, to) {
             return Sage.Platform.Mobile.Format.fixed(val/to, 2);
         },
         createNavigationOptions: function() {
@@ -158,16 +152,17 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
         validate: function() {
             var val = this.inputNode.value.toString(),
                 phraseMatch = this.autoCompletePhraseRE.exec(val);
-           if(!phraseMatch)
-           {
+
+            if (!phraseMatch)
+            {
                dojo.addClass(this.containerNode, 'row-error');
                return dojo.string.substitute(this.invalidDurationErrorText, [val]);
-           }
-           else
-           {
+            }
+            else
+            {
                dojo.removeClass(this.containerNode, 'row-error');
                return false;
-           }
+            }
         }
     });
     

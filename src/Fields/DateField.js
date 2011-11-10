@@ -23,14 +23,14 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button data-dojo-attach-point="triggerNode" data-action="navigateToEditView" class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange:onChange" type="text" />'
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange:_onChange" type="text" />'
         ]),
         view: 'generic_calendar',
         showTimePicker: false,
         formatValue: function(value) {
             return Sage.Platform.Mobile.Format.date(value, this.dateFormatText);
         },
-        onChange: function(evt) {
+        _onChange: function(evt) {
             var val = Date.parseExact(this.inputNode.value, this.dateFormatText);
 
             if (val)

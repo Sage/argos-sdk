@@ -730,19 +730,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             if (App.bars['tbar'])
                 App.bars['tbar'].invokeTool({tool: this.options.singleSelectAction}); // invoke action of tool
         },
-        expandExpression: function(expression) {
-            /// <summary>
-            ///     Expands the passed expression if it is a function.
-            /// </summary>
-            /// <param name="expression" type="String">
-            ///     1: function - Called on this object and must return a string.
-            ///     2: string - Returned directly.
-            /// </param>
-            if (typeof expression === 'function')
-                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
-            else
-                return expression;
-        },
         refreshRequiredFor: function(options) {
             if (this.options)
             {

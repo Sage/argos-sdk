@@ -79,7 +79,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/T
 
             return number;
         },               
-        onKeyUp: function(evt, el, o) {
+        _onKeyUp: function(evt) {
             /*
             // temporarily removed: http://code.google.com/p/android/issues/detail?id=14519
             this.el.dom.value = this.formatNumberForDisplay(this.el.dom.value, this.getValue());

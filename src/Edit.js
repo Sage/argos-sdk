@@ -32,6 +32,12 @@ define('Sage/Platform/Mobile/Edit', [
     ], function() {
 
     return dojo.declare('Sage.Platform.Mobile.Edit', [Sage.Platform.Mobile.View], {
+        attributeMap: {
+            validationContent: {
+                node: 'validationContentNode',
+                type: 'innerHTML'
+            }
+        },
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="edit panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',            
             '{%! $.loadingTemplate %}',
@@ -60,32 +66,23 @@ define('Sage/Platform/Mobile/Edit', [
             '</li>'
         ]),
         sectionBeginTemplate: new Simplate([
-            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}collapsed{% } %}">',
-            '{%: $.title %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
+            '<h2 data-action="toggleSection" class="{% if ($.collapsed || $.options.collapsed) { %}collapsed{% } %}">',
+            '{%: ($.title || $.options.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
-            '<fieldset class="{%= $.cls %}">',
+            '<fieldset class="{%= ($.cls || $.options.cls) %}">',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'
         ]),
         sectionEndTemplate: new Simplate([
             '</fieldset>'
         ]),
         propertyTemplate: new Simplate([
-            '<a name="{%= $.name %}"></a>',
-            '<div class="row row-edit {%= $.cls %}" data-field="{%= $.name %}" data-field-type="{%= $.type %}">',            
+            '<a name="{%= $.name || $.property %}"></a>',
+            '<div class="row row-edit {%= $.cls %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'
         ]),
-        attributeMap: {
-            validationContent: {
-                node: 'validationContentNode',
-                type: 'innerHTML'
-            }
-
-        },
         transitionEffect: 'slide',
         id: 'generic_edit',
         layout: null,
-        layoutCompiled: null,
-        layoutCompiledFrom: null,
         enableCustomizations: true,
         customizationSet: 'edit',
         expose: false,
@@ -103,7 +100,7 @@ define('Sage/Platform/Mobile/Edit', [
         },
         postCreate: function() {
             this.inherited(arguments);
-            this.processLayout(this.compileLayout(), {title: this.detailsText});
+            this.processLayout(this.compileLayout());
 
             dojo.query('div[data-field]', this.contentNode).forEach(function(node){
                 var name = dojo.attr(node, 'data-field'),
@@ -134,23 +131,15 @@ define('Sage/Platform/Mobile/Edit', [
             });
         },
         _onShowField: function(field) {
-            // todo: investigate why field is not being passed
-            if(!field) return;
             dojo.removeClass(field.containerNode, 'row-hidden');
         },
         _onHideField: function(field) {
-            // todo: investigate why field is not being passed
-            if(!field) return;
             dojo.addClass(field.containerNode, 'row-hidden');
         },
         _onEnableField: function(field) {
-            // todo: investigate why field is not being passed
-            if(!field) return;
             dojo.removeClass(field.containerNode, 'row-disabled');
         },
         _onDisableField: function(field) {
-            // todo: investigate why field is not being passed
-            if(!field) return;
             dojo.addClass(field.containerNode, 'row-disabled');
         },
         invokeAction: function(name, parameters, evt, el) {
@@ -172,22 +161,9 @@ define('Sage/Platform/Mobile/Edit', [
             return this.inherited(arguments);
         },
         toggleSection: function(params) {
-            var el = dojo.query(params.$source);
-            if (el)
-                dojo.toggleClass(el, 'collapsed');
-        },
-        expandExpression: function(expression) {
-            /// <summary>
-            ///     Expands the passed expression if it is a function.
-            /// </summary>
-            /// <param name="expression" type="String">
-            ///     1: function - Called on this object and must return a string.
-            ///     2: string - Returned directly.
-            /// </param>
-            if (typeof expression === 'function')
-                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
-            else
-                return expression;
+            var node = dojo.byId(params.$source);
+            if (node)
+                dojo.toggleClass(node, 'collapsed');
         },
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
@@ -226,22 +202,26 @@ define('Sage/Platform/Mobile/Edit', [
         createLayout: function() {
             return this.layout || [];
         },
-        processLayout: function(layout, layoutOptions)
+        processLayout: function(layout)
         {
-            var sectionQueue = [],
+            var rows = (layout['children'] || layout['as'] || layout),
+                options = layout['options'] || (layout['options'] = {
+                    title: this.detailsText
+                }),
+                sectionQueue = [],
                 sectionStarted = false,
                 content = [];
             
-            for (var i = 0; i < layout.length; i++)
+            for (var i = 0; i < rows.length; i++)
             {
-                var current = layout[i];
+                var current = rows[i];
 
-                if (current['as'])
+                if (current['children'] || current['as'])
                 {
                     if (sectionStarted)
                         sectionQueue.push(current);
                     else
-                        this.processLayout(current['as'], current['options']);
+                        this.processLayout(current);
 
                     continue;
                 }
@@ -249,26 +229,25 @@ define('Sage/Platform/Mobile/Edit', [
                 if (!sectionStarted)
                 {
                     sectionStarted = true;
-                    content.push(this.sectionBeginTemplate.apply(layoutOptions, this));
+                    content.push(this.sectionBeginTemplate.apply(layout, this));
                 }                    
 
                 var ctor = Sage.Platform.Mobile.FieldManager.get(current['type']),
-                    // use either the `alias` property, or the `name` property as the key for the field.
-                    field = this.fields[current['alias'] || current['name']] = new ctor(dojo.mixin({
+                    field = this.fields[current['name'] || current['property']] = new ctor(dojo.mixin({
                         owner: this
                     }, current)),
                     template = field.propertyTemplate || this.propertyTemplate;
 
 
-                dojo.connect(field, 'show', this, this._onShowField);
-                dojo.connect(field, 'hide', this, this._onHideField);
-                dojo.connect(field, 'enable', this, this._onEnableField);
-                dojo.connect(field, 'disable', this, this._onDisableField);
+                this.connect(field, 'onShow', this._onShowField);
+                this.connect(field, 'onHide', this._onHideField);
+                this.connect(field, 'onEnable', this._onEnableField);
+                this.connect(field, 'onDisable', this._onDisableField);
 
                 content.push(template.apply(field, this));
             }
 
-            content.push(this.sectionEndTemplate.apply(layoutOptions, this));
+            content.push(this.sectionEndTemplate.apply(layout, this));
 
             dojo.query(this.contentNode).append(content.join(''));
 
@@ -276,7 +255,7 @@ define('Sage/Platform/Mobile/Edit', [
             {
                 var current = sectionQueue[i];
 
-                this.processLayout(current['as'], current['options']);
+                this.processLayout(current);
             }
         },
         compileLayout: function() {
@@ -425,7 +404,8 @@ define('Sage/Platform/Mobile/Edit', [
         },
         processEntry: function(entry) {
             this.entry = this.convertEntry(entry || {});
-            dojo.removeClass(this.contentNode, 'panel-loading');
+            
+            dojo.removeClass(this.domNode, 'panel-loading');
         },
         applyContext: function(templateEntry) {
         },
@@ -443,7 +423,7 @@ define('Sage/Platform/Mobile/Edit', [
                 this.setValues(this.entry);
             }
 
-            dojo.removeClass(this.contentNode, 'panel-loading');
+            dojo.removeClass(this.domNode, 'panel-loading');
         },
         clearValues: function() {
             for (var name in this.fields)
@@ -740,11 +720,10 @@ define('Sage/Platform/Mobile/Edit', [
 
             if (this.refreshRequired)
             {
-                if (this.options.insert === true) {
-                    dojo.addClass(this.contentNode, 'panel-loading');
-                } else {
-                    dojo.removeClass(this.contentNode, 'panel-loading');
-                }
+                if (this.options.insert === true)
+                    dojo.addClass(this.domNode, 'panel-loading');
+                else
+                    dojo.removeClass(this.domNode, 'panel-loading');
             }
         },
         activate: function() {
@@ -756,7 +735,7 @@ define('Sage/Platform/Mobile/Edit', [
             this.changes = false;
             this.inserting = (this.options.insert === true);
 
-            dojo.removeClass(this.contentNode, 'panel-form-error');
+            dojo.removeClass(this.domNode, 'panel-form-error');
 
             this.clearValues();
 
