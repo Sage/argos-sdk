@@ -50,7 +50,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             '{% } %}'
         ]),
         propertyTemplate: new Simplate([
-            '<div class="row {%= $.cls %}" data-property="{%= $.name %}">',
+            '<div class="row {%= $.cls %}" data-property="{%= $.property || $.name %}">',
             '<label>{%: $.label %}</label>',
             '<span>{%= $.value %}</span>', // todo: create a way to allow the value to not be surrounded with a span tag
             '</div>'
