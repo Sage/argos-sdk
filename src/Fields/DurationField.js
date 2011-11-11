@@ -134,6 +134,11 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
                 autoCompleteValues = this.autoCompleteText;
             for(var key in autoCompleteValues){
                 stepValue = autoCompleteValues[key];
+                if(val===0 && stepValue===1)
+                {
+                    this.currentKey = key;
+                    break;
+                }
                 if(val / stepValue >= 1){
                     finalUnit = stepValue;
                     this.currentKey = key;
