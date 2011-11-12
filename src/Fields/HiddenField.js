@@ -16,7 +16,7 @@
 define('Sage/Platform/Mobile/Fields/HiddenField', ['Sage/Platform/Mobile/Fields/TextField'], function() {
     var control = dojo.declare('Sage.Platform.Mobile.Fields.HiddenField', [Sage.Platform.Mobile.Fields.TextField], {
         propertyTemplate: new Simplate([
-            '<div style="display: none;" data-field="{%= $.name %}" data-field-type="{%= $.type %}">',
+            '<div style="display: none;" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'
         ]),
         widgetTemplate: new Simplate([
