@@ -79,6 +79,13 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                 for (var i = 0; i < layoutCount; i++)
                 {
                     row = layout[i];
+
+                    /*** for compatibility ***/
+                    // will modify the underlying row
+                    if (typeof row['name'] === 'undefined' && typeof row['property'] === 'string')
+                        row['name'] = row['property'];
+                    /*************************/
+
                     insertRowsBefore = [];
                     insertRowsAfter = [];
 
@@ -107,6 +114,7 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                                     // make a shallow copy if we haven't already
                                     if (row === layout[i])
                                         row = dojo.mixin({}, row);
+                                    
                                     row = dojo.mixin(row, expand(customization.value, row));
                                     break;
                                 case 'insert':
@@ -124,15 +132,17 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                     }
 
                     output.push.apply(output, insertRowsBefore);
+
                     if (row)
                     {
-                        if (row['as'])
+                        var children = (row['children'] && 'children') || (row['as'] && 'as');
+                        if (children)
                         {
                             // make a shallow copy if we haven't already
                             if (row === layout[i])
                                 row = dojo.mixin({}, row);
 
-                            row['as'] = this._compileCustomizedLayout(customizations, row['as'], row);
+                            row[children] = this._compileCustomizedLayout(customizations, row[children], row);
                         }
 
                         output.push(row);
