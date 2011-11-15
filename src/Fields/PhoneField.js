@@ -42,7 +42,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/T
          */
         inputType: dojo.isSafari ? 'tel' : 'text',
 
-        onBlur: function() {
+        _onBlur: function() {
             this.inherited(arguments);
 
             // temporarily added: http://code.google.com/p/android/issues/detail?id=14519
