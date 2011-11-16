@@ -256,7 +256,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                         ? current['property']
                         : current['name'],
                     value = typeof current['value'] === 'undefined'
-                        ? provider(entry, property) || entry
+                        ? provider(entry, property || '')
                         : current['value'],
                     rendered,
                     formatted;
