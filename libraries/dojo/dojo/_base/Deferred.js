@@ -123,7 +123,7 @@ _1.Deferred.when=_1.when=function(_26,_27,_28,_29){
 if(_26&&typeof _26.then==="function"){
 return _26.then(_27,_28,_29);
 }
-return _27(_26);
+return _27?_27(_26):_26;
 };
 return _1.Deferred;
 });

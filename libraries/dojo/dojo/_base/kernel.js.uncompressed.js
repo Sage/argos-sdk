@@ -96,7 +96,7 @@ define("dojo/_base/kernel", ["../has", "./config", "require", "module"], functio
 	=====*/
 	var rev = "$Rev: 23930 $".match(/\d+/);
 	dojo.version = {
-		major: 1, minor: 7, patch: 0, flag: "rc1",
+		major: 1, minor: 7, patch: 0, flag: "",
 		revision: rev ? +rev[0] : NaN,
 		toString: function(){
 			var v = dojo.version;

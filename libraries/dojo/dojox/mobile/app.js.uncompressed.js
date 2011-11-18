@@ -3674,7 +3674,7 @@ define("dojox/mobile/common", [
 						}
 						return dic;
 					}
-					var rules = sheet.cssRules;
+					var rules = sheet.cssRules || [];
 					for (i = 0; i < rules.length; i++){
 						var rule = rules[i];
 						if(rule.href && rule.styleSheet){

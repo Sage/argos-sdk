@@ -74,6 +74,9 @@ this._ch=null;
 }
 };
 this.findDisp=function(_f){
+if(!_f.parentNode){
+return null;
+}
 var _10=_f.parentNode.childNodes;
 for(var i=0;i<_10.length;i++){
 var n=_10[i];

@@ -76,6 +76,10 @@
           "path": "../src"
         },
         {
+          "text": "Format.js",
+          "path": "../src"
+        },
+        {
           "text": "Detail.js",
           "path": "../src"
         },
@@ -96,23 +100,11 @@
           "path": "../src/Fields"
         },
         {
-          "text": "AddressField.js",
-          "path": "../src/Fields"
-        },
-        {
           "text": "PhoneField.js",
           "path": "../src/Fields"
         },
         {
-          "text": "NameField.js",
-          "path": "../src/Fields"
-        },
-        {
           "text": "LookupField.js",
-          "path": "../src/Fields"
-        },
-        {
-          "text": "PicklistField.js",
           "path": "../src/Fields"
         },
         {
@@ -122,10 +114,6 @@
         {
           "text": "BooleanField.js",
           "path": "../src/Fields"
-        },
-        {
-          "text": "Format.js",
-          "path": "../src"
         },
         {
           "text": "DateField.js",

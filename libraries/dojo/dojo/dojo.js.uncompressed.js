@@ -912,11 +912,20 @@
 
 				if(1 && legacyMode == sync && !plugin.executed){
 					injectModule(plugin);
-					checkCompleteGuard++;
-					execModule(plugin);
-					checkIdle();
-					promoteModuleToPlugin(plugin);
+					if(plugin.injected===arrived && !plugin.executed){
+						checkCompleteGuard++;
+						execModule(plugin);
+						checkIdle();
+					}
+					if(plugin.executed){
+						promoteModuleToPlugin(plugin);
+					}else{
+						// we are in xdomain mode for some reason
+						execQ.unshift(plugin);
+					}
 				}
+
+
 
 				if(plugin.executed === executed && !plugin.load){
 					// executed the module not knowing it was a plugin
@@ -3112,7 +3121,7 @@ define(["../has", "./config", "require", "module"], function(has, config, requir
 	=====*/
 	var rev = "$Rev: 23930 $".match(/\d+/);
 	dojo.version = {
-		major: 1, minor: 7, patch: 0, flag: "rc1",
+		major: 1, minor: 7, patch: 0, flag: "",
 		revision: rev ? +rev[0] : NaN,
 		toString: function(){
 			var v = dojo.version;
@@ -3765,7 +3774,7 @@ define("dojo/_base/Deferred", ["./kernel", "./lang"], function(dojo, lang){
 		if(promiseOrValue && typeof promiseOrValue.then === "function"){
 			return promiseOrValue.then(callback, errback, progressHandler);
 		}
-		return callback(promiseOrValue);	// Promise
+		return callback ? callback(promiseOrValue) : promiseOrValue;	// Promise
 	};
 
 	return dojo.Deferred;
@@ -5170,87 +5179,30 @@ define(["./kernel", "../has", "require", "module", "./json", "./lang", "./array"
 
 		buildDetectRe = /\/\/>>built/,
 
-		dojoRequireSet = {},
+		dojoRequireCallbacks = [],
+		dojoRequireModuleStack = [],
 
 		dojoRequirePlugin = function(mid, require, loaded){
-			var count = 1,
-				arrived = function(){
-					if(--count==0){
-						loaded(1);
-					}
-				};
-
-			// if this is a dojo/require! in a deps vector for a define, then annotate the reference module
-			// to help with the checkDojoRequirePlugin() algorithm; if it's in a context require in a
-			// dojo/loadInit!, then dojoRequireMids is not initialized since that pseudo module is never
-			// seen in checkDojoRequirePlugin
-			var target= "dojo/require!" + require.module.mid + "!" + mid,
-				dojoRequireMids;
-			array.some(require.module.deps, function(module){
-				if(target==module.mid){
-					dojoRequireMids = module.dojoRequireMids = [];
-					return 1;
-				}
-				return 0;
-			});
-
+			dojoRequireCallbacks.push(loaded);
 			array.forEach(mid.split(","), function(mid){
-				count++;
 				var module = getModule(mid, require.module);
-				mid = module.mid;
-				dojoRequireMids && dojoRequireMids.push(mid);
-				(dojoRequireSet[mid] ||  (dojoRequireSet[mid] = [])).push(arrived);
+				dojoRequireModuleStack.push(module);
 				injectModule(module);
 			});
 			checkDojoRequirePlugin();
-			arrived();
 		},
 
 		checkDojoRequirePlugin = function(){
-			var checked = [],
-				visited = [],
-				traverse = function(mid){
-					if(checked[mid]!==undefined){
-						return checked[mid];
-					}
-					var module= modules[mid];
-					if(module.executed){
-						// recall truthy executed indicated "executed" or "executing"
-						return (checked[mid] = 1);
-					}
-					if(module.injected!==arrived){
-						return (checked[mid] = 0);
-					}
-					if(visited[mid]){
-						// a circular path and haven't found a reason to reject this path
-						return 1;
-					}
-					visited[mid] = 1;
-					// the module is here, now look to see if all its deps are here...
-					for(var dep, i= 0, deps= module.deps || [], end= deps.length; i<end;){
-						dep = deps[i++];
-						if((dep.dojoRequireMids && !array.every(dep.dojoRequireMids, traverse)) || !traverse(dep.mid)){
-							return checked[module.mid] = 0;
-						}
-					}
-					return checked[mid] = 1;
-				},
-				p,
-				foundAtLeastOne = 0;
-
-			for(p in dojoRequireSet) {
-				traverse(p);
+			dojoRequireModuleStack = array.filter(dojoRequireModuleStack, function(module){
+				return module.injected!==arrived && !module.executed;
+			});
+			if(!dojoRequireModuleStack.length){
+				loaderVars.holdIdle();
+				var oldCallbacks = dojoRequireCallbacks;
+				dojoRequireCallbacks = [];
+				array.forEach(oldCallbacks, function(cb){cb(1);});
+				loaderVars.releaseIdle();
 			}
-
-			for(p in checked){
-				if(checked[p] && dojoRequireSet[p]){
-					array.forEach(dojoRequireSet[p], function(arrived){ arrived(); });
-					delete dojoRequireSet[p];
-					foundAtLeastOne = 1;
-				}
-			}
-
-			return foundAtLeastOne ? (checkDojoRequirePlugin() || 1) : 0;
 		},
 
 		dojoLoadInitPlugin = function(mid, require, loaded){
@@ -5367,8 +5319,13 @@ define(["./kernel", "../has", "require", "module", "./json", "./lang", "./array"
 					// requireList is the list of modules that need to be downloaded but not executed before the callingModule can be executed
 					requireList.length && deps.push("dojo/require!" + requireList.join(","));
 
-					// finally, load all detected modules vis dojo/require!; when loaded, signal the callingModule is ready to execute
-					require(deps, function(){ loaded(1); });
+					dojoRequireCallbacks.push(loaded);
+					array.forEach(requireList, function(mid){
+						var module = getModule(mid, require.module);
+						dojoRequireModuleStack.push(module);
+						injectModule(module);
+					});
+					checkDojoRequirePlugin();
 				});
 			});
 		},
@@ -5701,9 +5658,12 @@ define(["./kernel", "../has", "require", "module", "./json", "./lang", "./array"
 
 			var currentMode = getLegacyMode();
 
-			// recall, in sync mode to inject is to execute
+			// recall, in sync mode to inject is to *eval* the module text
+			// if the module is a legacy module, this is the same as executing
+			// but if the module is an AMD module, this means defining, not executing
 			injectModule(module);
 
+			// in sync mode to dojo.require is to execute
 			if(module.executed!==executed && module.injected===arrived){
 				// the module was already here before injectModule was called probably finishing up a xdomain
 				// load, but maybe a module given to the loader directly rather than having the loader retrieve it
@@ -10047,8 +10007,8 @@ define(["./aspect", "./on"], function(aspect, on){
 
 },
 'dojo/mouse':function(){
-define(["./_base/kernel", "./on", "./has", "./dom"], function(dojo, on, has, dom){
-	
+define(["./_base/kernel", "./on", "./has", "./dom", "./_base/window"], function(dojo, on, has, dom, win){
+
 	/*=====
 	dojo.mouse = {
 	// summary:
@@ -10077,9 +10037,10 @@ define(["./_base/kernel", "./on", "./has", "./dom"], function(dojo, on, has, dom
 	//		|		});
 	};
 	======*/
-	
-	has.add("dom-quirks", document.compatMode == "BackCompat");
-	has.add("events-mouseenter", "onmouseenter" in document.createElement("div"));
+
+    has.add("dom-quirks", win.doc && win.doc.compatMode == "BackCompat");
+ 	has.add("events-mouseenter", win.doc && "onmouseenter" in win.doc.createElement("div"));
+
 	var mouseButtons;
 	if(has("dom-quirks") || !has("dom-addeventlistener")){
 		mouseButtons = {
@@ -10117,7 +10078,7 @@ define(["./_base/kernel", "./on", "./has", "./dom"], function(dojo, on, has, dom
 		// RIGHT: Number
 		//		Numeric value of the right mouse button for the platform.
 		RIGHT:  2,
-	
+
 		isButton: function(e, button){
 			// summary:
 			//		Checks an event object for a pressed button
@@ -10157,7 +10118,7 @@ define(["./_base/kernel", "./on", "./has", "./dom"], function(dojo, on, has, dom
 			return on(node, type, function(evt){
 				if(!dom.isDescendant(evt.relatedTarget, mustBubble ? evt.target : node)){
 					return listener.call(this, evt);
-				}					
+				}
 			});
 		};
 		if(!mustBubble){
@@ -12945,7 +12906,7 @@ dojo.doc = {
 	//	|	n.appendChild(dojo.doc.createElement('div'));
 }
 =====*/
-dojo.doc = window["document"] || null;
+dojo.doc = this["document"] || null;
 
 dojo.body = function(){
 	// summary:
@@ -13013,7 +12974,7 @@ dojo.withDoc = function(	/*DocumentElement*/documentObject,
 		dojo.doc = ret.doc = documentObject;
 		// update dojo.isQuirks and the value of the has feature "quirks"
 		dojo.isQuirks = has.add("quirks", dojo.doc.compatMode == "BackCompat", true, true); // no need to check for QuirksMode which was Opera 7 only
-		
+
 		if(has("ie")){
 			if((pwin = documentObject.parentWindow) && pwin.navigator){
 				// re-run IE detection logic and update dojo.isIE / has("ie")
@@ -13295,7 +13256,7 @@ define([
 	"./_base/array",
 	"./ready",
 	"./_base/declare",
-	//"./_base/connect", // until we decide if connect is going back into non-browser environments
+	"./_base/connect",
 	"./_base/Deferred",
 	"./_base/json",
 	"./_base/Color",

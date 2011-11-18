@@ -1,6 +1,6 @@
 //>>built
-define("dojo/mouse", ["./_base/kernel", "./on", "./has", "./dom"], function(dojo, on, has, dom){
-	
+define("dojo/mouse", ["./_base/kernel", "./on", "./has", "./dom", "./_base/window"], function(dojo, on, has, dom, win){
+
 	/*=====
 	dojo.mouse = {
 	// summary:
@@ -29,9 +29,10 @@ define("dojo/mouse", ["./_base/kernel", "./on", "./has", "./dom"], function(dojo
 	//		|		});
 	};
 	======*/
-	
-	has.add("dom-quirks", document.compatMode == "BackCompat");
-	has.add("events-mouseenter", "onmouseenter" in document.createElement("div"));
+
+    has.add("dom-quirks", win.doc && win.doc.compatMode == "BackCompat");
+ 	has.add("events-mouseenter", win.doc && "onmouseenter" in win.doc.createElement("div"));
+
 	var mouseButtons;
 	if(has("dom-quirks") || !has("dom-addeventlistener")){
 		mouseButtons = {
@@ -69,7 +70,7 @@ define("dojo/mouse", ["./_base/kernel", "./on", "./has", "./dom"], function(dojo
 		// RIGHT: Number
 		//		Numeric value of the right mouse button for the platform.
 		RIGHT:  2,
-	
+
 		isButton: function(e, button){
 			// summary:
 			//		Checks an event object for a pressed button
@@ -109,7 +110,7 @@ define("dojo/mouse", ["./_base/kernel", "./on", "./has", "./dom"], function(dojo
 			return on(node, type, function(evt){
 				if(!dom.isDescendant(evt.relatedTarget, mustBubble ? evt.target : node)){
 					return listener.call(this, evt);
-				}					
+				}
 			});
 		};
 		if(!mustBubble){
