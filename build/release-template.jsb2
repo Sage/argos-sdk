@@ -30,5 +30,9 @@
 		"src": "../content",
 		"dest": "content",
 		"filters": ".*(\\.css|\\.jpg|\\.png|\\.gif)"
+	},{
+		"src": "../libraries/dojo/dojo",
+		"dest": "content/dojo/dojo",
+		"filters": "(dojo\\.js|acme\\.js)"
 	}]
 }
