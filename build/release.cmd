@@ -19,7 +19,4 @@ tools\JsBit\jsbit.exe -p "build/release.jsb2" -d "."
 REM Java Build Tool
 REM %JAVA_HOME%\bin\java -Dfile.encoding=UTF-8 -jar "tools/JSBuilder/JSBuilder2.jar" -v -p "build/release.jsb2" -d "."
 
-xcopy libraries\dojo\dojo\dojo.js .\deploy\content\dojo\dojo /Y /Q
-xcopy libraries\dojo\dojo\selector\acme.js .\deploy\content\dojo\dojo\selector /Y /Q
-
 if %errorlevel% neq 0 exit /b %errorlevel%
