@@ -22,10 +22,10 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         //Templates
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
-                '<canvas data-dojo-attach-point="canvasNode" width=360" height="100""></canvas>',
+                '<canvas data-dojo-attach-point="canvasNode" width="300" height="100"></canvas>',
                 '<input data-dojo-attach-point="inputNode" type="hidden">',
                 '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
-                '<button class="button" data-action="_restart"><span>{%: $.clearCanvasText %}</span></button>',
+                '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
             '<div>'
         ]),
 
@@ -69,6 +69,15 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             var value = dojo.attr(this.inputNode, 'value');
             return value;
         },
+        setValue: function(val, initial) {
+            dojo.attr(this.inputNode, 'value', val || '');
+            this.signature = val ? JSON.parse(val) : [];
+            this.redraw(this.signature, this.ctx, this.scale);
+        },
+        clearValue: function() {
+            this.setValue('', true);
+            clear_canvas(this.ctx);
+        },
         // _get_coords returns pointer pixel coordinates [x,y] relative to canvas object
         _get_coords: function (e) {
             var offset = dojo.position(this.canvasNode, false);
@@ -102,14 +111,10 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         _pen_up: function (e) {
             this.is_pen_down = false;
             if (this.trace.length)
-                this.signature.push(this.trace);
+                this.signature.push(this.optimize(this.trace));
 
             this.trace = [];
             this.redraw(this.signature, this.ctx, this.scale);
-        },
-        _restart: function () {
-            this.signature = [];
-            clear_canvas(this.ctx);
         },
         _undo: function () {
             if (this.signature.length) {
@@ -119,7 +124,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             return false;
         },
         redraw: function (vector, ctx, scale) {
-            var x, y; vector = this.optimize(vector);
+            var x, y;
             clear_canvas(ctx);
             scale = scale || this.scale;
             ctx.lineWidth = this.lineWidth * scale;
@@ -139,46 +144,38 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         },
 
         // eliminate intermediate points along a straight line
-        // in practice this is only saving about 30%
+        // in practice this is only saving roughly 30%
+        // disadvantage if retracing steps in reverse
         optimize: function(vector) {
-            var new_trace,
-                new_vector = [];
+            var new_vector = [],
+                slice_size = 0,
+                current_x = -1,
+                current_y = -1,
+                x, y;
 
-            for (trace in vector) {
-                new_trace = [];
-                slice_size = 0;
-                current_x = -1;
-                current_y = -1;
-
-                for (var i = 0; i < vector[trace].length; i++) {
-                    x = vector[trace][i][0];
-                    y = vector[trace][i][1];
-                    if (current_x == x || current_y == y) {
-                        slice_size++;
-                    } else if (0 < slice_size) {
-                        slice_size = 0;
-                        if(current_x != x) {
-                            new_trace.push([current_x, vector[trace][i-1][1]]);
-                            current_x = x;
-                        } else {
-                            new_trace.push([vector[trace][i-1][0], current_y]);
-                            current_y = y;
-                        }
-                        new_trace.push([x,y]);
-                    } else {
-                        new_trace.push([x,y]);
+            for (var i = 0; i < vector.length; i++) {
+                x = vector[i][0];
+                y = vector[i][1];
+                if (current_x == x || current_y == y) {
+                    slice_size++;
+                } else if (0 < slice_size) {
+                    slice_size = 0;
+                    if(current_x != x) {
+                        new_vector.push([current_x, vector[i-1][1]]);
                         current_x = x;
+                    } else {
+                        new_vector.push([vector[i-1][0], current_y]);
                         current_y = y;
                     }
+                    new_vector.push([x,y]);
+                } else {
+                    new_vector.push([x,y]);
+                    current_x = x;
+                    current_y = y;
                 }
-                new_trace.push(vector[trace].pop());
-                new_vector.push(new_trace);
             }
-
-            // console.log(JSON.stringify(vector).length);
-            // console.log('--- vs. optimized');
-            // console.log(JSON.stringify(new_vector).length);
-            // return vector; // returning original, not optimized
+            new_vector.push(vector.pop());
+            // console.log(100 - Math.floor((JSON.stringify(new_vector).length/JSON.stringify(vector).length)*100) + '% compressed.');
             return new_vector;
         }
     });

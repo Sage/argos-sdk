@@ -28,6 +28,7 @@ define('Sage/Platform/Mobile/Edit', [
     'Sage/Platform/Mobile/Fields/DurationField',
     'Sage/Platform/Mobile/Fields/HiddenField',
     'Sage/Platform/Mobile/Fields/NoteField',
+    'Sage/Platform/Mobile/Fields/SignatureField',
     'Sage/Platform/Mobile/Fields/TextAreaField'
     ], function() {
 
