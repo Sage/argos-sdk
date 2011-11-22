@@ -11,6 +11,13 @@
     cursor: default;
 }
 
+/* signature capture */
+#signature_edit { padding: 1em; }
+#signature_edit canvas {
+    border: 1px black solid;
+}
+#signature_edit .button { width: 100%; margin: 0.5em; }
+
 /* list view */
 .list
 {
@@ -356,7 +363,8 @@
 .row-edit[data-field-type="address"] > .button,
 .row-edit[data-field-type="name"] > .button,
 .row-edit[data-field-type="date"] > .button,
-.row-edit[data-field-type="note"] > .button
+.row-edit[data-field-type="note"] > .button,
+.row-edit[data-field-type="signature"] > div >.button
 {
     margin: 0;
     padding: 0 8px;
@@ -379,6 +387,8 @@
 {
     padding: 8px 34px 8px 110px !important;
 }
+
+.row-edit[data-field-type="signature"] > div > canvas { margin-left: 110px; }
 
 .row-edit[data-field-type="note"] > div > textarea,
 .row-edit[data-field-type="note"] > textarea
