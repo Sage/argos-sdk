@@ -136,6 +136,14 @@
           "path": "../src/Fields"
         },
         {
+          "text": "Signature.js",
+          "path": "../src/Views"
+        },
+        {
+          "text": "SignatureField.js",
+          "path": "../src/Fields"
+        },
+        {
           "text": "TextAreaField.js",
           "path": "../src/Fields"
         },
