@@ -15,8 +15,8 @@
 
 define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/FieldManager', 'Sage/Platform/Mobile/Fields/EditorField', 'Sage/Platform/Mobile/Views/Signature'], function() {
 
-    var clear_canvas = function (ctx) {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    var clearCanvas = function (context) {
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     }
 
     var control = dojo.declare('Sage.Platform.Mobile.Fields.SignatureField', [Sage.Platform.Mobile.Fields.EditorField], {
@@ -29,9 +29,9 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
         signature: [],
         scale: 0.5,
         lineWidth: 1,
-        pen_color: 'red',
-        sig_color: 'blue',
-        ctx: null,
+        penColor: 'red',
+        sigColor: 'blue',
+        context: null,
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.signatureLabelText %}"><span aria-hidden="true">{%: $.signatureText %}</span></button>',
@@ -42,9 +42,9 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
         init: function () {
             this.inherited(arguments);
 
-            this.ctx = this.signatureNode.getContext('2d');
-            this.ctx.lineWidth = this.lineWidth;
-            this.ctx.strokeStyle = this.sig_color;
+            this.context = this.signatureNode.getContext('2d');
+            this.context.lineWidth = this.lineWidth;
+            this.context.strokeStyle = this.sigColor;
         },
         getValuesFromView: function() {
             var view = App.getPrimaryActiveView();
@@ -68,17 +68,17 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
         },
         redraw: function () {
             var x, y;
-            clear_canvas(this.ctx);
+            clearCanvas(this.context);
             for (trace in this.signature) {
-                this.ctx.beginPath();
+                this.context.beginPath();
                 for (var i = 0; i < this.signature[trace].length; i++) {
                     x = this.signature[trace][i][0] * this.scale;
                     y = this.signature[trace][i][1] * this.scale;
-                    if (0 == i) { this.ctx.moveTo(x, y); }
-                    this.ctx.lineTo(x, y);
-                    this.ctx.moveTo(x, y);
+                    if (0 == i) { this.context.moveTo(x, y); }
+                    this.context.lineTo(x, y);
+                    this.context.moveTo(x, y);
                 }
-                this.ctx.stroke();
+                this.context.stroke();
             }
         },
     });

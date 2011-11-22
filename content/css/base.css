@@ -12,14 +12,9 @@
 }
 
 /* signature capture */
-#signature_edit {
-    padding: 1em;
-    text-align: center;
-}
-#signature_edit canvas {
-    border: 1px black solid;
-}
-#signature_edit .button { width: 100%; margin: 0.5em; }
+#signature_edit { text-align: center; }
+#signature_edit canvas {}
+#signature_edit .button { width: 90%; margin: 0.5em auto; }
 
 /* list view */
 .list
