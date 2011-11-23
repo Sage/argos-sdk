@@ -6,9 +6,9 @@
 
 define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], function() {
 
-    var clear_canvas = function (ctx) {
-        if (ctx && CanvasRenderingContext2D == ctx.constructor)
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    var clearCanvas = function (context) {
+        if (context && CanvasRenderingContext2D == context.constructor)
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
         return false;
     }
@@ -22,10 +22,12 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         //Templates
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
-                '<canvas data-dojo-attach-point="canvasNode" width="300" height="100"></canvas>',
+                '<canvas data-dojo-attach-point="canvasNode" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchen:_penUp" width="{%: $.canvasWidth %}" height="{%: $.canvasHeight %}"></canvas>',
                 '<input data-dojo-attach-point="inputNode" type="hidden">',
-                '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
-                '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
+                '<div class="buttons">',
+                    '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
+                    '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
+                '</div>',
             '<div>'
         ]),
 
@@ -37,32 +39,30 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         lastpos: {x:-1, y:-1},
         lineWidth: 3.0,
         scale: 1.0,
-        pen_color: 'red',
-        sig_color: 'blue',
-        is_pen_down: false,
-        ctx: null,
+        penColor: 'red',
+        sigColor: 'blue',
+        isPenDown: false,
+        context: null,
+        buffer: null,
+        // need to handle rotation/resizing
+        // but what if rotation happens after starting drawing?
+        // on-the-fly scaling won't work, need to "translate" to new scale
+        canvasWidth: dojo.window.getBox().w, // maybe the smaller of width/height (what if on landscape mode)
+        canvasHeight: dojo.window.getBox().w / 3, // 3:1 aspect ratio?
 
         show: function(options) {
             options = this.inherited(arguments);
 
             if (options && options.lineWidth) { this.lineWidth = options.lineWidth; }
-            if (options && options.pen_color) { this.pen_color = options.pen_color; }
-            if (options && options.sig_color) { this.sig_color = options.sig_color; }
+            if (options && options.penColor) { this.penColor = options.penColor; }
+            if (options && options.sigColor) { this.sigColor = options.sigColor; }
 
-            this.ctx = this.canvasNode.getContext('2d');
-            this.ctx.lineWidth = this.lineWidth;
-
-            dojo.connect(this.canvasNode, 'onmousedown', this, this._pen_down);
-            dojo.connect(this.canvasNode, 'onmousemove', this, this._pen_move);
-            dojo.connect(this.canvasNode, 'onmouseup',   this, this._pen_up);
-
-            dojo.connect(this.canvasNode, 'ontouchstart', this, this._pen_down);
-            dojo.connect(this.canvasNode, 'ontouchmove',  this, this._pen_move);
-            dojo.connect(this.canvasNode, 'ontouchend',   this, this._pen_up);
+            this.context = this.canvasNode.getContext('2d');
+            this.context.lineWidth = this.lineWidth;
 
             if (options && options.signature) {
                 this.signature = options.signature;
-                this.redraw(this.signature, this.ctx, this.scale);
+                this.redraw(this.signature, this.context, this.scale);
             }
         },
         getValues: function() {
@@ -72,14 +72,15 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         setValue: function(val, initial) {
             dojo.attr(this.inputNode, 'value', val || '');
             this.signature = val ? JSON.parse(val) : [];
-            this.redraw(this.signature, this.ctx, this.scale);
+            this.redraw(this.signature, this.context, this.scale);
         },
         clearValue: function() {
+            this.buffer = this.signature;
             this.setValue('', true);
-            clear_canvas(this.ctx);
+            clearCanvas(this.context);
         },
-        // _get_coords returns pointer pixel coordinates [x,y] relative to canvas object
-        _get_coords: function (e) {
+        // _getCoords returns pointer pixel coordinates [x,y] relative to canvas object
+        _getCoords: function (e) {
             var offset = dojo.position(this.canvasNode, false);
             return e.touches
                 ? [
@@ -92,53 +93,62 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
                   ]
                 ;
         },
-        _pen_down: function (e) {
-            this.is_pen_down = true;
-            this.lastpos = this._get_coords(e);
+        _penDown: function (e) {
+            this.isPenDown = true;
+            this.lastpos = this._getCoords(e);
+            e.preventDefault();
         },
-        _pen_move: function (e) {
-            if (!this.is_pen_down) { return; }
-            this.pos = this._get_coords(e);
-            this.ctx.strokeStyle = this.pen_color;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.lastpos[0], this.lastpos[1]);
-            this.ctx.lineTo(this.pos[0], this.pos[1]);
-            this.ctx.closePath();
-            this.ctx.stroke();
+        _penMove: function (e) {
+            if (!this.isPenDown) { return; }
+            this.pos = this._getCoords(e);
+            this.context.strokeStyle = this.penColor;
+            e.preventDefault();
+            this.context.beginPath();
+            this.context.moveTo(this.lastpos[0], this.lastpos[1]);
+            this.context.lineTo(this.pos[0], this.pos[1]);
+            this.context.closePath();
+            this.context.stroke();
+            e.preventDefault();
             this.lastpos = this.pos;
             this.trace.push(this.pos);
         },
-        _pen_up: function (e) {
-            this.is_pen_down = false;
+        _penUp: function (e) {
+            e.preventDefault();
+            this.isPenDown = false;
             if (this.trace.length)
                 this.signature.push(this.optimize(this.trace));
 
             this.trace = [];
-            this.redraw(this.signature, this.ctx, this.scale);
+            this.redraw(this.signature, this.context, this.scale);
         },
         _undo: function () {
             if (this.signature.length) {
-                var throw_away = this.signature.pop();
-                this.redraw(this.signature, this.ctx, this.scale);
+                this.buffer = this.signature.pop();
+                if (!this.signature.length)
+                    this.buffer = [this.buffer];
+
+            } else if (this.buffer.length) {
+                this.signature = this.buffer;
             }
+            this.redraw(this.signature, this.context, this.scale);
             return false;
         },
-        redraw: function (vector, ctx, scale) {
+        redraw: function (vector, context, scale) {
             var x, y;
-            clear_canvas(ctx);
+            clearCanvas(context);
             scale = scale || this.scale;
-            ctx.lineWidth = this.lineWidth * scale;
-            ctx.strokeStyle = this.sig_color;
+            context.lineWidth = this.lineWidth * scale;
+            context.strokeStyle = this.sigColor;
             for (trace in vector) {
-                ctx.beginPath();
+                context.beginPath();
                 for (var i = 0; i < vector[trace].length; i++) {
                     x = vector[trace][i][0] * scale;
                     y = vector[trace][i][1] * scale;
-                    if (0 == i) { ctx.moveTo(x, y); }
-                    ctx.lineTo(x, y);
-                    ctx.moveTo(x, y);
+                    if (0 == i) { context.moveTo(x, y); }
+                    context.lineTo(x, y);
+                    context.moveTo(x, y);
                 }
-                ctx.stroke();
+                context.stroke();
             }
             dojo.attr(this.inputNode, 'value', JSON.stringify(vector));
         },
@@ -147,36 +157,35 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         // in practice this is only saving roughly 30%
         // disadvantage if retracing steps in reverse
         optimize: function(vector) {
-            var new_vector = [],
+            var newVector = [],
                 slice_size = 0,
-                current_x = -1,
-                current_y = -1,
+                currentX = -1,
+                currentY = -1,
                 x, y;
 
             for (var i = 0; i < vector.length; i++) {
                 x = vector[i][0];
                 y = vector[i][1];
-                if (current_x == x || current_y == y) {
+                if (currentX == x || currentY == y) {
                     slice_size++;
                 } else if (0 < slice_size) {
                     slice_size = 0;
-                    if(current_x != x) {
-                        new_vector.push([current_x, vector[i-1][1]]);
-                        current_x = x;
+                    if(currentX != x) {
+                        newVector.push([currentX, vector[i-1][1]]);
+                        currentX = x;
                     } else {
-                        new_vector.push([vector[i-1][0], current_y]);
-                        current_y = y;
+                        newVector.push([vector[i-1][0], currentY]);
+                        currentY = y;
                     }
-                    new_vector.push([x,y]);
+                    newVector.push([x,y]);
                 } else {
-                    new_vector.push([x,y]);
-                    current_x = x;
-                    current_y = y;
+                    newVector.push([x,y]);
+                    currentX = x;
+                    currentY = y;
                 }
             }
-            new_vector.push(vector.pop());
-            // console.log(100 - Math.floor((JSON.stringify(new_vector).length/JSON.stringify(vector).length)*100) + '% compressed.');
-            return new_vector;
+            newVector.push(vector.pop());
+            return newVector;
         }
     });
 });
