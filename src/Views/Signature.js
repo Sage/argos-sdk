@@ -24,8 +24,10 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
                 '<canvas data-dojo-attach-point="canvasNode" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchen:_penUp" width="{%: $.canvasWidth %}" height="{%: $.canvasHeight %}"></canvas>',
                 '<input data-dojo-attach-point="inputNode" type="hidden">',
-                '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
-                '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
+                '<div class="buttons">',
+                    '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
+                    '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
+                '</div>',
             '<div>'
         ]),
 
@@ -41,6 +43,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         sigColor: 'blue',
         isPenDown: false,
         context: null,
+        buffer: null,
         // need to handle rotation/resizing
         // but what if rotation happens after starting drawing?
         // on-the-fly scaling won't work, need to "translate" to new scale
@@ -72,6 +75,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             this.redraw(this.signature, this.context, this.scale);
         },
         clearValue: function() {
+            this.buffer = this.signature;
             this.setValue('', true);
             clearCanvas(this.context);
         },
@@ -119,9 +123,14 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         },
         _undo: function () {
             if (this.signature.length) {
-                var throw_away = this.signature.pop();
-                this.redraw(this.signature, this.context, this.scale);
+                this.buffer = this.signature.pop();
+                if (!this.signature.length)
+                    this.buffer = [this.buffer];
+
+            } else if (this.buffer.length) {
+                this.signature = this.buffer;
             }
+            this.redraw(this.signature, this.context, this.scale);
             return false;
         },
         redraw: function (vector, context, scale) {
