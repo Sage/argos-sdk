@@ -152,40 +152,46 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             }
             dojo.attr(this.inputNode, 'value', JSON.stringify(vector));
         },
-
-        // eliminate intermediate points along a straight line
-        // in practice this is only saving roughly 30%
-        // disadvantage if retracing steps in reverse
         optimize: function(vector) {
-            var newVector = [],
-                slice_size = 0,
-                currentX = -1,
-                currentY = -1,
-                x, y;
+            if (vector.length < 2) return vector;
 
-            for (var i = 0; i < vector.length; i++) {
-                x = vector[i][0];
-                y = vector[i][1];
-                if (currentX == x || currentY == y) {
-                    slice_size++;
-                } else if (0 < slice_size) {
-                    slice_size = 0;
-                    if(currentX != x) {
-                        newVector.push([currentX, vector[i-1][1]]);
-                        currentX = x;
-                    } else {
-                        newVector.push([vector[i-1][0], currentY]);
-                        currentY = y;
-                    }
-                    newVector.push([x,y]);
-                } else {
-                    newVector.push([x,y]);
-                    currentX = x;
-                    currentY = y;
+            var result = [],
+                minA = 0.95,
+                maxL = 15.0, // 15.0, 10.0 works well
+                rootP = vector[0],
+                lastP = vector[1],
+                rootV = [lastP[0] - rootP[0], lastP[1] - rootP[1]],
+                rootL = Math.sqrt(rootV[0]*rootV[0] + rootV[1]*rootV[1]),
+                currentP,
+                currentV,
+                currentL,
+                dotProduct;
+
+            for (var i = 2; i < vector.length; i++)
+            {
+                currentP = vector[i];
+                currentV = [currentP[0] - rootP[0], currentP[1] - rootP[1]];
+                currentL = Math.sqrt(currentV[0]*currentV[0] + currentV[1]*currentV[1]);
+                dotProduct = (rootV[0]*currentV[0] + rootV[1]*currentV[1]) / (rootL*currentL);
+
+                if (dotProduct < minA || currentL > maxL)
+                {
+                    result.push(rootP);
+
+                    rootP = lastP;
+                    lastP = currentP;
+                    rootV = [lastP[0] - rootP[0], lastP[1] - rootP[1]];
+                    rootL = Math.sqrt(rootV[0]*rootV[0] + rootV[1]*rootV[1]);
+                }
+                else
+                {
+                    lastP = currentP;
                 }
             }
-            newVector.push(vector.pop());
-            return newVector;
+
+            result.push(lastP);
+
+            return result;
         }
     });
 });
