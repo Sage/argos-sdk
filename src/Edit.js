@@ -99,9 +99,10 @@ define('Sage/Platform/Mobile/Edit', [
         constructor: function(o) {
             this.fields = {};
         },
-        postCreate: function() {
+        startup: function() {
             this.inherited(arguments);
-            this.processLayout(this.compileLayout());
+            
+            this.processLayout(this._createCustomizedLayout(this.createLayout()));
 
             dojo.query('div[data-field]', this.contentNode).forEach(function(node){
                 var name = dojo.attr(node, 'data-field'),
@@ -257,91 +258,6 @@ define('Sage/Platform/Mobile/Edit', [
                 var current = sectionQueue[i];
 
                 this.processLayout(current);
-            }
-        },
-        compileLayout: function() {
-            var layout = this.createLayout(),
-                source = layout;
-            if (source === this.layoutCompiledFrom && this.layoutCompiled)
-                return this.layoutCompiled; // same layout, no changes
-
-            if (this.enableCustomizations)
-            {
-                var customizations = App.getCustomizationsFor(this.customizationSet, this.id);
-                if (customizations && customizations.length > 0)
-                {
-                    layout = [];
-                    this.applyCustomizationsToLayout(source, customizations, layout);
-                }
-            }
-
-            this.layoutCompiled = layout;
-            this.layoutCompiledFrom = source;
-
-            return layout;
-        },
-        applyCustomizationsToLayout: function(layout, customizations, output) {
-            for (var i = 0; i < layout.length; i++)
-            {
-                var row = layout[i],
-                    insertRowsBefore = [],
-                    insertRowsAfter = [];
-
-                for (var j = 0; j < customizations.length; j++)
-                {
-                    var customization = customizations[j],
-                        stop = false;
-
-                    if (customization.at(row))
-                    {
-                        switch (customization.type)
-                        {
-                            case 'remove':
-                                // full stop
-                                stop = true;
-                                row = null;
-                                break;
-                            case 'replace':
-                                // full stop
-                                stop = true;
-                                row = this.expandExpression(customization.value, row);
-                                break;
-                            case 'modify':
-                                // make a shallow copy if we haven't already
-                                if (row === layout[i])
-                                    row = dojo.mixin({}, row);
-                                row = dojo.mixin(row, this.expandExpression(customization.value, row));
-                                break;
-                            case 'insert':
-                                (customization.where !== 'before'
-                                    ? insertRowsAfter
-                                    : insertRowsBefore
-                                ).push(this.expandExpression(customization.value, row));
-                                break;
-                        }
-                    }
-
-                    if (stop) break;
-                }
-
-                output.push.apply(output, insertRowsBefore);
-                if (row)
-                {
-                    if (row['as'])
-                    {
-                        // make a shallow copy if we haven't already
-                        if (row === layout[i])
-                            row = dojo.mixin({}, row);
-
-                        var subLayout = row['as'],
-                            subLayoutOutput = (row['as'] = []);
-
-                        this.applyCustomizationsToLayout(subLayout, customizations, subLayoutOutput);
-                    }
-
-                    output.push(row);
-                }
-                output.push.apply(output, insertRowsAfter);
             }
         },
         onRequestDataFailure: function(response, o) {
