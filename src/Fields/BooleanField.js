@@ -38,20 +38,18 @@ define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields
             var toggledValue = !this.getValue();
 
             this.setValue(toggledValue);
-
-            this.onChange(toggledValue, this);
         },
         getValue: function() {
             return (dojo.attr(this.toggleNode, 'toggled') === 'true');
         },
         setValue: function(val, initial) {
             val = typeof val === 'string'
-                ? /^true$/i.test(val)
+                ? /^(true|t|0)$/i.test(val)
                 : !!val;
 
             if (initial) this.originalValue = val;
-
             this.set('toggled', val.toString());
+            this.onChange(val, this);
         },
         clearValue: function(flag) {
             var initial = flag !== true;
