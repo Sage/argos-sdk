@@ -25,7 +25,7 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '{% if($.enableClearButton) { %}',
-                '<button class="clear-button" data-dojo-attach-event="onclick:_onClearClick"></button>',
+                '<button class="clear-button" data-dojo-attach-point="clearNode" data-dojo-attach-event="onclick:_onClearClick"></button>',
             '{% } %}',
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),
@@ -79,15 +79,15 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
             if (this.notificationTrigger == 'blur')
                 this.onNotificationTrigger(evt);
 
-            setTimeout(dojo.hitch(this, this._onBlurTimeout), 100);
-        },
-        _onBlurTimeout: function() {
-            if (document.activeElement !== this.inputNode)
-                dojo.removeClass(this.domNode, 'text-field-active');
+            dojo.removeClass(this.domNode, 'text-field-active');
         },
         _onClearClick: function(evt) {
-            this.clearValue();
-            dojo.stopEvent(evt);
+            // only clear if input was already active
+            if(!dojo.hasClass(this.domNode, 'text-field-active')){
+                this.clearValue();
+                dojo.stopEvent(evt);
+            }
+
             // Mobile browsers listen to either or both events to show keyboard
             this.inputNode.focus();
             this.inputNode.click();
