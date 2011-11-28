@@ -51,13 +51,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         show: function(options) {
             options = this.inherited(arguments);
 
-            this.canvasWidth  = Math.floor(dojo.window.getBox().w * 0.92);
-            this.canvasHeight = Math.min(
-                Math.floor(this.canvasWidth * 0.5),
-                dojo.window.getBox().h - dojo.query('.toolbar')[0].offsetHeight - dojo.query('.footer-toolbar')[0].offsetHeight
-            );
-            this.canvasNode.width  = this.canvasWidth;
-            this.canvasNode.height = this.canvasHeight;
+            this._sizeCanvas();
 
             if (options && options.lineWidth) { this.lineWidth = options.lineWidth; }
             if (options && options.penColor)  { this.penColor = options.penColor;   }
@@ -67,6 +61,8 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             this.context = this.canvasNode.getContext('2d');
             this.context.lineWidth = this.lineWidth;
             this.redraw(this.signature, this.context, this.scale);
+
+            dojo.connect(window, 'resize', this, this.onResize)
         },
         getValues: function() {
             return {
@@ -138,6 +134,27 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             this.redraw(this.signature, this.context, this.scale);
             return false;
         },
+        _sizeCanvas: function () {
+            this.canvasWidth  = Math.floor(dojo.window.getBox().w * 0.92);
+            this.canvasHeight = Math.min(
+                Math.floor(this.canvasWidth * 0.5),
+                dojo.window.getBox().h - dojo.query('.toolbar')[0].offsetHeight - dojo.query('.footer-toolbar')[0].offsetHeight
+            );
+            this.canvasNode.width  = this.canvasWidth;
+            this.canvasNode.height = this.canvasHeight;
+        },
+        onResize: function (e) {
+            var newScale,
+                oldWidth  = this.canvasWidth,
+                oldHeight = this.canvasHeight;
+            this._sizeCanvas();
+            newScale = Math.min(
+                this.canvasWidth  / oldWidth,
+                this.canvasHeight / oldHeight
+            );
+            this.signature = this.rescale(newScale);
+            this.redraw(this.signature, this.context, this.scale);
+        },
         redraw: function (vector, context, scale) {
             var x, y;
             clearCanvas(context);
@@ -166,6 +183,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
                     ])
                 }
             }
+            return rescaled;
         },
         optimizeSignature: function() {
             var optimized = [];
