@@ -162,14 +162,16 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             context.lineWidth = this.lineWidth;
             context.strokeStyle = this.sigColor;
             for (trace in vector) {
-                context.beginPath();
-                for (var i = 0; i < vector[trace].length; i++) {
-                    x = vector[trace][i][0] * scale;
-                    y = vector[trace][i][1] * scale;
-                    if (0 == i) { context.moveTo(x, y); }
-                    context.lineTo(x, y);
+                if ( 1 < vector[trace].length) {
+                    context.beginPath();
+                    context.moveTo(vector[trace][0][0] * scale, vector[trace][0][1] * scale);
+                    for (var i = 1; i < vector[trace].length; i++) {
+                        x = vector[trace][i][0] * scale;
+                        y = vector[trace][i][1] * scale;
+                        context.lineTo(x, y);
+                    }
+                    context.stroke();
                 }
-                context.stroke();
             }
         },
         rescale: function (scale) {
