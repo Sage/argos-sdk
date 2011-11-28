@@ -50,7 +50,12 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
             var view = App.getPrimaryActiveView();
             if (view)
             {
-                this.currentValue = view.getValues();
+                var values = view.getValues();
+                this.currentValue = values.signature;
+                this.scale = Math.min(
+                    this.signatureNode.width / values.maxWidth,
+                    this.signatureNode.height / values.maxHeight
+                );
                 this.setValue(this.currentValue, false);
             }
         },

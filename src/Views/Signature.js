@@ -22,8 +22,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         //Templates
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
-                '<canvas data-dojo-attach-point="canvasNode" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchen:_penUp" width="{%: $.canvasWidth %}" height="{%: $.canvasHeight %}"></canvas>',
-                '<input data-dojo-attach-point="inputNode" type="hidden">',
+                '<canvas data-dojo-attach-point="canvasNode" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp" width="{%: $.canvasWidth %}" height="{%: $.canvasHeight %}"></canvas>',
                 '<div class="buttons">',
                     '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
                     '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
@@ -44,33 +43,39 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         isPenDown: false,
         context: null,
         buffer: null,
-        // need to handle rotation/resizing
-        // but what if rotation happens after starting drawing?
-        // on-the-fly scaling won't work, need to "translate" to new scale
-        canvasWidth: dojo.window.getBox().w, // maybe the smaller of width/height (what if on landscape mode)
-        canvasHeight: dojo.window.getBox().w / 3, // 3:1 aspect ratio?
+        maxWidth: 1,
+        maxHeight: 1,
+        canvasWidth: 360, // starting default size
+        canvasHeight: 120, // adjusted on show()
 
         show: function(options) {
             options = this.inherited(arguments);
 
+            this.canvasWidth  = Math.floor(dojo.window.getBox().w * 0.92);
+            this.canvasHeight = Math.min(
+                Math.floor(this.canvasWidth * 0.5),
+                dojo.window.getBox().h - dojo.query('.toolbar')[0].offsetHeight - dojo.query('.footer-toolbar')[0].offsetHeight
+            );
+            this.canvasNode.width  = this.canvasWidth;
+            this.canvasNode.height = this.canvasHeight;
+
             if (options && options.lineWidth) { this.lineWidth = options.lineWidth; }
-            if (options && options.penColor) { this.penColor = options.penColor; }
-            if (options && options.sigColor) { this.sigColor = options.sigColor; }
+            if (options && options.penColor)  { this.penColor = options.penColor;   }
+            if (options && options.sigColor)  { this.sigColor = options.sigColor;   }
+            if (options && options.signature) { this.signature = options.signature; }
 
             this.context = this.canvasNode.getContext('2d');
             this.context.lineWidth = this.lineWidth;
-
-            if (options && options.signature) {
-                this.signature = options.signature;
-                this.redraw(this.signature, this.context, this.scale);
-            }
+            this.redraw(this.signature, this.context, this.scale);
         },
         getValues: function() {
-            var value = dojo.attr(this.inputNode, 'value');
-            return value;
+            return {
+                signature: JSON.stringify(this.optimizeSignature()),
+                maxWidth: this.maxWidth,
+                maxHeight: this.maxHeight
+            };
         },
         setValue: function(val, initial) {
-            dojo.attr(this.inputNode, 'value', val || '');
             this.signature = val ? JSON.parse(val) : [];
             this.redraw(this.signature, this.context, this.scale);
         },
@@ -116,7 +121,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             e.preventDefault();
             this.isPenDown = false;
             if (this.trace.length)
-                this.signature.push(this.optimize(this.trace));
+                this.signature.push(this.trace);
 
             this.trace = [];
             this.redraw(this.signature, this.context, this.scale);
@@ -137,7 +142,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             var x, y;
             clearCanvas(context);
             scale = scale || this.scale;
-            context.lineWidth = this.lineWidth * scale;
+            context.lineWidth = this.lineWidth;
             context.strokeStyle = this.sigColor;
             for (trace in vector) {
                 context.beginPath();
@@ -146,11 +151,31 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
                     y = vector[trace][i][1] * scale;
                     if (0 == i) { context.moveTo(x, y); }
                     context.lineTo(x, y);
-                    context.moveTo(x, y);
                 }
                 context.stroke();
             }
-            dojo.attr(this.inputNode, 'value', JSON.stringify(vector));
+        },
+        rescale: function (scale) {
+            var rescaled = [];
+            for (var i = 0; i < this.signature.length; i++) {
+                rescaled.push([]);
+                for (var j = 0; j < this.signature[i].length; j++) {
+                    rescaled[i].push([
+                        this.signature[i][j][0] * scale,
+                        this.signature[i][j][1] * scale
+                    ])
+                }
+            }
+        },
+        optimizeSignature: function() {
+            var optimized = [];
+            this.maxWidth  = 1;
+            this.maxHeight = 1;
+
+            for (var i = 0; i < this.signature.length; i++)
+                optimized.push(this.optimize(this.signature[i]))
+
+            return optimized;
         },
         optimize: function(vector) {
             if (vector.length < 2) return vector;
@@ -187,6 +212,10 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
                 {
                     lastP = currentP;
                 }
+
+                if (this.maxWidth  < vector[i][0]) { this.maxWidth  = vector[i][0]; }
+                if (this.maxHeight < vector[i][1]) { this.maxHeight = vector[i][1]; }
+
             }
 
             result.push(lastP);

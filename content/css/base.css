@@ -13,9 +13,9 @@
 
 /* signature capture */
 #signature_edit { text-align: center; }
-#signature_edit canvas {}
+#signature_edit canvas { border-bottom: 1px black solid; }
 #signature_edit .buttons { overflow: auto; margin-bottom: 0.5em; }
-#signature_edit .buttons .button { float: left; width: 45%; margin-left: 2.5%; }
+#signature_edit .buttons .button { display: inline-block; width: 40%; margin: 0 1em; }
 
 /* list view */
 .list
