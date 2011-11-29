@@ -185,6 +185,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', ['Sage/Platform/Mobile/Fields/
         },
         setText: function(text) {
             this.set('inputValue', text);
+            this.onNotificationTrigger('change');
 
             this.previousValue = text;
         },
