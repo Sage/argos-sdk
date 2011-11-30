@@ -42,27 +42,27 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         sigColor: 'blue',
         isPenDown: false,
         context: null,
-        buffer: null,
+        buffer: [],
         maxWidth: 1,
         maxHeight: 1,
         canvasWidth: 360, // starting default size
         canvasHeight: 120, // adjusted on show()
 
         show: function(options) {
-            options = this.inherited(arguments);
-
-            this._sizeCanvas();
+            this.inherited(arguments);
 
             if (options && options.lineWidth) { this.lineWidth = options.lineWidth; }
             if (options && options.penColor)  { this.penColor = options.penColor;   }
             if (options && options.sigColor)  { this.sigColor = options.sigColor;   }
-            if (options && options.signature) { this.signature = options.signature; }
+            this.signature = (options && options.signature) ? options.signature : [];
 
+            this._sizeCanvas();
             this.context = this.canvasNode.getContext('2d');
             this.context.lineWidth = this.lineWidth;
-            this.redraw(this.signature, this.context, this.scale);
 
             dojo.connect(window, 'resize', this, this.onResize)
+
+            this.redraw(this.signature, this.context, this.scale);
         },
         getValues: function() {
             return {

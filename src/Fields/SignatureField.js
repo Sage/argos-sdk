@@ -46,6 +46,13 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
             this.context.lineWidth = this.lineWidth;
             this.context.strokeStyle = this.sigColor;
         },
+        createNavigationOptions: function() {
+            var options = this.inherited(arguments);
+
+            options.signature = this.signature;
+
+            return options;
+        },
         getValuesFromView: function() {
             var view = App.getPrimaryActiveView();
             if (view)
@@ -64,7 +71,12 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
 
             dojo.attr(this.inputNode, 'value', val || '');
 
-            this.signature = val ? JSON.parse(val) : [];
+            try {
+                this.signature = JSON.parse(val);
+            } catch(e) {}
+
+            if (!this.signature || Array != this.signature.constructor)
+                this.signature = []
 
             this.redraw();
         },
