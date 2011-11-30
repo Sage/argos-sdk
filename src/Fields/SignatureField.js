@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/FieldManager', 'Sage/Platform/Mobile/Fields/EditorField', 'Sage/Platform/Mobile/Views/Signature'], function() {
+define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fields/EditorField', 'Sage/Platform/Mobile/Views/Signature'], function() {
 
     var clearCanvas = function (context) {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -58,7 +58,7 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
             if (view)
             {
                 var values = view.getValues();
-                this.currentValue = values.signature;
+                this.currentValue = this.validationValue = values.signature;
                 this.scale = Math.min(
                     this.signatureNode.width / values.maxWidth,
                     this.signatureNode.height / values.maxHeight
@@ -73,15 +73,20 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
 
             try {
                 this.signature = JSON.parse(val);
-            } catch(e) {}
+            } catch(e) {
+                this.signature = [];
+            }
 
             if (!this.signature || Array != this.signature.constructor)
-                this.signature = []
+                this.signature = [];
 
             this.redraw();
         },
         clearValue: function() {
             this.setValue('', true);
+        },
+        formatValue: function(val) {
+            return val;
         },
         redraw: function () {
             var x, y;
