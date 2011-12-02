@@ -29,22 +29,23 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
         signature: [],
         scale: 0.5,
         lineWidth: 1,
-        penColor: 'red',
-        sigColor: 'blue',
+        penColor: 'blue',
         context: null,
+        canvasNodeName: 'signatureNode',
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.signatureLabelText %}"><span aria-hidden="true">{%: $.signatureText %}</span></button>',
-            '<canvas data-dojo-attach-point="signatureNode" width="180" height="50"></canvas>',
+            '{%= dojo.string.substitute($.canvasTemplate, [$.canvasNodeName]) %}',
             '<input data-dojo-attach-point="inputNode" type="hidden">'
         ]),
+        canvasTemplate: '<canvas data-dojo-attach-point="${0}" width="180" height="50"></canvas>',
 
         init: function () {
             this.inherited(arguments);
 
             this.context = this.signatureNode.getContext('2d');
             this.context.lineWidth = this.lineWidth;
-            this.context.strokeStyle = this.sigColor;
+            this.context.strokeStyle = this.penColor;
         },
         createNavigationOptions: function() {
             var options = this.inherited(arguments);
@@ -57,12 +58,8 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
             var view = App.getPrimaryActiveView();
             if (view)
             {
-                var values = view.getValues();
-                this.currentValue = this.validationValue = values.signature;
-                this.scale = Math.min(
-                    this.signatureNode.width / values.maxWidth,
-                    this.signatureNode.height / values.maxHeight
-                );
+                var value = view.getValues();
+                this.currentValue = this.validationValue = value;
                 this.setValue(this.currentValue, false);
             }
         },
@@ -80,6 +77,12 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
             if (!this.signature || Array != this.signature.constructor)
                 this.signature = [];
 
+            var size = App.views.signature_edit.getMaxSize(this.signature);
+            this.scale = Math.min(
+                this.signatureNode.width / size.width,
+                this.signatureNode.height / size.height
+            );
+
             this.redraw();
         },
         clearValue: function() {
@@ -89,20 +92,16 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
             return val;
         },
         redraw: function () {
-            var x, y;
-            clearCanvas(this.context);
-            for (trace in this.signature) {
-                this.context.beginPath();
-                for (var i = 0; i < this.signature[trace].length; i++) {
-                    x = this.signature[trace][i][0] * this.scale;
-                    y = this.signature[trace][i][1] * this.scale;
-                    if (0 == i) { this.context.moveTo(x, y); }
-                    this.context.lineTo(x, y);
-                    this.context.moveTo(x, y);
+            App.views.signature_edit.redraw(
+                this.signatureNode,
+                this.signature,
+                {
+                    scale:     this.scale,
+                    lineWidth: this.lineWidth,
+                    penColor:  this.penColor
                 }
-                this.context.stroke();
-            }
-        },
+            );
+        }
     });
 
     return Sage.Platform.Mobile.FieldManager.register('signature', control);
