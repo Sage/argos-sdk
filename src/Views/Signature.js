@@ -8,7 +8,10 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
 
     var clearCanvas = function (context) {
         if (context && CanvasRenderingContext2D == context.constructor)
-            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+            // Paint white instead of clearing because on Android toHTMLImage messes alpha pixels
+            //context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+            context.fillStyle = 'rgb(255,255,255)';
+            context.fillRect (0, 0, context.canvas.width, context.canvas.height);
 
         return false;
     }
@@ -29,6 +32,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
                 '</div>',
             '<div>'
         ]),
+        HTMLImageTemplate: '<img src="${0}" width="${1}" height="${2}" alt="" />',
 
         //View Properties
         id: 'signature_edit',
@@ -174,6 +178,9 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             }
         },
         draw: function (canvas, signature, options) {
+            if (0 < options.width ) { canvas.width  = options.width;  }
+            if (0 < options.height) { canvas.height = options.height; }
+
             if (typeof signature == 'string' || signature instanceof String)
                 try { signature = JSON.parse(signature); } catch(e) {}
 
@@ -187,6 +194,14 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             );
 
             this.redraw(canvas, signature, options);
+        },
+        toHTMLImage: function (signature, options) {
+            this.draw(this.canvasNode, signature, options);
+            var img = this.canvasNode.toDataURL('image/png');
+            if (img.indexOf("data:image/png") != 0)
+                img = Canvas2Image.saveAsBMP(this.canvasNode, true).src;
+
+            return dojo.string.substitute(this.HTMLImageTemplate, [img, options.width, options.height]);
         },
         rescale: function (scale) {
             var rescaled = [];
