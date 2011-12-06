@@ -262,6 +262,7 @@ define('Sage/Platform/Mobile/Edit', [
         },
         onRequestDataFailure: function(response, o) {
             alert(dojo.string.substitute(this.requestErrorText, [response, o]));
+            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options);
         },
         onRequestDataSuccess: function(entry) {
             this.processEntry(entry);
@@ -277,6 +278,7 @@ define('Sage/Platform/Mobile/Edit', [
         },
         onRequestTemplateFailure: function(response, o) {
             alert(dojo.string.substitute(this.requestErrorText, [response, o]));
+            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options);
         },
         onRequestTemplateSuccess: function(entry) {
             this.processTemplateEntry(entry);

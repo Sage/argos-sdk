@@ -364,9 +364,14 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         },
         onRequestDataFailure: function(response, o) {
             if (response && response.status == 404)
+            {
                 dojo.query(this.contentNode).append(this.notAvailableTemplate.apply(this));
+            }
             else
+            {
                 alert(dojo.string.substitute(this.requestErrorText, [response, o]));
+                Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options);
+            }
 
             dojo.removeClass(this.domNode, 'panel-loading');
         },
