@@ -687,7 +687,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             /// <param name="response" type="Object">The response object.</param>
             /// <param name="o" type="Object">The options that were passed to Ext when creating the Ajax request.</param>
             alert(dojo.string.substitute(this.requestErrorText, [response, o]));
-          //  Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options);
+            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options);
             dojo.removeClass(this.domNode, 'list-loading');
         },
         onRequestDataAborted: function(response, o) {
@@ -696,6 +696,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             dojo.removeClass(this.domNode, 'list-loading'); 
         },
         onRequestDataSuccess: function(feed) {
+            alert(feed);
             this.processFeed(feed);
 
             dojo.removeClass(this.domNode, 'list-loading'); 

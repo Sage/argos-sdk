@@ -42,6 +42,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
          * @param viewOptions The View Options of the view in which the error occurred
          */
         addError: function(serverResponse, requestOptions, viewOptions){
+            console.log(arguments);
             var errorDate = new Date(),
                 dateStamp = dojo.string.substitute('/Date(${0})/',[errorDate.getTime()]),
                 errorItem = {
@@ -89,7 +90,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                 if (window.localStorage)
                     window.localStorage.setItem('errorlog', dojo.toJson(this.errors));
             }
-            catch(e) {alert(e)}
+            catch(e) {}
         },
 
         /**
@@ -100,7 +101,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                 if (window.localStorage)
                     this.errors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
             }
-            catch(e) {alert(e);}
+            catch(e) {}
         },
 
         /**
