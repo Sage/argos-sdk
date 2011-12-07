@@ -16,55 +16,48 @@
 define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() {
 
     return dojo.setObject('Sage.Platform.Mobile.ErrorManager', {
+        //Localization
+        abortedText: 'Aborted',
 
         /**
          * Total amount of error reports to keep
          */
         errorCacheSizeMax: 10,
 
-        /**
-         * Array of custom error items
-         */
         errors: null,
-
-        /**
-         * Called at application start
-         */
-        init: function(){
-            this.errors = [];
-            this.load();
-        },
 
         /**
          * Adds a custom error item by combining error message/options for easier tech support
          * @param serverResponse Full response from server, status, responsetext, etc.
          * @param requestOptions GET or POST options sent, only records the URL at this time
          * @param viewOptions The View Options of the view in which the error occurred
+         * @param failType String, either "failure" or "aborted" as each response has different properties
          */
-        addError: function(serverResponse, requestOptions, viewOptions){
-            console.log(arguments);
+        addError: function(serverResponse, requestOptions, viewOptions, failType) {
             var errorDate = new Date(),
                 dateStamp = dojo.string.substitute('/Date(${0})/',[errorDate.getTime()]),
                 errorItem = {
                     errorDate: errorDate.toString(),
                     errorDateStamp: dateStamp,
-                    serverResponse: serverResponse,
                     url: requestOptions.url,
                     viewOptions: viewOptions,
-                    '$descriptor': serverResponse.statusText,
-                    '$key': dateStamp /* todo: change to something more readable? */
+                    '$key': dateStamp
                 };
 
-            // this removes the readonly restriction by converting to normal Object
-            errorItem = dojo.fromJson(dojo.toJson(errorItem));
+            if (failType === 'failure')
+            {
+                errorItem['serverResponse'] = this.extractFailureResponse(serverResponse);
+                errorItem['$descriptor'] = serverResponse.statusText;
+            }
 
-            // remove duplicate info as we convert it all to text anyways
-            if(errorItem.serverResponse.response && errorItem.serverResponse.responseText)
-                delete errorItem.serverResponse.response;
+            if (failType === 'aborted')
+            {
+                errorItem['serverResponse'] = this.extractAbortResponse(serverResponse);
+                errorItem['$descriptor'] = this.abortedText;
+            }
 
-            // SData sends back json as the error text with further keys that can be used
-            errorItem.serverResponse.responseText = dojo.fromJson(errorItem.serverResponse.responseText)[0];
-            
+            console.log(errorItem);
+
             this.checkCacheSize();
             this.errors.push(errorItem);
             this.onErrorAdd();
@@ -72,36 +65,52 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
         },
 
         /**
+         * Explicitly extract values due to how read-only objects are enforced
+         * @param response XMLHttpRequest object sent back from server
+         * @return Object with only relevant, standard properties
+         */
+        extractFailureResponse: function(response){
+            var serverResponse = {
+                "readyState": response.readyState,
+                "responseXML": response.responseXML,
+                "status": response.status,
+                "responseType": response.responseType,
+                "withCredentials": response.withCredentials,
+                "responseText": response.responseText
+                    ? dojo.fromJson(response.responseText)[0]
+                    : "",
+                "statusText": response.statusText
+            };
+            return serverResponse;
+        },
+
+        /**
+         * Abort error is hardset due to exceptions from reading properties
+         * https://bugzilla.mozilla.org/show_bug.cgi?id=238559
+         * @param response XMLHttpRequest object sent back from server
+         * @return Object with hardset abort info
+         */
+        extractAbortResponse: function(response){
+            var serverResponse = {
+                "readyState": 4,
+                "responseXML": "",
+                "status": 0,
+                "responseType": "",
+                "withCredentials": serverResponse.withCredentials,
+                "responseText": "",
+                "statusText": this.abortedText
+            };
+            return serverResponse;
+        },
+
+        /**
          * Ensures there is at least 1 open spot for a new error by checking against errorCacheSizeMax
          */
-        checkCacheSize: function(){
+        checkCacheSize: function() {
             var errLength = this.errors.length,
-                cacheSizeIndex = this.errorCacheSizeMax-1;
-            if(errLength > cacheSizeIndex)
-                this.removeError(cacheSizeIndex, errLength-cacheSizeIndex);
-        },
-
-        /**
-         * Saves the entire errors array as JSON to the users localStorage
-         * If local storage is not supported/disabled, then it does not save.
-         */
-        save: function(){
-            try {
-                if (window.localStorage)
-                    window.localStorage.setItem('errorlog', dojo.toJson(this.errors));
-            }
-            catch(e) {}
-        },
-
-        /**
-         * Loads from localStorage any previous errors.
-         */
-        load: function(){
-            try {
-                if (window.localStorage)
-                    this.errors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
-            }
-            catch(e) {}
+                cacheSizeIndex = this.errorCacheSizeMax - 1;
+            if (errLength > cacheSizeIndex)
+                this.removeError(cacheSizeIndex, errLength - cacheSizeIndex);
         },
 
         /**
@@ -111,38 +120,48 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
          * @return errorItem Returns the first error item in the match set or null if none found
          */
         getError: function(key, value){
-            var errorItem = dojo.filter(this.errors, function(item){
+            var errorItems = dojo.filter(this.errors, function(item) {
                 return item[key] == value;
             });
-            return errorItem[0] || null;
+            return errorItems[0] || null;
         },
 
-        /**
-         * Returns the entire error array
-         */
-        getAllErrors: function(){
+        getAllErrors: function() {
             return this.errors;
         },
 
-        /**
-         * Removes an error at the given index
-         * @param index Index of error to remove
-         * @param amount Optional. Number of items to remove, defaults to 1.
-         */
-        removeError: function(index, amount){
-            amount = amount || 1;
-
-            if(index+amount > this.errors.length)
-                amount = this.errors.length - index;
-
-            this.errors.splice(index, amount);
+        removeError: function(index, amount) {
+            this.errors.splice(index, amount || 1);
         },
 
         /**
          * Event that occurs when an error is successfully added (not guaranteed to be saved)
-         * Can be used for event binding/function chaining
+         * Can be used for event binding
          */
-        onErrorAdd: function(){
+        onErrorAdd: function() {
+        },
+
+        init: function(){
+            this.errors = [];
+            this.load();
+        },
+
+        save: function(){
+            try
+            {
+                if (window.localStorage)
+                    window.localStorage.setItem('errorlog', dojo.toJson(this.errors));
+            }
+            catch(e) {}
+        },
+
+        load: function(){
+            try
+            {
+                if (window.localStorage)
+                    this.errors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
+            }
+            catch(e) {}
         }
     });
 });

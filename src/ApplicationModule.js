@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Application', 'Sage/Platform/Mobile/ErrorManager'], function() {
+define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Application'], function() {
 
     return dojo.declare('Sage.Platform.Mobile.ApplicationModule', null, {
         _connects: null,
@@ -42,12 +42,12 @@ define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Applicat
         init: function(application) {
             this.application = application;
 
-            this.loadErrorLogger();
+            this.loadErrorManager();
             this.loadCustomizations();
             this.loadToolbars();
             this.loadViews();
         },
-        loadErrorLogger: function() {
+        loadErrorManager: function() {
             Sage.Platform.Mobile.ErrorManager.init();
         },
         loadCustomizations: function() {

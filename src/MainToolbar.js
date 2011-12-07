@@ -45,7 +45,7 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
         clear: function() {
             this.inherited(arguments);
 
-            dojo.query("> [data-action]", this.domNode).remove();
+            dojo.query("> [data-action], .toolButton-right", this.domNode).remove();
         },
         showTools: function(tools) {
             this.inherited(arguments);
