@@ -42,9 +42,13 @@ define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Applicat
         init: function(application) {
             this.application = application;
 
+            this.loadErrorManager();
             this.loadCustomizations();
             this.loadToolbars();
             this.loadViews();
+        },
+        loadErrorManager: function() {
+            Sage.Platform.Mobile.ErrorManager.init();
         },
         loadCustomizations: function() {
         },

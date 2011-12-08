@@ -45,7 +45,7 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
         clear: function() {
             this.inherited(arguments);
 
-            dojo.query("> [data-action]", this.domNode).remove();
+            dojo.query("> [data-action], .toolButton-right", this.domNode).remove();
         },
         showTools: function(tools) {
             this.inherited(arguments);
@@ -59,8 +59,9 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
                 for (var i = 0; i < tools.length; i++)
                 {
                     count[tools[i].side || 'right'] += 1;
+                    var toolTemplate = tools[i].template || this.toolTemplate;
 
-                    dojo.query(this.domNode).append(this.toolTemplate.apply(tools[i], this.tools[tools[i].id]));
+                    dojo.query(this.domNode).append(toolTemplate.apply(tools[i], this.tools[tools[i].id]));
                 }
 
                 this.size = Math.max(count.left, count.right);

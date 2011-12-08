@@ -44,6 +44,10 @@
           "path": "../src"
         },
         {
+          "text": "ErrorManager.js",
+          "path": "../src"
+        },
+        {
           "text": "ApplicationModule.js",
           "path": "../src"
         },

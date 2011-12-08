@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_CustomizationMixin', 'Sage/Platform/Mobile/_Templated'], function() {
+define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_CustomizationMixin', 'Sage/Platform/Mobile/_Templated', 'Sage/Platform/Mobile/ErrorManager'], function() {
 
     return dojo.declare('Sage.Platform.Mobile.View', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._CustomizationMixin, Sage.Platform.Mobile._Templated], {
         attributeMap: {
