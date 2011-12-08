@@ -20,7 +20,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
         abortedText: 'Aborted',
 
         /**
-         * Total amount of error reports to keep
+         * Total amount of errors to keep
          */
         errorCacheSizeMax: 10,
 
@@ -41,22 +41,14 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                     errorDateStamp: dateStamp,
                     url: requestOptions.url,
                     viewOptions: viewOptions,
-                    '$key': dateStamp
+                    "$key": dateStamp
                 };
 
             if (failType === 'failure')
-            {
-                errorItem['serverResponse'] = this.extractFailureResponse(serverResponse);
-                errorItem['$descriptor'] = serverResponse.statusText;
-            }
+                dojo.mixin(errorItem, this.extractFailureResponse(serverResponse));
 
             if (failType === 'aborted')
-            {
-                errorItem['serverResponse'] = this.extractAbortResponse(serverResponse);
-                errorItem['$descriptor'] = this.abortedText;
-            }
-
-            console.log(errorItem);
+                dojo.mixin(errorItem, this.extractAbortResponse(serverResponse));
 
             this.checkCacheSize();
             this.errors.push(errorItem);
@@ -70,37 +62,43 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
          * @return Object with only relevant, standard properties
          */
         extractFailureResponse: function(response){
-            var serverResponse = {
-                "readyState": response.readyState,
-                "responseXML": response.responseXML,
-                "status": response.status,
-                "responseType": response.responseType,
-                "withCredentials": response.withCredentials,
-                "responseText": response.responseText
-                    ? dojo.fromJson(response.responseText)[0]
-                    : "",
-                "statusText": response.statusText
+            var failureResponse = {
+                "$descriptor": response.statusText,
+                "serverResponse": {
+                    "readyState": response.readyState,
+                    "responseXML": response.responseXML,
+                    "status": response.status,
+                    "responseType": response.responseType,
+                    "withCredentials": response.withCredentials,
+                    "responseText": response.responseText
+                        ? dojo.fromJson(response.responseText)[0]
+                        : "",
+                    "statusText": response.statusText
+                }
             };
-            return serverResponse;
+            return failureResponse;
         },
 
         /**
          * Abort error is hardset due to exceptions from reading properties
-         * https://bugzilla.mozilla.org/show_bug.cgi?id=238559
+         * FF 3.6: https://bugzilla.mozilla.org/show_bug.cgi?id=238559
          * @param response XMLHttpRequest object sent back from server
          * @return Object with hardset abort info
          */
         extractAbortResponse: function(response){
-            var serverResponse = {
-                "readyState": 4,
-                "responseXML": "",
-                "status": 0,
-                "responseType": "",
-                "withCredentials": serverResponse.withCredentials,
-                "responseText": "",
-                "statusText": this.abortedText
+            var abortResponse = {
+                "$descriptor": this.abortedText,
+                "serverResponse": {
+                    "readyState": 4,
+                    "responseXML": "",
+                    "status": 0,
+                    "responseType": "",
+                    "withCredentials": response.withCredentials,
+                    "responseText": "",
+                    "statusText": this.abortedText
+                }
             };
-            return serverResponse;
+            return abortResponse;
         },
 
         /**
@@ -114,16 +112,18 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
         },
 
         /**
-         * Retrieves a list of errors that match the specified key|value pair
+         * Retrieve a error item that has the specified key|value pair
          * @param key Property of error item to check, such as errorDate or url
          * @param value Value of the key to match against
          * @return errorItem Returns the first error item in the match set or null if none found
          */
         getError: function(key, value){
-            var errorItems = dojo.filter(this.errors, function(item) {
-                return item[key] == value;
-            });
-            return errorItems[0] || null;
+            var errorList = this.getAllErrors();
+            for (var i=0; i<errorList.length; i++) {
+                if (errorList[i][key] == value)
+                    return errorList[i];
+            }
+            return null;
         },
 
         getAllErrors: function() {
