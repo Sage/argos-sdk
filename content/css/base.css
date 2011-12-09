@@ -387,7 +387,11 @@
     padding: 8px 34px 8px 110px !important;
 }
 
-.row-edit[data-field-type="signature"] > div > canvas { margin-left: 110px; }
+.row-edit[data-field-type="signature"] > div > canvas,
+.row-edit[data-field-type="signature"] > div > img
+{
+	margin-left: 110px;
+}
 
 .row-edit[data-field-type="note"] > div > textarea,
 .row-edit[data-field-type="note"] > textarea
