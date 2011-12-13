@@ -130,10 +130,6 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                             obj[key]='null';
                             break;
                         }
-                        if (obj[key].toString) {
-                           obj[key] = obj[key].toString();
-                            break;
-                        }
                         obj[key]=this.serializeValues(obj[key]);
                         break;
                 }
