@@ -539,6 +539,10 @@ define('Sage/Platform/Mobile/Edit', [
                 ReUI.back();
             }
         },
+        onRequestFailure: function(response, o) {
+            alert(dojo.string.substitute(this.requestErrorText, [response, o]));
+            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'failure');
+        },
         update: function() {
             var values = this.getValues();
             if (values)
