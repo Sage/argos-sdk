@@ -40,7 +40,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                     errorDate: errorDate.toString(),
                     errorDateStamp: dateStamp,
                     url: requestOptions.url,
-                    viewOptions: viewOptions,
+                    viewOptions: this.serializeValues(viewOptions),
                     "$key": dateStamp
                 };
 
@@ -99,6 +99,46 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                 }
             };
             return abortResponse;
+        },
+
+        /**
+         * JSON serializes an object by recursively discarding non value keys
+         * @param obj Object to be JSON serialized
+         */
+        serializeValues: function(obj){
+            for (var key in obj){
+                switch(typeof obj[key]){
+                    case 'string':
+                        break;
+                    case 'undefined':
+                        obj[key] = 'undefined';
+                        break;
+                    case 'boolean':
+                        obj[key] = obj[key].toString();
+                        break;
+                    case 'number':
+                        obj[key] = obj[key].toString();
+                        break;
+                    case 'function':
+                        delete obj[key];
+                        break;
+                    case 'xml':
+                        obj[key] = obj[key].toString();
+                        break;
+                    case 'object':
+                        if (obj[key] === null) {
+                            obj[key]='null';
+                            break;
+                        }
+                        if (obj[key].toString) {
+                           obj[key] = obj[key].toString();
+                            break;
+                        }
+                        obj[key]=this.serializeValues(obj[key]);
+                        break;
+                }
+            }
+            return obj;
         },
 
         /**
