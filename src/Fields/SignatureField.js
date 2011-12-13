@@ -15,10 +15,6 @@
 
 define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fields/EditorField', 'Sage/Platform/Mobile/Views/Signature'], function() {
 
-    var clearCanvas = function (context) {
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    }
-
     var control = dojo.declare('Sage.Platform.Mobile.Fields.SignatureField', [Sage.Platform.Mobile.Fields.EditorField], {
         // Localization
         emptyText: '',
@@ -27,25 +23,24 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
         signatureText: '...',
 
         signature: [],
-        scale: 0.5,
-        lineWidth: 1,
-        penColor: 'blue',
+        config: {
+            scale: 1,
+            lineWidth: 1,
+            penColor: 'blue',
+            width: 180,
+            height: 50
+        },
         context: null,
-        canvasNodeName: 'signatureNode',
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.signatureLabelText %}"><span aria-hidden="true">{%: $.signatureText %}</span></button>',
-            '{%= dojo.string.substitute($.canvasTemplate, [$.canvasNodeName]) %}',
+            '<img data-dojo-attach-point="signatureNode" src="" width="{%: $.config.width %}" height="{%: $.config.height %}" alt="" />',
             '<input data-dojo-attach-point="inputNode" type="hidden">'
         ]),
-        canvasTemplate: '<canvas data-dojo-attach-point="${0}" width="180" height="50"></canvas>',
 
         init: function () {
             this.inherited(arguments);
 
-            this.context = this.signatureNode.getContext('2d');
-            this.context.lineWidth = this.lineWidth;
-            this.context.strokeStyle = this.penColor;
         },
         createNavigationOptions: function() {
             var options = this.inherited(arguments);
@@ -77,30 +72,13 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
             if (!this.signature || Array != this.signature.constructor)
                 this.signature = [];
 
-            var size = App.views.signature_edit.getMaxSize(this.signature);
-            this.scale = Math.min(
-                this.signatureNode.width / size.width,
-                this.signatureNode.height / size.height
-            );
-
-            this.redraw();
+            this.signatureNode.src = Sage.Platform.Mobile.Format.imageFromVector(this.signature, this.config, false);
         },
         clearValue: function() {
             this.setValue('', true);
         },
         formatValue: function(val) {
             return val;
-        },
-        redraw: function () {
-            App.views.signature_edit.redraw(
-                this.signatureNode,
-                this.signature,
-                {
-                    scale:     this.scale,
-                    lineWidth: this.lineWidth,
-                    penColor:  this.penColor
-                }
-            );
         }
     });
 

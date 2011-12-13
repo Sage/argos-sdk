@@ -6,16 +6,6 @@
 
 define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], function() {
 
-    var clearCanvas = function (context) {
-        if (context && CanvasRenderingContext2D == context.constructor)
-            // Paint white instead of clearing because on Android toHTMLImage messes alpha pixels
-            //context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-            context.fillStyle = 'rgb(255,255,255)';
-            context.fillRect (0, 0, context.canvas.width, context.canvas.height);
-
-        return false;
-    }
-
     return dojo.declare('Sage.Platform.Mobile.Views.Signature', [Sage.Platform.Mobile.View], {
         // Localization
         titleText: 'Signature',
@@ -25,14 +15,16 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         //Templates
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
-                '<canvas data-dojo-attach-point="canvasNode" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp" width="{%: $.canvasWidth %}" height="{%: $.canvasHeight %}"></canvas>',
+                '{%! $.canvasTemplate %}',
                 '<div class="buttons">',
                     '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
                     '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
                 '</div>',
             '<div>'
         ]),
-        HTMLImageTemplate: '<img src="${0}" width="${1}" height="${2}" alt="" />',
+        canvasTemplate: new Simplate([
+            '<canvas data-dojo-attach-point="signatureNode" width="{%: $.canvasNodeWidth %}" height="{%: $.canvasNodeHeight %}" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp"></canvas>'
+        ]),
 
         //View Properties
         id: 'signature_edit',
@@ -40,46 +32,47 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         signature: [],
         trace: [],
         lastpos: {x:-1, y:-1},
-        lineWidth: 3.0,
-        scale: 1.0,
-        penColor: 'red',
-        sigColor: 'blue',
+        config: {
+            scale: 1,
+            lineWidth: 3,
+            penColor: 'blue',
+            drawColor: 'red'
+        },
         isPenDown: false,
         context: null,
         buffer: [],
-        canvasWidth: 360, // starting default size
-        canvasHeight: 120, // adjusted on show()
+        canvasNodeWidth: 360, // starting default size
+        canvasNodeHeight: 120, // adjusted on show()
 
         show: function(options) {
             this.inherited(arguments);
 
-            if (options && options.lineWidth) { this.lineWidth = options.lineWidth; }
-            if (options && options.penColor)  { this.penColor  = options.penColor;  }
-            if (options && options.sigColor)  { this.sigColor  = options.sigColor;  }
+            if (options && options.lineWidth) { this.config.lineWidth = options.lineWidth; }
+            if (options && options.penColor)  { this.config.penColor  = options.penColor;  }
+            if (options && options.drawColor) { this.config.drawColor = options.drawColor; }
             this.signature = (options && options.signature) ? options.signature : [];
 
             this._sizeCanvas();
-            this.context = this.canvasNode.getContext('2d');
+            this.context = this.signatureNode.getContext('2d');
 
             dojo.connect(window, 'resize', this, this.onResize)
 
-            this.redraw(this.canvasNode, this.signature);
+            this.redraw(this.signatureNode, this.signature, this.config);
         },
         getValues: function() {
             return JSON.stringify(this.optimizeSignature());
         },
         setValue: function(val, initial) {
             this.signature = val ? JSON.parse(val) : [];
-            this.redraw(this.canvasNode, this.signature);
+            this.redraw(this.signatureNode, this.signature, this.config);
         },
         clearValue: function() {
             this.buffer = this.signature;
             this.setValue('', true);
-            clearCanvas(this.context);
         },
         // _getCoords returns pointer pixel coordinates [x,y] relative to canvas object
         _getCoords: function (e) {
-            var offset = dojo.position(this.canvasNode, false);
+            var offset = dojo.position(this.signatureNode, false);
             return e.touches
                 ? [
                     e.touches[0].pageX - offset.x,
@@ -94,14 +87,13 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         _penDown: function (e) {
             this.isPenDown = true;
             this.lastpos = this._getCoords(e);
-            this.context.lineWidth = this.lineWidth;
-            this.context.strokeStyle = this.penColor;
+            this.context.lineWidth = this.config.lineWidth;
+            this.context.strokeStyle = this.config.drawColor;
             e.preventDefault();
         },
         _penMove: function (e) {
             if (!this.isPenDown) { return; }
             this.pos = this._getCoords(e);
-            this.context.strokeStyle = this.penColor;
             e.preventDefault();
             this.context.beginPath();
             this.context.moveTo(this.lastpos[0], this.lastpos[1]);
@@ -119,8 +111,8 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
                 this.signature.push(this.trace);
 
             this.trace = [];
-            this.context.strokeStyle = this.sigColor;
-            this.redraw(this.canvasNode, this.signature);
+            this.context.strokeStyle = this.config.penColor;
+            this.redraw(this.signatureNode, this.signature, this.config);
         },
         _undo: function () {
             if (this.signature.length) {
@@ -131,77 +123,31 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             } else if (this.buffer.length) {
                 this.signature = this.buffer;
             }
-            this.redraw(this.canvasNode, this.signature);
+            this.redraw(this.signatureNode, this.signature, this.config);
         },
         _sizeCanvas: function () {
-            this.canvasWidth  = Math.floor(dojo.window.getBox().w * 0.92);
-            this.canvasHeight = Math.min(
-                Math.floor(this.canvasWidth * 0.5),
+            this.canvasNodeWidth  = Math.floor(dojo.window.getBox().w * 0.92);
+            this.canvasNodeHeight = Math.min(
+                Math.floor(this.canvasNodeWidth * 0.5),
                 dojo.window.getBox().h - dojo.query('.toolbar')[0].offsetHeight - dojo.query('.footer-toolbar')[0].offsetHeight
             );
-            this.canvasNode.width  = this.canvasWidth;
-            this.canvasNode.height = this.canvasHeight;
+            this.signatureNode.width  = this.canvasNodeWidth;
+            this.signatureNode.height = this.canvasNodeHeight;
         },
         onResize: function (e) {
             var newScale,
-                oldWidth  = this.canvasWidth,
-                oldHeight = this.canvasHeight;
+                oldWidth  = this.canvasNodeWidth,
+                oldHeight = this.canvasNodeHeight;
             this._sizeCanvas();
             newScale = Math.min(
-                this.canvasWidth  / oldWidth,
-                this.canvasHeight / oldHeight
+                this.canvasNodeWidth  / oldWidth,
+                this.canvasNodeHeight / oldHeight
             );
             this.signature = this.rescale(newScale);
-            this.redraw(this.canvasNode, this.signature);
+            this.redraw(this.signatureNode, this.signature, this.config);
         },
         redraw: function (canvas, vector, options) {
-            var x, y,
-                context = canvas.getContext('2d');
-
-            clearCanvas(context);
-
-            scale               = options && options.scale     ? options.scale     : this.scale;
-            context.lineWidth   = options && options.lineWidth ? options.lineWidth : this.lineWidth;
-            context.strokeStyle = options && options.penColor  ? options.penColor  : this.sigColor;
-
-            for (trace in vector) {
-                if ( 1 < vector[trace].length) {
-                    context.beginPath();
-                    context.moveTo(vector[trace][0][0] * scale, vector[trace][0][1] * scale);
-                    for (var i = 1; i < vector[trace].length; i++) {
-                        x = vector[trace][i][0] * scale;
-                        y = vector[trace][i][1] * scale;
-                        context.lineTo(x, y);
-                    }
-                    context.stroke();
-                }
-            }
-        },
-        draw: function (canvas, signature, options) {
-            if (0 < options.width ) { canvas.width  = options.width;  }
-            if (0 < options.height) { canvas.height = options.height; }
-
-            if (typeof signature == 'string' || signature instanceof String)
-                try { signature = JSON.parse(signature); } catch(e) {}
-
-            if (!(signature instanceof Array))
-                return;
-
-            var size = this.getMaxSize(signature);
-            options.scale = Math.min(
-                canvas.width / size.width,
-                canvas.height / size.height
-            );
-
-            this.redraw(canvas, signature, options);
-        },
-        toHTMLImage: function (signature, options) {
-            this.draw(this.canvasNode, signature, options);
-            var img = this.canvasNode.toDataURL('image/png');
-            if (img.indexOf("data:image/png") != 0)
-                img = Canvas2Image.saveAsBMP(this.canvasNode, true).src;
-
-            return dojo.string.substitute(this.HTMLImageTemplate, [img, options.width, options.height]);
+            Sage.Platform.Mobile.Format.canvasDraw(canvas, vector, options);
         },
         rescale: function (scale) {
             var rescaled = [];
@@ -215,17 +161,6 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
                 }
             }
             return rescaled;
-        },
-        getMaxSize: function(signature) {
-            var w = h = 1;
-            for (var i = 0; i < signature.length; i++) {
-                for (var j = 0; j < signature[i].length; j++) {
-                    if (w < signature[i][j][0]) { w = signature[i][j][0]; }
-                    if (h < signature[i][j][1]) { h = signature[i][j][1]; }
-                }
-            }
-            // maybe should return bounding box? (x,y,w,h)
-            return { width: w, height: h };
         },
         optimizeSignature: function() {
             var optimized = [];

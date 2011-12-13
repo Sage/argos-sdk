@@ -16,7 +16,19 @@
 define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
 
     dojo.setObject('Sage.Platform.Mobile.Format', null);
-    
+
+    getVectorMaxSize = function (v) {
+        var w = h = 1;
+        for (var i = 0; i < v.length; i++) {
+            for (var j = 0; j < v[i].length; j++) {
+                if (w < v[i][j][0]) { w = v[i][j][0]; }
+                if (h < v[i][j][1]) { h = v[i][j][1]; }
+            }
+        }
+        // maybe should return bounding box? (x,y,w,h)
+        return { width: w, height: h };
+    }
+
     return Sage.Platform.Mobile.Format = (function() {
         function isEmpty(val) {
             if (typeof val !== 'string') return !val;
@@ -128,6 +140,68 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
 
                 return (hrs && mins) ? hrs + mins
                                      : hrs === 0 ? mins : hrs;
+            },
+            canvasDraw: function (canvas, vector, options) {
+                var scale, x, y,
+                    context = canvas.getContext('2d');
+
+                // Paint canvas white vs. clearing as on Android imageFromVector alpha pixels blacken
+                // context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+                context.fillStyle = 'rgb(255,255,255)';
+                context.fillRect (0, 0, context.canvas.width, context.canvas.height);
+
+                scale               = options && options.scale     ? options.scale     : 1;
+                context.lineWidth   = options && options.lineWidth ? options.lineWidth : 1;
+                context.strokeStyle = options && options.penColor  ? options.penColor  : 'black';
+
+                for (trace in vector) {
+                    if ( 1 < vector[trace].length) {
+                        context.beginPath();
+                        context.moveTo(vector[trace][0][0] * scale, vector[trace][0][1] * scale);
+                        for (var i = 1; i < vector[trace].length; i++) {
+                            x = vector[trace][i][0] * scale;
+                            y = vector[trace][i][1] * scale;
+                            context.lineTo(x, y);
+                        }
+                        context.stroke();
+                    }
+                }
+            },
+            imageFromVector: function (vector, options, html) {
+                var img;
+
+                if (typeof vector == 'string' || vector instanceof String)
+                    try { vector = JSON.parse(vector); } catch(e) {}
+
+                if (!(vector instanceof Array) || 0 == vector.length) {
+                    // a place-holder image (this one all white/invisible)
+                    img = '../../argos-sdk/content/images/arrow-right.png';
+
+                } else {
+
+                    var size = getVectorMaxSize(vector),
+                        canvasNode = document.createElement('canvas');
+
+                    canvasNode.width  = options.width;
+                    canvasNode.height = options.height;
+
+                    options.scale = Math.min(
+                        canvasNode.width  / size.width,
+                        canvasNode.height / size.height
+                    );
+
+                    Sage.Platform.Mobile.Format.canvasDraw(canvasNode, vector, options);
+
+                    img = canvasNode.toDataURL('image/png');
+                    if (img.indexOf("data:image/png") != 0)
+                        img = Canvas2Image.saveAsBMP(canvasNode, true).src;
+                }
+
+                return html
+                    ? dojo.string.substitute(
+                        '<img src="${0}" width="${1}" height="${2}" alt="${3}" />',
+                        [img, options.width, options.height, options.title || ''])
+                    : img;
             }
         };
     })();
