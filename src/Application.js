@@ -414,11 +414,13 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
                     resourceKind = context && context.resourceKind;
 
                 // if a predicate is defined, both resourceKind AND predicate must match.
-                if (lookup[resourceKind])
-                    if (predicate)
+                if (lookup[resourceKind]) {
+                    if (predicate) {
                         if (predicate.call(scope || this, o, context)) return o;
+                    }
                     else
                         return o;
+                }
             });
         },
         /**
