@@ -404,7 +404,11 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         },
         isNavigationFromResourceKind: function(kind, predicate, scope) {
             var lookup = {};
-            dojo.forEach(kind, function(item) { this[item] = true;  }, lookup);
+            if (dojo.isArray(kind))
+                dojo.forEach(kind, function(item) { this[item] = true;  }, lookup);
+            else
+                lookup[kind] = true;
+
             return this.queryNavigationContext(function(o) {
                 var context = (o.options && o.options.source) || o,
                     resourceKind = context && context.resourceKind;
