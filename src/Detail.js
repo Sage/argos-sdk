@@ -225,10 +225,12 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 encodeValue = Sage.Platform.Mobile.Format.encode,
                 sectionQueue = [],
                 sectionStarted = false,
-                content = [];
+                callbacks = [];
 
             for (var i = 0; i < rows.length; i++) {
                 var current = rows[i],
+                    section,
+                    sectionUl,
                     include = this.expandExpression(current['include'], entry),
                     exclude = this.expandExpression(current['exclude'], entry);
 
@@ -248,7 +250,8 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 if (!sectionStarted)
                 {
                     sectionStarted = true;
-                    content.push(this.sectionBeginTemplate.apply(layout, this));
+                    section = dojo.toDom(this.sectionBeginTemplate.apply(layout, this) + this.sectionEndTemplate.apply(layout, this));
+                    sectionUl = section.childNodes[1];
                 }
 
                 var provider = current['provider'] || getValue,
@@ -336,12 +339,19 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                                     : this.actionPropertyTemplate
                                 : this.propertyTemplate;
 
-                content.push(template.apply(data, this));
+                var rowNode = dojo.toDom(template.apply(data, this));
+
+                if(current['onInsert'])
+                    callbacks.push({row: current, rowNode: rowNode, raw: value, entry: entry});
+
+                dojo.query(sectionUl).append(rowNode);
             }
+            if (section)
+                dojo.query(this.contentNode).append(section);
 
-            if (sectionStarted) content.push(this.sectionEndTemplate.apply(layout, this));
-
-            dojo.query(this.contentNode).append(content.join(''));
+            dojo.forEach(callbacks, function(item){
+               item.row.onInsert.call(this, item);
+            });
 
             for (var i = 0; i < sectionQueue.length; i++)
             {

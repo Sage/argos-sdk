@@ -117,7 +117,6 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                         obj[key] = obj[key].toString();
                         break;
                     case 'number':
-                        obj[key] = obj[key].toString();
                         break;
                     case 'function':
                         delete obj[key];
@@ -128,6 +127,10 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                     case 'object':
                         if (obj[key] === null) {
                             obj[key]='null';
+                            break;
+                        }
+                        if(key === 'scope') { // eliminate recursive self call
+                            obj[key]= 'Scope is not saved in error report';
                             break;
                         }
                         obj[key]=this.serializeValues(obj[key]);
