@@ -122,12 +122,12 @@ define('Sage/Platform/Mobile/Fields/LookupField', ['Sage/Platform/Mobile/Fields/
                     }]
                     }
                 },
-                item,
                 expand = ['resourceKind', 'resourcePredicate', 'where'],
                 dependentValue = this.getDependentValue();
 
             if (options.singleSelect && options.singleSelectAction) {
-                for(item in options.tools.tbar){
+                for(var key in options.tools.tbar){
+                    var item = options.tools.tbar[key];
                     if( item.id == options.singleSelectAction ) {
                         item.cls = 'invisible';
                     }
