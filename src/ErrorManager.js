@@ -71,12 +71,34 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                     "responseType": response.responseType,
                     "withCredentials": response.withCredentials,
                     "responseText": response.responseText
-                        ? dojo.fromJson(response.responseText)[0]
+                        ? this.fromJsonArray(response.responseText)
                         : "",
                     "statusText": response.statusText
                 }
             };
             return failureResponse;
+        },
+
+        /**
+         * Attempts to parse a json string into a javascript object
+         * The need for this function is the fallback in case of failure
+         * @param json String Json formatted string
+         */
+        fromJsonArray: function(json){
+            var o;
+            try
+            {
+                o = dojo.fromJson(json);
+                o = o[0];
+            }
+            catch(e)
+            {
+                o = {
+                    message: json,
+                    severity: ""
+                };
+            }
+            return o;
         },
 
         /**
@@ -108,26 +130,19 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
         serializeValues: function(obj){
             for (var key in obj){
                 switch(typeof obj[key]){
-                    case 'string':
-                        break;
                     case 'undefined':
                         obj[key] = 'undefined';
-                        break;
-                    case 'boolean':
-                        obj[key] = obj[key].toString();
-                        break;
-                    case 'number':
-                        obj[key] = obj[key].toString();
                         break;
                     case 'function':
                         delete obj[key];
                         break;
-                    case 'xml':
-                        obj[key] = obj[key].toString();
-                        break;
                     case 'object':
                         if (obj[key] === null) {
-                            obj[key]='null';
+                            obj[key] = 'null';
+                            break;
+                        }
+                        if(key === 'scope') { // eliminate recursive self call
+                            obj[key] = 'Scope is not saved in error report';
                             break;
                         }
                         obj[key]=this.serializeValues(obj[key]);
