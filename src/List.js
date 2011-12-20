@@ -113,6 +113,89 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         }
     });
 
+    dojo.declare('Sage.Platform.Mobile.AssociateList', null, {
+        parentKind: null,
+        parentEntity: null,
+        viewEntity: null,
+        viewTargetEntity: null,
+        viewKind: null,
+        title: null,
+        viewId: null,
+
+        complete: function(){
+            var view = App.getPrimaryActiveView(),
+                selections,
+                value = {};
+            if (view && view._selectionModel) {
+                selections = view._selectionModel.getSelections();
+
+                if (0 == view._selectionModel.getSelectionCount() && view.options.allowEmptySelection)
+                    ReUI.back();
+
+                for (var selectionKey in selections) {
+                    var context = App.isNavigationFromResourceKind( [this.parentKind] );
+                    value['$name'] = this.viewEntity;
+                    value[this.parentEntity] = { '$key': context.key };
+                    value[this.viewTargetEntity] = { '$key': selectionKey };
+                }
+                this.insert(value);
+            }
+        },
+        insert: function(entry) {
+            var request = this.createInsertRequest();
+            if (request)
+                request.create(entry, {
+                    success: this.onInsertSuccess,
+                    failure: this.onInsertFailure,
+                    scope: this
+                });
+        },
+        onInsertSuccess: function(entry) {
+            App.onRefresh({
+                resourceKind: this.viewKind
+            });
+            ReUI.back();
+        },
+        onInsertFailure: function(response, o) {
+            this.onRequestDataFailure(response, o);
+        },
+        createInsertRequest: function() {
+            var request = new Sage.SData.Client.SDataSingleResourceRequest(App.getService(false));
+            request.setResourceKind(this.viewKind);
+            return request;
+        },
+        createNavigationOptions: function() {
+            var options = {
+                selectionOnly: true,
+                singleSelect: true,
+                singleSelectAction: 'complete',
+                allowEmptySelection: false,
+                title: this.title,
+                tools: {
+                    tbar: [{
+                        id: 'complete',
+                        fn: this.complete,
+                        cls: 'invisible',
+                       scope: this
+                    },{
+                        id: 'cancel',
+                        side: 'left',
+                        fn: ReUI.back,
+                        scope: ReUI
+                    }]
+                }
+            };
+            return options;
+        },
+        navigateToListView: function() {
+            var view = App.getView(this.viewId),
+                options = this.createNavigationOptions();
+            if (view && options)
+                view.show(options);
+        }
+    });
+
+
     /**
      * A base list view.
      * @constructor
@@ -370,7 +453,8 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          * @type {String}
          */
         requestErrorText: 'A server error occurred while requesting data.',
-        customizationSet: 'list',                
+        customizationSet: 'list',
+        associateList: null,
         searchWidget: null,
         searchWidgetClass: Sage.Platform.Mobile.SearchWidget,
         _selectionModel: null,

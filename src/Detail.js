@@ -317,6 +317,8 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                         context['resourceProperty'] = this.expandExpression(current['resourceProperty'], entry);
                     if (current['resourcePredicate'])
                         context['resourcePredicate'] = this.expandExpression(current['resourcePredicate'], entry);
+                    if (current['tools'])
+                        context['tools'] = this.expandExpression(current['tools'], entry);
 
                     data['view'] = current['view'];
                     data['context'] = dojo.toJson(context);
