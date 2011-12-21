@@ -114,6 +114,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
     });
 
     dojo.declare('Sage.Platform.Mobile.AssociateList', null, {
+        requestErrorText: 'Unable to submit to server.',
         parentKind: null,
         parentEntity: null,
         viewEntity: null,
@@ -121,7 +122,20 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         viewKind: null,
         title: null,
         viewId: null,
+        activate: function(options){
+            this.setValues(options);
+            this.navigateToListView();
+        },
+        setValues: function(options){
+            //todo: parse context/options etc to set all the entity/kinds
 
+            // we need to pass the parent stuff (from Detail view)
+            // and then also pass the view stuff (from List view)
+            // finally, the Target Entity should be set from whatever layout that initiated this (Detail View - layout)
+            console.log('set values', options);
+
+
+        },
         complete: function(){
             var view = App.getPrimaryActiveView(),
                 selections,
@@ -154,10 +168,14 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             App.onRefresh({
                 resourceKind: this.viewKind
             });
+            this.onAssociateComplete();
             ReUI.back();
         },
         onInsertFailure: function(response, o) {
-            this.onRequestDataFailure(response, o);
+            alert(dojo.string.substitute(this.requestErrorText, [response, o]));
+            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'failure');
+        },
+        onAssociateComplete: function(){
         },
         createInsertRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(App.getService(false));
@@ -503,6 +521,8 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                 this.searchWidget = null;
             }
 
+            this.associateList = new Sage.Platform.Mobile.AssociateList();
+
             dojo.toggleClass(this.domNode, 'list-hide-search', this.hideSearch);
 
             this.clear();
@@ -575,6 +595,9 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             if (this._selectionModel && key)
                 this._selectionModel.toggle(key, this.entries[key], row);
+        },
+        onAssociate: function(){
+            this.associateList.activate(this.options);
         },
         activateEntry: function(params) {
             if (params.key)
@@ -862,6 +885,10 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             if (this._selectionModel) this._loadPreviousSelections();
             
+            this.inherited(arguments);
+        },
+        show: function(options){
+            console.log(arguments);
             this.inherited(arguments);
         },
         createHashTagQueryLayout: function() {

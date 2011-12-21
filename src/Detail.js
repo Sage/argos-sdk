@@ -101,6 +101,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         ]),
         id: 'generic_detail',
         layout: null,
+        dataCache: null,
         security: false,
         customizationSet: 'detail',
         expose: false,
@@ -117,6 +118,19 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             this.inherited(arguments);
             this.connect(App, 'onRefresh', this._onRefresh);
             this.clear();
+            this.dataCacheClear();
+        },
+        dataCacheSet: function(data){
+            if(!data) return;
+            var index = this.dataCache.length;
+            this.dataCache[index] = data;
+            return index;
+        },
+        dataCacheGet: function(index){
+            return this.dataCache[index];
+        },
+        dataCacheClear: function(){
+            this.dataCache = [];
         },
         createToolLayout: function() {
             return this.tools || (this.tools = {
@@ -177,6 +191,13 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                     descriptor: descriptor
                 };
             } else {
+                if ('options' in o)
+                {
+                    var optionsIndex = o.options;
+                    delete o.options;
+                    o = dojo.mixin(this.dataCacheGet(optionsIndex), o); // o gets priority
+                }
+
                 context = o;
 
                 if (descriptor) context['descriptor'] = descriptor;
@@ -317,8 +338,8 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                         context['resourceProperty'] = this.expandExpression(current['resourceProperty'], entry);
                     if (current['resourcePredicate'])
                         context['resourcePredicate'] = this.expandExpression(current['resourcePredicate'], entry);
-                    if (current['tools'])
-                        context['tools'] = this.expandExpression(current['tools'], entry);
+                    if (current['options'])
+                        context['options'] = this.dataCacheSet(current['options'] || this.options);
 
                     data['view'] = current['view'];
                     data['context'] = dojo.toJson(context);
@@ -439,6 +460,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             if (this.refreshRequired)
             {
                 this.clear();
+                this.dataCacheClear();
             }
         },
         refresh: function() {
