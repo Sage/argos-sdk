@@ -115,26 +115,13 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
     dojo.declare('Sage.Platform.Mobile.AssociateList', null, {
         requestErrorText: 'Unable to submit to server.',
-        parentKind: null,
-        parentEntity: null,
-        viewEntity: null,
-        viewTargetEntity: null,
-        viewKind: null,
-        title: null,
-        viewId: null,
+        owner: null,
+        options: null,
+
         activate: function(options){
-            this.setValues(options);
-            this.navigateToListView();
-        },
-        setValues: function(options){
-            //todo: parse context/options etc to set all the entity/kinds
-
-            // we need to pass the parent stuff (from Detail view)
-            // and then also pass the view stuff (from List view)
-            // finally, the Target Entity should be set from whatever layout that initiated this (Detail View - layout)
-            console.log('set values', options);
-
-
+            this.options = options;
+            this.owner = options.owner;
+            this.navigateToAssociateView();
         },
         complete: function(){
             var view = App.getPrimaryActiveView(),
@@ -147,10 +134,10 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                     ReUI.back();
 
                 for (var selectionKey in selections) {
-                    var context = App.isNavigationFromResourceKind( [this.parentKind] );
-                    value['$name'] = this.viewEntity;
-                    value[this.parentEntity] = { '$key': context.key };
-                    value[this.viewTargetEntity] = { '$key': selectionKey };
+                    var context = App.isNavigationFromResourceKind( [this.options.context.resourceKind] );
+                    value['$name'] = this.options.target.entity;
+                    value[this.options.context.entity] = { '$key': context.key };
+                    value[this.options.related.entity] = { '$key': selectionKey };
                 }
                 this.insert(value);
             }
@@ -166,7 +153,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         },
         onInsertSuccess: function(entry) {
             App.onRefresh({
-                resourceKind: this.viewKind
+                resourceKind: this.owner.resourceKind
             });
             this.onAssociateComplete();
             ReUI.back();
@@ -179,7 +166,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         },
         createInsertRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(App.getService(false));
-            request.setResourceKind(this.viewKind);
+            request.setResourceKind(this.options.target.resourceKind);
             return request;
         },
         createNavigationOptions: function() {
@@ -188,7 +175,12 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                 singleSelect: true,
                 singleSelectAction: 'complete',
                 allowEmptySelection: false,
-                title: this.title,
+                title: this.owner.title,
+                itemTemplate: this.owner.itemTemplate,
+                security: this.owner.security,
+                queryOrderBy: this.owner.queryOrderBy,
+                querySelect: this.owner.querySelect,
+                resourceKind: this.owner.resourceKind,
                 tools: {
                     tbar: [{
                         id: 'complete',
@@ -205,8 +197,8 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             };
             return options;
         },
-        navigateToListView: function() {
-            var view = App.getView(this.viewId),
+        navigateToAssociateView: function() {
+            var view = App.getView('associate_list'),
                 options = this.createNavigationOptions();
             if (view && options)
                 view.show(options);
@@ -521,8 +513,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                 this.searchWidget = null;
             }
 
-            this.associateList = new Sage.Platform.Mobile.AssociateList();
-
             dojo.toggleClass(this.domNode, 'list-hide-search', this.hideSearch);
 
             this.clear();
@@ -597,7 +587,13 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                 this._selectionModel.toggle(key, this.entries[key], row);
         },
         onAssociate: function(){
-            this.associateList.activate(this.options);
+            var associateList = this.associateList || new Sage.Platform.Mobile.AssociateList(),
+                options = dojo.mixin(this.options, {
+                    'id': this.id,
+                    'owner': this
+                });
+
+            associateList.activate(options);
         },
         activateEntry: function(params) {
             if (params.key)
@@ -885,10 +881,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             if (this._selectionModel) this._loadPreviousSelections();
             
-            this.inherited(arguments);
-        },
-        show: function(options){
-            console.log(arguments);
             this.inherited(arguments);
         },
         createHashTagQueryLayout: function() {
