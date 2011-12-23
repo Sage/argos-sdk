@@ -195,6 +195,10 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                     }]
                 }
             };
+
+            if('prefilter' in this.options.context)
+                options.where = this.owner.expandExpression(this.options.context.prefilter);
+
             return options;
         },
         navigateToAssociateView: function() {
