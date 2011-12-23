@@ -406,6 +406,13 @@ define('Sage/Platform/Mobile/Edit', [
                 // for now, explicitly hidden fields (via. the field.hide() method) are not included
                 if (all || ((field.alwaysUseValue || field.isDirty() || include) && !field.isHidden()))
                 {
+                    // revert localized currency/number values to US-format DecimalSeparator for storing
+                    if ('decimal' == field.type && Mobile.CultureInfo)
+                        value = value
+                            .replace(Mobile.CultureInfo.numberFormat.currencyDecimalSeparator, '.')
+                            .replace(Mobile.CultureInfo.numberFormat.numberDecimalSeparator,   '.')
+                        ;
+
                     if (field.applyTo !== false)
                     {
                         target = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo);

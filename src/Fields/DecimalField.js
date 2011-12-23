@@ -21,7 +21,11 @@ define('Sage/Platform/Mobile/Fields/DecimalField', ['Sage/Platform/Mobile/Fields
             val = parseFloat(val, 10).toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
             val = isNaN(val)
                 ? dojo.string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.'])
-                : val;
+                : dojo.string.substitute('${0}${1}${2}',
+                    [ parseInt(val),
+                      Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.',
+                      val.substr(- Mobile.CultureInfo.numberFormat.currencyDecimalDigits)
+                    ]);
             Sage.Platform.Mobile.Fields.DecimalField.superclass.setValue.call(this, val);
         }
     });
