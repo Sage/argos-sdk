@@ -245,8 +245,6 @@ ReUI = {};
 
             D.removeClass(R.rootEl, 'transition');
 
-            context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);                                                               
-                
             D.dispatch(from, 'aftertransition', {out: true, tag: o.tag, data: o.data});
             D.dispatch(to, 'aftertransition', {out: false, tag: o.tag, data: o.data});
 
@@ -255,8 +253,6 @@ ReUI = {};
         }       
         
         context.transitioning = true;
-
-        D.clearTimer(context.check);
 
         scrollTo(0, 1);
 
@@ -330,18 +326,17 @@ ReUI = {};
         return false;
     };                   
 
-    var checkOrientationAndLocation = function() {
-        if (context.hasOrientationEvent !== true)
+    var checkOrientation = function() {
+        if ((window.innerHeight != context.height) || (window.innerWidth != context.width))
         {
-            if ((window.innerHeight != context.height) || (window.innerWidth != context.width))
-            {
-                context.height = window.innerHeight;
-                context.width = window.innerWidth;
+            context.height = window.innerHeight;
+            context.width = window.innerWidth;
 
-                setOrientation(context.height < context.width ? 'landscape' : 'portrait');
-            }
+            setOrientation(context.height < context.width ? 'landscape' : 'portrait');
         }
+    };
 
+    var checkLocation = function(){
         if (context.transitioning) return;
 
         if (context.hash != location.hash)
@@ -363,23 +358,19 @@ ReUI = {};
             page = info && D.get(info.page);
 
             // more often than not, data will only be needed when moving to a previous view (and restoring it's state).
-            
             if (page)
                 R.show(page, {external: true, reverse: reverse, tag: info && info.tag, data: info && info.data});
-        }         
+        }
     };
 
-    var orientationChanged = function() {
-        switch (window.orientation) 
-        {                
-            case 90:
-            case -90:
-                setOrientation('landscape');
-                break;
-            default:
-                setOrientation('portrait');
-                break;
-        }
+    var onResize = function() {
+        if (context.sizeTimer)
+            clearTimeout(context.sizeTimer);
+       context.sizeTimer = setTimeout(checkOrientation, 100);
+    };
+
+    var onHashChange = function() {
+       setTimeout(checkLocation, 100);
     };
 
     var setOrientation = function(value) {
@@ -413,8 +404,7 @@ ReUI = {};
         width: 0,
         height: 0,
         check: 0,
-        hasOrientationEvent: false, 
-        history: []      
+        history: []
     };
 
     var config = window['reConfig'] || {};
@@ -432,7 +422,6 @@ ReUI = {};
         updateBackButtonText: true,
         hashPrefix: '#_',
         backText: 'Back',               
-        checkStateEvery: 100,
         prioritizeLocation: false,
         showInitialPage: true,
         context: context,
@@ -486,22 +475,13 @@ ReUI = {};
                 }
             }
             
-            if (typeof window.onorientationchange === 'object')
-            {
-                window.onorientationchange = orientationChanged;
-
-                context.hasOrientationEvent = true;    
-                
-                D.wait(orientationChanged, 0);
-            }
+            window.onresize = onResize;
+            window.onhashchange = onHashChange;
 
             if (R.showInitialPage)
-            {
-                D.wait(checkOrientationAndLocation, 0);
-            }
+                D.wait(checkLocation, 0);
 
-            context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);
-
+            D.wait(checkOrientation, 0);
             D.bind(R.rootEl, 'click', onRootClick);
         },
 
@@ -527,7 +507,7 @@ ReUI = {};
         },
 
         back: function() {
-            history.back();
+            window.history.back();
         },
         
         /// <summary>
