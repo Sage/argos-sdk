@@ -29,6 +29,16 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                       val.substr(- Mobile.CultureInfo.numberFormat.currencyDecimalDigits)
                     );
             Sage.Platform.Mobile.Controls.DecimalField.superclass.setValue.call(this, val);
+        },
+        getValue: function(){
+            var value = Sage.Platform.Mobile.Controls.DecimalField.superclass.getValue.apply(this, arguments);
+            // SData (and other functions) expect American formatted numbers
+            value = value
+                .replace(Mobile.CultureInfo.numberFormat.currencyGroupSeparator, '')
+                .replace(Mobile.CultureInfo.numberFormat.numberGroupSeparator, '')
+                .replace(Mobile.CultureInfo.numberFormat.currencyDecimalSeparator, '.')
+                .replace(Mobile.CultureInfo.numberFormat.numberDecimalSeparator,   '.');
+            return parseFloat(value, 10);
         }
     });
 
