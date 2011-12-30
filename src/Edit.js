@@ -486,6 +486,8 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                     // revert localized currency/number values to US-format DecimalSeparator for storing
                     if ('decimal' == field.type && Mobile.CultureInfo)
                         value = value
+                            .replace(Mobile.CultureInfo.numberFormat.currencyGroupSeparator, '')
+                            .replace(Mobile.CultureInfo.numberFormat.numberGroupSeparator, '')
                             .replace(Mobile.CultureInfo.numberFormat.currencyDecimalSeparator, '.')
                             .replace(Mobile.CultureInfo.numberFormat.numberDecimalSeparator,   '.')
                         ;
