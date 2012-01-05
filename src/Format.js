@@ -141,7 +141,7 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
                 return (hrs && mins) ? hrs + mins
                                      : hrs === 0 ? mins : hrs;
             },
-            canvasDraw: function (canvas, vector, options) {
+            canvasDraw: function (vector, canvas, options) {
                 var scale, x, y,
                     context = canvas.getContext('2d');
 
@@ -168,34 +168,32 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
                 }
             },
             imageFromVector: function (vector, options, html) {
-                var img;
+                var img,
+                    canvasNode = document.createElement('canvas');
+
+                options = options || {}
 
                 if (typeof vector == 'string' || vector instanceof String)
                     try { vector = JSON.parse(vector); } catch(e) {}
 
-                if (!(vector instanceof Array) || 0 == vector.length) {
-                    // a place-holder image (this one all white/invisible)
-                    img = '../../argos-sdk/content/images/arrow-right.png';
+                if (!(vector instanceof Array) || 0 == vector.length)
+                    vector = [[]]; // blank image.
 
-                } else {
+                var size = getVectorMaxSize(vector);
 
-                    var size = getVectorMaxSize(vector),
-                        canvasNode = document.createElement('canvas');
+                canvasNode.width  = options.width  || size.width;
+                canvasNode.height = options.height || size.height;
 
-                    canvasNode.width  = options.width;
-                    canvasNode.height = options.height;
+                options.scale = Math.min(
+                    canvasNode.width  / size.width,
+                    canvasNode.height / size.height
+                );
 
-                    options.scale = Math.min(
-                        canvasNode.width  / size.width,
-                        canvasNode.height / size.height
-                    );
+                Sage.Platform.Mobile.Format.canvasDraw(vector, canvasNode, options);
 
-                    Sage.Platform.Mobile.Format.canvasDraw(canvasNode, vector, options);
-
-                    img = canvasNode.toDataURL('image/png');
-                    if (img.indexOf("data:image/png") != 0)
-                        img = Canvas2Image.saveAsBMP(canvasNode, true).src;
-                }
+                img = canvasNode.toDataURL('image/png');
+                if (img.indexOf("data:image/png") != 0)
+                    img = Canvas2Image.saveAsBMP(canvasNode, true).src;
 
                 return html
                     ? dojo.string.substitute(

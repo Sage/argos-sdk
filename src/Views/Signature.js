@@ -57,14 +57,14 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
 
             dojo.connect(window, 'resize', this, this.onResize)
 
-            this.redraw(this.signatureNode, this.signature, this.config);
+            this.redraw(this.signature, this.signatureNode, this.config);
         },
         getValues: function() {
             return JSON.stringify(this.optimizeSignature());
         },
         setValue: function(val, initial) {
             this.signature = val ? JSON.parse(val) : [];
-            this.redraw(this.signatureNode, this.signature, this.config);
+            this.redraw(this.signature, this.signatureNode, this.config);
         },
         clearValue: function() {
             this.buffer = this.signature;
@@ -112,7 +112,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
 
             this.trace = [];
             this.context.strokeStyle = this.config.penColor;
-            this.redraw(this.signatureNode, this.signature, this.config);
+            this.redraw(this.signature, this.signatureNode, this.config);
         },
         _undo: function () {
             if (this.signature.length) {
@@ -123,7 +123,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             } else if (this.buffer.length) {
                 this.signature = this.buffer;
             }
-            this.redraw(this.signatureNode, this.signature, this.config);
+            this.redraw(this.signature, this.signatureNode, this.config);
         },
         _sizeCanvas: function () {
             this.canvasNodeWidth  = Math.floor(dojo.window.getBox().w * 0.92);
@@ -144,10 +144,10 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
                 this.canvasNodeHeight / oldHeight
             );
             this.signature = this.rescale(newScale);
-            this.redraw(this.signatureNode, this.signature, this.config);
+            this.redraw(this.signature, this.signatureNode, this.config);
         },
-        redraw: function (canvas, vector, options) {
-            Sage.Platform.Mobile.Format.canvasDraw(canvas, vector, options);
+        redraw: function (vector, canvas, options) {
+            Sage.Platform.Mobile.Format.canvasDraw(vector, canvas, options);
         },
         rescale: function (scale) {
             var rescaled = [];
