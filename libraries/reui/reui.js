@@ -245,6 +245,8 @@ ReUI = {};
 
             D.removeClass(R.rootEl, 'transition');
 
+            context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);                                                               
+                
             D.dispatch(from, 'aftertransition', {out: true, tag: o.tag, data: o.data});
             D.dispatch(to, 'aftertransition', {out: false, tag: o.tag, data: o.data});
 
@@ -253,6 +255,8 @@ ReUI = {};
         }       
         
         context.transitioning = true;
+
+        D.clearTimer(context.check);
 
         scrollTo(0, 1);
 
@@ -326,7 +330,7 @@ ReUI = {};
         return false;
     };                   
 
-    var checkOrientation = function() {
+    var checkOrientationAndLocation = function() {
         if ((window.innerHeight != context.height) || (window.innerWidth != context.width))
         {
             context.height = window.innerHeight;
@@ -334,9 +338,7 @@ ReUI = {};
 
             setOrientation(context.height < context.width ? 'landscape' : 'portrait');
         }
-    };
 
-    var checkLocation = function(){
         if (context.transitioning) return;
 
         if (context.hash != location.hash)
@@ -358,19 +360,10 @@ ReUI = {};
             page = info && D.get(info.page);
 
             // more often than not, data will only be needed when moving to a previous view (and restoring it's state).
+            
             if (page)
                 R.show(page, {external: true, reverse: reverse, tag: info && info.tag, data: info && info.data});
-        }
-    };
-
-    var onResize = function() {
-        if (context.sizeTimer)
-            clearTimeout(context.sizeTimer);
-       context.sizeTimer = setTimeout(checkOrientation, 100);
-    };
-
-    var onHashChange = function() {
-       setTimeout(checkLocation, 100);
+        }         
     };
 
     var setOrientation = function(value) {
@@ -422,6 +415,7 @@ ReUI = {};
         updateBackButtonText: true,
         hashPrefix: '#_',
         backText: 'Back',               
+        checkStateEvery: 100,
         prioritizeLocation: false,
         showInitialPage: true,
         context: context,
@@ -475,13 +469,13 @@ ReUI = {};
                 }
             }
             
-            window.onresize = onResize;
-            window.onhashchange = onHashChange;
-
             if (R.showInitialPage)
-                D.wait(checkLocation, 0);
+            {
+                D.wait(checkOrientationAndLocation, 0);
+            }
 
-            D.wait(checkOrientation, 0);
+            context.check = D.timer(checkOrientationAndLocation, R.checkStateEvery);
+
             D.bind(R.rootEl, 'click', onRootClick);
         },
 
@@ -507,7 +501,7 @@ ReUI = {};
         },
 
         back: function() {
-            window.history.back();
+            history.back();
         },
         
         /// <summary>
@@ -893,4 +887,3 @@ ReUI = {};
         }, 0);     
     });
 })();
-
