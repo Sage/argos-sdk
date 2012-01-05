@@ -113,103 +113,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
         }
     });
 
-    dojo.declare('Sage.Platform.Mobile.AssociateList', null, {
-        requestErrorText: 'Unable to submit to server.',
-        owner: null,
-        options: null,
-
-        activate: function(options){
-            this.options = options;
-            this.owner = options.owner;
-            this.navigateToAssociateView();
-        },
-        complete: function(){
-            var view = App.getPrimaryActiveView(),
-                selections,
-                value = {};
-            if (view && view._selectionModel) {
-                selections = view._selectionModel.getSelections();
-
-                if (0 == view._selectionModel.getSelectionCount() && view.options.allowEmptySelection)
-                    ReUI.back();
-
-                for (var selectionKey in selections) {
-                    var context = App.isNavigationFromResourceKind( [this.options.context.resourceKind] );
-                    value['$name'] = this.options.target.entity;
-                    value[this.options.context.entity] = { '$key': context.key };
-                    value[this.options.related.entity] = { '$key': selectionKey };
-                }
-                this.insert(value);
-            }
-        },
-        insert: function(entry) {
-            var request = this.createInsertRequest();
-            if (request)
-                request.create(entry, {
-                    success: this.onInsertSuccess,
-                    failure: this.onInsertFailure,
-                    scope: this
-                });
-        },
-        onInsertSuccess: function(entry) {
-            App.onRefresh({
-                resourceKind: this.owner.resourceKind
-            });
-            this.onAssociateComplete();
-            ReUI.back();
-        },
-        onInsertFailure: function(response, o) {
-            alert(dojo.string.substitute(this.requestErrorText, [response, o]));
-            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'failure');
-        },
-        onAssociateComplete: function(){
-        },
-        createInsertRequest: function() {
-            var request = new Sage.SData.Client.SDataSingleResourceRequest(App.getService(false));
-            request.setResourceKind(this.options.target.resourceKind);
-            return request;
-        },
-        createNavigationOptions: function() {
-            var options = {
-                selectionOnly: true,
-                singleSelect: true,
-                singleSelectAction: 'complete',
-                allowEmptySelection: false,
-                title: this.owner.title,
-                itemTemplate: this.owner.itemTemplate,
-                security: this.owner.security,
-                queryOrderBy: this.owner.queryOrderBy,
-                querySelect: this.owner.querySelect,
-                resourceKind: this.owner.resourceKind,
-                tools: {
-                    tbar: [{
-                        id: 'complete',
-                        fn: this.complete,
-                        cls: 'invisible',
-                       scope: this
-                    },{
-                        id: 'cancel',
-                        side: 'left',
-                        fn: ReUI.back,
-                        scope: ReUI
-                    }]
-                }
-            };
-
-            if('prefilter' in this.options.context)
-                options.where = this.owner.expandExpression(this.options.context.prefilter);
-
-            return options;
-        },
-        navigateToAssociateView: function() {
-            var view = App.getView('associate_list'),
-                options = this.createNavigationOptions();
-            if (view && options)
-                view.show(options);
-        }
-    });
-
-
     /**
      * A base list view.
      * @constructor
@@ -468,7 +371,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          */
         requestErrorText: 'A server error occurred while requesting data.',
         customizationSet: 'list',
-        associateList: null,
         searchWidget: null,
         searchWidgetClass: Sage.Platform.Mobile.SearchWidget,
         _selectionModel: null,
@@ -589,15 +491,6 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             if (this._selectionModel && key)
                 this._selectionModel.toggle(key, this.entries[key], row);
-        },
-        onAssociate: function(){
-            var associateList = this.associateList || new Sage.Platform.Mobile.AssociateList(),
-                options = dojo.mixin(this.options, {
-                    'id': this.id,
-                    'owner': this
-                });
-
-            associateList.activate(options);
         },
         activateEntry: function(params) {
             if (params.key)
