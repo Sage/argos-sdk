@@ -95,7 +95,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
             }
         },
         onClearPress: function(evt){
-            this.clearValue();
+            this.clearValue(true);
             this.el.focus();
         },
         onNotificationTrigger: function(evt, el, o) {
@@ -122,8 +122,9 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             this.el.dom.value = val || '';
         },
-        clearValue: function() {
-            this.setValue('', true);
+        clearValue: function(asDirty) {
+            var initial = asDirty !== true;
+            this.setValue('', initial);
         },
         isDirty: function() {
             return (this.originalValue != this.getValue());
