@@ -84,7 +84,7 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
         _onClearClick: function(evt) {
             // only clear if input was already active
             if(!dojo.hasClass(this.domNode, 'text-field-active')){
-                this.clearValue();
+                this.clearValue(true);
                 dojo.stopEvent(evt);
             }
 
@@ -116,8 +116,10 @@ define('Sage/Platform/Mobile/Fields/TextField', ['Sage/Platform/Mobile/Fields/_F
 
             this.set('inputValue', val);
         },
-        clearValue: function() {
-            this.setValue('', true);
+        clearValue: function(asDirty) {
+            var initial = asDirty !== true;
+
+            this.setValue('', initial);
         },
         isDirty: function() {
             return (this.originalValue != this.getValue());
