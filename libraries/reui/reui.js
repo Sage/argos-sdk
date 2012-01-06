@@ -331,15 +331,12 @@ ReUI = {};
     };                   
 
     var checkOrientationAndLocation = function() {
-        if (context.hasOrientationEvent !== true)
+        if ((window.innerHeight != context.height) || (window.innerWidth != context.width))
         {
-            if ((window.innerHeight != context.height) || (window.innerWidth != context.width))
-            {
-                context.height = window.innerHeight;
-                context.width = window.innerWidth;
+            context.height = window.innerHeight;
+            context.width = window.innerWidth;
 
-                setOrientation(context.height < context.width ? 'landscape' : 'portrait');
-            }
+            setOrientation(context.height < context.width ? 'landscape' : 'portrait');
         }
 
         if (context.transitioning) return;
@@ -367,19 +364,6 @@ ReUI = {};
             if (page)
                 R.show(page, {external: true, reverse: reverse, tag: info && info.tag, data: info && info.data});
         }         
-    };
-
-    var orientationChanged = function() {
-        switch (window.orientation) 
-        {                
-            case 90:
-            case -90:
-                setOrientation('landscape');
-                break;
-            default:
-                setOrientation('portrait');
-                break;
-        }
     };
 
     var setOrientation = function(value) {
@@ -413,8 +397,7 @@ ReUI = {};
         width: 0,
         height: 0,
         check: 0,
-        hasOrientationEvent: false, 
-        history: []      
+        history: []
     };
 
     var config = window['reConfig'] || {};
@@ -486,15 +469,6 @@ ReUI = {};
                 }
             }
             
-            if (typeof window.onorientationchange === 'object')
-            {
-                window.onorientationchange = orientationChanged;
-
-                context.hasOrientationEvent = true;    
-                
-                D.wait(orientationChanged, 0);
-            }
-
             if (R.showInitialPage)
             {
                 D.wait(checkOrientationAndLocation, 0);
@@ -913,4 +887,3 @@ ReUI = {};
         }, 0);     
     });
 })();
-
