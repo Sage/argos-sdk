@@ -526,12 +526,15 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             return (query || '').replace(/"/g, '""');
         },
         _onSearchExpression: function(expression) {
-            this.clear(false);
+            var o = {
+                isSearch: true
+            };
 
+            this.clear(false);
             this.queryText = '';
             this.query = expression;
 
-            this.requestData();
+            this.requestData(o);
         },
         configureSearch: function() {
             if (this.searchWidget)
@@ -539,7 +542,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                     'context': this.getContext()
                 });
         },
-        createRequest:function() {
+        createRequest:function(o) {
             /// <summary>
             ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.
             /// </summary>
@@ -587,11 +590,16 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, queryOrderByExpr);
 
             var queryWhereExpr = this.expandExpression((options && options.where) || this.queryWhere);
+
+            if ((o && o.isSearch) && (options && 'queryScopeExpression' in options))
+                queryWhereExpr = this.expandExpression(options.queryScopeExpression);
+
             if (queryWhereExpr)
                 where.push(queryWhereExpr);
 
             if (this.query)
                 where.push(this.query);
+
 
             if (where.length > 0)
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Where, where.join(' and '));
@@ -701,14 +709,14 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             dojo.removeClass(this.domNode, 'list-loading'); 
         },
-        requestData: function() {
+        requestData: function(o) {
             /// <summary>
             ///     Initiates the SData request.
             /// </summary>
 
             dojo.addClass(this.domNode, 'list-loading');
 
-            var request = this.createRequest();
+            var request = this.createRequest(o);
             request.read({
                 success: this.onRequestDataSuccess,
                 failure: this.onRequestDataFailure,
