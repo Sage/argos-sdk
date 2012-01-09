@@ -575,7 +575,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                     .getUri()
                     .setCollectionPredicate(resourcePredicateExpr);
 
-            var querySelectExpr = this.expandExpression(this.querySelect);
+            var querySelectExpr = this.expandExpression((options && options.select) || this.querySelect);
             if (querySelectExpr)
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, querySelectExpr.join(','));
 
