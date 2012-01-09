@@ -530,12 +530,11 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             this.clear(false);
             this.queryText = '';
             this.query = expression;
-            if ('queryScopeExpression' in this.options)
-                this.options.where = this.options.queryScopeExpression;
 
             this.requestData();
         },
         configureSearch: function() {
+            this.query = this.options && this.options.query || null;
             if (this.searchWidget)
                 this.searchWidget.configure({
                     'context': this.getContext()
