@@ -215,8 +215,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         createLayout: function() {
             return this.layout || [];
         },
-        processLayout: function(layout, entry)
-        {
+        processLayout: function(layout, entry) {
             var rows = (layout['children'] || layout['as'] || layout),
                 options = layout['options'] || (layout['options'] = {
                     title: this.detailsText
@@ -325,7 +324,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                     data['context'] = dojo.toJson(context);
                 }
 
-                // priority: wrap > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
+                // priority: use > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
                 var useListTemplate = (layout['list'] || options['list']),
                     template = current['use']
                         ? current['use']
@@ -341,7 +340,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
                 var rowNode = dojo.toDom(template.apply(data, this));
 
-                if(current['onInsert'])
+                if(current['onCreate'])
                     callbacks.push({row: current, rowNode: rowNode, raw: value, entry: entry});
 
                 dojo.query(sectionUl).append(rowNode);
@@ -350,8 +349,8 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 dojo.query(this.contentNode).append(section);
 
             dojo.forEach(callbacks, function(item){
-               item.row.onInsert.call(this, item);
-            });
+               item.row.onCreate.call(this, item);
+            }, this);
 
             for (var i = 0; i < sectionQueue.length; i++)
             {
