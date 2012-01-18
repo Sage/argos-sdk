@@ -328,11 +328,23 @@ define('Sage/Platform/Mobile/Edit', [
         },
         applyContext: function(templateEntry) {
         },
+        applyFieldDefaults: function(){
+            var entry = {};
+            for (var name in this.fields)
+            {
+                var defaultValue = this.fields[name]['default'];
+                if (typeof defaultValue === 'undefined') continue;
+
+                entry[name] = defaultValue;
+            }
+            this.setValues(entry);
+        },
         processTemplateEntry: function(templateEntry) {
             this.templateEntry = this.convertEntry(templateEntry || {});
 
             this.setValues(this.templateEntry, true);
             this.applyContext(this.templateEntry);
+            this.applyFieldDefaults();
 
             // if an entry has been passed through options, apply it here, now that the template has been applied.
             // in this case, since we are doing an insert (only time template is used), the entry is applied as modified data.
