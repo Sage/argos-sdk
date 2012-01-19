@@ -112,6 +112,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         requestErrorText: 'A server error occurred while requesting data.',
         notAvailableText: 'The requested entry is not available.',
         editView: false,
+        _navigationOptions: null,
 
         postCreate: function() {
             this.inherited(arguments);
@@ -156,37 +157,24 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 dojo.toggleClass(node, 'collapsed');
         },
         activateRelatedEntry: function(params) {
-            if (params.context)
-                this.navigateToRelatedView(params.view, dojo.fromJson(params.context), params.descriptor);
+            if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context), params.descriptor);
         },
         activateRelatedList: function(params) {
-            if (params.context)
-                this.navigateToRelatedView(params.view, dojo.fromJson(params.context), params.descriptor);
+            if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context), params.descriptor);
         },
         navigateToEditView: function(el) {
             var view = App.getView(this.editView);
             if (view)
                 view.show({entry: this.entry});
         },
-        navigateToRelatedView: function(view, o, descriptor) {
-            var context,
-                targetView;
-            if (typeof o === 'string') {
-                context = {
-                    key: o,
-                    descriptor: descriptor
-                };
-            } else {
-                context = o;
+        navigateToRelatedView: function(id, slot, descriptor) {
+            var options = this._navigationOptions[slot],
+                view = App.getView(id);
 
-                if (descriptor) context['descriptor'] = descriptor;
-            }
+            if (descriptor && options) options['descriptor'] = descriptor;
 
-            if (context) {
-                targetView = App.getView(view);
-                if (targetView)
-                    targetView.show(context);
-            }
+            if (view && options)
+                view.show(options);
         },
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
@@ -303,8 +291,9 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 if (current['disabled'] && hasAccess)
                     data['disabled'] = this.expandExpression(current['disabled'], entry, value);
 
-                if (current['view']) {
-                    var context = {};
+                if (current['view'])
+                {
+                    var context = dojo.mixin({}, current['options']);
                     if (current['key'])
                         context['key'] = typeof current['key'] === 'function'
                             ? this.expandExpression(current['key'], entry)
@@ -319,7 +308,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                         context['resourcePredicate'] = this.expandExpression(current['resourcePredicate'], entry);
 
                     data['view'] = current['view'];
-                    data['context'] = dojo.toJson(context);
+                    data['context'] = (this._navigationOptions.push(context) - 1);
                 }
 
                 // priority: wrap > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
@@ -432,8 +421,6 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         beforeTransitionTo: function() {
             this.inherited(arguments);
 
-            this.canEdit = this.editor ? true : false;
-
             if (this.refreshRequired)
             {
                 this.clear();
@@ -453,7 +440,8 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         },
         clear: function() {
             this.set('detailContent', this.emptyTemplate.apply(this));
-            this.context = false;
+
+            this._navigationOptions = [];
         }
     });
 });

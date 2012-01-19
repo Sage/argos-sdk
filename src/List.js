@@ -370,7 +370,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
          * @type {String}
          */
         requestErrorText: 'A server error occurred while requesting data.',
-        customizationSet: 'list',                
+        customizationSet: 'list',
         searchWidget: null,
         searchWidgetClass: Sage.Platform.Mobile.SearchWidget,
         _selectionModel: null,
@@ -526,20 +526,21 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
             return (query || '').replace(/"/g, '""');
         },
         _onSearchExpression: function(expression) {
-            this.clear(false);
 
+            this.clear(false);
             this.queryText = '';
             this.query = expression;
 
             this.requestData();
         },
         configureSearch: function() {
+            this.query = this.options && this.options.query || null;
             if (this.searchWidget)
                 this.searchWidget.configure({
                     'context': this.getContext()
                 });
         },
-        createRequest:function() {
+        createRequest:function(o) {
             /// <summary>
             ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.
             /// </summary>
@@ -574,7 +575,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                     .getUri()
                     .setCollectionPredicate(resourcePredicateExpr);
 
-            var querySelectExpr = this.expandExpression(this.querySelect);
+            var querySelectExpr = this.expandExpression((options && options.select) || this.querySelect);
             if (querySelectExpr)
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, querySelectExpr.join(','));
 
@@ -592,6 +593,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             if (this.query)
                 where.push(this.query);
+
 
             if (where.length > 0)
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Where, where.join(' and '));
