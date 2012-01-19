@@ -229,7 +229,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             for (var i = 0; i < rows.length; i++) {
                 var current = rows[i],
                     section,
-                    sectionUl,
+                    sectionNode,
                     include = this.expandExpression(current['include'], entry),
                     exclude = this.expandExpression(current['exclude'], entry);
 
@@ -250,7 +250,8 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 {
                     sectionStarted = true;
                     section = dojo.toDom(this.sectionBeginTemplate.apply(layout, this) + this.sectionEndTemplate.apply(layout, this));
-                    sectionUl = section.childNodes[1];
+                    sectionNode = section.childNodes[1];
+                    dojo.place(section, this.contentNode);
                 }
 
                 var provider = current['provider'] || getValue,
@@ -341,15 +342,13 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 var rowNode = dojo.toDom(template.apply(data, this));
 
                 if(current['onCreate'])
-                    callbacks.push({row: current, rowNode: rowNode, raw: value, entry: entry});
+                    callbacks.push({row: current, node: rowNode, value: formatted, raw: value, entry: entry});
 
-                dojo.query(sectionUl).append(rowNode);
+                dojo.place(rowNode, sectionNode);
             }
-            if (section)
-                dojo.query(this.contentNode).append(section);
 
             dojo.forEach(callbacks, function(item){
-               item.row.onCreate.call(this, item);
+               item.row['onCreate'].call(this, item);
             }, this);
 
             for (var i = 0; i < sectionQueue.length; i++)
