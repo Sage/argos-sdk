@@ -116,7 +116,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
         postCreate: function() {
             this.inherited(arguments);
-            dojo.subscribe('/app/refresh', this, this._onRefresh);
+            this.subscribe('/app/refresh', this._onRefresh);
             this.clear();
         },
         createToolLayout: function() {
