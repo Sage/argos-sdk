@@ -740,6 +740,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                 {
                     if (this.expandExpression(this.options.stateKey) != this.expandExpression(options.stateKey)) return true;
                     if (this.expandExpression(this.options.where) != this.expandExpression(options.where)) return true;
+                    if (this.expandExpression(this.options.query) != this.expandExpression(options.query)) return true;
                     if (this.expandExpression(this.options.resourceKind) != this.expandExpression(options.resourceKind)) return true;
                     if (this.expandExpression(this.options.resourcePredicate) != this.expandExpression(options.resourcePredicate)) return true;
                 }
