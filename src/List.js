@@ -399,7 +399,7 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
 
             if (this._selectionModel == null) this.set('selectionModel', new Sage.Platform.Mobile.ConfigurableSelectionModel());
 
-            this.connect(App, 'onRefresh', this._onRefresh);
+            dojo.subscribe('/app/refresh', this, this._onRefresh);
 
             if (this.enableSearch)
             {

@@ -118,6 +118,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             }
         },
         initConnects: function() {
+            dojo.subscribe('/app/refresh', this, this.onRefresh);
             this._connects.push(dojo.connect(window, 'resize', this, this.onResize));
             this._connects.push(dojo.connect(dojo.body(), 'beforetransition', this, this._onBeforeTransition));
             this._connects.push(dojo.connect(dojo.body(), 'aftertransition', this, this._onAfterTransition));
@@ -313,6 +314,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
                 if (this.bars[n].managed) this.bars[n].set('title', title);
         },
         onResize: function() {
+            dojo.publish('/app/resize',[]);
         },
         onRefresh: function(options) {
         },
