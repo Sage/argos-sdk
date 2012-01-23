@@ -49,8 +49,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/T
             this.set('inputValue', this.formatNumberForDisplay(this.inputNode.value, this.getValue()));
         },
         getValue: function() {
-            var value = dojo.attr(this.inputNode, 'value');
-
+            var value = this.inherited(arguments);
 
             if (/^\+/.test(value)) return value;
 
@@ -61,8 +60,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/T
             
             this.previousValue = false;
 
-            dojo.attr(this.inputNode, 'value', this.formatNumberForDisplay(val) || '');
-            this.inputNode.value = this.formatNumberForDisplay(val) || '';
+            this.set('inputValue', this.formatNumberForDisplay(val) || '');
         },
         formatNumberForDisplay: function(number, clean) {
             if (typeof clean === 'undefined') clean = number;
