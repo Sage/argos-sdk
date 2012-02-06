@@ -339,17 +339,17 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                                     : this.actionPropertyTemplate
                                 : this.propertyTemplate;
 
-                var rowNode = dojo.toDom(template.apply(data, this));
+                var rowNode = dojo.place(template.apply(data, this), sectionNode);
 
                 if(current['onCreate'])
-                    callbacks.push({row: current, node: rowNode, value: formatted, raw: value, entry: entry});
-
-                dojo.place(rowNode, sectionNode);
+                    callbacks.push({row: current, node: rowNode, value: value, entry: entry});
             }
 
-            dojo.forEach(callbacks, function(item){
-               item.row['onCreate'].call(this, item);
-            }, this);
+            for (var i = 0; i < callbacks.length; i++)
+            {
+                var item = callbacks[i];
+                item.row['onCreate'].apply(this, [item.row, item.node, item.value, item.entry]);
+            }
 
             for (var i = 0; i < sectionQueue.length; i++)
             {
