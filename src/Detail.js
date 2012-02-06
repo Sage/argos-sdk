@@ -203,8 +203,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         createLayout: function() {
             return this.layout || [];
         },
-        processLayout: function(layout, entry)
-        {
+        processLayout: function(layout, entry) {
             var rows = (layout['children'] || layout['as'] || layout),
                 options = layout['options'] || (layout['options'] = {
                     title: this.detailsText
@@ -213,10 +212,12 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 encodeValue = Sage.Platform.Mobile.Format.encode,
                 sectionQueue = [],
                 sectionStarted = false,
-                content = [];
+                callbacks = [];
 
             for (var i = 0; i < rows.length; i++) {
                 var current = rows[i],
+                    section,
+                    sectionNode,
                     include = this.expandExpression(current['include'], entry),
                     exclude = this.expandExpression(current['exclude'], entry);
 
@@ -236,7 +237,9 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 if (!sectionStarted)
                 {
                     sectionStarted = true;
-                    content.push(this.sectionBeginTemplate.apply(layout, this));
+                    section = dojo.toDom(this.sectionBeginTemplate.apply(layout, this) + this.sectionEndTemplate.apply(layout, this));
+                    sectionNode = section.childNodes[1];
+                    dojo.place(section, this.contentNode);
                 }
 
                 var provider = current['provider'] || getValue,
@@ -311,7 +314,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                     data['context'] = (this._navigationOptions.push(context) - 1);
                 }
 
-                // priority: wrap > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
+                // priority: use > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
                 var useListTemplate = (layout['list'] || options['list']),
                     template = current['use']
                         ? current['use']
@@ -325,12 +328,17 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                                     : this.actionPropertyTemplate
                                 : this.propertyTemplate;
 
-                content.push(template.apply(data, this));
+                var rowNode = dojo.place(template.apply(data, this), sectionNode);
+
+                if(current['onCreate'])
+                    callbacks.push({row: current, node: rowNode, value: value, entry: entry});
             }
 
-            if (sectionStarted) content.push(this.sectionEndTemplate.apply(layout, this));
-
-            dojo.query(this.contentNode).append(content.join(''));
+            for (var i = 0; i < callbacks.length; i++)
+            {
+                var item = callbacks[i];
+                item.row['onCreate'].apply(this, [item.row, item.node, item.value, item.entry]);
+            }
 
             for (var i = 0; i < sectionQueue.length; i++)
             {

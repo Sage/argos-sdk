@@ -142,7 +142,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                             break;
                         }
                         if(key === 'scope') { // eliminate recursive self call
-                            obj[key] = 'Scope is not saved in error report';
+                            obj[key]= 'Scope is not saved in error report';
                             break;
                         }
                         obj[key]=this.serializeValues(obj[key]);
