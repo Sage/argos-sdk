@@ -20,6 +20,7 @@ define('Sage/Platform/Mobile/Convert', ['dojo'], function() {
     return Sage.Platform.Mobile.Convert = (function() {
     var trueRE = /^(true|T)$/i,
         isoDate = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|(-|\+)(\d{2}):(\d{2}))/,
+        isoCalendarDate = /(\d{4})-(\d{2})-(\d{2})/, // no time component
         jsonDate = /\/Date\((-?\d+)(?:(-|\+)(\d{2})(\d{2}))?\)\//,
         pad = function(n) { return n < 10 ? '0' + n : n };
 
@@ -31,7 +32,7 @@ define('Sage/Platform/Mobile/Convert', ['dojo'], function() {
             if (typeof value !== 'string')
                 return false;
             
-            return isoDate.test(value) || jsonDate.test(value);
+            return isoDate.test(value) || isoCalendarDate.test(value) || jsonDate.test(value);
         },
         toIsoStringFromDate: function(value) {
             // adapted from: https://developer.mozilla.org/en/JavaScript/Reference/global_objects/date
@@ -96,6 +97,14 @@ define('Sage/Platform/Mobile/Convert', ['dojo'], function() {
                 }
 
                 value = utc;
+            }
+            else if ((match = isoCalendarDate.exec(value)))
+            {   // can't adjust for time zone/(Date.UTC()) having no time data
+                value = new Date(
+                    parseInt(match[1]),
+                    parseInt(match[2]) - 1, // zero based
+                    parseInt(match[3])
+                );
             }
 
             return value;
