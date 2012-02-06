@@ -75,6 +75,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         bars: null,
         enableCaching: false,
         defaultService: null,
+        resizeTimer: null,
         constructor: function(options) {
             this._connects = [];
             this._subscribes = [];
@@ -313,8 +314,11 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
                 if (this.bars[n].managed) this.bars[n].set('title', title);
         },
         onResize: function() {
-        },
-        onRefresh: function(options) {
+            if (this.resizeTimer) clearTimeout(this.resizeTimer);
+
+            this.resizeTimer = setTimeout(function(){
+                dojo.publish('/app/resize',[]);
+            }, 100);
         },
         onRegistered: function(view) {
         },

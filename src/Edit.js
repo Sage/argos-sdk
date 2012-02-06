@@ -514,9 +514,9 @@ define('Sage/Platform/Mobile/Edit', [
         onInsertSuccess: function(entry) {
             this.enable();
 
-            App.onRefresh({
+            dojo.publish('/app/refresh', [{
                 resourceKind: this.resourceKind
-            });
+            }]);
 
             this.onInsertCompleted(entry);
         },
@@ -567,11 +567,11 @@ define('Sage/Platform/Mobile/Edit', [
         onUpdateSuccess: function(entry) {
             this.enable();
 
-            App.onRefresh({
+            dojo.publish('/app/refresh', [{
                 resourceKind: this.resourceKind,
                 key: entry['$key'],
                 data: entry
-            });
+            }]);
 
             this.onUpdateCompleted(entry);
         },

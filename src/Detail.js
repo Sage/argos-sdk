@@ -116,7 +116,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
         postCreate: function() {
             this.inherited(arguments);
-            this.connect(App, 'onRefresh', this._onRefresh);
+            this.subscribe('/app/refresh', this._onRefresh);
             this.clear();
         },
         createToolLayout: function() {
@@ -343,7 +343,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             for (var i = 0; i < sectionQueue.length; i++)
             {
                 var current = sectionQueue[i];
-                
+
                 this.processLayout(current, entry);
             }
         },
