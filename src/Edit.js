@@ -329,15 +329,15 @@ define('Sage/Platform/Mobile/Edit', [
         applyContext: function(templateEntry) {
         },
         applyFieldDefaults: function(){
-            var entry = {};
             for (var name in this.fields)
             {
-                var defaultValue = this.fields[name]['default'];
+                var field = this.fields[name],
+                    defaultValue = field['default'];
+
                 if (typeof defaultValue === 'undefined') continue;
 
-                entry[name] = defaultValue;
+                field.setValue(defaultValue);
             }
-            this.setValues(entry);
         },
         processTemplateEntry: function(templateEntry) {
             this.templateEntry = this.convertEntry(templateEntry || {});
