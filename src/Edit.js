@@ -328,10 +328,22 @@ define('Sage/Platform/Mobile/Edit', [
         },
         applyContext: function(templateEntry) {
         },
+        applyFieldDefaults: function(){
+            for (var name in this.fields)
+            {
+                var field = this.fields[name],
+                    defaultValue = field['default'];
+
+                if (typeof defaultValue === 'undefined') continue;
+
+                field.setValue(defaultValue);
+            }
+        },
         processTemplateEntry: function(templateEntry) {
             this.templateEntry = this.convertEntry(templateEntry || {});
 
             this.setValues(this.templateEntry, true);
+            this.applyFieldDefaults();
             this.applyContext(this.templateEntry);
 
             // if an entry has been passed through options, apply it here, now that the template has been applied.
