@@ -1,0 +1,798 @@
+/* fixes */
+/* http://code.google.com/p/android/issues/detail?id=6059 */
+.android-6059-fix
+{
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    color: transparent;
+    height: 1px;
+    width: 1px;
+    cursor: default;
+}
+
+/* signature capture */
+#signature_edit { text-align: center; }
+#signature_edit canvas { border-bottom: 1px black solid; }
+#signature_edit .buttons { overflow: auto; margin-bottom: 0.5em; }
+#signature_edit .buttons .button { display: inline-block; width: 40%; margin: 0 1em; }
+
+/* list view */
+.list
+{
+
+}
+
+.list-content > li
+{
+    cursor: pointer;
+}
+
+.list-search .dismissButton
+{
+    display: none;
+}
+
+.list-more, .list-empty-opt
+{
+    display: none;
+    padding: 12px;
+    border-bottom: 1px solid #DDD;
+}
+
+.list-more .button, .list-empty-opt .button
+{
+    height: 40px;
+    line-height: 40px;
+    cursor: pointer;
+    font-size: .9em;
+}
+
+.list-more .list-remaining
+{
+    display: none;
+}
+
+.list-loading-indicator
+{
+    display: none;
+}
+
+/* list view states */
+.list-hide-search .list-search
+{
+    display: none;
+}
+
+.list-has-more .list-more, .list-has-empty-opt .list-empty-opt
+{
+    display: block;
+    background-color: #fff;
+}
+
+.list-has-more .list-more .button, .list-has-empty-opt .list-empty-opt .button
+{
+    width: 100%;
+}
+
+.list-has-more .list-remaining
+{
+    display: block;
+    text-align: center;
+    padding: 0px 0 12px 0;
+    font-size: .8em;
+    font-weight: bold;
+}
+
+.list-loading .list-more .button span
+{
+    background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
+    padding: 0 0 0 20px;
+    color: #555;
+}
+
+.list-loading .list-loading-indicator
+{
+    display: block;
+    text-align: center;
+    font-size: 1em;
+    font-weight: normal;
+    line-height: 1.5em;
+    padding: 1em;
+}
+
+.list-loading .list-loading-indicator div
+{
+    background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
+    padding: 0 0 0 20px;
+	display: inline-block;
+    text-align: center;
+}
+
+.list-content > li > a
+{
+    padding: 8px 32px 8px 36px;
+}
+
+.list-content > li > .item
+{
+    font-weight: normal;
+}
+
+/* search */
+.list-search
+{
+    background-color: #e6e6e6;
+    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(1, #cccccc)
+    );
+    background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+	border-bottom: 1px solid black;
+    border-top: 1px solid transparent;
+
+    box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+}
+
+.list-search input
+{
+    font-size: 0.9em;
+    line-height: 30px;
+    z-index: 5;
+
+    /* these are marked !important due to Chrome CSS fix */
+    /* todo: needed still? */
+    padding: 0 128px 0 5px !important;
+    -moz-border-radius: 3px !important;
+    -webkit-border-radius: 3px !important;
+    border: solid 1px #000 !important;
+    background: #fff;
+
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+}
+
+.list-search .searchButton
+{
+    cursor: pointer;
+    -moz-border-radius: 0px 3px 3px 0px;
+    -webkit-border-radius: 0px 3px 3px 0px;
+    font-size: 0.9em;
+    line-height: 30px;
+    padding: 0 8px 0 6px;
+    border: solid 1px #000;
+    text-align: center;
+    z-index: 100;
+}
+
+.list-search .dismissButton
+{
+    cursor: pointer;
+    -moz-border-radius: 3px 0px 0px 3px;
+    -webkit-border-radius: 3px 0px 0px 3px;
+    font-size: 0.9em;
+    line-height: 30px;
+    text-align: center;
+    border-style: solid;
+    border-color: #000;
+    border-width: 1px 0 1px 1px;
+    z-index: 100;
+}
+
+.list-search label
+{
+    color: #aaa;
+    font-size: 0.9em !important;
+    line-height: 32px;
+    padding: 0 8px 0 6px;
+    font-weight: normal;
+}
+
+.search-active label
+{
+    display: none;
+}
+
+.search-active .dismissButton
+{
+    display: block;
+}
+
+/* list selection */
+.list .list-item-selector
+{
+    visibility: hidden;
+    width: 24px;
+    height: 24px;
+    color: #ff0;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+}
+
+.list-show-selectors .list-item-selector
+{
+    visibility: visible;
+}
+
+/* grouped list */
+.group-content > h2
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 32px;
+    line-height: 32px;
+    margin: 0;
+    padding: 0 0 0 6px;
+    font-size: 1em;
+    z-index: 5;
+    position: relative;
+}
+
+.group-content > h2
+{
+    border-bottom: 1px solid #000;
+    border-top: 1px solid #000;
+    background-color: #00a1de;
+    background-image: linear-gradient(top, #00a1de, #0079a7);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #00a1de),
+        color-stop(1, #0079a7)
+    );
+    background-image: -moz-linear-gradient(top, #00a1de, #0079a7);
+    box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    color: #fff;
+    text-shadow: #000 0px 1px 0px;
+    font-weight: bold;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00a1de, endColorstr=#0079a7)";
+}
+
+.android-6059-fix ~ .group-content,
+.android-6059-fix ~ .list-content
+{
+    margin-top: -1px;
+}
+
+.group-content > h2:first-child
+{
+    border-top: solid 1px #00a1de;
+}
+
+.group-content > ul
+{
+    margin: 0;
+    padding: 0 0 1.5em 0;
+}
+
+.group-content > ul:last-child
+{
+    margin: 0;
+    padding: 0 0 0 0;
+}
+
+.group-content > ul > li:last-child
+{
+    border-bottom: none 0 black;
+}
+
+.group-content
+{
+    border-bottom: 1px solid #DDD;
+}
+
+/* detail veiw */
+.panel .panel-loading-indicator div.row > div
+{
+	background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
+    display: inline-block;
+	padding: 0 0 0 20px;
+}
+
+.panel .panel-loading-indicator div.row
+{
+	text-align: center !important;
+	padding: 1em !important;
+	min-height: 1em !important;
+}
+
+.content-loading > span
+{
+    padding-left: 32px;
+    font-size: 0.7em;
+    background: url('../images/content-loading-light-green.gif') no-repeat scroll 12px 50%;
+}
+
+/* busy */
+.toolbar.busy .actionButton span
+{
+    background: url('../images/loading-indicator-light-green.gif') no-repeat scroll 0 50%;
+	padding: 0 0 0 20px;
+}
+
+.panel.busy .actionButton span
+{
+    background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
+	padding: 0 0 0 20px;
+}
+
+/* edit/insert */
+.row > div > input:not([type|=radio]):not([type|=checkbox]),
+.row > input:not([type|=radio]):not([type|=checkbox])
+{
+    height: auto;
+    padding: 10px 10px 0 110px;
+}
+
+/* fields */
+.row-hidden
+{
+    display: none;
+}
+
+.row-disabled > div > button,
+.row-disabled > div > input,
+.row-disabled > div > div,
+.row-disabled > button,
+.row-disabled > input,
+.row-disabled > div
+{
+    opacity: 0.3;
+    cursor: default;
+}
+
+.row-edit[data-field-type="picklist"] > div > .button,
+.row-edit[data-field-type="lookup"] > div > .button,
+.row-edit[data-field-type="select"] > div > .button,
+.row-edit[data-field-type="address"] > div > .button,
+.row-edit[data-field-type="name"] > div > .button,
+.row-edit[data-field-type="date"] > div > .button,
+.row-edit[data-field-type="note"] > div > .button,
+.row-edit[data-field-type="duration"] > div > .button,
+.row-edit[data-field-type="picklist"] > .button,
+.row-edit[data-field-type="lookup"] > .button,
+.row-edit[data-field-type="select"] > .button,
+.row-edit[data-field-type="address"] > .button,
+.row-edit[data-field-type="name"] > .button,
+.row-edit[data-field-type="date"] > .button,
+.row-edit[data-field-type="note"] > .button,
+.row-edit[data-field-type="signature"] > div >.button
+{
+    margin: 0;
+    padding: 0 8px;
+    position: absolute;
+    right: 4px;
+}
+
+.row-edit[data-field-type="picklist"] > div > input,
+.row-edit[data-field-type="lookup"] > div > input,
+.row-edit[data-field-type="select"] > div > input,
+.row-edit[data-field-type="name"] > div > input,
+.row-edit[data-field-type="date"] > div > input,
+.row-edit[data-field-type="note"] > div > input,
+.row-edit[data-field-type="picklist"] > input,
+.row-edit[data-field-type="lookup"] > input,
+.row-edit[data-field-type="select"] > input,
+.row-edit[data-field-type="name"] > input,
+.row-edit[data-field-type="date"] > input,
+.row-edit[data-field-type="note"] > input
+{
+    padding: 8px 34px 8px 110px !important;
+}
+
+.row-edit[data-field-type="signature"] > div > canvas,
+.row-edit[data-field-type="signature"] > div > img
+{
+	margin-left: 110px;
+}
+
+.row-edit[data-field-type="note"] > div > textarea,
+.row-edit[data-field-type="note"] > textarea
+{
+    padding: 8px 34px 8px 110px !important;
+    height: 5em;
+    overflow: hidden;
+}
+
+.row-edit[data-field-type="duration"] > div > .button
+{
+    z-index:55;
+}
+
+.row-edit[data-field-type="duration"] > div > input
+{
+    position:relative;
+    z-index:50;
+}
+
+.row-edit[data-field-type="duration"] > div > div.autoComplete-watermark
+{
+    position:absolute;
+    z-index: 10;
+    color: #999;
+    top:7px;
+    left:115px;
+}
+
+
+
+
+
+.row-edit[data-field-type="address"] > div > div
+{
+    min-height: 1.5em !important;
+    padding: 4px 34px 4px 110px !important;
+}
+
+input.text-input {
+    padding:  8px 34px 8px 110px !important;
+}
+
+.clear-button {
+    position: absolute !important;
+    right:4px;
+    margin: 1px 1px 0 0 !important;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index:101;
+    width:30px;
+    height:30px;
+}
+div.search-widget button.clear-button
+{
+    right: 70px;
+}
+div.search-active > button.clear-button,
+div.text-field-active > button.clear-button
+{
+    background: url('../images/delete.png') no-repeat 50% 50%;
+}
+
+/* TODO: Move color specifics to theme folder */
+/* Calendar */
+
+.calendar-content
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    padding: 4px;
+}
+
+.calendar-table
+{
+    width: 100%;
+}
+
+.calendar-month-header
+{
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.1em;
+    height: 2em;
+}
+
+.calendar-prev-month
+{
+    text-align: left;
+    font-weight: normal;
+}
+
+.calendar-next-month
+{
+    text-align: right;
+    font-weight: normal;
+}
+
+.calendar-week-header
+{
+    font-size: .9em;
+    text-align: center;
+}
+
+.calendar-day
+{
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    height: 30px;
+    font-size: .9em;
+    font-weight: bold;
+}
+
+.time-content
+{
+    text-align: center;
+    margin-top: 6px;
+}
+
+.time-content .date-tt
+{
+    width: 100px;
+    height: 18px;
+    margin: 3px 0px 3px 0px;
+    position: relative;
+    right: auto;
+    display: inline-block;
+}
+
+.time-content .date-tt > .toggle
+{
+    height: 28px;
+}
+
+.time-content .date-tt > .toggle > .thumb
+{
+    top: 0px;
+}
+
+.calendar-day
+{
+    color: #000;
+    background-color: #e9eed7;
+    background-image: linear-gradient(top, #e9eed7, #dae2bb);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #e9eed7),
+		color-stop(1, #dae2bb)
+	);
+	background-image: -moz-linear-gradient(top, #e9eed7, #dae2bb);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e9eed7, endColorstr=#dae2bb)";
+}
+
+.calendar-day.today
+{
+    color: #fff;
+    background-color: #4e5b2f;
+    background-image: linear-gradient(top, #4e5b2f, #8a9e57);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #4e5b2f),
+		color-stop(1, #8a9e57)
+	);
+	background-image: -moz-linear-gradient(top, #4e5b2f, #8a9e57);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4e5b2f, endColorstr=#8a9e57)";
+}
+
+
+.calendar-day.weekend
+{
+    background-color: #c4cfa5;
+    background-image: linear-gradient(top, #c4cfa5, #a6b979);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #c4cfa5),
+        color-stop(1, #a6b979)
+	);
+    background-image: -moz-linear-gradient(top, #c4cfa5, #a6b979);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#c4cfa5, endColorstr=#a6b979)";
+}
+
+.calendar-day.selected
+{
+    color: #000;
+    background-color: #CAE2EB;
+    background-image: linear-gradient(top, #CAE2EB, #7EB7CC);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #CAE2EB),
+		color-stop(1, #7EB7CC)
+	);
+	background-image: -moz-linear-gradient(top, #CAE2EB, #7EB7CC);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#CAE2EB, endColorstr=#7EB7CC)";
+}
+
+.time-content > .date-tt > .toggle
+{
+    border: 1px solid #1a250f;
+    background-color: #69923a;
+    background-image: linear-gradient(bottom, #4f6e2c, #35491d);
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0, #4f6e2c),
+        color-stop(1, #35491d)
+    );
+    background-image: -moz-linear-gradient(bottom, #4f6e2c, #35491d);
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4f6e2c, endColorstr=#35491d)";
+}
+
+.time-content > .date-tt .toggleOff
+{
+    color: #FFFFFF;
+    text-shadow: rgba(0, 0, 0, 1.0) 0px 1px 0;
+}
+
+/* Webkit browsers misbehaves. Don't know why. */
+.ext-webkit .time-content > input.hour-field,
+.ext-webkit .time-content > input.minute-field
+{
+    width: 60px;
+}
+body.landscape > #generic_calendar > #datetime-picker {
+    width:100%;
+    text-align:center;
+}
+
+body.landscape > #generic_calendar > #datetime-picker > .calendar-content,
+body.landscape > #generic_calendar > #datetime-picker > .time-content
+{
+    display:inline-block;
+    padding: 0px !important;
+}
+body.landscape > #generic_calendar > #datetime-picker > .time-content
+{
+    margin-left: 18px;
+}
+
+#datetime-picker { padding-bottom: 2em; }
+
+#datetime-picker div.time-content-hidden {
+    display:none !important;
+}
+#datetime-picker table {
+    border-spacing: 6px 0px;
+    padding: 2px;
+    margin: 0.5em auto 0;
+    text-align:center;
+}
+#datetime-picker div.calendar-content { padding-bottom: 0; }
+#datetime-picker div.date-tt { margin: 0; }
+#datetime-picker table caption { padding: 4px; }
+.ext-webkit #datetime-picker table caption { width: 100%; } /* Webkit caption does not match table width by default */
+#datetime-picker td
+{
+    padding: 0;
+    margin: 0;
+    border: 0;
+    text-align:center;
+    width: 64px;
+}
+#datetime-picker td>select {
+    font-size: 1.5em;
+    height: 34px;
+    line-height: 34px;
+    border: none;
+    margin: 0;
+    padding:0;
+    -webkit-appearance: listbox;
+    -moz-appearance: listbox;
+    appearance: listbox;
+    position: relative; /* Fix android browser issue with -webkit-transform blocking <select> */
+}
+#datetime-picker .datetime-selects td {
+    border: none;
+    border-left: 1px solid #b3b3b3;
+    border-right: 1px solid #b3b3b3;
+}
+#datetime-picker td>button {
+    display: block;
+    font-size: 1.5em;
+    width: 100%;
+    margin: 0;
+    height: 46px;
+    line-height: 44px;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+}
+#datetime-picker .plus > td > button
+{
+    -moz-border-radius-topleft: 3px;
+    -moz-border-radius-topright: 3px;
+    -moz-border-radius-bottomright: 0px;
+    -moz-border-radius-bottomleft: 0px;
+    -webkit-border-radius: 3px 3px 0px 0px;
+    border-radius: 3px 3px 0px 0px;
+}
+#datetime-picker .minus > td > button
+{
+    -moz-border-radius-topleft: 0px;
+    -moz-border-radius-topright: 0px;
+    -moz-border-radius-bottomright: 3px;
+    -moz-border-radius-bottomleft: 3px;
+    -webkit-border-radius: 0px 0px 3px 3px;
+    border-radius: 0px 0px 3px 3px;
+}
+#datetime-picker .datetime-tt {
+    border: none !important;
+}
+.collapsed
+{
+    margin-bottom: -1px !important;
+}
+
+h2 > .collapsed-indicator
+{
+    height: 30px;
+    width: 30px;
+    float: right;
+    margin: 0 4px 0 0;
+}
+
+.collapsed > .collapsed-indicator
+{
+
+}
+
+.collapsed + ul,
+.collapsed + fieldset,
+.collapsed + div
+{
+    display: none !important;
+}
+
+.action-list > li > a.disabled
+{
+    opacity: 0.3;
+}
+
+.action-list > ul > li > a
+{
+    text-overflow: ellipsis;
+}
+
+.action-list > li
+{
+    line-height: 1em !important;
+    cursor: pointer !important;
+}
+
+.action-list > li > a > label
+{
+    cursor: pointer !important;
+    display: block;
+    line-height: inherit;
+    padding: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.action-list > li > a > span
+{
+    display: block;
+    font-size: 0.75em;
+    min-height: 1em;
+    line-height: inherit;
+    padding: 2px 0 0 0;
+    color: #777;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.invisible {
+    visibility: hidden;
+}

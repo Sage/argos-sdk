@@ -1,0 +1,588 @@
+*
+{    
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+body
+{
+    position: relative;
+	padding: 45px 0 0 0;
+    margin: 0;
+	overflow-x: hidden;
+    min-height: 416px;
+}
+
+body[orient="landscape"]
+{
+    min-height: 268px;
+}
+
+body > *
+{
+    /* display: none; */
+    position: relative;
+    margin: 0;
+    padding : 0;
+}
+
+body > .list,
+body > .panel,
+body > .dialog
+{
+    display: none;
+}
+
+body.transition > .panel,
+body.transition > .list
+{
+    position: absolute;
+    top: 45px;
+}
+
+body > .panel,
+body > .list
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    -webkit-transform: translateX(0%);
+    -webkit-transition-duration: 300ms;
+    -webkit-transition-property: -webkit-transform;
+}
+
+body[orient="landscape"] > .panel,
+body[orient="landscape"] > .list
+{
+    height: auto;
+}
+
+body > [selected="true"]
+{
+    display: block;
+}
+
+.h-stack
+{
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: start;
+
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-pack: center;
+    -moz-box-align: start;
+
+    display: box;
+    box-orient: horizontal;
+    box-pack: center;
+    box-align: start;
+}
+
+.h-stack > div
+{
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    box-flex: 1;
+}
+
+.button
+{
+	height: 30px;
+	line-height: 30px;
+	padding: 0 2px 0 2px;
+}
+
+.toolbar
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+
+    height: 45px;
+    width: 100%;
+    padding: 4px 4px;
+
+    display: block;
+    z-index: 10;
+}
+
+.toolbar > h1 {
+    overflow: hidden; 
+    display: block;
+    margin: 0;
+    padding: 0;    
+    font-size: 1em;
+    line-height: 34px;
+    font-weight: normal;    
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #FFFFFF;
+
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    z-index: 0;
+}
+
+.toolbar-size-1 > h1
+{
+    left: 50px;
+    right: 50px;
+}
+
+.toolbar-size-2 > h1
+{
+    left: 100px;
+    right: 100px;
+}
+
+.toolButton
+{
+    position: relative;
+    width: 40px;
+    height: 34px;
+    padding: 0px;
+    z-index: 100;
+}
+
+.toolButton > img
+{
+    margin: 4px;
+}
+
+.toolButton > span
+{
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center center;
+    margin: 4px;
+    width: 24px;
+    height: 24px;
+}
+
+.toolButton-left
+{
+    float: left;
+    margin-right: 10px;
+}
+
+.toolButton-right
+{
+    float: right;
+    margin-left: 10px;
+}
+
+body > .dialog {
+    top: 0px;
+    bottom: 0px;
+    width: 100%;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0;
+    text-align: right;
+}
+
+.dialog > fieldset {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    border: none;
+    border-top: 1px solid #6d84a2;
+    padding: 0px 6px;
+    -webkit-border-bottom-left-radius: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-moz-border-bottom-left-radius: 5px;
+	-moz-border-bottom-right-radius: 5px;
+}
+
+.dialog > fieldset > label {
+    position: absolute;
+    margin: 8px 0 0 6px;
+    font-size: 14px;
+    display: inline-block;
+}
+
+input:not([type|=radio]):not([type|=checkbox]) {
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+    -webkit-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 100%;
+    margin: 0 0 8px 0;
+    padding: 6px 6px 6px 44px;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px solid #000;
+}
+
+.list-content
+{
+    margin: 0;
+    padding: 0;
+}
+
+.list-content > li
+{
+    font-size: 1.25em;
+    font-weight: bold;
+    list-style: none;
+    margin: 0;
+    padding: 8px 0px 8px 10px;
+    position: relative;
+    border-bottom: solid 1px #ddd;
+}
+.list-content > li:last-child
+{
+    border-bottom: none;
+}
+
+.list-content > li
+{
+    padding: 8px 32px 8px 36px;
+}
+
+.list-content > li > img.icon,
+.list-content > li > * > img.icon
+{
+    border: none 0 black;
+    margin: 0 .5em 0 0;
+    width: 24px;
+    height: 24px;
+    float: left;
+}
+
+.list-content > li > input.list-selector
+{
+    float: left;
+    margin: 2px 0 0 0px;
+}
+
+h3
+{
+	font-size: .75em;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+h4
+{
+	font-size: .5em;
+	margin: 0;
+	padding: 0;	
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+img
+{
+	border: none 0 black;
+}
+
+.panel > .panel-loading-indicator
+{
+	display: none;
+}
+
+.panel > .panel-validation-summary
+{
+    display: none;
+}
+
+.panel-loading > .panel-loading-indicator
+{
+	display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.panel-loading > *:not(.panel-loading-indicator)
+{
+	display: none;
+}
+
+.panel-form-error > .panel-validation-summary
+{
+    display: block;
+}
+
+.panel-content > h2,
+.panel-validation-summary > h2
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 32px;
+    line-height: 32px;
+    margin: 0;
+    padding: 0 0 0 6px;
+    font-size: 1em;
+    z-index: 5;
+    position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;    
+    user-select: none;
+}
+
+.panel > ul > li,
+.panel-content > ul > li
+{
+    list-style: none;
+    line-height: 28px;
+    clear: both;
+}
+
+.panel-validation-summary > ul > li
+{
+    list-style: none;
+    clear: both;
+}
+
+.panel-content > ul > li > img.icon,
+.panel-content > ul > li > * > img.icon,
+.panel-validation-summary > ul > li > img.icon
+.panel-validation-summary > ul > li > * > img.icon
+{
+    border: none 0 black;
+    margin: 0 .5em 0 0;
+    width: 24px;
+    height: 24px;
+    float: left;
+}
+
+.panel-content > fieldset,
+.panel-validation-summary > fieldset,
+.panel-content > div,
+.panel-validation-summary > div,
+.panel-content > ul,
+.panel-validation-summary > ul
+{
+    margin: 0;
+    padding: 0 0 1.5em 0;
+}
+
+.panel-content > fieldset:last-child,
+.panel-content > ul:last-child,
+.panel-content > div:last-child
+{
+    margin: 0;
+    padding: 0 0 0 0;
+}
+
+.panel-content > ul > li,
+.panel-validation-summary > ul > li
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.panel-content > ul > li > a,
+.panel-validation-summary > ul > li > a
+{
+    padding: 8px;
+    margin: 0px;
+    display: block;
+}
+
+.panel-validation-summary > ul > li > a > h3
+{
+    overflow: visible;
+    text-overflow: inherit;
+    white-space: inherit;
+}
+
+.row > div > label,
+.row > label
+{
+	margin: 0px;
+	padding: 0;
+	position: relative;
+	float: left;	
+	width: 100px;
+	text-align: right;
+	font-size: 0.8em;
+}
+
+.row
+{
+	text-align: left;
+	clear: both;
+    line-height: 1.5em;
+    padding: 0 .75em;
+}
+
+.row > div > span,
+.row > div > a,
+.row > span,
+.row > a
+{
+	display: block;
+	margin: 0 0 0 0;
+	padding: 0 0 0 12px;
+	position: relative;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.row > * > a
+{
+    border-bottom: 1px dotted #00338D;
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.not-available
+{
+    text-align: center;
+    padding: 8px 32px 8px 36px !important;
+    font-size: 1.25em;
+}
+
+.no-data
+{
+	text-align: center;
+}
+
+.list-search
+{
+    padding: 6px;
+    position: relative;
+}
+
+.list-search input
+{    
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    height: 32px;
+    margin: 0 !important;
+}
+
+.list-search .searchButton
+{    
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    position: absolute;
+    display: inline-block;    
+    height: 32px;
+    width: 64px;
+    right: 6px;
+    top: 6px;
+    border: solid 1px black;
+}
+
+.list-search .dismissButton {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    position: absolute;
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    right: 70px;
+    top: 6px;
+    border: solid 1px black;
+}
+
+.list-search label
+{
+    position: absolute;
+    top: 6px;
+    left: 6px;
+}
+
+.row-edit
+{
+    position: relative;
+    padding: 2px 0.75em;
+}
+
+.row-edit > div > label,
+.row-edit > label
+{
+	position: absolute;
+    height: 30px;
+    line-height: 30px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.row > div > input[type|=radio], .row > div > input[type|=checkbox],
+.row > input[type|=radio], .row > input[type|=checkbox]
+{
+    margin: 7px 7px 0 0;
+    height: 25px;
+    width: 25px;
+}
+
+.row > div > input:not([type|=radio]):not([type|=checkbox]),
+.row > input:not([type|=radio]):not([type|=checkbox])
+{
+    -webkit-appearance: none;
+
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+
+    margin: 0;
+    border: none 0px black;
+    padding: 0px 10px 0 110px;
+    height: 32px !important;
+    border: none 0px transparent;
+    background: transparent;
+}
+
+.row > div > textarea,
+.row > textarea
+{
+    -webkit-appearance: none;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+    margin: 0;
+    border: none 0px black;
+    padding: 8px 10px 8px 110px;
+    border: none 0px transparent;
+    background: transparent;
+    width: 100%;
+    display: block;    
+}
+
+.row > div > input[type|=radio], .row > div >x input[type|=checkbox],
+.row > input[type|=radio], .row > div >x input[type|=checkbox]
+{
+  margin: 7px 7px 0 0;
+  height: 25px;
+  width: 25px;
+}
