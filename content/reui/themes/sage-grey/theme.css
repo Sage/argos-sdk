@@ -3,7 +3,7 @@
 body
 {
 	font-family: Helvetica, Arial;
-	background: #f6f6f6;
+	background: #fff;
 	color: #000;
 }
 
@@ -38,7 +38,6 @@ h5
     font-weight: normal;
 
     /* remove for no-list gradient */
-    /*
     border-bottom: 0px solid #ccc;
     border-top: 1px solid #ccc;
     background-color: #f2f2f2;
@@ -53,7 +52,7 @@ h5
     background-image: -moz-linear-gradient(top, #f2f2f2, #e6e6e6);
     color: #000;
     text-shadow: #fff 0px 1px 0px;
-    font-weight: normal;*/
+    font-weight: normal;
 }
 
 .list-content > li:active
@@ -149,7 +148,7 @@ body > .toolbar
 .panel-content,
 .panel-loading-indicator
 {
-    background-color: #fff;
+    background-color: #eee;
     border: none 0px black;
     border-bottom: solid 1px #ddd;
 }
@@ -236,14 +235,25 @@ textarea:focus
 .panel-validation-summary > ul
 {
     border: none 0px black;
-    background-color: #fff;    
+    background-color: #eee;
 }
 
 .panel-content > ul > li,
 .panel-validation-summary > ul > li
 {
-    border-top: solid 1px #ddd;
-    cursor: pointer;
+    border-bottom: 0px solid #ccc;
+    border-top: 1px solid #ccc;
+    background-color: #f2f2f2;
+    background-image: linear-gradient(top, #f2f2f2, #e6e6e6);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #fdfdfd),
+        color-stop(1, #eee)
+    );
+    background-image: -moz-linear-gradient(top, #f2f2f2, #e6e6e6);
+    color: #000;
 }
 
 .panel-content > ul > li:first-child,
@@ -264,7 +274,22 @@ textarea:focus
 {
     padding: .25em;
     min-height: 1.5em;
-    border-top: solid 1px #ddd;
+
+    border-bottom: 0px solid #ccc;
+    border-top: 1px solid #ccc;
+    background-color: #f2f2f2;
+    background-image: linear-gradient(top, #f2f2f2, #e6e6e6);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #fdfdfd),
+        color-stop(1, #eee)
+    );
+    background-image: -moz-linear-gradient(top, #f2f2f2, #e6e6e6);
+    color: #000;
+    text-shadow: #fff 0px 1px 0px;
+    font-weight: normal;
 }
 
 .panel-content > fieldset > .row:first-child,

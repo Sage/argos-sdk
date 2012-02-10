@@ -67,12 +67,46 @@
 .list-has-more .list-more, .list-has-empty-opt .list-empty-opt
 {
     display: block;
-    background-color: #fff;
+    background-color: #eee;
 }
 
 .list-has-more .list-more .button, .list-has-empty-opt .list-empty-opt .button
 {
     width: 100%;
+}
+
+.list-more .button
+{
+    border-color: #000;
+    background-color: #00a1de;
+    background-image: linear-gradient(top, #00a1de, #0079a7);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #00a1de),
+        color-stop(1, #0079a7)
+    );
+    background-image: -moz-linear-gradient(top, #00a1de, #0079a7);
+    color: #fff;
+    text-shadow: #000 0px 1px 0px;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00a1de, endColorstr=#0079a7)";
+}
+
+.list-more .button:active
+{
+    border-color: #000;
+    background-color: #0079a7;
+    background-image: linear-gradient(top, #0079a7, #00a1de);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #0079a7),
+        color-stop(1, #00a1de)
+    );
+    background-image: -moz-linear-gradient(top, #0079a7, #00a1de);
 }
 
 .list-has-more .list-remaining
@@ -86,9 +120,9 @@
 
 .list-loading .list-more .button span
 {
-    background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
+    background: url('../images/loading-indicator-blue.gif') no-repeat scroll 0 50%;
     padding: 0 0 0 20px;
-    color: #555;
+    color: #fff;
 }
 
 .list-loading .list-loading-indicator
@@ -293,7 +327,13 @@
 
 .group-content
 {
-    border-bottom: 1px solid #DDD;
+    /* border-bottom: 1px solid #DDD; */
+}
+
+.group-content,
+.list-content
+{
+    background-color: #eee;
 }
 
 /* detail veiw */
