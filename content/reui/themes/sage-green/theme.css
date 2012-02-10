@@ -28,7 +28,8 @@ h5
     font-weight: normal;
 }
 
-.list-content
+.list-content,
+.group-content
 {
     background-color: #fff;
 }
