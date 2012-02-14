@@ -106,13 +106,13 @@
                 switch (control)
                 {
                     case '=':
-                        fragments[i] = '__p(' + source + ');';
+                        fragments[i] = '__r.push(' + source + ');';
                         break;
                     case ':':
-                        fragments[i] = '__p(__s.encode(' + source + '));';
+                        fragments[i] = '__r.push(__s.encode(' + source + '));';
                         break;
                     case '!':
-                        fragments[i] = '__p(' + trim(source) + '.apply(__v, this));';
+                        fragments[i] = '__r.push(' + trim(source) + '.apply(__v, __c));';
                         break;
                     default:
                         break;
@@ -121,10 +121,10 @@
         }
 
         for (var i = 0; i < fragments.length; i += 2)
-            fragments[i] = '__p(\'' + escape(fragments[i]) + '\');';
+            fragments[i] = '__r.push(\'' + escape(fragments[i]) + '\');';
 
         fragments.unshift(
-            'var __r = [], $ = __v, $$ = this, __s = Simplate, __p = function() { __r.push.apply(__r, arguments); };',
+            'var __r = [], $ = __v, $$ = __c, __s = Simplate;',
             options.allowWith ? 'with ($ || {}) {' : ''
         );
 
@@ -137,7 +137,7 @@
 
         try
         {
-            fn = new Function('__v', fragments.join(''));
+            fn = new Function('__v, __c', fragments.join(''));
         }
         catch (e)
         {
@@ -157,8 +157,8 @@
     });
 
     mix(S.prototype, {
-        apply: function(data, scope) {
-            return this.fn.call(scope || this, data);
+        apply: function(data, container) {
+            return this.fn(data, container || this);
         }
     });
 })(this);
