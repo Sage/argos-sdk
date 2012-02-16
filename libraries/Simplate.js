@@ -4,7 +4,7 @@
  *
  * MIT Licensed - See LICENSE.txt
  */
-(function(scope) {
+(function(window, undefined) {
     var trimRE = /^\s+|\s+$/g,
         testRE = /(,)/,
         escQuoteRE = /'/g,
@@ -147,18 +147,21 @@
         return (cache[markup] = fn);
     };
 
-    var S = scope.Simplate = function(markup, o) {
+    var Simplate = function(markup, o) {
         this.fn = make(markup, o);
     };
 
-    mix(S, {
+    mix(Simplate, {
         options: options,
-        encode: encode
+        encode: encode,
+        make: make
     });
 
-    mix(S.prototype, {
+    mix(Simplate.prototype, {
         apply: function(data, container) {
-            return this.fn(data, container || this);
+            return this.fn.call(container || this, data, container || data);
         }
     });
-})(this);
+
+    window.Simplate = Simplate;
+})(window);
