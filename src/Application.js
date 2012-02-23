@@ -213,7 +213,7 @@ Sage.Platform.Mobile.Application = Ext.extend(Ext.util.Observable, {
             instance.on('requestcomplete', this._cacheSDataRequest, this);
         }        
 
-        if ((options.isDefault || instance.isDefault) || !this.defaultService)
+        if ((options.isDefault || service.isDefault) || !this.defaultService)
             this.defaultService = instance;
 
         return this;
