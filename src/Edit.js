@@ -336,7 +336,7 @@ define('Sage/Platform/Mobile/Edit', [
 
                 if (typeof defaultValue === 'undefined') continue;
 
-                field.setValue(defaultValue);
+                field.setValue(this.expandExpression(defaultValue, field));
             }
         },
         processTemplateEntry: function(templateEntry) {
