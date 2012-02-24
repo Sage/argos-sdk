@@ -25,10 +25,13 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
             '<button data-dojo-attach-point="triggerNode" data-action="navigateToEditView" class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange:_onChange" type="text" />'
         ]),
+
         view: 'generic_calendar',
         showTimePicker: false,
+        isUTC: false,
+
         formatValue: function(value) {
-            return Sage.Platform.Mobile.Format.date(value, this.dateFormatText);
+            return Sage.Platform.Mobile.Format.date(value, this.dateFormatText, this.isUTC);
         },
         _onChange: function(evt) {
             var val = Date.parseExact(this.inputNode.value, this.dateFormatText);
@@ -49,6 +52,7 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
 
             options.date = this.currentValue;
             options.showTimePicker = this.showTimePicker;
+            options.isUTC = this.isUTC;
 
             return options;
         },
