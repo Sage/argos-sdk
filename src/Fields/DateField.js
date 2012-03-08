@@ -28,10 +28,10 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
 
         view: 'generic_calendar',
         showTimePicker: false,
-        isUTC: false,
+        asTimeless: false,
 
         formatValue: function(value) {
-            return Sage.Platform.Mobile.Format.date(value, this.dateFormatText, this.isUTC);
+            return Sage.Platform.Mobile.Format.date(value, this.dateFormatText, this.asTimeless);
         },
         _onChange: function(evt) {
             var val = Date.parseExact(this.inputNode.value, this.dateFormatText);
@@ -52,7 +52,7 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
 
             options.date = this.currentValue;
             options.showTimePicker = this.showTimePicker;
-            options.isUTC = this.isUTC;
+            options.asTimeless = this.asTimeless;
 
             return options;
         },

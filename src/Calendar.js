@@ -35,7 +35,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
         is24hrTimeFormat: Date.CultureInfo.formatPatterns.shortTime.match(/H\:/),
         date: false,
         showTimePicker: false,
-        isUTC: false,
+        asTimeless: false,
         selectorTemplate:  '<select id="${0}-field" data-dojo-attach-point="${0}Node"></select>',
         incrementTemplate: '<button data-action="increment${0}" class="button">+</button>',
         decrementTemplate: '<button data-action="decrement${0}" class="button">-</button>',
@@ -168,7 +168,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
             this.year  = this.date.getFullYear();
             this.month = this.date.getMonth();
 
-            if ((this.options && this.options.isUTC) || this.isUTC)
+            if ((this.options && this.options.asTimeless) || this.asTimeless)
                 this.date = this.date.clone().add({minutes: this.date.getTimezoneOffset()});
 
             var today = new Date();
@@ -265,9 +265,6 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
 
             result.setHours(hours);
             result.setMinutes(minutes);
-
-            if ((this.options && this.options.isUTC) || this.isUTC)
-                result = result.clone().add({minutes: -1*result.getTimezoneOffset()});
 
             return result;
         }
