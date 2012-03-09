@@ -437,7 +437,7 @@ input.text-input {
 
 .clear-button {
     position: absolute !important;
-    right:4px;
+    right: 4px;
     margin: 1px 1px 0 0 !important;
     padding: 0;
     background: transparent;

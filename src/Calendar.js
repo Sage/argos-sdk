@@ -266,6 +266,9 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
             result.setHours(hours);
             result.setMinutes(minutes);
 
+            if ((this.options && this.options.asTimeless) || this.asTimeless)
+                result = result.clone().add({minutes: -1*result.getTimezoneOffset()});
+
             return result;
         }
     });
