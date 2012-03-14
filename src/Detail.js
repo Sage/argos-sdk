@@ -198,6 +198,9 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             if (this.queryOrderBy)
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, this.queryOrderBy);
 
+            if (this.contractName)
+                request.setContractName(this.contractName);
+
             return request;
         },
         createLayout: function() {

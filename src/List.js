@@ -559,6 +559,10 @@ define('Sage/Platform/Mobile/List', ['Sage/Platform/Mobile/View', 'Sage/Platform
                 .setCount(pageSize)
                 .setStartIndex(startIndex);
 
+            var contractName = this.expandExpression((options && options.contractName) || this.contractName);
+            if (contractName)
+                request.setContractName(contractName);
+
             var resourceKindExpr = this.expandExpression((options && options.resourceKind) || this.resourceKind);
             if (resourceKindExpr)
                 request.setResourceKind(this.resourceKind);
