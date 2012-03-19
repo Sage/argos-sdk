@@ -173,6 +173,9 @@ define('Sage/Platform/Mobile/Edit', [
             if (this.entry && this.entry['$key'])
                 request.setResourceSelector(dojo.string.substitute("'${0}'", [this.entry['$key']]));
 
+            if (this.contractName)
+                request.setContractName(this.contractName);
+
             if (this.resourceKind)
                 request.setResourceKind(this.resourceKind);
 
