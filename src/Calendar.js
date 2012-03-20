@@ -172,8 +172,9 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
                 this.date = this.date.clone().add({minutes: this.date.getTimezoneOffset()});
 
             var today = new Date();
+
             this.populateSelector(this.yearNode, this.year,
-                    (this.year < today.getFullYear() ? this.year : today.getFullYear()),
+                    (this.year < today.getFullYear() - 10 ? this.year : today.getFullYear() - 10), // min 10 years in past - arbitrary min
                     (10 + today.getFullYear()) // max 10 years into future - arbitrary limit
             );
             this.populateSelector(this.monthNode, this.month, 0, 11);
