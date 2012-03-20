@@ -13,9 +13,16 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() {
-
-    return dojo.setObject('Sage.Platform.Mobile.ErrorManager', {
+define('Sage/Platform/Mobile/ErrorManager', [
+    'dojo/_base/json',
+    'dojo/_base/lang',
+    'dojo/string'
+], function(
+    dojo,
+    lang,
+    string
+) {
+    var ErrorManager = lang.setObject('Sage.Platform.Mobile.ErrorManager', {
         //Localization
         abortedText: 'Aborted',
 
@@ -24,7 +31,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
          */
         errorCacheSizeMax: 10,
 
-        errors: null,
+        errors: [],
 
         /**
          * Adds a custom error item by combining error message/options for easier tech support
@@ -35,7 +42,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
          */
         addError: function(serverResponse, requestOptions, viewOptions, failType) {
             var errorDate = new Date(),
-                dateStamp = dojo.string.substitute('/Date(${0})/',[errorDate.getTime()]),
+                dateStamp = string.substitute('/Date(${0})/',[errorDate.getTime()]),
                 errorItem = {
                     errorDate: errorDate.toString(),
                     errorDateStamp: dateStamp,
@@ -45,10 +52,10 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                 };
 
             if (failType === 'failure')
-                dojo.mixin(errorItem, this.extractFailureResponse(serverResponse));
+                lang.mixin(errorItem, this.extractFailureResponse(serverResponse));
 
             if (failType === 'aborted')
-                dojo.mixin(errorItem, this.extractAbortResponse(serverResponse));
+                lang.mixin(errorItem, this.extractAbortResponse(serverResponse));
 
             this.checkCacheSize();
             this.errors.push(errorItem);
@@ -192,11 +199,6 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
         onErrorAdd: function() {
         },
 
-        init: function(){
-            this.errors = [];
-            this.load();
-        },
-
         save: function(){
             try
             {
@@ -215,4 +217,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
             catch(e) {}
         }
     });
+
+    ErrorManager.load();
+    return ErrorManager;
 });

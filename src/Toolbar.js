@@ -13,9 +13,24 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_Templated'], function() {
-
-    return dojo.declare('Sage.Platform.Mobile.Toolbar', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
+define('Sage/Platform/Mobile/Toolbar', [
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/dom-style',
+    'dojo/dom-class',
+    'dijit/_Widget',
+    'Sage/Platform/Mobile/_ActionMixin',
+    'Sage/Platform/Mobile/_Templated'
+], function(
+    declare,
+    lang,
+    domStyle,
+    domClass,
+    _Widget,
+    _ActionMixin,
+    _Templated
+) {
+    return declare('Sage.Platform.Mobile.Toolbar', [_Widget, _ActionMixin, _Templated], {
         widgetTemplate: new Simplate([
             '<div class="toolbar">',
             '</div>'
@@ -29,7 +44,6 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
                 return expression;
         },
         init: function() {
-            this.startup();
         },
         invokeTool: function(parameters, evt, el) {
             var id = parameters && parameters.tool,
@@ -45,27 +59,27 @@ define('Sage/Platform/Mobile/Toolbar', ['dojo', 'dojo/string', 'dojo/NodeList-ma
                 {
                     var view = App.getPrimaryActiveView();
                     if (view && view.hasAction(source.action))
-                        view.invokeAction(source.action, dojo.mixin(parameters, {'$tool': source}), evt, el);
+                        view.invokeAction(source.action, lang.mixin(parameters, {'$tool': source}), evt, el);
                 }
             }
         },
         show: function() {
-            dojo.style(this.domNode, "display", "block");
+            domStyle.set(this.domNode, "display", "block");
         },
         hide: function() {
-            dojo.style(this.domNode, "display", "none");
+            domStyle.set(this.domNode, "display", "none");
         },
         clear: function() {
             this.tools = {};
-            dojo.removeClass(this.domNode, 'toolbar-disabled');
+            domClass.remove(this.domNode, 'toolbar-disabled');
             this.enabled = true;
         },
         enable: function() {
-            dojo.removeClass(this.domNode, 'toolbar-disabled');
+            domClass.remove(this.domNode, 'toolbar-disabled');
             this.enabled = true;
         },
         disable: function() {
-            dojo.addClass(this.domNode, 'toolbar-disabled');
+            domClass.add(this.domNode, 'toolbar-disabled');
             this.enabled = false;
         },
         enableTool: function(id) {

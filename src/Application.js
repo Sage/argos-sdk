@@ -13,9 +13,23 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
+define('Sage/Platform/Mobile/Application', [
+    'dojo',
+    'dojo/_base/array',
+    'dojo/_base/connect',
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/string'
+], function(
+    dojo,
+    array,
+    connect,
+    declare,
+    lang,
+    string
+) {
     
-    dojo.extend(Function, {
+    lang.extend(Function, {
         bindDelegate: function(scope) {
             var fn = this;
 
@@ -35,14 +49,14 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             var target = object.prototype || object;
             for(var key in localization)
             {
-                if(dojo.isObject(localization[key]))
+                if(lang.isObject(localization[key]))
                     applyLocalizationTo(target[key], localization[key]);
                 else
                     target[key] = localization[key];
             }
         },
         localize = function(name, localization) {
-            var target = dojo.getObject(name);
+            var target = lang.getObject(name);
             if (target && target.prototype) target = target.prototype;
             if (target) applyLocalizationTo(target, localization);
         },
@@ -53,18 +67,18 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
                     baseConfiguration.modules = baseConfiguration.modules.concat(moduleConfiguration.modules);
 
                 if (baseConfiguration.connections && moduleConfiguration.connections)
-                    baseConfiguration.connections = dojo.mixin(baseConfiguration.connections, moduleConfiguration.connections);
+                    baseConfiguration.connections = lang.mixin(baseConfiguration.connections, moduleConfiguration.connections);
             }
 
             return baseConfiguration;
         };
 
-    dojo.mixin(dojo.global, {
+    lang.mixin(dojo.global, {
         'localize': localize,
         'mergeConfiguration': mergeConfiguration
     });
     
-    return dojo.declare('Sage.Platform.Mobile.Application', null, {
+    return declare('Sage.Platform.Mobile.Application', null, {
         _connects: null,
         _subscribes: null,
         _started: false,
@@ -88,15 +102,15 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
 
             this.context = {};
 
-            dojo.mixin(this, options);
+            lang.mixin(this, options);
         },
         destroy: function() {
-            dojo.forEach(this._connects, function(handle) {
-                dojo.disconnect(handle);
+            array.forEach(this._connects, function(handle) {
+                connect.disconnect(handle);
             });
 
-            dojo.forEach(this._subscribes, function(handle){
-                dojo.unsubscribe(handle);
+            array.forEach(this._subscribes, function(handle){
+                connect.unsubscribe(handle);
             });
 
             this.uninitialize();
@@ -119,10 +133,10 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             }
         },
         initConnects: function() {
-            this._connects.push(dojo.connect(window, 'resize', this, this.onResize));
-            this._connects.push(dojo.connect(dojo.body(), 'beforetransition', this, this._onBeforeTransition));
-            this._connects.push(dojo.connect(dojo.body(), 'aftertransition', this, this._onAfterTransition));
-            this._connects.push(dojo.connect(dojo.body(), 'show', this, this._onActivate));
+            this._connects.push(connect.connect(window, 'resize', this, this.onResize));
+            this._connects.push(connect.connect(dojo.body(), 'beforetransition', this, this._onBeforeTransition));
+            this._connects.push(connect.connect(dojo.body(), 'aftertransition', this, this._onAfterTransition));
+            this._connects.push(connect.connect(dojo.body(), 'show', this, this._onActivate));
         },
         initServices: function() {
             for (var name in this.connections) this.registerService(name, this.connections[name]);
@@ -317,7 +331,7 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
             if (this.resizeTimer) clearTimeout(this.resizeTimer);
 
             this.resizeTimer = setTimeout(function(){
-                dojo.publish('/app/resize',[]);
+                connect.publish('/app/resize',[]);
             }, 100);
         },
         onRegistered: function(view) {
@@ -408,8 +422,8 @@ define('Sage/Platform/Mobile/Application', ['dojo', 'dojo/string'], function() {
         },
         isNavigationFromResourceKind: function(kind, predicate, scope) {
             var lookup = {};
-            if (dojo.isArray(kind))
-                dojo.forEach(kind, function(item) { this[item] = true;  }, lookup);
+            if (lang.isArray(kind))
+                array.forEach(kind, function(item) { this[item] = true;  }, lookup);
             else
                 lookup[kind] = true;
 

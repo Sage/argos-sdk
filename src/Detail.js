@@ -13,9 +13,35 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platform/Mobile/Utility', 'Sage/Platform/Mobile/Format'], function() {
+define('Sage/Platform/Mobile/Detail', [
+    'dojo',
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/string',
+    'dojo/dom',
+    'dojo/dom-class',
+    'dojo/dom-construct',
+    'dojo/query',
+    'Sage/Platform/Mobile/View',
+    'Sage/Platform/Mobile/Utility',
+    'Sage/Platform/Mobile/Format',
+    'Sage/Platform/Mobile/ErrorManager'
+], function(
+    dojo,
+    declare,
+    lang,
+    string,
+    dom,
+    domClass,
+    domConstruct,
+    query,
+    View,
+    Utility,
+    Format,
+    ErrorManager
+) {
 
-    return dojo.declare('Sage.Platform.Mobile.Detail', [Sage.Platform.Mobile.View], {
+    return declare('Sage.Platform.Mobile.Detail', [View], {
         attributeMap: {
             detailContent: {node: 'contentNode', type: 'innerHTML'}
         },
@@ -147,20 +173,19 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             }
         },
         formatRelatedQuery: function(entry, fmt, property) {
-            var property = property || '$key';
-
-            return dojo.string.substitute(fmt, [Sage.Platform.Mobile.Utility.getValue(entry, property)]);
+            property = property || '$key';
+            return string.substitute(fmt, [Utility.getValue(entry, property)]);
         },
         toggleSection: function(params) {
-            var node = dojo.byId(params.$source);
+            var node = dom.byId(params.$source);
             if (node)
-                dojo.toggleClass(node, 'collapsed');
+                domClass.toggle(node, 'collapsed');
         },
         activateRelatedEntry: function(params) {
-            if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context), params.descriptor);
+            if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context, 10), params.descriptor);
         },
         activateRelatedList: function(params) {
-            if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context), params.descriptor);
+            if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context, 10), params.descriptor);
         },
         navigateToEditView: function(el) {
             var view = App.getView(this.editView);
@@ -184,7 +209,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             if (/(\s+)/.test(this.options.key))
                 request.setResourceSelector(this.options.key);
             else
-                request.setResourceSelector(dojo.string.substitute("'${0}'", [this.options.key]));
+                request.setResourceSelector(string.substitute("'${0}'", [this.options.key]));
 
             if (this.resourceKind)
                 request.setResourceKind(this.resourceKind);
@@ -208,8 +233,8 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                 options = layout['options'] || (layout['options'] = {
                     title: this.detailsText
                 }),
-                getValue = Sage.Platform.Mobile.Utility.getValue,
-                encodeValue = Sage.Platform.Mobile.Format.encode,
+                getValue = Utility.getValue,
+                encodeValue = Format.encode,
                 sectionQueue = [],
                 sectionStarted = false,
                 callbacks = [];
@@ -239,7 +264,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                     sectionStarted = true;
                     section = dojo.toDom(this.sectionBeginTemplate.apply(layout, this) + this.sectionEndTemplate.apply(layout, this));
                     sectionNode = section.childNodes[1];
-                    dojo.place(section, this.contentNode);
+                    domConstruct.place(section, this.contentNode);
                 }
 
                 var provider = current['provider'] || getValue,
@@ -273,7 +298,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                         : value;
                 }
 
-                var data = dojo.mixin({}, {
+                var data = lang.mixin({}, {
                     entry: entry,
                     value: formatted,
                     raw: value
@@ -296,7 +321,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
 
                 if (current['view'])
                 {
-                    var context = dojo.mixin({}, current['options']);
+                    var context = lang.mixin({}, current['options']);
                     if (current['key'])
                         context['key'] = typeof current['key'] === 'function'
                             ? this.expandExpression(current['key'], entry)
@@ -328,7 +353,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
                                     : this.actionPropertyTemplate
                                 : this.propertyTemplate;
 
-                var rowNode = dojo.place(template.apply(data, this), sectionNode);
+                var rowNode = domConstruct.place(template.apply(data, this), sectionNode);
 
                 if(current['onCreate'])
                     callbacks.push({row: current, node: rowNode, value: value, entry: entry});
@@ -362,27 +387,27 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         onRequestDataFailure: function(response, o) {
             if (response && response.status == 404)
             {
-                dojo.query(this.contentNode).append(this.notAvailableTemplate.apply(this));
+                query(this.contentNode).append(this.notAvailableTemplate.apply(this));
             }
             else
             {
-                alert(dojo.string.substitute(this.requestErrorText, [response, o]));
-                Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'failure');
+                alert(string.substitute(this.requestErrorText, [response, o]));
+                ErrorManager.addError(response, o, this.options, 'failure');
             }
 
-            dojo.removeClass(this.domNode, 'panel-loading');
+            domClass.remove(this.domNode, 'panel-loading');
         },
         onRequestDataAborted: function(response, o) {
             this.options = false; // force a refresh
-            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'aborted');
-            dojo.removeClass(this.domNode, 'panel-loading');
+            ErrorManager.addError(response, o, this.options, 'aborted');
+            domClass.remove(this.domNode, 'panel-loading');
         },
         onRequestDataSuccess: function(entry) {
             this.processEntry(entry);
-            dojo.removeClass(this.domNode, 'panel-loading');
+            domClass.remove(this.domNode, 'panel-loading');
         },
         requestData: function() {
-            dojo.addClass(this.domNode, 'panel-loading');
+            domClass.add(this.domNode, 'panel-loading');
 
             var request = this.createRequest();
             if (request)
@@ -420,7 +445,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
             return this.options && this.options.key;
         },
         getContext: function() {
-            return dojo.mixin(this.inherited(arguments), {
+            return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
                 key: this.options.key,
                 descriptor: this.options.descriptor
@@ -437,7 +462,7 @@ define('Sage/Platform/Mobile/Detail', ['Sage/Platform/Mobile/View', 'Sage/Platfo
         refresh: function() {
             if (this.security && !App.hasAccessTo(this.expandExpression(this.security)))
             {
-                dojo.query(this.contentNode).append(this.notAvailableTemplate.apply(this));
+                query(this.contentNode).append(this.notAvailableTemplate.apply(this));
                 return;
             }
 

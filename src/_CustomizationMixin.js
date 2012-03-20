@@ -13,7 +13,13 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
+define('Sage/Platform/Mobile/_CustomizationMixin', [
+    'dojo/_base/declare',
+    'dojo/_base/lang'
+], function(
+    declare,
+    lang
+) {
 
     var expand = function(expression) {
         if (typeof expression === 'function')
@@ -22,7 +28,7 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
             return expression;
     };
 
-    return dojo.declare('Sage.Platform.Mobile._CustomizationMixin', null, {
+    return declare('Sage.Platform.Mobile._CustomizationMixin', null, {
         _layoutCompiled: null,
         _layoutCompiledFrom: null,
         id: null,
@@ -72,7 +78,7 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                 stop,
                 row;
 
-            if (dojo.isArray(layout))
+            if (lang.isArray(layout))
             {
                 output = [];
                 
@@ -113,9 +119,9 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                                 case 'modify':
                                     // make a shallow copy if we haven't already
                                     if (row === layout[i])
-                                        row = dojo.mixin({}, row);
+                                        row = lang.mixin({}, row);
                                     
-                                    row = dojo.mixin(row, expand(customization.value, row));
+                                    row = lang.mixin(row, expand(customization.value, row));
                                     break;
                                 case 'insert':
                                     (customization.where !== 'before'
@@ -140,7 +146,7 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                         {
                             // make a shallow copy if we haven't already
                             if (row === layout[i])
-                                row = dojo.mixin({}, row);
+                                row = lang.mixin({}, row);
 
                             row[children] = this._compileCustomizedLayout(customizations, row[children], row);
                         }
@@ -166,16 +172,16 @@ define('Sage/Platform/Mobile/_CustomizationMixin', ['dojo'], function() {
                     }
                 }
             }
-            else if (dojo.isFunction(layout))
+            else if (lang.isFunction(layout))
             {
                 return this._compileCustomizedLayout(customizations, layout.call(this), name);
             }
-            else if (dojo.isObject(layout))
+            else if (lang.isObject(layout))
             {
                 output = {};
 
                 for (var name in layout)
-                    if (dojo.isArray(layout[name]))
+                    if (lang.isArray(layout[name]))
                         output[name] = this._compileCustomizedLayout(customizations, layout[name], name);
                     else
                         output[name] = layout[name];

@@ -13,9 +13,19 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], function() {
+define('Sage/Platform/Mobile/MainToolbar', [
+    'dojo/_base/declare',
+    'dojo/dom-class',
+    'dojo/query',
+    'Sage/Platform/Mobile/Toolbar'
+], function(
+    declare,
+    domClass,
+    query,
+    Toolbar
+) {
 
-    return dojo.declare('Sage.Platform.Mobile.MainToolbar', [Sage.Platform.Mobile.Toolbar], {
+    return declare('Sage.Platform.Mobile.MainToolbar', [Toolbar], {
         attributeMap: {
             'title': {
                 node: 'titleNode',
@@ -45,12 +55,12 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
         clear: function() {
             this.inherited(arguments);
 
-            dojo.query("> [data-action], .toolButton-right", this.domNode).remove();
+            query("> [data-action], .toolButton-right", this.domNode).remove();
         },
         showTools: function(tools) {
             this.inherited(arguments);
 
-            dojo.removeClass(this.domNode, 'toolbar-size-' + this.size);
+            domClass.remove(this.domNode, 'toolbar-size-' + this.size);
             
             if (tools)
             {
@@ -61,11 +71,11 @@ define('Sage/Platform/Mobile/MainToolbar', ['Sage/Platform/Mobile/Toolbar'], fun
                     count[tools[i].side || 'right'] += 1;
                     var toolTemplate = tools[i].template || this.toolTemplate;
 
-                    dojo.query(this.domNode).append(toolTemplate.apply(tools[i], this.tools[tools[i].id]));
+                    query(this.domNode).append(toolTemplate.apply(tools[i], this.tools[tools[i].id]));
                 }
 
                 this.size = Math.max(count.left, count.right);
-                dojo.addClass(this.domNode, 'toolbar-size-' + this.size);
+                domClass.add(this.domNode, 'toolbar-size-' + this.size);
             }
         }
     });

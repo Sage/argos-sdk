@@ -13,9 +13,20 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manipulate', 'dojo/NodeList-traverse', 'dijit/_Widget', 'Sage/Platform/Mobile/_ActionMixin', 'Sage/Platform/Mobile/_CustomizationMixin', 'Sage/Platform/Mobile/_Templated', 'Sage/Platform/Mobile/ErrorManager'], function() {
-
-    return dojo.declare('Sage.Platform.Mobile.View', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._CustomizationMixin, Sage.Platform.Mobile._Templated], {
+define('Sage/Platform/Mobile/View', [
+    'dojo/_base/declare',
+    'dijit/_Widget',
+    'Sage/Platform/Mobile/_ActionMixin',
+    'Sage/Platform/Mobile/_CustomizationMixin',
+    'Sage/Platform/Mobile/_Templated'
+], function(
+    declare,
+    _Widget,
+    _ActionMixin,
+    _CustomizationMixin,
+    _Templated
+) {
+    return declare('Sage.Platform.Mobile.View', [_Widget, _ActionMixin, _CustomizationMixin, _Templated], {
         attributeMap: {
             'title': {
                 node: 'domNode',
@@ -38,7 +49,7 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manip
         tools: null,
         security: null,
         serviceName: false,
- 
+
         getTools: function() {
             return this._createCustomizedLayout(this.createToolLayout(), 'tools');
         },
@@ -156,7 +167,7 @@ define('Sage/Platform/Mobile/View', ['dojo', 'dojo/string', 'dojo/NodeList-manip
             /// <summary>
             ///     Called before the view is transitioned (slide animation complete) to.
             /// </summary>
-            
+
             this.onBeforeTransitionTo(this);
         },
         beforeTransitionAway: function() {

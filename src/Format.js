@@ -13,12 +13,23 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
+define('Sage/Platform/Mobile/Format', [
+    'dojo/_base/lang',
+    'dojo/string',
+    'dojo/_base/json',
+    'Sage/Platform/Mobile/Convert'
+], function(
+    lang,
+    string,
+    dojo,
+    Convert
+) {
 
-    dojo.setObject('Sage.Platform.Mobile.Format', null);
+    lang.setObject('Sage.Platform.Mobile.Format', null);
 
-    getVectorMaxSize = function (v) {
-        var w = h = 1;
+    var getVectorMaxSize = function (v) {
+        var w = 1,
+            h = 1;
         for (var i = 0; i < v.length; i++) {
             for (var j = 0; j < v[i].length; j++) {
                 if (w < v[i][j][0]) { w = v[i][j][0]; }
@@ -27,7 +38,7 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
         }
         // maybe should return bounding box? (x,y,w,h)
         return { width: w, height: h };
-    }
+    };
 
     return Sage.Platform.Mobile.Format = (function() {
         function isEmpty(val) {
@@ -63,13 +74,13 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
                 if (typeof val !== 'string')
                     return val;
 
-                return dojo.string.substitute('<a target="_blank" href="http://${0}">${0}</a>', [val]);
+                return string.substitute('<a target="_blank" href="http://${0}">${0}</a>', [val]);
             },
             mail: function(val) {
                 if (typeof val !== 'string')
                     return val;
 
-                return dojo.string.substitute('<a href="mailto:${0}">${0}</a>', [val]);
+                return string.substitute('<a href="mailto:${0}">${0}</a>', [val]);
             },
             trim: function(val) {
                 return val.replace(/^\s+|\s+$/g,'');
@@ -77,8 +88,8 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
             date: function(val, fmt, utc) {
                 var date = val instanceof Date
                     ? val
-                    : Sage.Platform.Mobile.Convert.isDateString(val)
-                        ? Sage.Platform.Mobile.Convert.toDateFromString(val)
+                    : Convert.isDateString(val)
+                        ? Convert.toDateFromString(val)
                         : null;
 
                 if (date)
@@ -132,11 +143,11 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
                 var mins  = v % 60;
 
                 if (hrs)
-                    hrs = hrs > 1 ? dojo.string.substitute('${0} ${1} ', [hrs, (format.hoursText || 'hours')])
-                                  : dojo.string.substitute('${0} ${1} ', [hrs, (format.hourText || 'hour')]);
+                    hrs = hrs > 1 ? string.substitute('${0} ${1} ', [hrs, (format.hoursText || 'hours')])
+                                  : string.substitute('${0} ${1} ', [hrs, (format.hourText || 'hour')]);
                 if (mins)
-                    mins = mins > 1 ? dojo.string.substitute('${0} ${1}', [mins, (format.minutesText || 'minutes')])
-                                    : dojo.string.substitute('${0} ${1}', [mins, (format.minuteText || 'minute')]);
+                    mins = mins > 1 ? string.substitute('${0} ${1}', [mins, (format.minutesText || 'minutes')])
+                                    : string.substitute('${0} ${1}', [mins, (format.minuteText || 'minute')]);
 
                 return (hrs && mins) ? hrs + mins
                                      : hrs === 0 ? mins : hrs;
@@ -154,7 +165,7 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
                 context.lineWidth   = options && options.lineWidth ? options.lineWidth : 1;
                 context.strokeStyle = options && options.penColor  ? options.penColor  : 'black';
 
-                for (trace in vector) {
+                for (var trace in vector) {
                     if ( 1 < vector[trace].length) {
                         context.beginPath();
                         context.moveTo(vector[trace][0][0] * scale, vector[trace][0][1] * scale);
@@ -174,7 +185,7 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
                 options = options || {}
 
                 if (typeof vector == 'string' || vector instanceof String)
-                    try { vector = JSON.parse(vector); } catch(e) {}
+                    try { vector = dojo.fromJson(vector); } catch(e) {}
 
                 if (!(vector instanceof Array) || 0 == vector.length)
                     vector = [[]]; // blank image.
@@ -196,7 +207,7 @@ define('Sage/Platform/Mobile/Format', ['dojo', 'dojo/string'], function() {
                     img = Canvas2Image.saveAsBMP(canvasNode, true).src;
 
                 return html
-                    ? dojo.string.substitute(
+                    ? string.substitute(
                         '<img src="${0}" width="${1}" height="${2}" alt="${3}" />',
                         [img, options.width, options.height, options.title || ''])
                     : img;

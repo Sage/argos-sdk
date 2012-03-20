@@ -12,9 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/_Field'], function() {
+define('Sage/Platform/Mobile/Fields/EditorField', [
+    'dojo/_base/declare',
+    'dojo/_base/event',
+    'dojo/_base/lang',
+    'Sage/Platform/Mobile/Edit',
+    'Sage/Platform/Mobile/Fields/_Field'
+], function(
+    declare,
+    event,
+    lang,
+    Edit,
+    _Field
+) {
 
-    return dojo.declare('Sage.Platform.Mobile.Fields.EditorField', [Sage.Platform.Mobile.Fields._Field], {
+    return declare('Sage.Platform.Mobile.Fields.EditorField', [_Field], {
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -90,7 +102,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/
             }
         },
         _onClick: function(evt) {
-            dojo.stopEvent(evt);
+            event.stopEvent(evt);
             
             this.navigateToEditView();
         },
@@ -110,7 +122,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/
             var view = App.getPrimaryActiveView();
             var success = true;
 
-            if (view instanceof Sage.Platform.Mobile.Edit)
+            if (view instanceof Edit)
             {
                 view.hideValidationSummary();
 
@@ -135,7 +147,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/
             // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
             // requests created in this state (the pre-flight request is made, and the request ends with status 0).
             // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
-            if (success) setTimeout(dojo.hitch(this, this._onComplete), 0);
+            if (success) setTimeout(lang.hitch(this, this._onComplete), 0);
         },
         _onComplete: function() {
             this.onChange(this.currentValue, this);
@@ -151,7 +163,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', ['Sage/Platform/Mobile/Fields/
         },
         validate: function(value) {
             return typeof value === 'undefined'
-                ? Sage.Platform.Mobile.Fields._Field.prototype.validate.call(this, this.validationValue)
+                ? _Field.prototype.validate.call(this, this.validationValue)
                 : this.inherited(arguments);
         },
         setValue: function(val, initial)

@@ -13,16 +13,26 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DecimalField', ['Sage/Platform/Mobile/Fields/TextField'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.DecimalField', [Sage.Platform.Mobile.Fields.TextField], {
+define('Sage/Platform/Mobile/Fields/DecimalField', [
+    'dojo/_base/declare',
+    'dojo/string',
+    'Sage/Platform/Mobile/Fields/TextField',
+    'Sage/Platform/Mobile/FieldManager'
+], function(
+    declare,
+    string,
+    TextField,
+    FieldManager
+) {
+    var control = declare('Sage.Platform.Mobile.Fields.DecimalField', [TextField], {
         precision: 2,
         enableClearButton: false,
         setValue: function(val) {
-            val = parseFloat(val, 10).toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
+            val = parseFloat(val).toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
             val = isNaN(val)
-                ? dojo.string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.'])
-                : dojo.string.substitute('${0}${1}${2}',
-                    [ parseInt(val),
+                ? string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.'])
+                : string.substitute('${0}${1}${2}',
+                    [ parseInt(val, 10),
                       Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.',
                       val.substr(- Mobile.CultureInfo.numberFormat.currencyDecimalDigits)
                     ]);
@@ -35,10 +45,10 @@ define('Sage/Platform/Mobile/Fields/DecimalField', ['Sage/Platform/Mobile/Fields
                 .replace(Mobile.CultureInfo.numberFormat.currencyGroupSeparator, '')
                 .replace(Mobile.CultureInfo.numberFormat.numberGroupSeparator, '')
                 .replace(Mobile.CultureInfo.numberFormat.currencyDecimalSeparator, '.')
-                .replace(Mobile.CultureInfo.numberFormat.numberDecimalSeparator,   '.');
-            return parseFloat(value, 10);
+                .replace(Mobile.CultureInfo.numberFormat.numberDecimalSeparator, '.');
+            return parseFloat(value);
         }
     });
 
-    return Sage.Platform.Mobile.FieldManager.register('decimal', control);
+    return FieldManager.register('decimal', control);
 });

@@ -13,8 +13,22 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Fields/LookupField', 'Sage/Platform/Mobile/Format'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.DurationField', [Sage.Platform.Mobile.Fields.LookupField], {
+define('Sage/Platform/Mobile/Fields/DurationField', [
+    'dojo/_base/declare',
+    'dojo/string',
+    'dojo/dom-class',
+    'Sage/Platform/Mobile/Fields/LookupField',
+    'Sage/Platform/Mobile/FieldManager',
+    'Sage/Platform/Mobile/Format'
+], function(
+    declare,
+    string,
+    domClass,
+    LookupField,
+    FieldManager,
+    Format
+) {
+    var control = declare('Sage.Platform.Mobile.Fields.DurationField', [LookupField], {
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -70,11 +84,11 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
             var numberDecimalSeparator = Mobile.CultureInfo.numberFormat.numberDecimalSeparator;
 
             this.autoCompletePhraseRE = new RegExp(
-                dojo.string.substitute('^((?:\\d+(?:\\${0}\\d*)?|\\${0}\\d+)\\s*?)(\\w+)', [numberDecimalSeparator])
+                string.substitute('^((?:\\d+(?:\\${0}\\d*)?|\\${0}\\d+)\\s*?)(\\w+)', [numberDecimalSeparator])
             );
 
             this.autoCompleteValueRE = new RegExp(
-                dojo.string.substitute('^((?:\\d+(?:\\${0}\\d*)?|\\${0}\\d+))', [numberDecimalSeparator])
+                string.substitute('^((?:\\d+(?:\\${0}\\d*)?|\\${0}\\d+))', [numberDecimalSeparator])
             );
         },
         _onKeyUp: function(evt) {
@@ -114,7 +128,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
             if(val.length < 1) return true;
             if(!match) return true;
 
-            newValue = parseFloat(match[0],10) * multiplier;
+            newValue = parseFloat(match[0]) * multiplier;
             this.setValue(newValue);
         },
         getValue: function(){
@@ -126,7 +140,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
             this.hideAutoComplete();
         },
         setSelection: function(val, key) {
-            this.setValue(parseFloat(key, 10));
+            this.setValue(parseFloat(key));
         },
         textFormat: function(val) {
             var stepValue,
@@ -147,7 +161,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
             return this.convertUnit(val, finalUnit)+' '+this.currentKey;
         },
         convertUnit: function(val, to) {
-            return Sage.Platform.Mobile.Format.fixed(val/to, 2);
+            return Format.fixed(val/to, 2);
         },
         createNavigationOptions: function() {
             var options = this.inherited(arguments);
@@ -160,16 +174,16 @@ define('Sage/Platform/Mobile/Fields/DurationField', ['Sage/Platform/Mobile/Field
 
             if (!phraseMatch)
             {
-               dojo.addClass(this.containerNode, 'row-error');
-               return dojo.string.substitute(this.invalidDurationErrorText, [val]);
+               domClass.add(this.containerNode, 'row-error');
+               return string.substitute(this.invalidDurationErrorText, [val]);
             }
             else
             {
-               dojo.removeClass(this.containerNode, 'row-error');
+               domClass.remove(this.containerNode, 'row-error');
                return false;
             }
         }
     });
     
-    return Sage.Platform.Mobile.FieldManager.register('duration', control);
+    return FieldManager.register('duration', control);
 });

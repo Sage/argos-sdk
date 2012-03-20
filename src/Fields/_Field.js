@@ -14,17 +14,22 @@
  */
 
 define('Sage/Platform/Mobile/Fields/_Field', [
-    'dojo',
+    'dojo/_base/declare',
+    'dojo/_base/lang',
     'dojo/string',
-    'dojo/NodeList-manipulate',
-    'dojo/NodeList-traverse',
     'dijit/_Widget',
-    'Sage/Platform/Mobile/FieldManager',
     'Sage/Platform/Mobile/_ActionMixin',
     'Sage/Platform/Mobile/_Templated'
-], function() {
+], function(
+    declare,
+    lang,
+    string,
+    _Widget,
+    _ActionMixin,
+    _Templated
+) {
     
-    return dojo.declare('Sage.Platform.Mobile.Fields._Field', [dijit._Widget, Sage.Platform.Mobile._ActionMixin, Sage.Platform.Mobile._Templated], {
+    return declare('Sage.Platform.Mobile.Fields._Field', [_Widget, _ActionMixin, _Templated], {
         owner: false,
         applyTo: false,
         alwaysUseValue: false,
@@ -34,7 +39,7 @@ define('Sage/Platform/Mobile/Fields/_Field', [
             '<input data-dojo-attach-point="inputNode">'
         ]),
         constructor: function(o) {
-            dojo.mixin(this, o);
+            lang.mixin(this, o);
         },
         renderTo: function(node) {
             this.containerNode = node; // todo: should node actually be containerNode instead of last rendered node?
@@ -77,7 +82,7 @@ define('Sage/Platform/Mobile/Fields/_Field', [
             if (typeof this.validator === 'undefined')
                 return false;
 
-            var all = dojo.isArray(this.validator) ? this.validator : [this.validator];
+            var all = lang.isArray(this.validator) ? this.validator : [this.validator];
 
             for (var i = 0; i < all.length; i++)
             {
@@ -109,7 +114,7 @@ define('Sage/Platform/Mobile/Fields/_Field', [
                     if (definition.message)
                         result = typeof definition.message === 'function'
                             ? definition.message.call(definition.scope || this, value, this, this.owner)
-                            : dojo.string.substitute(definition.message, [value, this.name, this.label]);
+                            : string.substitute(definition.message, [value, this.name, this.label]);
 
                     return result;
                 }

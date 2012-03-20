@@ -12,8 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/TextField'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.PhoneField', [Sage.Platform.Mobile.Fields.TextField], {
+define('Sage/Platform/Mobile/Fields/PhoneField', [
+    'dojo/_base/declare',
+    'dojo/has',
+    'dojo/string',
+    'Sage/Platform/Mobile/Fields/TextField',
+    'Sage/Platform/Mobile/FieldManager',
+    'dojo/_base/sniff'
+], function(
+    declare,
+    has,
+    string,
+    TextField,
+    FieldManager
+) {
+    var control = declare('Sage.Platform.Mobile.Fields.PhoneField', [TextField], {
         /*
             {0}: original value
             {1}: cleaned value
@@ -40,7 +53,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/T
         /* Currently only iOS supports non-numbers when a tel field has a default value
             http://code.google.com/p/android/issues/detail?id=19724
          */
-        inputType: dojo.isSafari ? 'tel' : 'text',
+        inputType: has('safari') ? 'tel' : 'text',
 
         _onBlur: function() {
             this.inherited(arguments);
@@ -71,7 +84,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/T
                     match;
                 if ((match = formatter.test.exec(clean)))
                 {
-                    return dojo.string.substitute(formatter.format, [number, clean].concat(match));
+                    return string.substitute(formatter.format, [number, clean].concat(match));
                 }
             }
 
@@ -86,5 +99,5 @@ define('Sage/Platform/Mobile/Fields/PhoneField', ['Sage/Platform/Mobile/Fields/T
         }
     });
 
-    return Sage.Platform.Mobile.FieldManager.register('phone', control);
+    return FieldManager.register('phone', control);
 });

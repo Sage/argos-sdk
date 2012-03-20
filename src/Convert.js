@@ -13,9 +13,13 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Convert', ['dojo'], function() {
+define('Sage/Platform/Mobile/Convert', [
+    'dojo/_base/lang'
+], function(
+    lang
+) {
 
-    dojo.setObject('Sage.Platform.Mobile.Convert', null);
+    lang.setObject('Sage.Platform.Mobile.Convert', null);
 
     return Sage.Platform.Mobile.Convert = (function() {
     var trueRE = /^(true|T)$/i,
@@ -55,7 +59,7 @@ define('Sage/Platform/Mobile/Convert', ['dojo'], function() {
 
             if ((match = jsonDate.exec(value)))
             {
-                utc = new Date(parseInt(match[1]));
+                utc = new Date(parseInt(match[1], 10));
 
                 // todo: may not be needed
                 /*
@@ -76,18 +80,18 @@ define('Sage/Platform/Mobile/Convert', ['dojo'], function() {
             else if ((match = isoDate.exec(value)))
             {
                 utc = new Date(Date.UTC(
-                    parseInt(match[1]),
-                    parseInt(match[2]) - 1, // zero based
-                    parseInt(match[3]),
-                    parseInt(match[4] || 0),
-                    parseInt(match[5] || 0),
-                    parseInt(match[6] || 0)
+                    parseInt(match[1], 10),
+                    parseInt(match[2], 10) - 1, // zero based
+                    parseInt(match[3], 10),
+                    parseInt(match[4] || 0, 10),
+                    parseInt(match[5] || 0, 10),
+                    parseInt(match[6] || 0, 10)
                 ));
 
                 if (match[8] && match[8] !== 'Z')
                 {
-                    h = parseInt(match[10]);
-                    m = parseInt(match[11]);
+                    h = parseInt(match[10], 10);
+                    m = parseInt(match[11], 10);
                     
                     if (match[9] === '-')
                         utc.addMinutes((h * 60) + m);

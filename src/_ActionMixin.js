@@ -13,13 +13,26 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/_ActionMixin', ['dojo', 'dojo/NodeList-traverse'], function() {
+define('Sage/Platform/Mobile/_ActionMixin', [
+    'dojo/_base/array',
+    'dojo/_base/declare',
+    'dojo/_base/event',
+    'dojo/dom-attr',
+    'dojo/query',
+    'dojo/NodeList-traverse'
+], function(
+    array,
+    declare,
+    event,
+    domAttr,
+    query
+) {
 
-    return dojo.declare('Sage.Platform.Mobile._ActionMixin', null, {
+    return declare('Sage.Platform.Mobile._ActionMixin', null, {
         actionsFrom: 'click',
         postCreate: function() {
             // todo: add delegation
-            dojo.forEach(this.actionsFrom.split(','), function(event) {
+            array.forEach(this.actionsFrom.split(','), function(event) {
                 this.connect(this.domNode, event, this._initiateActionFromEvent);
             }, this);
         },
@@ -31,8 +44,8 @@ define('Sage/Platform/Mobile/_ActionMixin', ['dojo', 'dojo/NodeList-traverse'], 
             return (this.domNode === el) || contained;
         },
         _initiateActionFromEvent: function(evt) {
-            var el = dojo.query(evt.target).closest('[data-action]')[0],
-                action = el && dojo.attr(el, 'data-action'); 
+            var el = query(evt.target).closest('[data-action]')[0],
+                action = el && domAttr.get(el, 'data-action');
 
             if (action && this._isValidElementForAction(el) && this.hasAction(action, evt, el))
             {
@@ -40,7 +53,7 @@ define('Sage/Platform/Mobile/_ActionMixin', ['dojo', 'dojo/NodeList-traverse'], 
 
                 this.invokeAction(action, parameters, evt, el);
 
-                dojo.stopEvent(evt);
+                event.stopEvent(evt);
             }
         },
         _getParametersForAction: function(name, evt, el) {
@@ -59,7 +72,7 @@ define('Sage/Platform/Mobile/_ActionMixin', ['dojo', 'dojo/NodeList-traverse'], 
                 /* todo: remove transformation and use dataset when browser support is there */
                 var parameterName = attributeName.substr('data-'.length).replace(/-(\w)(\w+)/g, function($0, $1, $2) { return $1.toUpperCase() + $2; });
 
-                parameters[parameterName] = dojo.attr(el, attributeName);
+                parameters[parameterName] = domAttr.get(el, attributeName);
             }
 
             return parameters;

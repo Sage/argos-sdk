@@ -13,9 +13,12 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Utility', ['dojo'], function() {
-
-    dojo.declare('Sage.Platform.Mobile.Utility', null, {});
+define('Sage/Platform/Mobile/Utility', [
+    'dojo/_base/lang'
+], function(
+    lang
+) {
+    lang.setObject('Sage.Platform.Mobile.Utility', null, {});
     return Sage.Platform.Mobile.Utility = (function(){
         var nameToPathCache = {};
         var nameToPath = function(name) {

@@ -13,8 +13,16 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/HiddenField', ['Sage/Platform/Mobile/Fields/TextField'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.HiddenField', [Sage.Platform.Mobile.Fields.TextField], {
+define('Sage/Platform/Mobile/Fields/HiddenField', [
+    'dojo/_base/declare',
+    'Sage/Platform/Mobile/Fields/TextField',
+    'Sage/Platform/Mobile/FieldManager'
+], function(
+    declare,
+    TextField,
+    FieldManager
+) {
+    var control = declare('Sage.Platform.Mobile.Fields.HiddenField', [TextField], {
         propertyTemplate: new Simplate([
             '<div style="display: none;" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'
@@ -29,5 +37,5 @@ define('Sage/Platform/Mobile/Fields/HiddenField', ['Sage/Platform/Mobile/Fields/
         }
     });
 
-    return Sage.Platform.Mobile.FieldManager.register('hidden', control);
+    return FieldManager.register('hidden', control);
 });

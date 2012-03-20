@@ -15,8 +15,16 @@
 
 // todo: move to argos-saleslogix; this does not belong here.
 
-define('Sage/Platform/Mobile/Fields/NoteField', ['Sage/Platform/Mobile/FieldManager', 'Sage/Platform/Mobile/Fields/EditorField'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.NoteField', [Sage.Platform.Mobile.Fields.EditorField], {
+define('Sage/Platform/Mobile/Fields/NoteField', [
+    'dojo/_base/declare',
+    'Sage/Platform/Mobile/Fields/EditorField',
+    'Sage/Platform/Mobile/FieldManager'
+], function(
+    declare,
+    EditorField,
+    FieldManager
+) {
+    var control = declare('Sage.Platform.Mobile.Fields.NoteField', [EditorField], {
         attributeMap: {
             noteText: {
                 node: 'inputNode',
@@ -71,5 +79,5 @@ define('Sage/Platform/Mobile/Fields/NoteField', ['Sage/Platform/Mobile/FieldMana
         }
     });
 
-    return Sage.Platform.Mobile.FieldManager.register('note', control);
+    return FieldManager.register('note', control);
 });

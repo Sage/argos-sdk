@@ -13,9 +13,23 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fields/EditorField', 'Sage/Platform/Mobile/Views/Signature'], function() {
+define('Sage/Platform/Mobile/Fields/SignatureField', [
+    'dojo/_base/declare',
+    'dojo/_base/json',
+    'dojo/dom-attr',
+    'Sage/Platform/Mobile/Fields/EditorField',
+    'Sage/Platform/Mobile/Format',
+    'Sage/Platform/Mobile/FieldManager'
+], function(
+    declare,
+    dojo,
+    domAttr,
+    EditorField,
+    Format,
+    FieldManager
+) {
 
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.SignatureField', [Sage.Platform.Mobile.Fields.EditorField], {
+    var control = declare('Sage.Platform.Mobile.Fields.SignatureField', [EditorField], {
         // Localization
         emptyText: '',
         titleText: 'Signature',
@@ -61,10 +75,10 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
         setValue: function (val, initial) {
             if (initial) this.originalValue = val;
 
-            dojo.attr(this.inputNode, 'value', val || '');
+            domAttr.set(this.inputNode, 'value', val || '');
 
             try {
-                this.signature = JSON.parse(val);
+                this.signature = dojo.fromJson(val);
             } catch(e) {
                 this.signature = [];
             }
@@ -72,7 +86,7 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
             if (!this.signature || Array != this.signature.constructor)
                 this.signature = [];
 
-            this.signatureNode.src = Sage.Platform.Mobile.Format.imageFromVector(this.signature, this.config, false);
+            this.signatureNode.src = Format.imageFromVector(this.signature, this.config, false);
         },
         clearValue: function() {
             this.setValue('', true);
@@ -82,5 +96,5 @@ define('Sage/Platform/Mobile/Fields/SignatureField', ['Sage/Platform/Mobile/Fiel
         }
     });
 
-    return Sage.Platform.Mobile.FieldManager.register('signature', control);
+    return FieldManager.register('signature', control);
 });

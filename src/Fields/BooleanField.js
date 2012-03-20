@@ -13,8 +13,18 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields/_Field'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.BooleanField', [Sage.Platform.Mobile.Fields._Field], {
+define('Sage/Platform/Mobile/Fields/BooleanField', [
+    'dojo/_base/declare',
+    'dojo/dom-attr',
+    'Sage/Platform/Mobile/Fields/_Field',
+    'Sage/Platform/Mobile/FieldManager'
+], function(
+    declare,
+    domAttr,
+    Field,
+    FieldManager
+) {
+    var control = declare('Sage.Platform.Mobile.Fields.BooleanField', [Field], {
         attributeMap: {
             toggled:{
                 node: 'toggleNode',
@@ -25,13 +35,17 @@ define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<div class="toggle" data-dojo-attach-point="toggleNode" data-dojo-attach-event="onclick:_onClick" toggled="{%= !!$.checked %}">',
-            '<span class="thumb"></span>',
-            '<span class="toggleOn">{%= $.onText %}</span>',
-            '<span class="toggleOff">{%= $.offText %}</span>',
+                '<span class="thumb"></span>',
+                '<span class="toggleOn">{%= $.onText %}</span>',
+                '<span class="toggleOff">{%= $.offText %}</span>',
             '</div>'
-        ]),        
+        ]),
+        toggleNode: null,
+
+        //Localization
         onText: 'ON',
         offText: 'OFF',
+
         _onClick: function(evt) {
             if (this.isDisabled()) return;
 
@@ -40,7 +54,7 @@ define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields
             this.setValue(toggledValue);
         },
         getValue: function() {
-            return (dojo.attr(this.toggleNode, 'toggled') === 'true');
+            return (domAttr.get(this.toggleNode, 'toggled') === 'true');
         },
         setValue: function(val, initial) {
             val = typeof val === 'string'
@@ -61,5 +75,5 @@ define('Sage/Platform/Mobile/Fields/BooleanField', ['Sage/Platform/Mobile/Fields
         }
     });
 
-    return Sage.Platform.Mobile.FieldManager.register('boolean', control);
+    return FieldManager.register('boolean', control);
 });
