@@ -102,7 +102,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
             }
         },
         _onClick: function(evt) {
-            event.stopEvent(evt);
+            event.stop(evt);
             
             this.navigateToEditView();
         },

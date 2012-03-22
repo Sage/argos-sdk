@@ -145,7 +145,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
                 return expression;
         },
         _onClearClick: function(evt){
-            event.stopEvent(evt);
+            event.stop(evt);
             this.clear();
             this.queryNode.focus();
             this.queryNode.click();
@@ -159,7 +159,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
         _onKeyPress: function(evt) {
             if (evt.keyCode == 13 || evt.keyCode == 10)
             {
-                event.stopEvent(evt);
+                event.stop(evt);
                 this.queryNode.blur();
                 this.search();
             }

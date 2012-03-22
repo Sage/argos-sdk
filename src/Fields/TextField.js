@@ -70,7 +70,7 @@ define('Sage/Platform/Mobile/Fields/TextField', [
             var v = this.getValue() + String.fromCharCode(evt.getCharCode());
             if (this.validate(v))
             {
-                event.stopEvent(evt);
+                event.stop(evt);
                 return false;
             }            
         },
@@ -99,7 +99,7 @@ define('Sage/Platform/Mobile/Fields/TextField', [
             // only clear if input was already active
             if(!domClass.contains(this.domNode, 'text-field-active')){
                 this.clearValue(true);
-                event.stopEvent(evt);
+                event.stop(evt);
             }
 
             // Mobile browsers listen to either or both events to show keyboard

@@ -53,7 +53,7 @@ define('Sage/Platform/Mobile/_ActionMixin', [
 
                 this.invokeAction(action, parameters, evt, el);
 
-                event.stopEvent(evt);
+                event.stop(evt);
             }
         },
         _getParametersForAction: function(name, evt, el) {

@@ -26,7 +26,21 @@ define('Sage/Platform/Mobile/Edit', [
     'Sage/Platform/Mobile/Utility',
     'Sage/Platform/Mobile/Convert',
     'Sage/Platform/Mobile/FieldManager',
-    'Sage/Platform/Mobile/ErrorManager'
+    'Sage/Platform/Mobile/ErrorManager',
+
+    'dojo/NodeList-manipulate',
+    'Sage/Platform/Mobile/Fields/BooleanField',
+    'Sage/Platform/Mobile/Fields/DateField',
+    'Sage/Platform/Mobile/Fields/DecimalField',
+    'Sage/Platform/Mobile/Fields/DurationField',
+    'Sage/Platform/Mobile/Fields/HiddenField',
+    'Sage/Platform/Mobile/Fields/LookupField',
+    'Sage/Platform/Mobile/Fields/NoteField',
+    'Sage/Platform/Mobile/Fields/PhoneField',
+    'Sage/Platform/Mobile/Fields/SelectField',
+    'Sage/Platform/Mobile/Fields/SignatureField',
+    'Sage/Platform/Mobile/Fields/TextAreaField',
+    'Sage/Platform/Mobile/Fields/TextField'
 ], function(
     declare,
     lang,

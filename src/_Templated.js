@@ -28,6 +28,10 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
                 this._attachTemplateNodes(root);
             } else if (this.widgetTemplate) {
                 var root = domConstruct.toDom(this.widgetTemplate.apply(this));
+
+                if (root.nodeType === 11)
+                    root = domConstruct.toDom(['<div>', this.widgetTemplate.apply(this), '</div>'].join(''));
+
                 if (root.nodeType !== 1) {
                     throw new Error('Invalid template.');
                 }

@@ -182,7 +182,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
 
             if (!this.isDisabled() && (buttonNode || this.requireSelection))
             {
-                event.stopEvent(evt);
+                event.stop(evt);
 
                 this.navigateToListView();
             }
