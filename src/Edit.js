@@ -170,8 +170,9 @@ define('Sage/Platform/Mobile/Edit', [
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
 
-            if (this.entry && this.entry['$key'])
-                request.setResourceSelector(dojo.string.substitute("'${0}'", [this.entry['$key']]));
+            var key = (this.entry && this.entry['$key']) || this.options['$key']
+            if (key)
+                request.setResourceSelector(dojo.string.substitute("'${0}'", [key]));
 
             if (this.resourceKind)
                 request.setResourceKind(this.resourceKind);
@@ -289,6 +290,30 @@ define('Sage/Platform/Mobile/Edit', [
                 request.read({
                     success: this.onRequestTemplateSuccess,
                     failure: this.onRequestTemplateFailure,
+                    scope: this
+                });
+        },
+        onRequestEntryFailure: function(response, o) {
+            alert(dojo.string.substitute(this.requestErrorText, [response, o]));
+            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'failure');
+        },
+        onRequestEntrySuccess: function(entry) {
+            this.processEntry(entry);
+            this.setValues(this.entry, true);
+
+            // Re-apply any passed changes as they may have been overwritten
+            if (this.options.changes)
+            {
+                this.changes = this.options.changes;
+                this.setValues(this.changes);
+            }
+        },
+        requestEntry: function(){
+            var request = this.createRequest();
+            if (request)
+                request.read({
+                    success: this.onRequestEntrySuccess,
+                    failure: this.onRequestEntryFailure,
                     scope: this
                 });
         },
@@ -655,7 +680,7 @@ define('Sage/Platform/Mobile/Edit', [
 
             if (this.refreshRequired)
             {
-                if (this.options.insert === true)
+                if (this.options.insert === true || this.options['$key'])
                     dojo.addClass(this.domNode, 'panel-loading');
                 else
                     dojo.removeClass(this.domNode, 'panel-loading');
@@ -665,6 +690,16 @@ define('Sage/Platform/Mobile/Edit', [
             // external navigation (browser back/forward) never refreshes the edit view as it's always a terminal loop.
             // i.e. you never move "forward" from an edit view; you navigate to child editors, from which you always return.
         },       
+        refreshRequiredFor: function(options) {
+            if (this.options) {
+                if (options) {
+                    if (this.options['$key'] !== options['$key']) return true;
+                }
+                return false;
+            }
+            else
+                return this.inherited(arguments);
+        },
         refresh: function() {
             this.entry = false;
             this.changes = false;
@@ -689,6 +724,12 @@ define('Sage/Platform/Mobile/Edit', [
                     this.processEntry(this.options.entry);
                     this.setValues(this.entry, true);
                 }
+                else
+                {
+                    // if $key is passed request that keys entity and process
+                    if (this.options['$key'])
+                        this.requestEntry();
+                }
 
                 // apply changes as modified data, since we want this to feed-back through
                 // the changes option is primarily used by editor fields
@@ -697,6 +738,7 @@ define('Sage/Platform/Mobile/Edit', [
                     this.changes = this.options.changes;
                     this.setValues(this.changes);
                 }
+
             }
         }
     });
