@@ -283,8 +283,11 @@ define('Sage/Platform/Mobile/Edit', [
         },
         onRequestTemplateSuccess: function(entry) {
             this.processTemplateEntry(entry);
+            dojo.removeClass(this.domNode, 'panel-loading');
         },
         requestTemplate: function() {
+            dojo.addClass(this.domNode, 'panel-loading');
+
             var request = this.createTemplateRequest();
             if (request)
                 request.read({
@@ -307,8 +310,11 @@ define('Sage/Platform/Mobile/Edit', [
                 this.changes = this.options.changes;
                 this.setValues(this.changes);
             }
+            dojo.removeClass(this.domNode, 'panel-loading');
         },
         requestEntry: function(){
+            dojo.addClass(this.domNode, 'panel-loading');
+
             var request = this.createRequest();
             if (request)
                 request.read({
@@ -348,8 +354,6 @@ define('Sage/Platform/Mobile/Edit', [
         },
         processEntry: function(entry) {
             this.entry = this.convertEntry(entry || {});
-            
-            dojo.removeClass(this.domNode, 'panel-loading');
         },
         applyContext: function(templateEntry) {
         },
@@ -378,8 +382,6 @@ define('Sage/Platform/Mobile/Edit', [
                 this.processEntry(this.options.entry);
                 this.setValues(this.entry);
             }
-
-            dojo.removeClass(this.domNode, 'panel-loading');
         },
         clearValues: function() {
             for (var name in this.fields)
@@ -675,17 +677,6 @@ define('Sage/Platform/Mobile/Edit', [
 
             return lookup[access];
         },
-        beforeTransitionTo: function() {
-            Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
-
-            if (this.refreshRequired)
-            {
-                if (this.options.insert === true || this.options['key'])
-                    dojo.addClass(this.domNode, 'panel-loading');
-                else
-                    dojo.removeClass(this.domNode, 'panel-loading');
-            }
-        },
         activate: function() {
             // external navigation (browser back/forward) never refreshes the edit view as it's always a terminal loop.
             // i.e. you never move "forward" from an edit view; you navigate to child editors, from which you always return.
@@ -707,7 +698,6 @@ define('Sage/Platform/Mobile/Edit', [
             this.inserting = (this.options.insert === true);
 
             dojo.removeClass(this.domNode, 'panel-form-error');
-
             this.clearValues();
 
             if (this.inserting)
