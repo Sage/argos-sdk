@@ -170,7 +170,7 @@ define('Sage/Platform/Mobile/Edit', [
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
 
-            var key = (this.entry && this.entry['$key']) || this.options['$key']
+            var key = (this.entry && this.entry['$key']) || this.options['key']
             if (key)
                 request.setResourceSelector(dojo.string.substitute("'${0}'", [key]));
 
@@ -680,7 +680,7 @@ define('Sage/Platform/Mobile/Edit', [
 
             if (this.refreshRequired)
             {
-                if (this.options.insert === true || this.options['$key'])
+                if (this.options.insert === true || this.options['key'])
                     dojo.addClass(this.domNode, 'panel-loading');
                 else
                     dojo.removeClass(this.domNode, 'panel-loading');
@@ -693,7 +693,8 @@ define('Sage/Platform/Mobile/Edit', [
         refreshRequiredFor: function(options) {
             if (this.options) {
                 if (options) {
-                    if (this.options['$key'] !== options['$key']) return true;
+                    if (this.options['key'] !== options['key']) return true;
+                    if (this.options['entry'] !== options['entry']) return true;
                 }
                 return false;
             }
@@ -727,7 +728,7 @@ define('Sage/Platform/Mobile/Edit', [
                 else
                 {
                     // if $key is passed request that keys entity and process
-                    if (this.options['$key'])
+                    if (this.options['key'])
                         this.requestEntry();
                 }
 
