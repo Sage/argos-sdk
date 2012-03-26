@@ -16,13 +16,26 @@
 define('Sage/Platform/Mobile/ErrorManager', [
     'dojo/_base/json',
     'dojo/_base/lang',
+    'dojo/_base/connect',
     'dojo/string'
 ], function(
     dojo,
     lang,
+    connect,
     string
 ) {
-    var ErrorManager = lang.setObject('Sage.Platform.Mobile.ErrorManager', {
+    var loadedErrors = [];
+    try
+    {
+        if (window.localStorage)
+            loadedErrors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
+    }
+    catch(e)
+    {
+
+    }
+
+    return lang.setObject('Sage.Platform.Mobile.ErrorManager', {
         //Localization
         abortedText: 'Aborted',
 
@@ -31,7 +44,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
          */
         errorCacheSizeMax: 10,
 
-        errors: [],
+        errors: loadedErrors,
 
         /**
          * Adds a custom error item by combining error message/options for easier tech support
@@ -149,10 +162,10 @@ define('Sage/Platform/Mobile/ErrorManager', [
                             break;
                         }
                         if(key === 'scope') { // eliminate recursive self call
-                            obj[key]= 'Scope is not saved in error report';
+                            obj[key] = 'Scope is not saved in error report';
                             break;
                         }
-                        obj[key]=this.serializeValues(obj[key]);
+                        obj[key] = this.serializeValues(obj[key]);
                         break;
                 }
             }
@@ -192,11 +205,10 @@ define('Sage/Platform/Mobile/ErrorManager', [
             this.errors.splice(index, amount || 1);
         },
 
-        /**
-         * Event that occurs when an error is successfully added (not guaranteed to be saved)
-         * Can be used for event binding
-         */
         onErrorAdd: function() {
+            connect.publish('/app/refresh', [{
+                resourceKind: 'errorlogs'
+            }]);
         },
 
         save: function(){
@@ -206,18 +218,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
                     window.localStorage.setItem('errorlog', dojo.toJson(this.errors));
             }
             catch(e) {}
-        },
-
-        load: function(){
-            try
-            {
-                if (window.localStorage)
-                    this.errors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
-            }
-            catch(e) {}
         }
-    });
-
-    ErrorManager.load();
-    return ErrorManager;
+    }
+);
 });
