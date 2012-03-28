@@ -17,16 +17,16 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
     'dojo/_base/declare',
     'dojo/string',
     'dojo/dom-class',
+    'Sage/Platform/Mobile/Format',
     'Sage/Platform/Mobile/Fields/LookupField',
-    'Sage/Platform/Mobile/FieldManager',
-    'Sage/Platform/Mobile/Format'
+    'Sage/Platform/Mobile/FieldManager'
 ], function(
     declare,
     string,
     domClass,
+    format,
     LookupField,
-    FieldManager,
-    Format
+    FieldManager
 ) {
     var control = declare('Sage.Platform.Mobile.Fields.DurationField', [LookupField], {
         attributeMap: {
@@ -161,7 +161,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
             return this.convertUnit(val, finalUnit)+' '+this.currentKey;
         },
         convertUnit: function(val, to) {
-            return Format.fixed(val/to, 2);
+            return format.fixed(val/to, 2);
         },
         createNavigationOptions: function() {
             var options = this.inherited(arguments);

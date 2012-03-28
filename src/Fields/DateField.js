@@ -17,17 +17,17 @@ define('Sage/Platform/Mobile/Fields/DateField', [
     'dojo/_base/declare',
     'dojo/string',
     'dojo/dom-class',
+    'Sage/Platform/Mobile/Format',
     'Sage/Platform/Mobile/FieldManager',
     'Sage/Platform/Mobile/Fields/EditorField',
-    'Sage/Platform/Mobile/Format',
     'Sage/Platform/Mobile/Calendar'
 ], function(
     declare,
     string,
     domClass,
+    format,
     FieldManager,
-    EditorField,
-    Format
+    EditorField
 ) {
     var control = declare('Sage.Platform.Mobile.Fields.DateField', [EditorField], {
         // Localization
@@ -46,7 +46,7 @@ define('Sage/Platform/Mobile/Fields/DateField', [
         asTimeless: false,
 
         formatValue: function(value) {
-            return Format.date(value, this.dateFormatText, this.asTimeless);
+            return format.date(value, this.dateFormatText, this.asTimeless);
         },
         _onChange: function(evt) {
             var val = Date.parseExact(this.inputNode.value, this.dateFormatText);

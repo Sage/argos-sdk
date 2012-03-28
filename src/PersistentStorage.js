@@ -23,8 +23,8 @@ define('Sage/Platform/Mobile/PersistentStorage', [
     declare,
     lang,
     dojo,
-    Convert,
-    Utility
+    convert,
+    utility
 ) {
     var sosCache = {};
 
@@ -55,8 +55,8 @@ define('Sage/Platform/Mobile/PersistentStorage', [
                 return dojo.fromJson(value);
             if (value && value.indexOf('[') === 0 && value.lastIndexOf(']') === (value.length - 1))
                 return dojo.fromJson(value);
-            if (Convert.isDateString(value))
-                return Convert.toDateFromString(value);
+            if (convert.isDateString(value))
+                return convert.toDateFromString(value);
             if (/^(true|false)$/.test(value))
                 return value === 'true';
             var numeric = parseFloat(value);
@@ -88,7 +88,7 @@ define('Sage/Platform/Mobile/PersistentStorage', [
                             if (this.allowCacheUse) sosCache[this.name] = store;
                         }
 
-                        var value = Utility.getValue(store, key);
+                        var value = utility.getValue(store, key);
 
                         if (options.success)
                             options.success.call(options.scope || this, value);
@@ -144,7 +144,7 @@ define('Sage/Platform/Mobile/PersistentStorage', [
                             if (this.allowCacheUse) sosCache[this.name] = store;
                         }
 
-                        Utility.setValue(store, key, value);
+                        utility.setValue(store, key, value);
 
                         encoded = dojo.toJson(store);
 

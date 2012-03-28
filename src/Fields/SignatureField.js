@@ -17,15 +17,15 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
     'dojo/_base/declare',
     'dojo/_base/json',
     'dojo/dom-attr',
-    'Sage/Platform/Mobile/Fields/EditorField',
     'Sage/Platform/Mobile/Format',
+    'Sage/Platform/Mobile/Fields/EditorField',
     'Sage/Platform/Mobile/FieldManager'
 ], function(
     declare,
     dojo,
     domAttr,
+    format,
     EditorField,
-    Format,
     FieldManager
 ) {
 
@@ -52,10 +52,6 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
             '<input data-dojo-attach-point="inputNode" type="hidden">'
         ]),
 
-        init: function () {
-            this.inherited(arguments);
-
-        },
         createNavigationOptions: function() {
             var options = this.inherited(arguments);
 
@@ -86,7 +82,7 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
             if (!this.signature || Array != this.signature.constructor)
                 this.signature = [];
 
-            this.signatureNode.src = Format.imageFromVector(this.signature, this.config, false);
+            this.signatureNode.src = format.imageFromVector(this.signature, this.config, false);
         },
         clearValue: function() {
             this.setValue('', true);

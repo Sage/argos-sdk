@@ -22,10 +22,10 @@ define('Sage/Platform/Mobile/Detail', [
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/query',
-    'Sage/Platform/Mobile/View',
-    'Sage/Platform/Mobile/Utility',
     'Sage/Platform/Mobile/Format',
-    'Sage/Platform/Mobile/ErrorManager'
+    'Sage/Platform/Mobile/Utility',
+    'Sage/Platform/Mobile/ErrorManager',
+    'Sage/Platform/Mobile/View'
 ], function(
     dojo,
     declare,
@@ -35,10 +35,10 @@ define('Sage/Platform/Mobile/Detail', [
     domClass,
     domConstruct,
     query,
-    View,
-    Utility,
-    Format,
-    ErrorManager
+    format,
+    utility,
+    ErrorManager,
+    View
 ) {
 
     return declare('Sage.Platform.Mobile.Detail', [View], {
@@ -174,7 +174,7 @@ define('Sage/Platform/Mobile/Detail', [
         },
         formatRelatedQuery: function(entry, fmt, property) {
             property = property || '$key';
-            return string.substitute(fmt, [Utility.getValue(entry, property)]);
+            return string.substitute(fmt, [utility.getValue(entry, property)]);
         },
         toggleSection: function(params) {
             var node = dom.byId(params.$source);
@@ -233,8 +233,6 @@ define('Sage/Platform/Mobile/Detail', [
                 options = layout['options'] || (layout['options'] = {
                     title: this.detailsText
                 }),
-                getValue = Utility.getValue,
-                encodeValue = Format.encode,
                 sectionQueue = [],
                 sectionStarted = false,
                 callbacks = [];
@@ -267,7 +265,7 @@ define('Sage/Platform/Mobile/Detail', [
                     domConstruct.place(section, this.contentNode);
                 }
 
-                var provider = current['provider'] || getValue,
+                var provider = current['provider'] || utility.getValue,
                     property = typeof current['property'] == 'string'
                         ? current['property']
                         : current['name'],
@@ -281,20 +279,20 @@ define('Sage/Platform/Mobile/Detail', [
                 {
                     rendered = (current['template'] || current['tpl']).apply(value, this);
                     formatted = current['encode'] === true
-                        ? encodeValue(rendered)
+                        ? format.encode(rendered)
                         : rendered;
                 }
                 else if (current['renderer'] && typeof current['renderer'] === 'function')
                 {
                     rendered = current['renderer'].call(this, value);
                     formatted = current['encode'] === true
-                        ? encodeValue(rendered)
+                        ? format.encode(rendered)
                         : rendered;
                 }
                 else
                 {
                     formatted = current['encode'] !== false
-                        ? encodeValue(value)
+                        ? format.encode(value)
                         : value;
                 }
 

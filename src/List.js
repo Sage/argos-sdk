@@ -116,7 +116,7 @@ define('Sage/Platform/Mobile/List', [
         }
     });
 
-    declare('Sage.Platform.Mobile.ConfigurableSelectionModel', [SelectionModel], {
+    var ConfigurableSelectionModel = declare('Sage.Platform.Mobile.ConfigurableSelectionModel', [SelectionModel], {
         singleSelection: false,
         useSingleSelection: function(val) {
             if (this.singleSelection != !!val) //false != undefined = true, false != !!undefined = false
@@ -419,7 +419,7 @@ define('Sage/Platform/Mobile/List', [
         postCreate: function() {
             this.inherited(arguments);
 
-            if (this._selectionModel == null) this.set('selectionModel', new Sage.Platform.Mobile.ConfigurableSelectionModel());
+            if (this._selectionModel == null) this.set('selectionModel', new ConfigurableSelectionModel());
 
             this.subscribe('/app/refresh', this._onRefresh);
 

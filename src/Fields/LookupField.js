@@ -19,8 +19,8 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     'dojo/_base/lang',
     'dojo/string',
     'dojo/query',
-    'Sage/Platform/Mobile/Fields/_Field',
     'Sage/Platform/Mobile/Utility',
+    'Sage/Platform/Mobile/Fields/_Field',
     'Sage/Platform/Mobile/FieldManager'
 ], function(
     array,
@@ -29,8 +29,8 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     lang,
     string,
     query,
+    utility,
     _Field,
-    Utility,
     FieldManager
 ) {
     var control = declare('Sage.Platform.Mobile.Fields.LookupField', [_Field], {
@@ -306,23 +306,23 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                 if (this.currentValue)
                 {
                     if (keyProperty)
-                        value = Utility.setValue(value || {}, keyProperty, this.currentValue.key);
+                        value = utility.setValue(value || {}, keyProperty, this.currentValue.key);
 
                     // if a text template has been applied there is no way to guarantee a correct
                     // mapping back to the property
                     if (textProperty && !this.textTemplate)
-                        value = Utility.setValue(value || {}, textProperty, this.requireSelection ? this.currentValue.text : text);
+                        value = utility.setValue(value || {}, textProperty, this.requireSelection ? this.currentValue.text : text);
                 }
                 else if (!this.requireSelection)
                 {
                     if (keyProperty && text.length > 0)
-                        value = Utility.setValue(value || {}, keyProperty, text);
+                        value = utility.setValue(value || {}, keyProperty, text);
 
                     // if a text template has been applied there is no way to guarantee a correct
                     // mapping back to the property
                     if (textProperty && !this.textTemplate && text.length > 0)
                     {
-                        value = Utility.setValue(value || {}, textProperty, text);
+                        value = utility.setValue(value || {}, textProperty, text);
                     }
                 }                
             }
@@ -345,8 +345,8 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             return value;
         },
         setSelection: function(val, key) {
-            var key = Utility.getValue(val, this.keyProperty, val) || key, // if we can extract the key as requested, use it instead of the selection key
-                text = Utility.getValue(val, this.textProperty);
+            var key = utility.getValue(val, this.keyProperty, val) || key, // if we can extract the key as requested, use it instead of the selection key
+                text = utility.getValue(val, this.textProperty);
 
             if (text && this.textTemplate)
                 text = this.textTemplate.apply(text, this);
@@ -374,26 +374,29 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                     ? this.valueTextProperty || this.textProperty
                     : false;
 
-            if (typeof val === 'undefined' || val == null) {
+            if (typeof val === 'undefined' || val == null)
+            {
                 this.currentValue = false;
                 if (initial) this.originalValue = this.currentValue;
                 this.setText(this.requireSelection ? this.emptyText : '');
                 return false;
             }
 
-            if (keyProperty || textProperty) {
+            if (keyProperty || textProperty)
+            {
                 if (keyProperty)
-                    key = Utility.getValue(val, keyProperty);
+                    key = utility.getValue(val, keyProperty);
 
                 if (textProperty)
-                    text = Utility.getValue(val, textProperty);
+                    text = utility.getValue(val, textProperty);
 
                 if (text && this.textTemplate)
                     text = this.textTemplate.apply(text, this);
                 else if (this.textRenderer)
                     text = this.textRenderer.call(this, val, key, text);
 
-                if (key || text) {
+                if (key || text)
+                {
                     this.currentValue = {
                         key: key || text,
                         text: text || key
@@ -402,14 +405,18 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                     if (initial) this.originalValue = this.currentValue;
 
                     this.setText(this.currentValue.text);
-                } else {
+                }
+                else
+                {
                     this.currentValue = false;
 
                     if (initial) this.originalValue = this.currentValue;
 
                     this.setText(this.requireSelection ? this.emptyText : '');    
                 }
-            } else {
+            }
+            else
+            {
                 key = val;
                 text = val;
 

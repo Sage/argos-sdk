@@ -85,8 +85,6 @@ define('Sage/Platform/Mobile/Fields/TextField', [
             domClass.add(this.domNode, 'text-field-active');
         },
         _onBlur: function(evt) {
-            var scope = this;
-
             if (this.validationTrigger == 'blur')
                 this.onValidationTrigger(evt);
 

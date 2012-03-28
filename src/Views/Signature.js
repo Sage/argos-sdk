@@ -5,19 +5,21 @@
 /// <reference path="../../../../argos-sdk/src/Detail.js"/>
 
 define('Sage/Platform/Mobile/Views/Signature', [
-    'dojo',
-    'dojo/_base/connect',
     'dojo/_base/declare',
+    'dojo/_base/json',
     'dojo/query',
-    'Sage/Platform/Mobile/View',
-    'Sage/Platform/Mobile/Format'
+    'dojo/dom-geometry',
+    'dojo/window',
+    'Sage/Platform/Mobile/Format',
+    'Sage/Platform/Mobile/View'
 ], function(
-    dojo,
-    connect,
     declare,
+    dojo,
     query,
-    View,
-    Format
+    domGeom,
+    win,
+    format,
+    View
 ) {
 
     return declare('Sage.Platform.Mobile.Views.Signature', [View], {
@@ -70,12 +72,12 @@ define('Sage/Platform/Mobile/Views/Signature', [
             this._sizeCanvas();
             this.context = this.signatureNode.getContext('2d');
 
-            connect.connect(dojo.global(), 'resize', this, this.onResize);
+            this.subscribe('/app/resize', this.onResize);
 
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         getValues: function() {
-            return JSON.stringify(this.optimizeSignature());
+            return dojo.toJson(this.optimizeSignature());
         },
         setValue: function(val, initial) {
             this.signature = val ? dojo.fromJson(val) : [];
@@ -87,7 +89,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
         },
         // _getCoords returns pointer pixel coordinates [x,y] relative to canvas object
         _getCoords: function (e) {
-            var offset = dojo.position(this.signatureNode, false);
+            var offset = domGeom.position(this.signatureNode, false);
             return e.touches
                 ? [
                     e.touches[0].pageX - offset.x,
@@ -141,10 +143,10 @@ define('Sage/Platform/Mobile/Views/Signature', [
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         _sizeCanvas: function () {
-            this.canvasNodeWidth  = Math.floor(dojo.window.getBox().w * 0.92);
+            this.canvasNodeWidth  = Math.floor(win.getBox().w * 0.92);
             this.canvasNodeHeight = Math.min(
                 Math.floor(this.canvasNodeWidth * 0.5),
-                dojo.window.getBox().h - query('.toolbar')[0].offsetHeight - query('.footer-toolbar')[0].offsetHeight
+                win.getBox().h - query('.toolbar')[0].offsetHeight - query('.footer-toolbar')[0].offsetHeight
             );
             this.signatureNode.width  = this.canvasNodeWidth;
             this.signatureNode.height = this.canvasNodeHeight;
@@ -162,7 +164,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         redraw: function (vector, canvas, options) {
-            Format.canvasDraw(vector, canvas, options);
+            format.canvasDraw(vector, canvas, options);
         },
         rescale: function (scale) {
             var rescaled = [];

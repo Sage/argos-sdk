@@ -18,16 +18,12 @@ define('Sage/Platform/Mobile/Convert', [
 ], function(
     lang
 ) {
-
-    lang.setObject('Sage.Platform.Mobile.Convert', null);
-
-    return Sage.Platform.Mobile.Convert = (function() {
     var trueRE = /^(true|T)$/i,
         isoDate = /(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|(-|\+)(\d{2}):(\d{2})))?/,
         jsonDate = /\/Date\((-?\d+)(?:(-|\+)(\d{2})(\d{2}))?\)\//,
         pad = function(n) { return n < 10 ? '0' + n : n };
 
-    return {
+    return lang.setObject('Sage.Platform.Mobile.Convert', {
         toBoolean: function(value) {
             return trueRE.test(value);
         },
@@ -104,7 +100,6 @@ define('Sage/Platform/Mobile/Convert', [
 
             return value;
         }
-    };
-    })();
+    });
 });
 

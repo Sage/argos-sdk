@@ -24,11 +24,11 @@ define('Sage/Platform/Mobile/ErrorManager', [
     connect,
     string
 ) {
-    var loadedErrors = [];
+    var errors = [];
     try
     {
         if (window.localStorage)
-            loadedErrors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
+            errors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
     }
     catch(e)
     {
@@ -43,8 +43,6 @@ define('Sage/Platform/Mobile/ErrorManager', [
          * Total amount of errors to keep
          */
         errorCacheSizeMax: 10,
-
-        errors: loadedErrors,
 
         /**
          * Adds a custom error item by combining error message/options for easier tech support
@@ -71,7 +69,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
                 lang.mixin(errorItem, this.extractAbortResponse(serverResponse));
 
             this.checkCacheSize();
-            this.errors.push(errorItem);
+            errors.push(errorItem);
             this.onErrorAdd();
             this.save();
         },
@@ -176,7 +174,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
          * Ensures there is at least 1 open spot for a new error by checking against errorCacheSizeMax
          */
         checkCacheSize: function() {
-            var errLength = this.errors.length,
+            var errLength = errors.length,
                 cacheSizeIndex = this.errorCacheSizeMax - 1;
             if (errLength > cacheSizeIndex)
                 this.removeError(cacheSizeIndex, errLength - cacheSizeIndex);
@@ -188,9 +186,9 @@ define('Sage/Platform/Mobile/ErrorManager', [
          * @param value Value of the key to match against
          * @return errorItem Returns the first error item in the match set or null if none found
          */
-        getError: function(key, value){
+        getError: function(key, value) {
             var errorList = this.getAllErrors();
-            for (var i=0; i<errorList.length; i++) {
+            for (var i = 0; i < errorList.length; i++) {
                 if (errorList[i][key] == value)
                     return errorList[i];
             }
@@ -198,11 +196,11 @@ define('Sage/Platform/Mobile/ErrorManager', [
         },
 
         getAllErrors: function() {
-            return this.errors;
+            return lang.clone(errors);
         },
 
         removeError: function(index, amount) {
-            this.errors.splice(index, amount || 1);
+            errors.splice(index, amount || 1);
         },
 
         onErrorAdd: function() {
@@ -215,7 +213,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
             try
             {
                 if (window.localStorage)
-                    window.localStorage.setItem('errorlog', dojo.toJson(this.errors));
+                    window.localStorage.setItem('errorlog', dojo.toJson(errors));
             }
             catch(e) {}
         }

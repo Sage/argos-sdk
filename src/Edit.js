@@ -17,16 +17,17 @@ define('Sage/Platform/Mobile/Edit', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/connect',
+    'dojo/_base/array',
     'dojo/string',
     'dojo/dom',
     'dojo/dom-attr',
     'dojo/dom-class',
     'dojo/query',
-    'Sage/Platform/Mobile/View',
-    'Sage/Platform/Mobile/Utility',
     'Sage/Platform/Mobile/Convert',
-    'Sage/Platform/Mobile/FieldManager',
+    'Sage/Platform/Mobile/Utility',
     'Sage/Platform/Mobile/ErrorManager',
+    'Sage/Platform/Mobile/FieldManager',
+    'Sage/Platform/Mobile/View',
 
     'dojo/NodeList-manipulate',
     'Sage/Platform/Mobile/Fields/BooleanField',
@@ -45,16 +46,17 @@ define('Sage/Platform/Mobile/Edit', [
     declare,
     lang,
     connect,
+    array,
     string,
     dom,
     domAttr,
     domClass,
     query,
-    View,
-    Utility,
-    Convert,
+    convert,
+    utility,
+    ErrorManager,
     FieldManager,
-    ErrorManager
+    View
 ) {
 
     return declare('Sage.Platform.Mobile.Edit', [View], {
@@ -129,7 +131,7 @@ define('Sage/Platform/Mobile/Edit', [
             
             this.processLayout(this._createCustomizedLayout(this.createLayout()));
 
-            dojo.query('div[data-field]', this.contentNode).forEach(function(node){
+            query('div[data-field]', this.contentNode).forEach(function(node){
                 var name = domAttr.get(node, 'data-field'),
                     field = this.fields[name];
                 if (field)
@@ -171,7 +173,7 @@ define('Sage/Platform/Mobile/Edit', [
         },
         invokeAction: function(name, parameters, evt, el) {
             var fieldEl = el && query(el, this.contentNode).parents('[data-field]'),
-                field = this.fields[fieldEl.length>0 && domAttr.get(fieldEl[0], 'data-field')];
+                field = this.fields[fieldEl.length > 0 && domAttr.get(fieldEl[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
                 return field[name].apply(field, [parameters, evt, el]);
@@ -180,7 +182,7 @@ define('Sage/Platform/Mobile/Edit', [
         },
         hasAction: function(name, evt, el) {
             var fieldEl = el && query(el, this.contentNode).parents('[data-field]'),
-                field = fieldEl && this.fields[fieldEl.length>0 && domAttr.get(fieldEl[0], 'data-field')];
+                field = fieldEl && this.fields[fieldEl.length > 0 && domAttr.get(fieldEl[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
                 return true;
@@ -323,8 +325,8 @@ define('Sage/Platform/Mobile/Edit', [
 
             for (var n in entry)
             {
-                if (Convert.isDateString(entry[n]))
-                    entry[n] = Convert.toDateFromString(entry[n]);
+                if (convert.isDateString(entry[n]))
+                    entry[n] = convert.toDateFromString(entry[n]);
             }
 
             return entry;
@@ -336,8 +338,8 @@ define('Sage/Platform/Mobile/Edit', [
             {
                 if (values[n] instanceof Date)
                     values[n] = this.getService().isJsonEnabled()
-                        ? Convert.toJsonStringFromDate(values[n])
-                        : Convert.toIsoStringFromDate(values[n]);
+                        ? convert.toJsonStringFromDate(values[n])
+                        : convert.toIsoStringFromDate(values[n]);
             }
 
             return values;
@@ -397,11 +399,11 @@ define('Sage/Platform/Mobile/Edit', [
 
                 if (field.applyTo !== false)
                 {
-                    value = Utility.getValue(values, field.applyTo, noValue);
+                    value = utility.getValue(values, field.applyTo, noValue);
                 }
                 else
                 {
-                    value = Utility.getValue(values, field.property || name, noValue);
+                    value = utility.getValue(values, field.property || name, noValue);
                 }
 
                 // fyi: uses the fact that ({} !== {})
@@ -441,12 +443,12 @@ define('Sage/Platform/Mobile/Edit', [
                 {
                     if (field.applyTo !== false)
                     {
-                        target = Utility.getValue(o, field.applyTo);
+                        target = utility.getValue(o, field.applyTo);
                         lang.mixin(target, value);
                     }
                     else
                     {
-                        Utility.setValue(o, field.property || name, value);
+                        utility.setValue(o, field.property || name, value);
                     }
 
                     empty = false;
@@ -657,7 +659,7 @@ define('Sage/Platform/Mobile/Edit', [
                 this.update();
         },
         getContext: function() {
-            return lang.mixin(Sage.Platform.Mobile.Edit.superclass.getContext.call(this), {
+            return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
                 insert: this.options.insert,
                 key: this.options.insert ? false : this.options.entry && this.options.entry['$key']
@@ -672,8 +674,6 @@ define('Sage/Platform/Mobile/Edit', [
             return lookup[access];
         },
         beforeTransitionTo: function() {
-            Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
-
             if (this.refreshRequired)
             {
                 if (this.options.insert === true)
@@ -681,6 +681,8 @@ define('Sage/Platform/Mobile/Edit', [
                 else
                     domClass.remove(this.domNode, 'panel-loading');
             }
+
+            this.inherited(arguments);
         },
         activate: function() {
             // external navigation (browser back/forward) never refreshes the edit view as it's always a terminal loop.
