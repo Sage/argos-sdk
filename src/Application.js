@@ -14,11 +14,12 @@
  */
 
 define('Sage/Platform/Mobile/Application', [
-    'dojo',
+    'dojo/_base/json',
     'dojo/_base/array',
     'dojo/_base/connect',
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/_base/window',
     'dojo/string'
 ], function(
     dojo,
@@ -26,6 +27,7 @@ define('Sage/Platform/Mobile/Application', [
     connect,
     declare,
     lang,
+    win,
     string
 ) {
     
@@ -73,7 +75,7 @@ define('Sage/Platform/Mobile/Application', [
             return baseConfiguration;
         };
 
-    lang.mixin(dojo.global, {
+    lang.mixin(win.global, {
         'localize': localize,
         'mergeConfiguration': mergeConfiguration
     });
@@ -134,9 +136,9 @@ define('Sage/Platform/Mobile/Application', [
         },
         initConnects: function() {
             this._connects.push(connect.connect(window, 'resize', this, this.onResize));
-            this._connects.push(connect.connect(dojo.body(), 'beforetransition', this, this._onBeforeTransition));
-            this._connects.push(connect.connect(dojo.body(), 'aftertransition', this, this._onAfterTransition));
-            this._connects.push(connect.connect(dojo.body(), 'show', this, this._onActivate));
+            this._connects.push(connect.connect(win.body(), 'beforetransition', this, this._onBeforeTransition));
+            this._connects.push(connect.connect(win.body(), 'aftertransition', this, this._onAfterTransition));
+            this._connects.push(connect.connect(win.body(), 'show', this, this._onActivate));
         },
         initServices: function() {
             for (var name in this.connections) this.registerService(name, this.connections[name]);
@@ -252,7 +254,7 @@ define('Sage/Platform/Mobile/Application', [
 
             if (this._started) view.init();
 
-            view.placeAt(dojo.body(), 'first');
+            view.placeAt(win.body(), 'first');
 
             this.onRegistered(view);
 
@@ -270,7 +272,7 @@ define('Sage/Platform/Mobile/Application', [
 
             if (this._started) tbar.init();
 
-            tbar.placeAt(dojo.body(), 'last');
+            tbar.placeAt(win.body(), 'last');
 
             return this;
         },

@@ -161,7 +161,7 @@ define('Sage/Platform/Mobile/Calendar', [
             if (val > max) { val = max; }
             el.options.length = 0;
             for (var i=min; i <= max; i++) {
-                var opt = domConstruct('option', {
+                var opt = domConstruct.create('option', {
                     innerHTML: (this.monthNode == el) ? uCase(this.months[i]) : pad(i),
                     value: i,
                     selected: (i == val)
@@ -212,7 +212,7 @@ define('Sage/Platform/Mobile/Calendar', [
                 this.is24hrTimeFormat ? 23 : 12
             );
             this.populateSelector(this.minuteNode, this.date.getMinutes(), 0, 59);
-            domAttr(this.meridiemNode, 'toggled', this.date.getHours() < 12);
+            domAttr.set(this.meridiemNode, 'toggled', this.date.getHours() < 12);
 
             this.updateDatetimeCaption();
 

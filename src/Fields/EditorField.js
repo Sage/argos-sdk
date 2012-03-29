@@ -122,7 +122,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
             var view = App.getPrimaryActiveView();
             var success = true;
 
-            if (view instanceof Edit)
+            if (view instanceof Sage.Platform.Mobile.Edit)
             {
                 view.hideValidationSummary();
 

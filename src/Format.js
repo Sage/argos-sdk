@@ -126,15 +126,15 @@ define('Sage/Platform/Mobile/Format', [
             if (typeof val === 'string') val = /^true$/i.test(val);
 
             return val
-                ? this.yesText || 'Yes'
-                : this.noText || 'No';
+                ? Sage.Platform.Mobile.Format.yesText || 'Yes'
+                : Sage.Platform.Mobile.Format.noText || 'No';
         },
         bool: function(val) {
             if (typeof val === 'string') val = /^true$/i.test(val);
 
             return val
-                ? this.trueText || 'T'
-                : this.falseText || 'F';
+                ? Sage.Platform.Mobile.Format.trueText || 'T'
+                : Sage.Platform.Mobile.Format.falseText || 'F';
         },
         nl2br: function(val) {
             if (typeof val !== 'string') return val;
@@ -142,18 +142,18 @@ define('Sage/Platform/Mobile/Format', [
             return val.replace(/\n/g, '<br />');
         },
         timespan: function(val) {
-            var v = this.fixed(val);
+            var v = Sage.Platform.Mobile.Format.fixed(val);
             if (isNaN(v) || !v) return '';
 
             var hrs = Math.floor(v / 60);
             var mins  = v % 60;
 
             if (hrs)
-                hrs = hrs > 1 ? string.substitute('${0} ${1} ', [hrs, (this.hoursText || 'hours')])
-                              : string.substitute('${0} ${1} ', [hrs, (this.hourText || 'hour')]);
+                hrs = hrs > 1 ? string.substitute('${0} ${1} ', [hrs, (Sage.Platform.Mobile.Format.hoursText || 'hours')])
+                              : string.substitute('${0} ${1} ', [hrs, (Sage.Platform.Mobile.Format.hourText || 'hour')]);
             if (mins)
-                mins = mins > 1 ? string.substitute('${0} ${1}', [mins, (this.minutesText || 'minutes')])
-                                : string.substitute('${0} ${1}', [mins, (this.minuteText || 'minute')]);
+                mins = mins > 1 ? string.substitute('${0} ${1}', [mins, (Sage.Platform.Mobile.Format.minutesText || 'minutes')])
+                                : string.substitute('${0} ${1}', [mins, (Sage.Platform.Mobile.Format.minuteText || 'minute')]);
 
             return (hrs && mins) ? hrs + mins
                                  : hrs === 0 ? mins : hrs;
@@ -206,7 +206,7 @@ define('Sage/Platform/Mobile/Format', [
                 canvasNode.height / size.height
             );
 
-            this.canvasDraw(vector, canvasNode, options);
+            Sage.Platform.Mobile.Format.canvasDraw(vector, canvasNode, options);
 
             img = canvasNode.toDataURL('image/png');
             if (img.indexOf("data:image/png") != 0)

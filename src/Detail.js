@@ -260,7 +260,7 @@ define('Sage/Platform/Mobile/Detail', [
                 if (!sectionStarted)
                 {
                     sectionStarted = true;
-                    section = dojo.toDom(this.sectionBeginTemplate.apply(layout, this) + this.sectionEndTemplate.apply(layout, this));
+                    section = domConstruct.toDom(this.sectionBeginTemplate.apply(layout, this) + this.sectionEndTemplate.apply(layout, this));
                     sectionNode = section.childNodes[1];
                     domConstruct.place(section, this.contentNode);
                 }

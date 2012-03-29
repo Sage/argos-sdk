@@ -15,12 +15,14 @@
 
 define('Sage/Platform/Mobile/View', [
     'dojo/_base/declare',
+    'dojo/_base/lang',
     'dijit/_Widget',
     'Sage/Platform/Mobile/_ActionMixin',
     'Sage/Platform/Mobile/_CustomizationMixin',
     'Sage/Platform/Mobile/_Templated'
 ], function(
     declare,
+    lang,
     _Widget,
     _ActionMixin,
     _CustomizationMixin,
@@ -148,7 +150,7 @@ define('Sage/Platform/Mobile/View', [
 
             (this.options.title) ? this.set('title', this.options.title) : this.set('title', this.titleText);
 
-            ReUI.show(this.domNode, dojo.mixin(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
+            ReUI.show(this.domNode, lang.mixin(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
         },
         expandExpression: function(expression) {
             /// <summary>
