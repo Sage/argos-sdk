@@ -125,11 +125,11 @@ define('Sage/Platform/Mobile/Calendar', [
         init: function() {
             this.inherited(arguments);
 
-            this.connect(this.dayNode,    'onchange', this, this.validate);
-            this.connect(this.monthNode,  'onchange', this, this.validate);
-            this.connect(this.yearNode,   'onchange', this, this.validate);
-            this.connect(this.hourNode,   'onchange', this, this.validate);
-            this.connect(this.minuteNode, 'onchange', this, this.validate);
+            this.connect(this.dayNode,    'onchange', this.validate);
+            this.connect(this.monthNode,  'onchange', this.validate);
+            this.connect(this.yearNode,   'onchange', this.validate);
+            this.connect(this.hourNode,   'onchange', this.validate);
+            this.connect(this.minuteNode, 'onchange', this.validate);
         },
 
         validate: function() {
