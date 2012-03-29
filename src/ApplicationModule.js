@@ -13,9 +13,20 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Application', 'Sage/Platform/Mobile/ErrorManager'], function() {
+define('Sage/Platform/Mobile/ApplicationModule', [
+    'dojo/_base/array',
+    'dojo/_base/connect',
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'Sage/Platform/Mobile/Application'
+], function(
+    array,
+    connect,
+    declare,
+    lang
+) {
 
-    return dojo.declare('Sage.Platform.Mobile.ApplicationModule', null, {
+    return declare('Sage.Platform.Mobile.ApplicationModule', null, {
         _connects: null,
         _subscribes: null,
         application: null,
@@ -23,15 +34,15 @@ define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Applicat
             this._connects = [];
             this._subscribes = [];
 
-            dojo.mixin(this, options);
+            lang.mixin(this, options);
         },
         destroy: function() {
-            dojo.forEach(this._connects, function(handle) {
-                dojo.disconnect(handle);
+            array.forEach(this._connects, function(handle) {
+                connect.disconnect(handle);
             });
 
-            dojo.forEach(this._subscribes, function(handle){
-                dojo.unsubscribe(handle);
+            array.forEach(this._subscribes, function(handle){
+                connect.unsubscribe(handle);
             });
 
             this.uninitialize();
@@ -42,13 +53,9 @@ define('Sage/Platform/Mobile/ApplicationModule', ['Sage/Platform/Mobile/Applicat
         init: function(application) {
             this.application = application;
 
-            this.loadErrorManager();
             this.loadCustomizations();
             this.loadToolbars();
             this.loadViews();
-        },
-        loadErrorManager: function() {
-            Sage.Platform.Mobile.ErrorManager.init();
         },
         loadCustomizations: function() {
         },

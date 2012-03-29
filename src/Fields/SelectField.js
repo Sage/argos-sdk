@@ -13,8 +13,16 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/SelectField', ['Sage/Platform/Mobile/Fields/LookupField'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.SelectField', [Sage.Platform.Mobile.Fields.LookupField], {
+define('Sage/Platform/Mobile/Fields/SelectField', [
+    'dojo/_base/declare',
+    'Sage/Platform/Mobile/Fields/LookupField',
+    'Sage/Platform/Mobile/FieldManager'
+], function(
+    declare,
+    LookupField,
+    FieldManager
+) {
+    var control = declare('Sage.Platform.Mobile.Fields.SelectField', [LookupField], {
         valueKeyProperty: false,
         valueTextProperty: false,
         createNavigationOptions: function() {
@@ -24,5 +32,5 @@ define('Sage/Platform/Mobile/Fields/SelectField', ['Sage/Platform/Mobile/Fields/
         }        
     });
 
-    return Sage.Platform.Mobile.FieldManager.register('select', control);
+    return FieldManager.register('select', control);
 });

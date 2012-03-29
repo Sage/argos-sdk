@@ -13,9 +13,21 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], function() {
+define('Sage/Platform/Mobile/GroupedList', [
+    'dojo/_base/declare',
+    'dojo/query',
+    'dojo/string',
+    'dojo/dom-class',
+    'Sage/Platform/Mobile/List'
+], function(
+    declare,
+    query,
+    string,
+    domClass,
+    List
+) {
 
-    return dojo.declare('Sage.Platform.Mobile.GroupedList', [Sage.Platform.Mobile.List], {
+    return declare('Sage.Platform.Mobile.GroupedList', [List], {
         // Localization
         toggleCollapseText: 'toggle collapse',
 
@@ -43,9 +55,9 @@ define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], functi
             };
         },
         toggleGroup: function(params) {
-            var node = dojo.query(params.$source);
+            var node = query(params.$source);
             if (node)
-                node.toggleClass('collapsed');
+                domClass.toggle(node, 'collapsed');
         },
         processFeed: function(feed) {
             /// <summary>
@@ -71,13 +83,13 @@ define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], functi
 
                     if (entryGroup.tag != this._currentGroup)
                     {
-                        if (o.length > 0) dojo.query(this._currentGroupNode).append(o.join(''));
+                        if (o.length > 0) query(this._currentGroupNode).append(o.join(''));
 
                         o = [];
 
                         this._currentGroup = entryGroup.tag;
-                        dojo.query(this.contentNode).append(this.groupTemplate.apply(entryGroup, this));
-                        this._currentGroupNode = dojo.query("> :last-child", this.contentNode)[0];
+                        query(this.contentNode).append(this.groupTemplate.apply(entryGroup, this));
+                        this._currentGroupNode = query("> :last-child", this.contentNode)[0];
                     }
 
                     this.entries[entry.$key] = entry;
@@ -85,17 +97,17 @@ define('Sage/Platform/Mobile/GroupedList', ['Sage/Platform/Mobile/List'], functi
                     o.push(this.rowTemplate.apply(entry, this));
                 }
 
-                if (o.length > 0) dojo.query(this._currentGroupNode).append(o.join(''));
+                if (o.length > 0) query(this._currentGroupNode).append(o.join(''));
             }
 
             // todo: add more robust handling when $totalResults does not exist, i.e., hide element completely
             if (typeof this.feed['$totalResults'] !== 'undefined')
             {
                 var remaining = this.feed['$totalResults'] - (this.feed['$startIndex'] + this.feed['$itemsPerPage'] - 1);
-                this.set('remainingContent', dojo.string.substitute(this.remainingText, [remaining]));
+                this.set('remainingContent', string.substitute(this.remainingText, [remaining]));
             }
 
-            dojo.toggleClass(this.domNode, 'list-has-more', this.hasMoreData());
+            domClass.toggle(this.domNode, 'list-has-more', this.hasMoreData());
         },
         clear: function() {
             this.inherited(arguments);

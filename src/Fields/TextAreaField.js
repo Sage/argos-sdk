@@ -13,8 +13,16 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/TextAreaField', ['Sage/Platform/Mobile/Fields/TextField'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.TextAreaField', [Sage.Platform.Mobile.Fields.TextField], {
+define('Sage/Platform/Mobile/Fields/TextAreaField', [
+    'dojo/_base/declare',
+    'Sage/Platform/Mobile/Fields/TextField',
+    'Sage/Platform/Mobile/FieldManager'
+], function(
+    declare,
+    TextField,
+    FieldManager
+) {
+    var control = declare('Sage.Platform.Mobile.Fields.TextAreaField', [TextField], {
         rows: 4,
         enableClearButton: false,
         widgetTemplate: new Simplate([
@@ -23,5 +31,5 @@ define('Sage/Platform/Mobile/Fields/TextAreaField', ['Sage/Platform/Mobile/Field
         ])
     });
 
-    return Sage.Platform.Mobile.FieldManager.register('textarea', control);
+    return FieldManager.register('textarea', control);
 });

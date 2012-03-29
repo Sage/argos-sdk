@@ -14,20 +14,32 @@
  */
 
 define('Sage/Platform/Mobile/SearchWidget', [
-    'dojo',
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/_base/event',
+    'dojo/string',
+    'dojo/dom-class',
     'dijit/_Widget',
     'Sage/Platform/Mobile/_Templated'
-], function() {
-    return dojo.declare('Sage.Platform.Mobile.SearchWidget', [dijit._Widget, Sage.Platform.Mobile._Templated], {
+], function(
+    declare,
+    lang,
+    event,
+    string,
+    domClass,
+    _Widget,
+    _Templated
+) {
+    return declare('Sage.Platform.Mobile.SearchWidget', [_Widget, _Templated], {
         attributeMap: {
             queryValue: { node: 'queryNode', type: 'attribute', attribute: 'value' }
         },
         widgetTemplate: new Simplate([
             '<div class="search-widget">',
-            '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="queryNode" data-dojo-attach-event="onfocus:_onFocus,onblur:_onBlur,onkeypress:_onKeyPress" />',
-            '<button class="clear-button" data-dojo-attach-event="onclick: _onClearClick"></button>',
-            '<button class="subHeaderButton searchButton" data-dojo-attach-event="click: search">{%= $.searchText %}</button>',
-            '<label data-dojo-attach-point="labelNode">{%= $.searchText %}</label>',
+                '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="queryNode" data-dojo-attach-event="onfocus:_onFocus,onblur:_onBlur,onkeypress:_onKeyPress" />',
+                '<button class="clear-button" data-dojo-attach-event="onclick: _onClearClick"></button>',
+                '<button class="subHeaderButton searchButton" data-dojo-attach-event="click: search">{%= $.searchText %}</button>',
+                '<label data-dojo-attach-point="labelNode">{%= $.searchText %}</label>',
             '</div>'
         ]),
         
@@ -48,7 +60,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
         queryNode: null,
 
         clear: function() {
-            dojo.removeClass(this.domNode, 'search-active');
+            domClass.remove(this.domNode, 'search-active');
             this.set('queryValue', '');
         },
         search: function() {
@@ -113,18 +125,18 @@ define('Sage/Platform/Mobile/SearchWidget', [
             if(hashQueries.length < 1)
                 return this.formatSearchQuery(query);
 
-            query = dojo.string.substitute('(${0})', [hashQueries.join(') and (')]);
+            query = string.substitute('(${0})', [hashQueries.join(') and (')]);
 
             additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
 
             if (additionalSearch)
-                query += dojo.string.substitute(' and (${0})', [this.formatSearchQuery(additionalSearch)]);
+                query += string.substitute(' and (${0})', [this.formatSearchQuery(additionalSearch)]);
 
             return query;
         },
         configure: function(options) {
             // todo: for now, we simply mixin the options
-            dojo.mixin(this, options);
+            lang.mixin(this, options);
         },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
@@ -133,21 +145,21 @@ define('Sage/Platform/Mobile/SearchWidget', [
                 return expression;
         },
         _onClearClick: function(evt){
-            dojo.stopEvent(evt);
+            event.stop(evt);
             this.clear();
             this.queryNode.focus();
             this.queryNode.click();
         },
         _onBlur: function() {
-            dojo.toggleClass(this.domNode, 'search-active', !!this.queryNode.value);
+            domClass.toggle(this.domNode, 'search-active', !!this.queryNode.value);
         },
         _onFocus: function() {
-            dojo.addClass(this.domNode, 'search-active');
+            domClass.add(this.domNode, 'search-active');
         },
         _onKeyPress: function(evt) {
             if (evt.keyCode == 13 || evt.keyCode == 10)
             {
-                dojo.stopEvent(evt);
+                event.stop(evt);
                 this.queryNode.blur();
                 this.search();
             }

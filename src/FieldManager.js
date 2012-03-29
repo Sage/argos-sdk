@@ -13,10 +13,13 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/FieldManager', ['dojo'], function() {
-
+define('Sage/Platform/Mobile/FieldManager', [
+    'dojo/_base/lang'
+], function(
+    lang
+) {
     var store = {};
-    return dojo.setObject('Sage.Platform.Mobile.FieldManager', {
+    return lang.setObject('Sage.Platform.Mobile.FieldManager', {
         types: store,
         register: function(name, ctor) {
             return (store[name] = ctor);
@@ -25,5 +28,4 @@ define('Sage/Platform/Mobile/FieldManager', ['dojo'], function() {
             return store[name];
         }
     });
-    
 });

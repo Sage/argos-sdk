@@ -4,9 +4,25 @@
 /// <reference path="../../../../argos-sdk/src/View.js"/>
 /// <reference path="../../../../argos-sdk/src/Detail.js"/>
 
-define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], function() {
+define('Sage/Platform/Mobile/Views/Signature', [
+    'dojo/_base/declare',
+    'dojo/_base/json',
+    'dojo/query',
+    'dojo/dom-geometry',
+    'dojo/window',
+    'Sage/Platform/Mobile/Format',
+    'Sage/Platform/Mobile/View'
+], function(
+    declare,
+    dojo,
+    query,
+    domGeom,
+    win,
+    format,
+    View
+) {
 
-    return dojo.declare('Sage.Platform.Mobile.Views.Signature', [Sage.Platform.Mobile.View], {
+    return declare('Sage.Platform.Mobile.Views.Signature', [View], {
         // Localization
         titleText: 'Signature',
         clearCanvasText: 'Erase',
@@ -25,6 +41,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         canvasTemplate: new Simplate([
             '<canvas data-dojo-attach-point="signatureNode" width="{%: $.canvasNodeWidth %}" height="{%: $.canvasNodeHeight %}" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp"></canvas>'
         ]),
+        signatureNode: null,
 
         //View Properties
         id: 'signature_edit',
@@ -55,15 +72,15 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             this._sizeCanvas();
             this.context = this.signatureNode.getContext('2d');
 
-            dojo.connect(window, 'resize', this, this.onResize)
+            this.subscribe('/app/resize', this.onResize);
 
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         getValues: function() {
-            return JSON.stringify(this.optimizeSignature());
+            return dojo.toJson(this.optimizeSignature());
         },
         setValue: function(val, initial) {
-            this.signature = val ? JSON.parse(val) : [];
+            this.signature = val ? dojo.fromJson(val) : [];
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         clearValue: function() {
@@ -72,7 +89,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
         },
         // _getCoords returns pointer pixel coordinates [x,y] relative to canvas object
         _getCoords: function (e) {
-            var offset = dojo.position(this.signatureNode, false);
+            var offset = domGeom.position(this.signatureNode, false);
             return e.touches
                 ? [
                     e.touches[0].pageX - offset.x,
@@ -126,10 +143,10 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         _sizeCanvas: function () {
-            this.canvasNodeWidth  = Math.floor(dojo.window.getBox().w * 0.92);
+            this.canvasNodeWidth  = Math.floor(win.getBox().w * 0.92);
             this.canvasNodeHeight = Math.min(
                 Math.floor(this.canvasNodeWidth * 0.5),
-                dojo.window.getBox().h - dojo.query('.toolbar')[0].offsetHeight - dojo.query('.footer-toolbar')[0].offsetHeight
+                win.getBox().h - query('.toolbar')[0].offsetHeight - query('.footer-toolbar')[0].offsetHeight
             );
             this.signatureNode.width  = this.canvasNodeWidth;
             this.signatureNode.height = this.canvasNodeHeight;
@@ -147,7 +164,7 @@ define('Sage/Platform/Mobile/Views/Signature', ['Sage/Platform/Mobile/View'], fu
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         redraw: function (vector, canvas, options) {
-            Sage.Platform.Mobile.Format.canvasDraw(vector, canvas, options);
+            format.canvasDraw(vector, canvas, options);
         },
         rescale: function (scale) {
             var rescaled = [];

@@ -14,25 +14,52 @@
  */
 
 define('Sage/Platform/Mobile/Edit', [
-    'Sage/Platform/Mobile/View',
-    'Sage/Platform/Mobile/Utility',
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/_base/connect',
+    'dojo/_base/array',
+    'dojo/string',
+    'dojo/dom',
+    'dojo/dom-attr',
+    'dojo/dom-class',
+    'dojo/query',
     'Sage/Platform/Mobile/Convert',
+    'Sage/Platform/Mobile/Utility',
+    'Sage/Platform/Mobile/ErrorManager',
     'Sage/Platform/Mobile/FieldManager',
-    'Sage/Platform/Mobile/Fields/EditorField',
-    'Sage/Platform/Mobile/Fields/TextField',
-    'Sage/Platform/Mobile/Fields/PhoneField',
-    'Sage/Platform/Mobile/Fields/SelectField',
+    'Sage/Platform/Mobile/View',
+
+    'dojo/NodeList-manipulate',
     'Sage/Platform/Mobile/Fields/BooleanField',
     'Sage/Platform/Mobile/Fields/DateField',
     'Sage/Platform/Mobile/Fields/DecimalField',
     'Sage/Platform/Mobile/Fields/DurationField',
     'Sage/Platform/Mobile/Fields/HiddenField',
+    'Sage/Platform/Mobile/Fields/LookupField',
     'Sage/Platform/Mobile/Fields/NoteField',
+    'Sage/Platform/Mobile/Fields/PhoneField',
+    'Sage/Platform/Mobile/Fields/SelectField',
     'Sage/Platform/Mobile/Fields/SignatureField',
-    'Sage/Platform/Mobile/Fields/TextAreaField'
-    ], function() {
+    'Sage/Platform/Mobile/Fields/TextAreaField',
+    'Sage/Platform/Mobile/Fields/TextField'
+], function(
+    declare,
+    lang,
+    connect,
+    array,
+    string,
+    dom,
+    domAttr,
+    domClass,
+    query,
+    convert,
+    utility,
+    ErrorManager,
+    FieldManager,
+    View
+) {
 
-    return dojo.declare('Sage.Platform.Mobile.Edit', [Sage.Platform.Mobile.View], {
+    return declare('Sage.Platform.Mobile.Edit', [View], {
         attributeMap: {
             validationContent: {
                 node: 'validationContentNode',
@@ -104,8 +131,8 @@ define('Sage/Platform/Mobile/Edit', [
             
             this.processLayout(this._createCustomizedLayout(this.createLayout()));
 
-            dojo.query('div[data-field]', this.contentNode).forEach(function(node){
-                var name = dojo.attr(node, 'data-field'),
+            query('div[data-field]', this.contentNode).forEach(function(node){
+                var name = domAttr.get(node, 'data-field'),
                     field = this.fields[name];
                 if (field)
                     field.renderTo(node);
@@ -133,20 +160,20 @@ define('Sage/Platform/Mobile/Edit', [
             });
         },
         _onShowField: function(field) {
-            dojo.removeClass(field.containerNode, 'row-hidden');
+            domClass.remove(field.containerNode, 'row-hidden');
         },
         _onHideField: function(field) {
-            dojo.addClass(field.containerNode, 'row-hidden');
+            domClass.add(field.containerNode, 'row-hidden');
         },
         _onEnableField: function(field) {
-            dojo.removeClass(field.containerNode, 'row-disabled');
+            domClass.remove(field.containerNode, 'row-disabled');
         },
         _onDisableField: function(field) {
-            dojo.addClass(field.containerNode, 'row-disabled');
+            domClass.add(field.containerNode, 'row-disabled');
         },
         invokeAction: function(name, parameters, evt, el) {
-            var fieldEl = el && dojo.query(el, this.contentNode).parents('[data-field]'),
-                field = this.fields[fieldEl.length>0 && dojo.attr(fieldEl[0], 'data-field')];
+            var fieldEl = el && query(el, this.contentNode).parents('[data-field]'),
+                field = this.fields[fieldEl.length > 0 && domAttr.get(fieldEl[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
                 return field[name].apply(field, [parameters, evt, el]);
@@ -154,8 +181,8 @@ define('Sage/Platform/Mobile/Edit', [
             return this.inherited(arguments);
         },
         hasAction: function(name, evt, el) {
-            var fieldEl = el && dojo.query(el, this.contentNode).parents('[data-field]'),
-                field = fieldEl && this.fields[fieldEl.length>0 && dojo.attr(fieldEl[0], 'data-field')];
+            var fieldEl = el && query(el, this.contentNode).parents('[data-field]'),
+                field = fieldEl && this.fields[fieldEl.length > 0 && domAttr.get(fieldEl[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
                 return true;
@@ -163,16 +190,16 @@ define('Sage/Platform/Mobile/Edit', [
             return this.inherited(arguments);
         },
         toggleSection: function(params) {
-            var node = dojo.byId(params.$source);
+            var node = dom.byId(params.$source);
             if (node)
-                dojo.toggleClass(node, 'collapsed');
+                domClass.toggle(node, 'collapsed');
         },
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
 
             var key = (this.entry && this.entry['$key']) || this.options.key
             if (key)
-                request.setResourceSelector(dojo.string.substitute("'${0}'", [key]));
+                request.setResourceSelector(string.substitute("'${0}'", [key]));
 
             if (this.contractName)
                 request.setContractName(this.contractName);
@@ -238,8 +265,8 @@ define('Sage/Platform/Mobile/Edit', [
                     content.push(this.sectionBeginTemplate.apply(layout, this));
                 }                    
 
-                var ctor = Sage.Platform.Mobile.FieldManager.get(current['type']),
-                    field = this.fields[current['name'] || current['property']] = new ctor(dojo.mixin({
+                var ctor = FieldManager.get(current['type']),
+                    field = this.fields[current['name'] || current['property']] = new ctor(lang.mixin({
                         owner: this
                     }, current)),
                     template = field.propertyTemplate || this.propertyTemplate;
@@ -255,7 +282,7 @@ define('Sage/Platform/Mobile/Edit', [
 
             content.push(this.sectionEndTemplate.apply(layout, this));
 
-            dojo.query(this.contentNode).append(content.join(''));
+            query(this.contentNode).append(content.join(''));
 
             for (var i = 0; i < sectionQueue.length; i++)
             {
@@ -265,8 +292,8 @@ define('Sage/Platform/Mobile/Edit', [
             }
         },
         onRequestDataFailure: function(response, o) {
-            alert(dojo.string.substitute(this.requestErrorText, [response, o]));
-            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'failure');
+            alert(string.substitute(this.requestErrorText, [response, o]));
+            ErrorManager.addError(response, o, this.options, 'failure');
         },
         onRequestDataSuccess: function(entry) {
             this.processEntry(entry);
@@ -281,8 +308,8 @@ define('Sage/Platform/Mobile/Edit', [
                 });
         },
         onRequestTemplateFailure: function(response, o) {
-            alert(dojo.string.substitute(this.requestErrorText, [response, o]));
-            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'failure');
+            alert(string.substitute(this.requestErrorText, [response, o]));
+            ErrorManager.addError(response, o, this.options, 'failure');
         },
         onRequestTemplateSuccess: function(entry) {
             this.processTemplateEntry(entry);
@@ -324,12 +351,10 @@ define('Sage/Platform/Mobile/Edit', [
             // todo: should we create a deep copy?
             // todo: do a deep conversion?
 
-            var converter = Sage.Platform.Mobile.Convert;
-
             for (var n in entry)
             {
-                if (converter.isDateString(entry[n]))
-                    entry[n] = converter.toDateFromString(entry[n]);                
+                if (convert.isDateString(entry[n]))
+                    entry[n] = convert.toDateFromString(entry[n]);
             }
 
             return entry;
@@ -337,14 +362,12 @@ define('Sage/Platform/Mobile/Edit', [
         convertValues: function(values) {
             // todo: do a deep conversion?
 
-            var converter = Sage.Platform.Mobile.Convert;
-
             for (var n in values)
             {
                 if (values[n] instanceof Date)
                     values[n] = this.getService().isJsonEnabled()
-                        ? converter.toJsonStringFromDate(values[n])
-                        : converter.toIsoStringFromDate(values[n]);
+                        ? convert.toJsonStringFromDate(values[n])
+                        : convert.toIsoStringFromDate(values[n]);
             }
 
             return values;
@@ -352,7 +375,7 @@ define('Sage/Platform/Mobile/Edit', [
         processEntry: function(entry) {
             this.entry = this.convertEntry(entry || {});
             
-            dojo.removeClass(this.domNode, 'panel-loading');
+            domClass.remove(this.domNode, 'panel-loading');
         },
         applyContext: function(templateEntry) {
         },
@@ -382,7 +405,7 @@ define('Sage/Platform/Mobile/Edit', [
                 this.setValues(this.entry);
             }
 
-            dojo.removeClass(this.domNode, 'panel-loading');
+            domClass.remove(this.domNode, 'panel-loading');
         },
         clearValues: function() {
             for (var name in this.fields)
@@ -404,11 +427,11 @@ define('Sage/Platform/Mobile/Edit', [
 
                 if (field.applyTo !== false)
                 {
-                    value = Sage.Platform.Mobile.Utility.getValue(values, field.applyTo, noValue);
+                    value = utility.getValue(values, field.applyTo, noValue);
                 }
                 else
                 {
-                    value = Sage.Platform.Mobile.Utility.getValue(values, field.property || name, noValue);
+                    value = utility.getValue(values, field.property || name, noValue);
                 }
 
                 // fyi: uses the fact that ({} !== {})
@@ -448,12 +471,12 @@ define('Sage/Platform/Mobile/Edit', [
                 {
                     if (field.applyTo !== false)
                     {
-                        target = Sage.Platform.Mobile.Utility.getValue(o, field.applyTo);
-                        dojo.mixin(target, value);
+                        target = utility.getValue(o, field.applyTo);
+                        lang.mixin(target, value);
                     }
                     else
                     {
-                        Sage.Platform.Mobile.Utility.setValue(o, field.property || name, value);
+                        utility.setValue(o, field.property || name, value);
                     }
 
                     empty = false;
@@ -471,7 +494,7 @@ define('Sage/Platform/Mobile/Edit', [
 
                 if (!field.isHidden() && false !== (result = field.validate()))
                 {
-                    dojo.addClass(field.containerNode, 'row-error');
+                    domClass.add(field.containerNode, 'row-error');
 
                     this.errors.push({
                         name: name,
@@ -480,7 +503,7 @@ define('Sage/Platform/Mobile/Edit', [
                 }
                 else
                 {
-                    dojo.removeClass(field.containerNode, 'row-error');
+                    domClass.remove(field.containerNode, 'row-error');
                 }
             }
 
@@ -498,7 +521,7 @@ define('Sage/Platform/Mobile/Edit', [
         createEntryForUpdate: function(values) {
             values = this.convertValues(values);
 
-            return dojo.mixin(values, {
+            return lang.mixin(values, {
                 '$key': this.entry['$key'],
                 '$etag': this.entry['$etag'],
                 '$name': this.entry['$name']
@@ -507,7 +530,7 @@ define('Sage/Platform/Mobile/Edit', [
         createEntryForInsert: function(values) {
             values = this.convertValues(values);
             
-            return dojo.mixin(values, {
+            return lang.mixin(values, {
                 '$name': this.entityName
             });
         },
@@ -520,7 +543,7 @@ define('Sage/Platform/Mobile/Edit', [
             if (App.bars.tbar)
                 App.bars.tbar.disable();
 
-            dojo.addClass(this.domNode, 'busy');
+            domClass.add(this.domNode, 'busy');
         },
         enable: function() {
             this.busy = false;
@@ -528,7 +551,7 @@ define('Sage/Platform/Mobile/Edit', [
             if (App.bars.tbar)
                 App.bars.tbar.enable();
 
-            dojo.removeClass(this.domNode, 'busy');
+            domClass.remove(this.domNode, 'busy');
         },
         insert: function() {
             this.disable();
@@ -554,7 +577,7 @@ define('Sage/Platform/Mobile/Edit', [
         onInsertSuccess: function(entry) {
             this.enable();
 
-            dojo.publish('/app/refresh', [{
+            connect.publish('/app/refresh', [{
                 resourceKind: this.resourceKind
             }]);
 
@@ -580,8 +603,8 @@ define('Sage/Platform/Mobile/Edit', [
             }
         },
         onRequestFailure: function(response, o) {
-            alert(dojo.string.substitute(this.requestErrorText, [response, o]));
-            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'failure');
+            alert(string.substitute(this.requestErrorText, [response, o]));
+            ErrorManager.addError(response, o, this.options, 'failure');
         },
         update: function() {
             var values = this.getValues();
@@ -607,7 +630,7 @@ define('Sage/Platform/Mobile/Edit', [
         onUpdateSuccess: function(entry) {
             this.enable();
 
-            dojo.publish('/app/refresh', [{
+            connect.publish('/app/refresh', [{
                 resourceKind: this.resourceKind,
                 key: entry['$key'],
                 data: entry
@@ -641,10 +664,10 @@ define('Sage/Platform/Mobile/Edit', [
                 content.push(this.validationSummaryItemTemplate.apply(this.errors[i], this.fields[this.errors[i].name]));
 
             this.set('validationContent', content.join(''));
-            dojo.addClass(this.domNode, 'panel-form-error');
+            domClass.add(this.domNode, 'panel-form-error');
         },
         hideValidationSummary: function() {
-            dojo.removeClass(this.domNode, 'panel-form-error');
+            domClass.remove(this.domNode, 'panel-form-error');
             this.set('validationContent', '');
         },
         save: function() {
@@ -664,7 +687,7 @@ define('Sage/Platform/Mobile/Edit', [
                 this.update();
         },
         getContext: function() {
-            return dojo.mixin(Sage.Platform.Mobile.Edit.superclass.getContext.call(this), {
+            return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
                 insert: this.options.insert,
                 key: this.options.insert ? false : this.options.entry && this.options.entry['$key']
@@ -679,15 +702,15 @@ define('Sage/Platform/Mobile/Edit', [
             return lookup[access];
         },
         beforeTransitionTo: function() {
-            Sage.Platform.Mobile.Edit.superclass.beforeTransitionTo.call(this);
-
             if (this.refreshRequired)
             {
                 if (this.options.insert === true || this.options.key)
                     dojo.addClass(this.domNode, 'panel-loading');
                 else
-                    dojo.removeClass(this.domNode, 'panel-loading');
+                    domClass.remove(this.domNode, 'panel-loading');
             }
+
+            this.inherited(arguments);
         },
         activate: function() {
             // external navigation (browser back/forward) never refreshes the edit view as it's always a terminal loop.
@@ -708,7 +731,7 @@ define('Sage/Platform/Mobile/Edit', [
             this.changes = false;
             this.inserting = (this.options.insert === true);
 
-            dojo.removeClass(this.domNode, 'panel-form-error');
+            domClass.remove(this.domNode, 'panel-form-error');
 
             this.clearValues();
 

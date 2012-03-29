@@ -13,10 +13,22 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/PersistentStorage', ['dojo', 'dojo/string', 'Sage/Platform/Mobile/Convert', 'Sage/Platform/Mobile/Utility'], function() {
-
+define('Sage/Platform/Mobile/PersistentStorage', [
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/_base/json',
+    'Sage/Platform/Mobile/Convert',
+    'Sage/Platform/Mobile/Utility'
+], function(
+    declare,
+    lang,
+    dojo,
+    convert,
+    utility
+) {
     var sosCache = {};
-    return dojo.declare('Sage.Platform.Mobile.PersistentStorage', null, {
+
+    return declare('Sage.Platform.Mobile.PersistentStorage', null, {
 
         name: false,
         singleObjectStore: false,
@@ -24,7 +36,7 @@ define('Sage/Platform/Mobile/PersistentStorage', ['dojo', 'dojo/string', 'Sage/P
         serializeValues: true,
 
         constructor: function(options){
-            dojo.mixin(this, options);
+            lang.mixin(this, options);
         },
         formatQualifiedKey: function(name, key) {
             if (key && key.indexOf(name) !== 0)
@@ -43,20 +55,18 @@ define('Sage/Platform/Mobile/PersistentStorage', ['dojo', 'dojo/string', 'Sage/P
                 return dojo.fromJson(value);
             if (value && value.indexOf('[') === 0 && value.lastIndexOf(']') === (value.length - 1))
                 return dojo.fromJson(value);
-            if (Sage.Platform.Mobile.Convert.isDateString(value))
-                return Sage.Platform.Mobile.Convert.toDateFromString(value);
+            if (convert.isDateString(value))
+                return convert.toDateFromString(value);
             if (/^(true|false)$/.test(value))
                 return value === 'true';
-            var numeric = parseFloat(value, 10);
+            var numeric = parseFloat(value);
             if (!isNaN(numeric))
                 return numeric;
 
             return value;
         },
         getItem: function(key, options) {
-            console.log('getting item storage');
             options = options || {};
-
             try
             {
                 if (window.localStorage)
@@ -78,7 +88,7 @@ define('Sage/Platform/Mobile/PersistentStorage', ['dojo', 'dojo/string', 'Sage/P
                             if (this.allowCacheUse) sosCache[this.name] = store;
                         }
 
-                        var value = Sage.Platform.Mobile.Utility.getValue(store, key);
+                        var value = utility.getValue(store, key);
 
                         if (options.success)
                             options.success.call(options.scope || this, value);
@@ -113,8 +123,6 @@ define('Sage/Platform/Mobile/PersistentStorage', ['dojo', 'dojo/string', 'Sage/P
         },
         setItem: function(key, value, options) {
             options = options || {};
-            console.log('setting item storage');
-
             try
             {
                 if (window.localStorage)
@@ -136,7 +144,7 @@ define('Sage/Platform/Mobile/PersistentStorage', ['dojo', 'dojo/string', 'Sage/P
                             if (this.allowCacheUse) sosCache[this.name] = store;
                         }
 
-                        Sage.Platform.Mobile.Utility.setValue(store, key, value);
+                        utility.setValue(store, key, value);
 
                         encoded = dojo.toJson(store);
 

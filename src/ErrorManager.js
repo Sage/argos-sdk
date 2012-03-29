@@ -13,9 +13,29 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() {
+define('Sage/Platform/Mobile/ErrorManager', [
+    'dojo/_base/json',
+    'dojo/_base/lang',
+    'dojo/_base/connect',
+    'dojo/string'
+], function(
+    dojo,
+    lang,
+    connect,
+    string
+) {
+    var errors = [];
+    try
+    {
+        if (window.localStorage)
+            errors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
+    }
+    catch(e)
+    {
 
-    return dojo.setObject('Sage.Platform.Mobile.ErrorManager', {
+    }
+
+    return lang.setObject('Sage.Platform.Mobile.ErrorManager', {
         //Localization
         abortedText: 'Aborted',
 
@@ -23,8 +43,6 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
          * Total amount of errors to keep
          */
         errorCacheSizeMax: 10,
-
-        errors: null,
 
         /**
          * Adds a custom error item by combining error message/options for easier tech support
@@ -35,7 +53,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
          */
         addError: function(serverResponse, requestOptions, viewOptions, failType) {
             var errorDate = new Date(),
-                dateStamp = dojo.string.substitute('/Date(${0})/',[errorDate.getTime()]),
+                dateStamp = string.substitute('/Date(${0})/',[errorDate.getTime()]),
                 errorItem = {
                     errorDate: errorDate.toString(),
                     errorDateStamp: dateStamp,
@@ -45,13 +63,13 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                 };
 
             if (failType === 'failure')
-                dojo.mixin(errorItem, this.extractFailureResponse(serverResponse));
+                lang.mixin(errorItem, this.extractFailureResponse(serverResponse));
 
             if (failType === 'aborted')
-                dojo.mixin(errorItem, this.extractAbortResponse(serverResponse));
+                lang.mixin(errorItem, this.extractAbortResponse(serverResponse));
 
             this.checkCacheSize();
-            this.errors.push(errorItem);
+            errors.push(errorItem);
             this.onErrorAdd();
             this.save();
         },
@@ -142,10 +160,10 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
                             break;
                         }
                         if(key === 'scope') { // eliminate recursive self call
-                            obj[key]= 'Scope is not saved in error report';
+                            obj[key] = 'Scope is not saved in error report';
                             break;
                         }
-                        obj[key]=this.serializeValues(obj[key]);
+                        obj[key] = this.serializeValues(obj[key]);
                         break;
                 }
             }
@@ -156,7 +174,7 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
          * Ensures there is at least 1 open spot for a new error by checking against errorCacheSizeMax
          */
         checkCacheSize: function() {
-            var errLength = this.errors.length,
+            var errLength = errors.length,
                 cacheSizeIndex = this.errorCacheSizeMax - 1;
             if (errLength > cacheSizeIndex)
                 this.removeError(cacheSizeIndex, errLength - cacheSizeIndex);
@@ -168,9 +186,9 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
          * @param value Value of the key to match against
          * @return errorItem Returns the first error item in the match set or null if none found
          */
-        getError: function(key, value){
+        getError: function(key, value) {
             var errorList = this.getAllErrors();
-            for (var i=0; i<errorList.length; i++) {
+            for (var i = 0; i < errorList.length; i++) {
                 if (errorList[i][key] == value)
                     return errorList[i];
             }
@@ -178,41 +196,27 @@ define('Sage/Platform/Mobile/ErrorManager', ['dojo', 'dojo/string'], function() 
         },
 
         getAllErrors: function() {
-            return this.errors;
+            return lang.clone(errors);
         },
 
         removeError: function(index, amount) {
-            this.errors.splice(index, amount || 1);
+            errors.splice(index, amount || 1);
         },
 
-        /**
-         * Event that occurs when an error is successfully added (not guaranteed to be saved)
-         * Can be used for event binding
-         */
         onErrorAdd: function() {
-        },
-
-        init: function(){
-            this.errors = [];
-            this.load();
+            connect.publish('/app/refresh', [{
+                resourceKind: 'errorlogs'
+            }]);
         },
 
         save: function(){
             try
             {
                 if (window.localStorage)
-                    window.localStorage.setItem('errorlog', dojo.toJson(this.errors));
-            }
-            catch(e) {}
-        },
-
-        load: function(){
-            try
-            {
-                if (window.localStorage)
-                    this.errors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
+                    window.localStorage.setItem('errorlog', dojo.toJson(errors));
             }
             catch(e) {}
         }
-    });
+    }
+);
 });

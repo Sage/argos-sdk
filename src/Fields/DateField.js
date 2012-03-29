@@ -13,8 +13,23 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/EditorField', 'Sage/Platform/Mobile/Calendar', 'Sage/Platform/Mobile/Format'], function() {
-    var control = dojo.declare('Sage.Platform.Mobile.Fields.DateField', [Sage.Platform.Mobile.Fields.EditorField], {
+define('Sage/Platform/Mobile/Fields/DateField', [
+    'dojo/_base/declare',
+    'dojo/string',
+    'dojo/dom-class',
+    'Sage/Platform/Mobile/Format',
+    'Sage/Platform/Mobile/FieldManager',
+    'Sage/Platform/Mobile/Fields/EditorField',
+    'Sage/Platform/Mobile/Calendar'
+], function(
+    declare,
+    string,
+    domClass,
+    format,
+    FieldManager,
+    EditorField
+) {
+    var control = declare('Sage.Platform.Mobile.Fields.DateField', [EditorField], {
         // Localization
         emptyText: '',
         dateFormatText: 'MM/dd/yyyy',
@@ -31,7 +46,7 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
         asTimeless: false,
 
         formatValue: function(value) {
-            return Sage.Platform.Mobile.Format.date(value, this.dateFormatText, this.asTimeless);
+            return format.date(value, this.dateFormatText, this.asTimeless);
         },
         _onChange: function(evt) {
             var val = Date.parseExact(this.inputNode.value, this.dateFormatText);
@@ -39,12 +54,12 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
             if (val)
             {
                 this.validationValue = this.currentValue = val;
-                dojo.removeClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
+                domClass.remove(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
             }
             else
             {
                 this.validationValue = this.currentValue = null;
-                dojo.addClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
+                domClass.add(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
             }
         },
         createNavigationOptions: function() {
@@ -61,7 +76,7 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
             if (view)
             {
                 this.currentValue = this.validationValue = view.getDateTime();
-                dojo.removeClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
+                domClass.remove(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
             }
         },
         isDirty: function() {
@@ -71,15 +86,15 @@ define('Sage/Platform/Mobile/Fields/DateField', ['Sage/Platform/Mobile/Fields/Ed
         },
         clearValue: function() {
             this.inherited(arguments);
-            dojo.removeClass(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
+            domClass.remove(this.containerNode, 'row-error'); // todo: not the right spot for this, add validation eventing
         },
         validate: function() {
             if (this.inputNode.value !== '' && !this.currentValue)
-                return dojo.string.substitute(this.invalidDateFormatErrorText, [this.label]);
+                return string.substitute(this.invalidDateFormatErrorText, [this.label]);
 
             return this.inherited(arguments);
         }
     });
 
-    return Sage.Platform.Mobile.FieldManager.register('date', control);
+    return FieldManager.register('date', control);
 });

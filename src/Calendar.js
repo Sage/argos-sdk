@@ -13,12 +13,27 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function() {
-
+define('Sage/Platform/Mobile/Calendar', [
+    'dojo/_base/declare',
+    'dojo/string',
+    'dojo/dom-attr',
+    'dojo/dom-class',
+    'dojo/dom-construct',
+    'dojo/dom-style',
+    'Sage/Platform/Mobile/View'
+], function(
+    declare,
+    string,
+    domAttr,
+    domClass,
+    domConstruct,
+    domStyle,
+    View
+) {
     var pad = function(n) { return n < 10 ? '0' + n : n };
-    var uCase = function (str) { return str.charAt(0).toUpperCase() + str.substring(1); }
+    var uCase = function (str) { return str.charAt(0).toUpperCase() + str.substring(1); };
 
-    return dojo.declare('Sage.Platform.Mobile.Calendar', [Sage.Platform.Mobile.View], {
+    return declare('Sage.Platform.Mobile.Calendar', [View], {
         // Localization
         titleText: 'Calendar',
         amText: 'AM',
@@ -91,6 +106,14 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
             '</div>'
         ]),
 
+        dayNode: null,
+        monthNode: null,
+        yearNode: null,
+        hourNode: null,
+        minuteNode: null,
+        datePickControl: null,
+        timePickControl: null,
+
         daysInMonth: function() {
             var dlo = (1==this.month) ? 28 : 30;
             var dhi = (1==this.month) ? 29 : 31;
@@ -102,11 +125,11 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
         init: function() {
             this.inherited(arguments);
 
-            dojo.connect(this.dayNode,    'onchange', this, this.validate);
-            dojo.connect(this.monthNode,  'onchange', this, this.validate);
-            dojo.connect(this.yearNode,   'onchange', this, this.validate);
-            dojo.connect(this.hourNode,   'onchange', this, this.validate);
-            dojo.connect(this.minuteNode, 'onchange', this, this.validate);
+            this.connect(this.dayNode,    'onchange', this, this.validate);
+            this.connect(this.monthNode,  'onchange', this, this.validate);
+            this.connect(this.yearNode,   'onchange', this, this.validate);
+            this.connect(this.hourNode,   'onchange', this, this.validate);
+            this.connect(this.minuteNode, 'onchange', this, this.validate);
         },
 
         validate: function() {
@@ -117,8 +140,8 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
                 this.populateSelector(this.dayNode, this.dayNode.selectedIndex + 1, 1, this.daysInMonth());
             }
 
-            this.date = new Date(this.year, this.month, this.dayNode.value),
-                isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : this.meridiemNode.getAttribute('toggled') !== 'true',
+            this.date = new Date(this.year, this.month, this.dayNode.value);
+            var isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : this.meridiemNode.getAttribute('toggled') !== 'true',
                 hours = parseInt(this.hourNode.value, 10),
                 minutes = parseInt(this.minuteNode.value, 10);
             hours = isPM ? (hours % 12) + 12 : (hours % 12);
@@ -129,17 +152,20 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
         },
         toggleMeridiem: function(params) {
             var el = params.$source,
-                toggledValue = el && (el.getAttribute('toggled') !== 'true');
+                toggledValue = el && (domAttr.get(el, 'toggled') !== 'true');
 
-            if (el) el.setAttribute('toggled', toggledValue);
+            if (el) domAttr.set(el, 'toggled', toggledValue);
             this.updateDatetimeCaption();
         },
         populateSelector: function(el, val, min, max) {
             if (val > max) { val = max; }
             el.options.length = 0;
             for (var i=min; i <= max; i++) {
-                opt = new Option((this.monthNode == el) ? uCase(this.months[i]) : pad(i), i);
-                opt.selected = (i == val);
+                var opt = domConstruct.create('option', {
+                    innerHTML: (this.monthNode == el) ? uCase(this.months[i]) : pad(i),
+                    value: i,
+                    selected: (i == val)
+                });
                 el.options[el.options.length] = opt;
             }
         },
@@ -155,7 +181,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
                 ? whichField
                 : uCase(whichField);
 
-            return dojo.string.substitute(this[whichTemplate], [whichFormat]);
+            return string.substitute(this[whichTemplate], [whichFormat]);
         },
         show: function(options) {
             this.inherited(arguments);
@@ -187,16 +213,16 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
                 this.is24hrTimeFormat ? 23 : 12
             );
             this.populateSelector(this.minuteNode, this.date.getMinutes(), 0, 59);
-            this.meridiemNode.setAttribute('toggled', this.date.getHours() < 12);
+            domAttr.set(this.meridiemNode, 'toggled', this.date.getHours() < 12);
 
             this.updateDatetimeCaption();
 
             if (this.showTimePicker) {
-                dojo.removeClass(this.timeNode, 'time-content-hidden');
+                domClass.remove(this.timeNode, 'time-content-hidden');
                 // hide meridiem toggle when using 24hr time format:
-                if (this.is24hrTimeFormat) { this.meridiemNode.parentNode.style.display='none'; }
+                if (this.is24hrTimeFormat) { domStyle.set(this.meridiemNode.parentNode, 'display', 'none'); }
             } else {
-                dojo.addClass(this.timeNode, 'time-content-hidden');
+                domClass.add(this.timeNode, 'time-content-hidden');
             }
         },
 
@@ -211,7 +237,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
         },
         decrementMinute: function() { this.decrement(this.minuteNode, 15); },
         decrement: function(el, inc) { // all fields are <select> elements
-            var inc = inc || 1;
+            inc = inc || 1;
             if (0 <= (el.selectedIndex - inc)) {
                 el.selectedIndex = inc * Math.floor((el.selectedIndex -1)/ inc);
             } else {
@@ -221,7 +247,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
                 if (el == this.minuteNode) { this.decrementHour();  }
                 el.selectedIndex = el.options.length - inc;
             }
-            this.validate(null,el);
+            this.validate(null, el);
         },
 
         incrementYear: function() { this.increment(this.yearNode); },
@@ -235,7 +261,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
         },
         incrementMinute: function() { this.increment(this.minuteNode, 15); },
         increment: function(el, inc) {
-            var inc = inc || 1;
+            inc = inc || 1;
             if (el.options.length > (el.selectedIndex + inc)) {
                 el.selectedIndex += inc;
             } else {
@@ -245,7 +271,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
                 if (el == this.minuteNode) { this.incrementHour(); }
                 el.selectedIndex = 0;
             }
-            this.validate(null,el);
+            this.validate(null, el);
         },
         updateDatetimeCaption: function() {
             var t = this.getDateTime();
@@ -256,7 +282,7 @@ define('Sage/Platform/Mobile/Calendar', ['Sage/Platform/Mobile/View'], function(
         },
         getDateTime: function() {
             var result = new Date(this.date.getTime()),
-                isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : this.meridiemNode.getAttribute('toggled') !== 'true',
+                isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : domAttr.get(this.meridiemNode, 'toggled') !== 'true',
                 hours = parseInt(this.hourNode.value, 10),
                 minutes = parseInt(this.minuteNode.value, 10);
 
