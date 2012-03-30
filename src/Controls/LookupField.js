@@ -190,9 +190,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
                 for (var selectionKey in selections)
                 {
-                    var val = selections[selectionKey].data,
-                        success = true;
-
+                    var val = selections[selectionKey].data;
                     this.setSelection(val, selectionKey);
                     break;
                 }
@@ -203,7 +201,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
                 // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
                 // requests created in this state (the pre-flight request is made, and the request ends with status 0).
                 // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
-                if (success) setTimeout(this.onChange.createDelegate(this), 0);
+                setTimeout(this.onChange.createDelegate(this), 0);
             }
         },
         onChange: function() {
