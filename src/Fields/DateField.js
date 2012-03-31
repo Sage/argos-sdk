@@ -43,10 +43,10 @@ define('Sage/Platform/Mobile/Fields/DateField', [
 
         view: 'generic_calendar',
         showTimePicker: false,
-        asTimeless: false,
+        timeless: false,
 
         formatValue: function(value) {
-            return format.date(value, this.dateFormatText, this.asTimeless);
+            return format.date(value, this.dateFormatText, this.timeless);
         },
         _onChange: function(evt) {
             var val = Date.parseExact(this.inputNode.value, this.dateFormatText);
@@ -67,7 +67,7 @@ define('Sage/Platform/Mobile/Fields/DateField', [
 
             options.date = this.currentValue;
             options.showTimePicker = this.showTimePicker;
-            options.asTimeless = this.asTimeless;
+            options.timeless = this.timeless;
 
             return options;
         },

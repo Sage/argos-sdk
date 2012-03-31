@@ -14,7 +14,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
     'Sage/Platform/Mobile/View'
 ], function(
     declare,
-    dojo,
+    json,
     query,
     domGeom,
     win,
@@ -77,10 +77,10 @@ define('Sage/Platform/Mobile/Views/Signature', [
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         getValues: function() {
-            return dojo.toJson(this.optimizeSignature());
+            return json.toJson(this.optimizeSignature());
         },
         setValue: function(val, initial) {
-            this.signature = val ? dojo.fromJson(val) : [];
+            this.signature = val ? json.fromJson(val) : [];
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         clearValue: function() {

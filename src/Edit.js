@@ -324,8 +324,8 @@ define('Sage/Platform/Mobile/Edit', [
                 });
         },
         onRequestEntryFailure: function(response, o) {
-            alert(dojo.string.substitute(this.requestErrorText, [response, o]));
-            Sage.Platform.Mobile.ErrorManager.addError(response, o, this.options, 'failure');
+            alert(string.substitute(this.requestErrorText, [response, o]));
+            ErrorManager.addError(response, o, this.options, 'failure');
         },
         onRequestEntrySuccess: function(entry) {
             this.processEntry(entry);
@@ -705,7 +705,7 @@ define('Sage/Platform/Mobile/Edit', [
             if (this.refreshRequired)
             {
                 if (this.options.insert === true || this.options.key)
-                    dojo.addClass(this.domNode, 'panel-loading');
+                    domClass.add(this.domNode, 'panel-loading');
                 else
                     domClass.remove(this.domNode, 'panel-loading');
             }

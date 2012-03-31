@@ -22,7 +22,7 @@ define('Sage/Platform/Mobile/Application', [
     'dojo/_base/window',
     'dojo/string'
 ], function(
-    dojo,
+    json,
     array,
     connect,
     declare,
@@ -204,7 +204,7 @@ define('Sage/Platform/Mobile/Application', [
                 var feed = window.localStorage.getItem(key);
                 if (feed)
                 {
-                    o.result = dojo.fromJson(feed);
+                    o.result = json.fromJson(feed);
                 }
             }
         },
@@ -217,7 +217,7 @@ define('Sage/Platform/Mobile/Application', [
                     var key = this._createCacheKey(request);
 
                     window.localStorage.removeItem(key);
-                    window.localStorage.setItem(key, dojo.toJson(feed));
+                    window.localStorage.setItem(key, json.toJson(feed));
                 }
             }
         },

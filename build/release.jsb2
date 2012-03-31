@@ -88,6 +88,10 @@
           "path": "../src"
         },
         {
+          "text": "Edit.js",
+          "path": "../src"
+        },
+        {
           "text": "FieldManager.js",
           "path": "../src"
         },
@@ -150,10 +154,6 @@
         {
           "text": "TextAreaField.js",
           "path": "../src/Fields"
-        },
-        {
-          "text": "Edit.js",
-          "path": "../src"
         },
         {
           "text": "SearchWidget.js",

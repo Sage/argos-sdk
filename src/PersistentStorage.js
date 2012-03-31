@@ -22,7 +22,7 @@ define('Sage/Platform/Mobile/PersistentStorage', [
 ], function(
     declare,
     lang,
-    dojo,
+    json,
     convert,
     utility
 ) {
@@ -45,16 +45,16 @@ define('Sage/Platform/Mobile/PersistentStorage', [
         },
         serializeValue: function(value) {
             return typeof value === 'object'
-                ? dojo.toJson(value)
+                ? json.toJson(value)
                 : value && value.toString
                     ? value.toString()
                     : value;
         },
         deserializeValue: function(value) {
             if (value && value.indexOf('{') === 0 && value.lastIndexOf('}') === (value.length - 1))
-                return dojo.fromJson(value);
+                return json.fromJson(value);
             if (value && value.indexOf('[') === 0 && value.lastIndexOf(']') === (value.length - 1))
-                return dojo.fromJson(value);
+                return json.fromJson(value);
             if (convert.isDateString(value))
                 return convert.toDateFromString(value);
             if (/^(true|false)$/.test(value))
@@ -83,7 +83,7 @@ define('Sage/Platform/Mobile/PersistentStorage', [
                         else
                         {
                             encoded = window.localStorage.getItem(this.name);
-                            store = dojo.fromJson(encoded);
+                            store = json.fromJson(encoded);
 
                             if (this.allowCacheUse) sosCache[this.name] = store;
                         }
@@ -139,14 +139,14 @@ define('Sage/Platform/Mobile/PersistentStorage', [
                         else
                         {
                             encoded = window.localStorage.getItem(this.name);
-                            store = (encoded && dojo.fromJson(encoded)) || {};
+                            store = (encoded && json.fromJson(encoded)) || {};
 
                             if (this.allowCacheUse) sosCache[this.name] = store;
                         }
 
                         utility.setValue(store, key, value);
 
-                        encoded = dojo.toJson(store);
+                        encoded = json.toJson(store);
 
                         window.localStorage.setItem(this.name, encoded);
 

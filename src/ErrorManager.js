@@ -19,7 +19,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
     'dojo/_base/connect',
     'dojo/string'
 ], function(
-    dojo,
+    json,
     lang,
     connect,
     string
@@ -28,7 +28,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
     try
     {
         if (window.localStorage)
-            errors = dojo.fromJson(window.localStorage.getItem('errorlog')) || [];
+            errors = json.fromJson(window.localStorage.getItem('errorlog')) || [];
     }
     catch(e)
     {
@@ -106,7 +106,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
             var o;
             try
             {
-                o = dojo.fromJson(json);
+                o = json.fromJson(json);
                 o = o[0];
             }
             catch(e)
@@ -213,7 +213,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
             try
             {
                 if (window.localStorage)
-                    window.localStorage.setItem('errorlog', dojo.toJson(errors));
+                    window.localStorage.setItem('errorlog', json.toJson(errors));
             }
             catch(e) {}
         }

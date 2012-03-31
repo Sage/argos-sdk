@@ -20,7 +20,7 @@ define('Sage/Platform/Mobile/Format', [
     'dojo/string',
     'Sage/Platform/Mobile/Convert'
 ], function(
-    dojo,
+    json,
     lang,
     domConstruct,
     string,
@@ -191,7 +191,7 @@ define('Sage/Platform/Mobile/Format', [
             options = options || {};
 
             if (typeof vector == 'string' || vector instanceof String)
-                try { vector = dojo.fromJson(vector); } catch(e) {}
+                try { vector = json.fromJson(vector); } catch(e) {}
 
             if (!(vector instanceof Array) || 0 == vector.length)
                 vector = [[]]; // blank image.

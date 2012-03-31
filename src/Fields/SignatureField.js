@@ -22,7 +22,7 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
     'Sage/Platform/Mobile/FieldManager'
 ], function(
     declare,
-    dojo,
+    json,
     domAttr,
     format,
     EditorField,
@@ -74,7 +74,7 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
             domAttr.set(this.inputNode, 'value', val || '');
 
             try {
-                this.signature = dojo.fromJson(val);
+                this.signature = json.fromJson(val);
             } catch(e) {
                 this.signature = [];
             }

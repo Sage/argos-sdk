@@ -1,5 +1,6 @@
 /*globals Sage, dojo, dojox, dijit, Simplate, window, Sys, define */
-define([
+define('Sage/Platform/Mobile/_Templated',
+    [
         'dojo/dom-construct',
         'dojo/_base/declare',
         'dojo/query',
@@ -12,7 +13,7 @@ define([
 function(domConstruct, declare, query, parser, array, lang, registry, wai) {
     // not inheriting from dijit._Templated, but using similar functionality.
     // this is required for contentTemplate to work property.
-    var templated = declare('Sage._Templated', null, {
+    var templated = declare('Sage.Platform.Mobile._Templated', null, {
         constructor: function () {
             this._attachPoints = [];
             this._attachEvents = [];
