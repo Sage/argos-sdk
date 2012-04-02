@@ -16,13 +16,11 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
     'dojo/_base/declare',
     'dojo/_base/event',
     'dojo/_base/lang',
-    'Sage/Platform/Mobile/Edit',
     'Sage/Platform/Mobile/Fields/_Field'
 ], function(
     declare,
     event,
     lang,
-    Edit,
     _Field
 ) {
 

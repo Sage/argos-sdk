@@ -44,10 +44,6 @@
           "path": "../src"
         },
         {
-          "text": "ErrorManager.js",
-          "path": "../src"
-        },
-        {
           "text": "ApplicationModule.js",
           "path": "../src"
         },
@@ -76,19 +72,19 @@
           "path": "../src"
         },
         {
-          "text": "Utility.js",
-          "path": "../src"
-        },
-        {
           "text": "Format.js",
           "path": "../src"
         },
         {
-          "text": "Detail.js",
+          "text": "Utility.js",
           "path": "../src"
         },
         {
-          "text": "Edit.js",
+          "text": "ErrorManager.js",
+          "path": "../src"
+        },
+        {
+          "text": "Detail.js",
           "path": "../src"
         },
         {
@@ -100,27 +96,11 @@
           "path": "../src/Fields"
         },
         {
-          "text": "EditorField.js",
-          "path": "../src/Fields"
-        },
-        {
-          "text": "TextField.js",
-          "path": "../src/Fields"
-        },
-        {
-          "text": "PhoneField.js",
-          "path": "../src/Fields"
-        },
-        {
-          "text": "LookupField.js",
-          "path": "../src/Fields"
-        },
-        {
-          "text": "SelectField.js",
-          "path": "../src/Fields"
-        },
-        {
           "text": "BooleanField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "EditorField.js",
           "path": "../src/Fields"
         },
         {
@@ -128,7 +108,15 @@
           "path": "../src/Fields"
         },
         {
+          "text": "TextField.js",
+          "path": "../src/Fields"
+        },
+        {
           "text": "DecimalField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "LookupField.js",
           "path": "../src/Fields"
         },
         {
@@ -144,8 +132,12 @@
           "path": "../src/Fields"
         },
         {
-          "text": "Signature.js",
-          "path": "../src/Views"
+          "text": "PhoneField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "SelectField.js",
+          "path": "../src/Fields"
         },
         {
           "text": "SignatureField.js",
@@ -154,6 +146,10 @@
         {
           "text": "TextAreaField.js",
           "path": "../src/Fields"
+        },
+        {
+          "text": "Edit.js",
+          "path": "../src"
         },
         {
           "text": "SearchWidget.js",
@@ -178,6 +174,10 @@
         {
           "text": "PersistentStorage.js",
           "path": "../src"
+        },
+        {
+          "text": "Signature.js",
+          "path": "../src/Views"
         },
         {
           "text": "_ServiceMixin.js",
