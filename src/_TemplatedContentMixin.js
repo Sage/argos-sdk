@@ -43,9 +43,9 @@ define('Sage/Platform/Mobile/_TemplatedContentMixin', [
                 this._startupWidgets = this._startupWidgets.concat(widgetsToAttach);
 
                 this._supportingWidgets = this._supportingWidgets || [];
-                this._supportingWidgets = this._supportingWidgets.concat(registry.findWidgets(root));
+                this._supportingWidgets = this._supportingWidgets.concat(registry.findWidgets(node));
 
-                this._attachTemplateNodes(widgetsToAttach, function(n,p){
+                this._attachTemplateNodes(widgetsToAttach, function(n,p) {
                     return n[p];
                 });
             }

@@ -1,28 +1,27 @@
 define('Sage/Platform/Mobile/_ComponentContainerMixin', [
-        'dojo/dom-construct',
         'dojo/_base/declare',
-        'dojo/query',
-        'dojo/parser',
         'dojo/_base/array',
         'dojo/_base/lang',
         'dijit/registry',
-        'dijit/_base/wai'
+        './_Component'
 ], function(
-    domConstruct,
     declare,
-    query,
-    parser,
     array,
     lang,
     registry,
-    wai
+    _Component
 ) {
     return declare('Sage.Platform.Mobile._ComponentWidgetMixin', null, {
+        constructor: function() {
+        },
         postCreate: function() {
-            for (var i = 0; i < this.components.length; i++)
-            {
-                
-            }
+            this.inherited();
+
+            this.components = _Component.createComponents(this.components, {owner: this});
+
+            array.forEach(this.components, function(component) {
+
+            }, this);
         }
     });
 });
