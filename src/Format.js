@@ -77,6 +77,7 @@ define('Sage/Platform/Mobile/Format', [
         minuteText: 'minute',
 
         encode: encode,
+        decode: decode,
         isEmpty: isEmpty,
         link: function(val) {
             if (typeof val !== 'string')
