@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_Objected', [
+define('Sage/Platform/Mobile/_ComponentContainerMixin', [
         'dojo/dom-construct',
         'dojo/_base/declare',
         'dojo/query',
@@ -17,7 +17,12 @@ define('Sage/Platform/Mobile/_Objected', [
     registry,
     wai
 ) {
-    return declare('Sage.Platform.Mobile._Objected', null, {
-
+    return declare('Sage.Platform.Mobile._ComponentWidgetMixin', null, {
+        postCreate: function() {
+            for (var i = 0; i < this.components.length; i++)
+            {
+                
+            }
+        }
     });
 });

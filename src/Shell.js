@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/Shell', [
 ) {
     return declare('Sage.Platform.Mobile.Shell', [FixedSplitter], {
         orientation: 'H',
-        widgets: [
+        components: [
             {type: 'dojox.mobile.FixedSplitterPane', attachPoint: 'left', attachEvent: {'onChange':'_onChange'}, props:{}}
         ],
         startup: function() {

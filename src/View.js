@@ -19,16 +19,16 @@ define('Sage/Platform/Mobile/View', [
     'dijit/_Widget',
     'Sage/Platform/Mobile/_ActionMixin',
     'Sage/Platform/Mobile/_CustomizationMixin',
-    'Sage/Platform/Mobile/_Templated'
+    'Sage/Platform/Mobile/_TemplatedWidgetMixin'
 ], function(
     declare,
     lang,
     _Widget,
     _ActionMixin,
     _CustomizationMixin,
-    _Templated
+    _TemplatedWidgetMixin
 ) {
-    return declare('Sage.Platform.Mobile.View', [_Widget, _ActionMixin, _CustomizationMixin, _Templated], {
+    return declare('Sage.Platform.Mobile.View', [_Widget, _ActionMixin, _CustomizationMixin, _TemplatedWidgetMixin], {
         attributeMap: {
             'title': {
                 node: 'domNode',
