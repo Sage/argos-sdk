@@ -17,18 +17,26 @@ define('Sage/Platform/Mobile/Shell', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojox/mobile/FixedSplitter',
-    'dojox/mobile/FixedSplitterPane'
+    'dojox/mobile/FixedSplitterPane',
+    './_Component'
 ], function(
     declare,
     lang,
     FixedSplitter,
-    FixedSplitterPane
+    FixedSplitterPane,
+    _Component
 ) {
-    return declare('Sage.Platform.Mobile.Shell', [FixedSplitter], {
+    return declare('Sage.Platform.Mobile.Shell', [FixedSplitter, _Component], {
         orientation: 'H',
         components: [
-            {type: 'dojox.mobile.FixedSplitterPane', attachPoint: 'left', attachEvent: {'onChange':'_onChange'}, props:{}}
+            {type: 'dojox.mobile.FixedSplitterPane', attachPoint: 'left', attachEvent: {}, props:{'class':'shell-left'}},
+            {type: 'dojox.mobile.FixedSplitterPane', attachPoint: 'center', attachEvent: {}, props:{'class':'shell-center'}},
+            {type: 'dojox.mobile.FixedSplitterPane', attachPoint: 'right', attachEvent: {}, props:{'class':'shell-right'}}
         ],
+        postCreate: function() {
+            /* todo: buffer this? */
+            this.connect(window, 'onresize', this.resize);
+        },
         startup: function() {
             this.inherited(arguments);
         },
