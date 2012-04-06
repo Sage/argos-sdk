@@ -29,7 +29,6 @@ define('Sage/Platform/Mobile/_Component', [
 
     var _Component = declare('Sage.Platform.Mobile._Component', null, {
         owner: null,
-        _componentReady: false,
         _componentSignals: null,
         startup: function() {
             this.initComponents();
@@ -41,22 +40,21 @@ define('Sage/Platform/Mobile/_Component', [
                 component.startup();
             });
         },
-        shutdown: function() {
+        destroy: function() {
+            array.forEach(this._componentSignals, function(signal) {
+                signal.remove();
+            });
+            this._componentSignals = null;
+
+            this.inherited(arguments);
+
             array.forEach(this.components, function(component) {
                 if (component.isInstanceOf(_WidgetBase) && component._beingDestroyed) return;
 
                 component.destroy();
             });
 
-            this.components = [];
-        },
-        destroy: function() {
-            array.forEach(this._componentSignals, function(signal) {
-                signal.remove();
-            });
-            this._componentSignals = null;
-            this.inherited(arguments);
-            this.shutdown();
+            this.components = null;
         },
         initComponents: function() {
             var created = [];
@@ -102,7 +100,7 @@ define('Sage/Platform/Mobile/_Component', [
                 {
                     if (this.isInstanceOf(_Container))
                         this.addChild(instance, component.position);
-                    else
+                    else if (this.isInstanceOf(_WidgetBase))
                         instance.placeAt(this.containerNode || this.domNode, component.position);
                 }
             }
