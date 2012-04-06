@@ -349,7 +349,7 @@ ReUI = {};
                 page;
 
             for (var position = context.history.length - 2; position >= 0; position--)
-                if (context.history[position].hash == location.hash)
+                if (context.history[position].hash == location.hash || !location.hash)
                 {
                     info = context.history[position];
                     reverse = true;
