@@ -205,7 +205,6 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         },
         setText: function(text) {
             this.set('inputValue', text);
-            this.onNotificationTrigger('change');
 
             this.previousValue = text;
         },
@@ -215,38 +214,35 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         complete: function() {
             // todo: should there be a better way?
             var view = App.getPrimaryActiveView(),
-                selections,
-                values = [];
+                selections;
 
             if (view && view._selectionModel) {
                 selections = view._selectionModel.getSelections();
 
-                if (0 == view._selectionModel.getSelectionCount() && view.options.allowEmptySelection)
+                if (view._selectionModel.getSelectionCount() == 0 && view.options.allowEmptySelection)
                     this.clearValue(true);
 
-                for (var selectionKey in selections) {
-                    var val = selections[selectionKey].data,
-                        success = true;
-
-                    if(view.multi){
-                        values.push(val);
-
-                    } else {
+                if (view.multi)
+                {
+                    this.setMultiSelection(selections);
+                }
+                else
+                {
+                    for (var selectionKey in selections) {
+                        var val = selections[selectionKey].data;
                         this.setSelection(val, selectionKey);
                         break;
                     }
                 }
-                if(view.multi) {
-                    this.setText(values.join(', '));
-                }
 
+                view._selectionModel.clear();
                 ReUI.back();
 
                 // if the event is fired before the transition, any XMLHttpRequest created in an event handler and
                 // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
                 // requests created in this state (the pre-flight request is made, and the request ends with status 0).
                 // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
-                if (success) setTimeout(lang.hitch(this, this._onComplete), 0);
+                setTimeout(lang.hitch(this, this._onComplete), 0);
             }
         },
         _onComplete: function() {
@@ -343,6 +339,11 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             }
             
             return value;
+        },
+        setMultiSelection: function(values) {
+            this.currentValue = (this.formatValue) ? this.formatValue.call(this, values) : values;
+            var text = (this.textRenderer) ? this.textRenderer.call(this, values) : '';
+            this.setText(text);
         },
         setSelection: function(val, key) {
             var key = utility.getValue(val, this.keyProperty, val) || key, // if we can extract the key as requested, use it instead of the selection key
