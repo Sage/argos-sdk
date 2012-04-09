@@ -59,49 +59,52 @@ define('Sage/Platform/Mobile/_Component', [
         initComponents: function() {
             var created = [];
 
-            for (var i = 0; i < this.components.length; i++)
+            if (this.components)
             {
-                var component = this.components[i],
-                    type = component.type,
-                    ctor = lang.isFunction(type) ? type : lang.getObject(type, false);
-
-                if (!ctor) throw new Error('Invalid component type.');
-
-                var instance = new ctor(component.props);
-                if (instance.isInstanceOf(_Component))
-                    instance.owner = this;
-
-                created.push(instance);
-
-                var attach = component.attachPoint,
-                    events = component.attachEvent;
-
-                if (attach)
+                for (var i = 0; i < this.components.length; i++)
                 {
-                    if (lang.getObject(attach, false, this)) throw new Error('Attach point already occupied.');
+                    var component = this.components[i],
+                        type = component.type,
+                        ctor = lang.isFunction(type) ? type : lang.getObject(type, false);
 
-                    lang.setObject(attach, instance, this);
-                }
+                    if (!ctor) throw new Error('Invalid component type.');
 
-                if (events && lang.isString(events))
-                    events = parse(events);
+                    var instance = new ctor(component.props);
+                    if (instance.isInstanceOf(_Component))
+                        instance.owner = this;
 
-                if (events)
-                {
-                    this._componentSignals = (this._componentSignals || []);
+                    created.push(instance);
 
-                    for (var name in events)
+                    var attach = component.attachPoint,
+                        events = component.attachEvent;
+
+                    if (attach)
                     {
-                        this._componentSignals.push(connect.connect(instance, name, this, events[name]));
-                    }
-                }
+                        if (lang.getObject(attach, false, this)) throw new Error('Attach point already occupied.');
 
-                if (instance.isInstanceOf(_WidgetBase))
-                {
-                    if (this.isInstanceOf(_Container))
-                        this.addChild(instance, component.position);
-                    else if (this.isInstanceOf(_WidgetBase))
-                        instance.placeAt(this.containerNode || this.domNode, component.position);
+                        lang.setObject(attach, instance, this);
+                    }
+
+                    if (events && lang.isString(events))
+                        events = parse(events);
+
+                    if (events)
+                    {
+                        this._componentSignals = (this._componentSignals || []);
+
+                        for (var name in events)
+                        {
+                            this._componentSignals.push(connect.connect(instance, name, this, events[name]));
+                        }
+                    }
+
+                    if (instance.isInstanceOf(_WidgetBase))
+                    {
+                        if (this.isInstanceOf(_Container))
+                            this.addChild(instance, component.position);
+                        else if (this.isInstanceOf(_WidgetBase))
+                            instance.placeAt(this.containerNode || this.domNode, component.position);
+                    }
                 }
             }
 

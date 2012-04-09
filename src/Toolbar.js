@@ -19,17 +19,25 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dojo/dom-style',
     'dojo/dom-class',
     'dijit/_Widget',
-    'Sage/Platform/Mobile/_ActionMixin',
-    'Sage/Platform/Mobile/_Templated'
+    './_EventMapMixin',
+    './_Component'
 ], function(
     declare,
     lang,
     domStyle,
     domClass,
     _Widget,
-    _ActionMixin,
-    _Templated
+    _EventMapMixin,
+    _Component
 ) {
+    return declare('Sage.Platform.Mobile.Toolbar', [_Widget, _EventMapMixin, _Component], {
+        baseClass: 'toolbar',
+        fixed: 'top',
+        _setFixedAttr: {node: 'domNode', type: 'attribute'},
+        _getFixedAttr: {node: 'domNode', type: 'attribute'}
+    });
+
+    /*
     return declare('Sage.Platform.Mobile.Toolbar', [_Widget, _ActionMixin, _Templated], {
         widgetTemplate: new Simplate([
             '<div class="toolbar">',
@@ -125,4 +133,5 @@ define('Sage/Platform/Mobile/Toolbar', [
             }
         }
     });
+    */
 });

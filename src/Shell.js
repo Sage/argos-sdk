@@ -17,21 +17,21 @@ define('Sage/Platform/Mobile/Shell', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojox/mobile/FixedSplitter',
-    'dojox/mobile/FixedSplitterPane',
-    './_Component'
+    './_Component',
+    './Pane'
 ], function(
     declare,
     lang,
     FixedSplitter,
-    FixedSplitterPane,
-    _Component
+    _Component,
+    Pane
 ) {
     return declare('Sage.Platform.Mobile.Shell', [FixedSplitter, _Component], {
         orientation: 'H',
         components: [
-            {type: 'dojox.mobile.FixedSplitterPane', attachPoint: 'left', attachEvent: {}, props:{'class':'shell-left'}},
-            {type: 'dojox.mobile.FixedSplitterPane', attachPoint: 'center', attachEvent: {}, props:{'class':'shell-center'}},
-            {type: 'dojox.mobile.FixedSplitterPane', attachPoint: 'right', attachEvent: {}, props:{'class':'shell-right'}}
+            {type: Pane, attachPoint: 'left', attachEvent: {}, props:{'class':'shell-left'}},
+            {type: Pane, attachPoint: 'center', attachEvent: {}, props:{'class':'shell-center'}},
+            {type: Pane, attachPoint: 'right', attachEvent: {}, props:{'class':'shell-right'}}
         ],
         postCreate: function() {
             /* todo: buffer this? */
@@ -40,7 +40,10 @@ define('Sage/Platform/Mobile/Shell', [
         startup: function() {
             this.inherited(arguments);
         },
-        show: function(view, at, options) {
+        show: function(view, options, at) {
+            /* for now, just show it in the chosen container */
+            /* is it going to be performant to move DOM nodes around? */
+            this[at || 'right'].show(view, options);
         }
     });
 });

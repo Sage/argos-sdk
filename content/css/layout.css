@@ -28,10 +28,28 @@ html, body
 
 .shell-left
 {
-    width: 300px;
+    width: 200px;
 }
 
 .shell-center
 {
     width: 300px;
+}
+
+.toolbar
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+
+    height: 45px;
+    width: 100%;
+    padding: 4px 4px;
+
+    display: block;
+    z-index: 10;
 }
