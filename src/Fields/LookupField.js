@@ -213,18 +213,18 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         },
         complete: function() {
             // todo: should there be a better way?
-            var view = App.getPrimaryActiveView(),
-                selections;
+            var view = App.getPrimaryActiveView();
 
-            if (view && view._selectionModel) {
-                selections = view._selectionModel.getSelections();
+            if (view && view.get('selectionModel')) {
+                var selectionModel = view.get('selectionModel'),
+                    selections = selectionModel.getSelections();
 
-                if (view._selectionModel.getSelectionCount() == 0 && view.options.allowEmptySelection)
+                if (selectionModel.getSelectionCount() == 0 && view.options.allowEmptySelection)
                     this.clearValue(true);
 
                 if (view.multi)
                 {
-                    this.setMultiSelection(selections);
+                    this.setSelections(selections);
                 }
                 else
                 {
@@ -235,7 +235,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                     }
                 }
 
-                view._selectionModel.clear();
+                selectionModel.clear();
                 ReUI.back();
 
                 // if the event is fired before the transition, any XMLHttpRequest created in an event handler and
@@ -340,7 +340,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             
             return value;
         },
-        setMultiSelection: function(values) {
+        setSelections: function(values) {
             this.currentValue = (this.formatValue) ? this.formatValue.call(this, values) : values;
             var text = (this.textRenderer) ? this.textRenderer.call(this, values) : '';
             this.setText(text);
