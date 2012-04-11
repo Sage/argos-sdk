@@ -16,11 +16,13 @@
 define('Sage/Platform/Mobile/Fields/BooleanField', [
     'dojo/_base/declare',
     'dojo/dom-attr',
+    'dojo/dom-class',
     'Sage/Platform/Mobile/Fields/_Field',
     'Sage/Platform/Mobile/FieldManager'
 ], function(
     declare,
     domAttr,
+    domClass,
     Field,
     FieldManager
 ) {
@@ -63,6 +65,13 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
 
             if (initial) this.originalValue = val;
             this.set('toggled', val.toString());
+
+            if (val === false)
+                domClass.remove(this.toggleNode, 'toggleStateOn');
+            else
+                domClass.add(this.toggleNode, 'toggleStateOn');
+
+
             this.onChange(val, this);
         },
         clearValue: function(flag) {
