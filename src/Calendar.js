@@ -84,8 +84,8 @@ define('Sage/Platform/Mobile/Calendar', [
                                 '<td>{%= $.localizeViewTemplate("incrementTemplate", 3) %}</td>',
                                 '<td>{%= $.localizeViewTemplate("incrementTemplate", 4) %}</td>',
                                 '<td rowspan="3">',
-                                    '<div class="toggle-vertical meridiem-field" data-action="toggleMeridiem" data-dojo-attach-point="meridiemNode">',
-                                        '<span class="thumb"></span>',
+                                    '<div class="toggle toggle-vertical meridiem-field" data-action="toggleMeridiem" data-dojo-attach-point="meridiemNode">',
+                                        '<span class="thumb vertical"></span>',
                                         '<span class="toggleOn">{%= $.amText %}</span>',
                                         '<span class="toggleOff">{%= $.pmText %}</span>',
                                     '</div>',
@@ -152,9 +152,13 @@ define('Sage/Platform/Mobile/Calendar', [
         },
         toggleMeridiem: function(params) {
             var el = params.$source,
-                toggledValue = el && (domAttr.get(el, 'toggled') !== 'true');
+                toggledValue = el && (domAttr.get(el, 'toggled') !== true);
 
-            if (el) domAttr.set(el, 'toggled', toggledValue);
+            if (el)
+            {
+                domClass.toggle(el, 'toggleStateOn');
+                domAttr.set(el, 'toggled', toggledValue);
+            }
             this.updateDatetimeCaption();
         },
         populateSelector: function(el, val, min, max) {
@@ -282,7 +286,7 @@ define('Sage/Platform/Mobile/Calendar', [
         },
         getDateTime: function() {
             var result = new Date(this.date.getTime()),
-                isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : domAttr.get(this.meridiemNode, 'toggled') !== 'true',
+                isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : domAttr.get(this.meridiemNode, 'toggled') !== true,
                 hours = parseInt(this.hourNode.value, 10),
                 minutes = parseInt(this.minuteNode.value, 10);
 
