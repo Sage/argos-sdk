@@ -349,17 +349,30 @@ ReUI = {};
                 page;
 
             for (var position = context.history.length - 2; position >= 0; position--)
-                if (context.history[position].hash == location.hash || !location.hash)
+                if (context.history[position].hash == location.hash)
                 {
                     info = context.history[position];
                     reverse = true;
                     break;
                 }
 
+            if (!info && !location.hash) { // IE9 loses the hash going back in history
+                var el = R.getCurrentPage() || R.getCurrentDialog();
+                if (el && el.id)
+                    for (var position = context.history.length - 1; position > 0; position--)
+                        if (context.history[position].hash.match(el.id))
+                        {
+                            info = context.history[position - 1];
+                            reverse = true;
+                            break;
+                        }
+
+            }
+
             info = info || extractInfoFromHash(location.hash);
             page = info && D.get(info.page);
 
-            // more often than not, data will only be needed when moving to a previous view (and restoring it's state).
+            // more often than not, data will only be needed when moving to a previous view (and restoring its state).
             
             if (page)
                 R.show(page, {external: true, reverse: reverse, tag: info && info.tag, data: info && info.data});
