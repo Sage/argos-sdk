@@ -304,14 +304,27 @@ ReUI = {};
     };
 
     var extractInfoFromHash = function(hash) {
-        if (hash && hash.indexOf(R.hashPrefix) === 0)
+        if (hash)
         {
-            var segments = hash.substr(R.hashPrefix.length).split(';');
-            return {
-                hash: hash,
-                page: segments[0],
-                tag: segments.length <= 2 ? segments[1] : segments.slice(1)
-            };
+            if (hash.indexOf(R.hashPrefix) === 0)
+                var segments = hash.substr(R.hashPrefix.length).split(';');
+                return {
+                    hash: hash,
+                    page: segments[0],
+                    tag: segments.length <= 2 ? segments[1] : segments.slice(1)
+                };
+        }
+        else
+        {   // no hash? IE9 can lose it on history.back()
+            var position,
+                el = R.getCurrentPage() || R.getCurrentDialog();
+            if (el && el.id)
+                for (position = context.history.length - 1; position > 0; position--)
+                    if (context.history[position].hash.match(el.id))
+                        break;
+
+                return context.history[position - 1];
+
         }
 
         return false;
@@ -355,19 +368,6 @@ ReUI = {};
                     reverse = true;
                     break;
                 }
-
-            if (!info && !location.hash) { // IE9 loses the hash going back in history
-                var el = R.getCurrentPage() || R.getCurrentDialog();
-                if (el && el.id)
-                    for (var position = context.history.length - 1; position > 0; position--)
-                        if (context.history[position].hash.match(el.id))
-                        {
-                            info = context.history[position - 1];
-                            reverse = true;
-                            break;
-                        }
-
-            }
 
             info = info || extractInfoFromHash(location.hash);
             page = info && D.get(info.page);
