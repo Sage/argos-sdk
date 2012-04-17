@@ -367,6 +367,9 @@ ReUI = {};
     };
 
     var setOrientation = function(value) {
+        var currentOrient = R.rootEl.getAttribute('orient');
+        if (value === currentOrient) return;
+
         R.rootEl.setAttribute('orient', value);
 
         if (value == 'portrait') 
