@@ -141,7 +141,7 @@ define('Sage/Platform/Mobile/Calendar', [
             }
 
             this.date = new Date(this.year, this.month, this.dayNode.value);
-            var isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : this.meridiemNode.getAttribute('toggled') !== 'true',
+            var isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : domAttr.get(this.meridiemNode, 'toggled') !== true,
                 hours = parseInt(this.hourNode.value, 10),
                 minutes = parseInt(this.minuteNode.value, 10);
             hours = isPM ? (hours % 12) + 12 : (hours % 12);

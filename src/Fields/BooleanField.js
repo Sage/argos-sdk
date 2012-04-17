@@ -56,7 +56,7 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
             this.setValue(toggledValue);
         },
         getValue: function() {
-            return (domAttr.get(this.toggleNode, 'toggled') === 'true');
+            return (domAttr.get(this.toggleNode, 'toggled') === true);
         },
         setValue: function(val, initial) {
             val = typeof val === 'string'
@@ -64,7 +64,7 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
                 : !!val;
 
             if (initial) this.originalValue = val;
-            this.set('toggled', val.toString());
+            domAttr.set(this.toggleNode, 'toggled', val);
 
             if (val === false)
                 domClass.remove(this.toggleNode, 'toggleStateOn');
