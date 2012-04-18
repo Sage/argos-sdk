@@ -21,7 +21,6 @@ define('Sage/Platform/Mobile/Detail', [
     'dojo/dom',
     'dojo/dom-class',
     'dojo/dom-construct',
-    'dojo/query',
     'Sage/Platform/Mobile/Format',
     'Sage/Platform/Mobile/Utility',
     'Sage/Platform/Mobile/ErrorManager',
@@ -34,7 +33,6 @@ define('Sage/Platform/Mobile/Detail', [
     dom,
     domClass,
     domConstruct,
-    query,
     format,
     utility,
     ErrorManager,
@@ -163,10 +161,12 @@ define('Sage/Platform/Mobile/Detail', [
         _onRefresh: function(o) {
             var descriptor = o.data && o.data['$descriptor'];
 
-            if (this.options && this.options.key === o.key) {
+            if (this.options && this.options.key === o.key)
+            {
                 this.refreshRequired = true;
 
-                if (descriptor) {
+                if (descriptor)
+                {
                     this.options.title = descriptor;
                     this.set('title', descriptor);
                 }
@@ -388,7 +388,7 @@ define('Sage/Platform/Mobile/Detail', [
         onRequestDataFailure: function(response, o) {
             if (response && response.status == 404)
             {
-                query(this.contentNode).append(this.notAvailableTemplate.apply(this));
+                domConstruct.place(this.notAvailableTemplate.apply(this), this.contentNode, 'last');
             }
             else
             {
@@ -463,7 +463,7 @@ define('Sage/Platform/Mobile/Detail', [
         refresh: function() {
             if (this.security && !App.hasAccessTo(this.expandExpression(this.security)))
             {
-                query(this.contentNode).append(this.notAvailableTemplate.apply(this));
+                domConstruct.place(this.notAvailableTemplate.apply(this), this.contentNode, 'last');
                 return;
             }
 

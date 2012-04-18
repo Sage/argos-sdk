@@ -73,9 +73,12 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
 
             domAttr.set(this.inputNode, 'value', val || '');
 
-            try {
+            try
+            {
                 this.signature = json.fromJson(val);
-            } catch(e) {
+            }
+            catch(e)
+            {
                 this.signature = [];
             }
 

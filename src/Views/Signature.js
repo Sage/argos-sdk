@@ -1,8 +1,17 @@
-/// <reference path="../../../../argos-sdk/libraries/ext/ext-core-debug.js"/>
-/// <reference path="../../../../argos-sdk/libraries/sdata/sdata-client-debug"/>
-/// <reference path="../../../../argos-sdk/libraries/Simplate.js"/>
-/// <reference path="../../../../argos-sdk/src/View.js"/>
-/// <reference path="../../../../argos-sdk/src/Detail.js"/>
+/* Copyright (c) 2010, Sage Software, Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 define('Sage/Platform/Mobile/Views/Signature', [
     'dojo/_base/declare',
@@ -132,22 +141,26 @@ define('Sage/Platform/Mobile/Views/Signature', [
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         _undo: function () {
-            if (this.signature.length) {
+            if (this.signature.length)
+            {
                 this.buffer = this.signature.pop();
                 if (!this.signature.length)
                     this.buffer = [this.buffer];
 
-            } else if (this.buffer.length) {
+            } else if (this.buffer.length)
+            {
                 this.signature = this.buffer;
             }
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         _sizeCanvas: function () {
             this.canvasNodeWidth  = Math.floor(win.getBox().w * 0.92);
+
             this.canvasNodeHeight = Math.min(
                 Math.floor(this.canvasNodeWidth * 0.5),
                 win.getBox().h - query('.toolbar')[0].offsetHeight - query('.footer-toolbar')[0].offsetHeight
             );
+
             this.signatureNode.width  = this.canvasNodeWidth;
             this.signatureNode.height = this.canvasNodeHeight;
         },
@@ -156,10 +169,12 @@ define('Sage/Platform/Mobile/Views/Signature', [
                 oldWidth  = this.canvasNodeWidth,
                 oldHeight = this.canvasNodeHeight;
             this._sizeCanvas();
+
             newScale = Math.min(
                 this.canvasNodeWidth  / oldWidth,
                 this.canvasNodeHeight / oldHeight
             );
+
             this.signature = this.rescale(newScale);
             this.redraw(this.signature, this.signatureNode, this.config);
         },
@@ -168,9 +183,11 @@ define('Sage/Platform/Mobile/Views/Signature', [
         },
         rescale: function (scale) {
             var rescaled = [];
-            for (var i = 0; i < this.signature.length; i++) {
+            for (var i = 0; i < this.signature.length; i++)
+            {
                 rescaled.push([]);
-                for (var j = 0; j < this.signature[i].length; j++) {
+                for (var j = 0; j < this.signature[i].length; j++)
+                {
                     rescaled[i].push([
                         this.signature[i][j][0] * scale,
                         this.signature[i][j][1] * scale

@@ -84,7 +84,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
          * @param {String} query Value of search box
          * @returns {String} query Unformatted query
          */
-        customSearch: function(query){
+        customSearch: function(query) {
             this.customSearchRE.lastIndex = 0;
             query = query.replace(this.customSearchRE, '');
             return query;
@@ -100,29 +100,28 @@ define('Sage/Platform/Mobile/SearchWidget', [
         hashTagSearch: function(query) {
             var hashLayout = this.hashTagQueries || [],
                 hashQueries = [],
-                hashQueryExpression,
-                match,
-                hashTag,
                 additionalSearch = query;
 
             this.hashTagSearchRE.lastIndex = 0;
-            
+
+            var match;
             while (match = this.hashTagSearchRE.exec(query))
             {
-                hashTag = match[1];
-                hashQueryExpression = null;
+                var hashTag = match[1],
+                    hashQueryExpression = null;
 
                 // todo: can optimize later if necessary
                 for (var i = 0; i < hashLayout.length && !hashQueryExpression; i++)
-                    if (hashLayout[i].tag == hashTag) hashQueryExpression = hashLayout[i].query;
+                    if (hashLayout[i].tag == hashTag)
+                        hashQueryExpression = hashLayout[i].query;
 
-                if(!hashQueryExpression) continue;
+                if (!hashQueryExpression) continue;
 
                 hashQueries.push(this.expandExpression(hashQueryExpression));
                 additionalSearch = additionalSearch.replace(match[0], '');
             }
 
-            if(hashQueries.length < 1)
+            if (hashQueries.length < 1)
                 return this.formatSearchQuery(query);
 
             query = string.substitute('(${0})', [hashQueries.join(') and (')]);

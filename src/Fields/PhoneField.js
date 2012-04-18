@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 define('Sage/Platform/Mobile/Fields/PhoneField', [
     'dojo/_base/declare',
     'dojo/has',
@@ -93,7 +94,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', [
         _onKeyUp: function(evt) {
             /*
             // temporarily removed: http://code.google.com/p/android/issues/detail?id=14519
-            this.el.dom.value = this.formatNumberForDisplay(this.el.dom.value, this.getValue());
+            this.set('inputValue', this.formatNumberForDisplay(this.inputNode.value, this.getValue()));
             */
             this.inherited(arguments);
         }

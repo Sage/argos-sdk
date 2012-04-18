@@ -30,8 +30,10 @@ define('Sage/Platform/Mobile/Format', [
     var getVectorMaxSize = function (v) {
         var w = 1,
             h = 1;
-        for (var i = 0; i < v.length; i++) {
-            for (var j = 0; j < v[i].length; j++) {
+        for (var i = 0; i < v.length; i++)
+        {
+            for (var j = 0; j < v[i].length; j++)
+            {
                 if (w < v[i][j][0]) { w = v[i][j][0]; }
                 if (h < v[i][j][1]) { h = v[i][j][1]; }
             }

@@ -110,7 +110,8 @@ define('Sage/Platform/Mobile/Fields/_Field', [
                         ? !definition.test.test(value)
                         : false;
 
-                if (result) {
+                if (result)
+                {
                     if (definition.message)
                         result = typeof definition.message === 'function'
                             ? definition.message.call(definition.scope || this, value, this, this.owner)

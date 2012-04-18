@@ -52,6 +52,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
             '<button class="button simpleSubHeaderButton" data-dojo-attach-event="onclick:navigateToListView" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),
+
         // Localization
         emptyText: '',
         invalidDurationErrorText: "Field '${0}' is not a valid duration.",
@@ -67,11 +68,13 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
         valueTextProperty: false,
         currentKey: null,
         currentValue: 0,
+
         /**
          * The first capture group must be non-text part
          * Second capture is the phrase to be used in auto complete
          */
         autoCompletePhraseRE: /^((?:\d+(?:\.\d*)?|\.\d+)\s*?)(\w+)/,
+
         /**
          * Only one capture which should correlate to the value portion
          */
@@ -80,7 +83,6 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
         init: function() {
             // do not use lookups connects
 
-            // apply localization info
             var numberDecimalSeparator = Mobile.CultureInfo.numberFormat.numberDecimalSeparator;
 
             this.autoCompletePhraseRE = new RegExp(
@@ -94,30 +96,37 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
         _onKeyUp: function(evt) {
             var val = this.inputNode.value.toString(),
                 match = this.autoCompletePhraseRE.exec(val);
-            if(!match || val.length < 1) {
+
+            if (!match || val.length < 1)
+            {
                 this.hideAutoComplete();
                 return true;
             }
-            for(var key in this.autoCompleteText){
-                if(this.isWordMatch(match[2], key)){
+
+            for (var key in this.autoCompleteText)
+            {
+                if (this.isWordMatch(match[2], key))
+                {
                     this.currentKey = key;
-                    this.showAutoComplete(match[1]+key);
+                    this.showAutoComplete(match[1] + key);
                     return true;
                 }
             }
+
             this.hideAutoComplete();
         },
-        isWordMatch: function(val, word){
+        isWordMatch: function(val, word) {
             if (val.length > word.length)
                 val = val.slice(0, word.length);
             else
                 word = word.slice(0, val.length);
+
             return val.toUpperCase() === word.toUpperCase();
         },
-        showAutoComplete: function(word){
+        showAutoComplete: function(word) {
             this.set('autoCompleteContent', word);
         },
-        hideAutoComplete: function(){
+        hideAutoComplete: function() {
             this.set('autoCompleteContent', '');
         },
         _onBlur: function(evt) {
@@ -125,8 +134,9 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
                 match = this.autoCompleteValueRE.exec(val),
                 multiplier = this.autoCompleteText[this.currentKey],
                 newValue = 0;
-            if(val.length < 1) return true;
-            if(!match) return true;
+
+            if (val.length < 1) return true;
+            if (!match) return true;
 
             newValue = parseFloat(match[0]) * multiplier;
             this.setValue(newValue);
@@ -146,19 +156,22 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
             var stepValue,
                 finalUnit = 1,
                 autoCompleteValues = this.autoCompleteText;
-            for(var key in autoCompleteValues){
+
+            for (var key in autoCompleteValues)
+            {
                 stepValue = autoCompleteValues[key];
-                if(val===0 && stepValue===1)
+                if (val === 0 && stepValue === 1)
                 {
                     this.currentKey = key;
                     break;
                 }
-                if(val / stepValue >= 1){
+                if (val / stepValue >= 1)
+                {
                     finalUnit = stepValue;
                     this.currentKey = key;
                 }
             }
-            return this.convertUnit(val, finalUnit)+' '+this.currentKey;
+            return this.convertUnit(val, finalUnit) + ' ' +this.currentKey;
         },
         convertUnit: function(val, to) {
             return format.fixed(val/to, 2);

@@ -35,7 +35,8 @@ define('Sage/Platform/Mobile/Application', [
         bindDelegate: function(scope) {
             var fn = this;
 
-            if (arguments.length == 1) return function() {
+            if (arguments.length == 1) return function()
+            {
                 return fn.apply(scope || this, arguments);
             };
 
@@ -49,9 +50,9 @@ define('Sage/Platform/Mobile/Application', [
 
     var applyLocalizationTo = function(object, localization) {
             var target = object.prototype || object;
-            for(var key in localization)
+            for (var key in localization)
             {
-                if(lang.isObject(localization[key]))
+                if (lang.isObject(localization[key]))
                     applyLocalizationTo(target[key], localization[key]);
                 else
                     target[key] = localization[key];
@@ -141,17 +142,20 @@ define('Sage/Platform/Mobile/Application', [
             this._connects.push(connect.connect(win.body(), 'show', this, this._onActivate));
         },
         initServices: function() {
-            for (var name in this.connections) this.registerService(name, this.connections[name]);
+            for (var name in this.connections)
+                this.registerService(name, this.connections[name]);
         },
         initModules: function() {
             for (var i = 0; i < this.modules.length; i++)
                 this.modules[i].init(this);
         },
         initViews: function() {
-            for (var n in this.views) this.views[n].init(); // todo: change to startup
+            for (var n in this.views)
+                this.views[n].init(); // todo: change to startup
         },
         initToolbars: function() {
-            for (var n in this.bars) this.bars[n].init(); // todo: change to startup
+            for (var n in this.bars)
+                this.bars[n].init(); // todo: change to startup
         },
         activate: function() {
             window.App = this;
@@ -370,7 +374,8 @@ define('Sage/Platform/Mobile/Application', [
         },
         _onActivate: function(evt) {
             var view = this.getView(evt.target);
-            if (view) this._viewActivate(view, evt.tag, evt.data);
+            if (view)
+                this._viewActivate(view, evt.tag, evt.data);
         },
         _beforeViewTransitionAway: function(view) {
             this.onBeforeViewTransitionAway(view);
@@ -418,7 +423,8 @@ define('Sage/Platform/Mobile/Application', [
                 depth = depth || 0;
 
             for (var i = list.length - 2, j = 0; i >= 0 && (depth <= 0 || j < depth); i--, j++)
-                if (predicate.call(scope || this, list[i].data)) return list[i].data;
+                if (predicate.call(scope || this, list[i].data))
+                    return list[i].data;
 
             return false;
         },
@@ -434,8 +440,10 @@ define('Sage/Platform/Mobile/Application', [
                     resourceKind = context && context.resourceKind;
 
                 // if a predicate is defined, both resourceKind AND predicate must match.
-                if (lookup[resourceKind]) {
-                    if (predicate) {
+                if (lookup[resourceKind])
+                {
+                    if (predicate)
+                    {
                         if (predicate.call(scope || this, o, context)) return o;
                     }
                     else

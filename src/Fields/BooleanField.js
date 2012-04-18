@@ -64,13 +64,13 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
                 : !!val;
 
             if (initial) this.originalValue = val;
+
             domAttr.set(this.toggleNode, 'toggled', val);
 
             if (val === false)
                 domClass.remove(this.toggleNode, 'toggleStateOn');
             else
                 domClass.add(this.toggleNode, 'toggleStateOn');
-
 
             this.onChange(val, this);
         },

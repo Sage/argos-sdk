@@ -79,7 +79,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
          * @param response XMLHttpRequest object sent back from server
          * @return Object with only relevant, standard properties
          */
-        extractFailureResponse: function(response){
+        extractFailureResponse: function(response) {
             var failureResponse = {
                 "$descriptor": response.statusText,
                 "serverResponse": {
@@ -102,7 +102,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
          * The need for this function is the fallback in case of failure
          * @param json String Json formatted string
          */
-        fromJsonArray: function(json){
+        fromJsonArray: function(json) {
             var o;
             try
             {
@@ -125,7 +125,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
          * @param response XMLHttpRequest object sent back from server
          * @return Object with hardset abort info
          */
-        extractAbortResponse: function(response){
+        extractAbortResponse: function(response) {
             var abortResponse = {
                 "$descriptor": this.abortedText,
                 "serverResponse": {
@@ -145,7 +145,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
          * JSON serializes an object by recursively discarding non value keys
          * @param obj Object to be JSON serialized
          */
-        serializeValues: function(obj){
+        serializeValues: function(obj) {
             for (var key in obj){
                 switch(typeof obj[key]){
                     case 'undefined':
@@ -176,6 +176,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
         checkCacheSize: function() {
             var errLength = errors.length,
                 cacheSizeIndex = this.errorCacheSizeMax - 1;
+
             if (errLength > cacheSizeIndex)
                 this.removeError(cacheSizeIndex, errLength - cacheSizeIndex);
         },
@@ -188,10 +189,13 @@ define('Sage/Platform/Mobile/ErrorManager', [
          */
         getError: function(key, value) {
             var errorList = this.getAllErrors();
-            for (var i = 0; i < errorList.length; i++) {
+
+            for (var i = 0; i < errorList.length; i++)
+            {
                 if (errorList[i][key] == value)
                     return errorList[i];
             }
+
             return null;
         },
 
@@ -209,13 +213,16 @@ define('Sage/Platform/Mobile/ErrorManager', [
             }]);
         },
 
-        save: function(){
+        save: function() {
             try
             {
                 if (window.localStorage)
                     window.localStorage.setItem('errorlog', json.toJson(errors));
             }
-            catch(e) {}
+            catch(e)
+            {
+
+            }
         }
     }
 );

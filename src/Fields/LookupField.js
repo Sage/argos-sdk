@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 define('Sage/Platform/Mobile/Fields/LookupField', [
     'dojo/_base/array',
     'dojo/_base/declare',
@@ -102,13 +103,15 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             return !this.view;
         },
         getDependentValue: function() {
-            if (this.dependsOn && this.owner) {
+            if (this.dependsOn && this.owner)
+            {
                 var field = this.owner.fields[this.dependsOn];
                 if (field) return field.getValue();
             }
         },
         getDependentLabel: function() {
-            if (this.dependsOn && this.owner) {
+            if (this.dependsOn && this.owner)
+            {
                 var field = this.owner.fields[this.dependsOn];
                 if (field) return field.label;
             }
@@ -145,16 +148,20 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                 expand = ['resourceKind', 'resourcePredicate', 'where'],
                 dependentValue = this.getDependentValue();
 
-            if (options.singleSelect && options.singleSelectAction) {
-                for(var key in options.tools.tbar){
+            if (options.singleSelect && options.singleSelectAction)
+            {
+                for (var key in options.tools.tbar)
+                {
                     var item = options.tools.tbar[key];
-                    if( item.id == options.singleSelectAction ) {
+                    if (item.id == options.singleSelectAction)
+                    {
                         item.cls = 'invisible';
                     }
                 }
             }
 
-            if (this.dependsOn && !dependentValue) {
+            if (this.dependsOn && !dependentValue)
+            {
                 alert(string.substitute(this.dependentErrorText, [this.getDependentLabel()]));
                 return false;
             }
@@ -215,7 +222,8 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             // todo: should there be a better way?
             var view = App.getPrimaryActiveView();
 
-            if (view && view.get('selectionModel')) {
+            if (view && view.get('selectionModel'))
+            {
                 var selectionModel = view.get('selectionModel'),
                     selections = selectionModel.getSelections();
 
@@ -228,7 +236,8 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                 }
                 else
                 {
-                    for (var selectionKey in selections) {
+                    for (var selectionKey in selections)
+                    {
                         var val = selections[selectionKey].data;
                         this.setSelection(val, selectionKey);
                         break;
@@ -341,8 +350,14 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             return value;
         },
         setSelections: function(values) {
-            this.currentValue = (this.formatValue) ? this.formatValue.call(this, values) : values;
-            var text = (this.textRenderer) ? this.textRenderer.call(this, values) : '';
+            this.currentValue = (this.formatValue)
+                ? this.formatValue.call(this, values)
+                : values;
+
+            var text = (this.textRenderer)
+                ? this.textRenderer.call(this, values)
+                : '';
+
             this.setText(text);
         },
         setSelection: function(val, key) {

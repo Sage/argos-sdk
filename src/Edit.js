@@ -22,6 +22,7 @@ define('Sage/Platform/Mobile/Edit', [
     'dojo/dom',
     'dojo/dom-attr',
     'dojo/dom-class',
+    'dojo/dom-construct',
     'dojo/query',
     'Sage/Platform/Mobile/Convert',
     'Sage/Platform/Mobile/Utility',
@@ -51,6 +52,7 @@ define('Sage/Platform/Mobile/Edit', [
     dom,
     domAttr,
     domClass,
+    domConstruct,
     query,
     convert,
     utility,
@@ -131,7 +133,7 @@ define('Sage/Platform/Mobile/Edit', [
             
             this.processLayout(this._createCustomizedLayout(this.createLayout()));
 
-            query('div[data-field]', this.contentNode).forEach(function(node){
+            query('div[data-field]', this.contentNode).forEach(function(node) {
                 var name = domAttr.get(node, 'data-field'),
                     field = this.fields[name];
                 if (field)
@@ -141,7 +143,8 @@ define('Sage/Platform/Mobile/Edit', [
         init: function() {
             this.inherited(arguments);
 
-            for (var name in this.fields) this.fields[name].init();
+            for (var name in this.fields)
+                this.fields[name].init();
         },
         createToolLayout: function() {
             return this.tools || (this.tools = {
@@ -171,18 +174,18 @@ define('Sage/Platform/Mobile/Edit', [
         _onDisableField: function(field) {
             domClass.add(field.containerNode, 'row-disabled');
         },
-        invokeAction: function(name, parameters, evt, el) {
-            var fieldEl = el && query(el, this.contentNode).parents('[data-field]'),
-                field = this.fields[fieldEl.length > 0 && domAttr.get(fieldEl[0], 'data-field')];
+        invokeAction: function(name, parameters, evt, node) {
+            var fieldNode = node && query(node, this.contentNode).parents('[data-field]'),
+                field = this.fields[fieldNode.length > 0 && domAttr.get(fieldNode[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
-                return field[name].apply(field, [parameters, evt, el]);
+                return field[name].apply(field, [parameters, evt, node]);
 
             return this.inherited(arguments);
         },
-        hasAction: function(name, evt, el) {
-            var fieldEl = el && query(el, this.contentNode).parents('[data-field]'),
-                field = fieldEl && this.fields[fieldEl.length > 0 && domAttr.get(fieldEl[0], 'data-field')];
+        hasAction: function(name, evt, node) {
+            var fieldNode = node && query(node, this.contentNode).parents('[data-field]'),
+                field = fieldNode && this.fields[fieldNode.length > 0 && domAttr.get(fieldNode[0], 'data-field')];
 
             if (field && typeof field[name] === 'function')
                 return true;
@@ -282,7 +285,7 @@ define('Sage/Platform/Mobile/Edit', [
 
             content.push(this.sectionEndTemplate.apply(layout, this));
 
-            query(this.contentNode).append(content.join(''));
+            domConstruct.place(content.join(''), this.contentNode, 'last');
 
             for (var i = 0; i < sectionQueue.length; i++)
             {
@@ -717,9 +720,12 @@ define('Sage/Platform/Mobile/Edit', [
             // i.e. you never move "forward" from an edit view; you navigate to child editors, from which you always return.
         },       
         refreshRequiredFor: function(options) {
-            if (this.options) {
-                if (options) {
-                    if (this.options.key && this.options.key === options['key']) return false;
+            if (this.options)
+            {
+                if (options)
+                {
+                    if (this.options.key && this.options.key === options['key'])
+                        return false;
                 }
                 return true;
             }
@@ -764,7 +770,6 @@ define('Sage/Platform/Mobile/Edit', [
                     this.changes = this.options.changes;
                     this.setValues(this.changes);
                 }
-
             }
         }
     });

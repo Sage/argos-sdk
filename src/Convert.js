@@ -102,4 +102,3 @@ define('Sage/Platform/Mobile/Convert', [
         }
     });
 });
-

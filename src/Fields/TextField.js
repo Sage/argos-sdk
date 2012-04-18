@@ -54,7 +54,8 @@ define('Sage/Platform/Mobile/Fields/TextField', [
         init: function() {
             this.inherited(arguments);
             
-            if (this.validInputOnly) this.connect(this.inputNode, 'onkeypress', this._onKeyPress);
+            if (this.validInputOnly)
+                this.connect(this.inputNode, 'onkeypress', this._onKeyPress);
         },
         enable: function() {
             this.inherited(arguments);
@@ -94,8 +95,8 @@ define('Sage/Platform/Mobile/Fields/TextField', [
             domClass.remove(this.domNode, 'text-field-active');
         },
         _onClearClick: function(evt) {
-            // only clear if input was already active
-            if(!domClass.contains(this.domNode, 'text-field-active')){
+            if(!domClass.contains(this.domNode, 'text-field-active'))
+            {
                 this.clearValue(true);
                 event.stop(evt);
             }

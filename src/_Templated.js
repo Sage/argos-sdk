@@ -1,4 +1,18 @@
-/*globals Sage, dojo, dojox, dijit, Simplate, window, Sys, define */
+/* Copyright (c) 2010, Sage Software, Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 define('Sage/Platform/Mobile/_Templated',
     [
         'dojo/dom-construct',
@@ -19,31 +33,38 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
             this._attachEvents = [];
         },
         buildRendering: function () {
-            if (this.widgetTemplate && this.contentTemplate) {
+            if (this.widgetTemplate && this.contentTemplate)
+            {
                 throw new Error('Both "widgetTemplate" and "contentTemplate" cannot be specified at the same time.');
             }
             
-            if (this.contentTemplate) {
+            if (this.contentTemplate)
+            {
                 this.inherited(arguments);
                 var root = domConstruct.toDom(['<div>', this.contentTemplate.apply(this), '</div>'].join(''));
                 this._attachTemplateNodes(root);
-            } else if (this.widgetTemplate) {
+            } else if (this.widgetTemplate)
+            {
                 var root = domConstruct.toDom(this.widgetTemplate.apply(this));
 
                 if (root.nodeType === 11)
                     root = domConstruct.toDom(['<div>', this.widgetTemplate.apply(this), '</div>'].join(''));
 
-                if (root.nodeType !== 1) {
+                if (root.nodeType !== 1)
+                {
                     throw new Error('Invalid template.');
                 }
 
                 this.domNode = root;
                 this._attachTemplateNodes(root);
-            } else {
+            }
+            else
+            {
                 return;
             }
 
-            if (this.widgetsInTemplate) {
+            if (this.widgetsInTemplate)
+            {
                 // Store widgets that we need to start at a later point in time
                 var widgetsToAttach = parser.parse(root, {
                     noStart: !this._earlyTemplatedStartup,
@@ -64,26 +85,30 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
                 });
             }
 
-            if (this.contentTemplate) {
+            if (this.contentTemplate)
+            {
                 query('> *', root).place(this.domNode);
-            } else {
+            } else
+            {
                 this._fillContent(this.srcNodeRef);
             }
         },
-        _fillContent: function(/*DomNode*/ source){
+        _fillContent: function(/*DomNode*/ source) {
             // summary:
             //		Relocate source contents to templated container node.
             //		this.containerNode must be able to receive children, or exceptions will be thrown.
             // tags:
             //		protected
             var dest = this.containerNode;
-            if (source && dest) {
-                while(source.hasChildNodes()){
+            if (source && dest)
+            {
+                while (source.hasChildNodes())
+                {
                     dest.appendChild(source.firstChild);
                 }
             }
         },
-        _attachTemplateNodes: function(rootNode, getAttrFunc){
+        _attachTemplateNodes: function(rootNode, getAttrFunc) {
             // summary:
             //		Iterate through the template and attach functions and nodes accordingly.
             // description:
@@ -106,20 +131,27 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
 
             var nodes = (rootNode instanceof Array) ? rootNode : (rootNode.all || rootNode.getElementsByTagName("*"));
             var x = (rootNode instanceof Array) ? 0 : -1;
-            for (; x<nodes.length; x++) {
+            for (; x<nodes.length; x++)
+            {
                 var baseNode = (x == -1) ? rootNode : nodes[x];
-                if(this.widgetsInTemplate && (getAttrFunc(baseNode, "dojoType") || getAttrFunc(baseNode, "data-dojo-type"))){
+                if (this.widgetsInTemplate && (getAttrFunc(baseNode, "dojoType") || getAttrFunc(baseNode, "data-dojo-type")))
+                {
                     continue;
                 }
                 // Process dojoAttachPoint
                 //var attachPoint = getAttrFunc(baseNode, "dojoAttachPoint");
                 var attachPoint = getAttrFunc(baseNode, "dojoAttachPoint") || getAttrFunc(baseNode, "data-dojo-attach-point");
-                if (attachPoint) {
+                if (attachPoint)
+                {
                     var point, points = attachPoint.split(/\s*,\s*/);
-                    while ((point = points.shift())){
-                        if (this[point] instanceof Array) {
+                    while ((point = points.shift()))
+                    {
+                        if (this[point] instanceof Array)
+                        {
                             this[point].push(baseNode);
-                        } else {
+                        }
+                        else
+                        {
                             this[point]=baseNode;
                         }
                         
@@ -130,23 +162,31 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
                 // Process dojoAttachEvent
                 //var attachEvent = getAttrFunc(baseNode, "dojoAttachEvent");
                 var attachEvent = getAttrFunc(baseNode, "dojoAttachEvent") || getAttrFunc(baseNode, "data-dojo-attach-event");
-                if (attachEvent) {
+                if (attachEvent)
+                {
                     // NOTE: we want to support attributes that have the form
                     // "domEvent: nativeEvent; ..."
                     var event, events = attachEvent.split(/\s*,\s*/);
                     var trim = lang.trim;
-                    while((event = events.shift())){
-                        if(event){
+                    while ((event = events.shift()))
+                    {
+                        if (event)
+                        {
                             var thisFunc = null;
-                            if(event.indexOf(":") != -1){
+                            if (event.indexOf(":") != -1)
+                            {
                                 // oh, if only JS had tuple assignment
                                 var funcNameArr = event.split(":");
                                 event = trim(funcNameArr[0]);
                                 thisFunc = trim(funcNameArr[1]);
-                            }else{
+                            }
+                            else
+                            {
                                 event = trim(event);
                             }
-                            if(!thisFunc){
+
+                            if (!thisFunc)
+                            {
                                 thisFunc = event;
                             }
                             //this.connect(baseNode, event, thisFunc);
@@ -158,14 +198,17 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
                 // waiRole, waiState
                 // TODO: remove this in 2.0, templates are now using role=... and aria-XXX=... attributes directicly
                 var role = getAttrFunc(baseNode, "waiRole");
-                if (role) {
+                if (role)
+                {
                     wai.setWaiRole(baseNode, role);
                 }
                 
                 var values = getAttrFunc(baseNode, "waiState");
-                if (values){
-                    array.forEach(values.split(/\s*,\s*/), function(stateValue){
-                        if(stateValue.indexOf('-') != -1){
+                if (values)
+                {
+                    array.forEach(values.split(/\s*,\s*/), function(stateValue) {
+                        if (stateValue.indexOf('-') != -1)
+                        {
                             var pair = stateValue.split('-');
                             wai.setWaiState(baseNode, pair[0], pair[1]);
                         }
@@ -173,15 +216,16 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
                 }
             }
         },
-        startup: function(){
+        startup: function() {
             array.forEach(this._startupWidgets, function(w){
-                if(w && !w._started && w.startup){
+                if (w && !w._started && w.startup)
+                {
                     w.startup();
                 }
             });
             this.inherited(arguments);
         },
-        destroyRendering: function(){
+        destroyRendering: function() {
             // Delete all attach points to prevent IE6 memory leaks.
             array.forEach(this._attachPoints, function(point) {
                 delete this[point];
@@ -194,8 +238,6 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
 
             this.inherited(arguments);
         }
-
     });
-
     return templated;
 });

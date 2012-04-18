@@ -56,7 +56,10 @@ define('Sage/Platform/Mobile/Fields/NoteField', [
                 options.entry = {'Notes': options.entry};
                 options.changes = {'Notes': options.changes};
             }
-            if (this.title) options.title = this.title;
+
+            if (this.title)
+                options.title = this.title;
+
             return options;
         },
         formatValue: function(val) {

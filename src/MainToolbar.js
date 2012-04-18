@@ -15,13 +15,15 @@
 
 define('Sage/Platform/Mobile/MainToolbar', [
     'dojo/_base/declare',
-    'dojo/dom-class',
     'dojo/query',
+    'dojo/dom-class',
+    'dojo/dom-construct',
     'Sage/Platform/Mobile/Toolbar'
 ], function(
     declare,
-    domClass,
     query,
+    domClass,
+    domConstruct,
     Toolbar
 ) {
 
@@ -71,7 +73,7 @@ define('Sage/Platform/Mobile/MainToolbar', [
                     count[tools[i].side || 'right'] += 1;
                     var toolTemplate = tools[i].template || this.toolTemplate;
 
-                    query(this.domNode).append(toolTemplate.apply(tools[i], this.tools[tools[i].id]));
+                    domConstruct.place(toolTemplate.apply(tools[i], this.tools[tools[i].id]), this.domNode, 'lastl');
                 }
 
                 this.size = Math.max(count.left, count.right);

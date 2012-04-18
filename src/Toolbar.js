@@ -45,7 +45,7 @@ define('Sage/Platform/Mobile/Toolbar', [
         },
         init: function() {
         },
-        invokeTool: function(parameters, evt, el) {
+        invokeTool: function(parameters, evt, node) {
             var id = parameters && parameters.tool,
                 tool = this.tools && this.tools[id],
                 source = tool && tool.source;
@@ -59,7 +59,7 @@ define('Sage/Platform/Mobile/Toolbar', [
                 {
                     var view = App.getPrimaryActiveView();
                     if (view && view.hasAction(source.action))
-                        view.invokeAction(source.action, lang.mixin(parameters, {'$tool': source}), evt, el);
+                        view.invokeAction(source.action, lang.mixin(parameters, {'$tool': source}), evt, node);
                 }
             }
         },
@@ -108,7 +108,7 @@ define('Sage/Platform/Mobile/Toolbar', [
         showTools: function(tools) {
             this.tools = {};
 
-            if(typeof tools == 'undefined') return;
+            if (typeof tools == 'undefined') return;
 
             for (var i = 0; i < tools.length; i++) {
                 var tool = {

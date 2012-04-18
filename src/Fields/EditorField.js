@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 define('Sage/Platform/Mobile/Fields/EditorField', [
     'dojo/_base/declare',
     'dojo/_base/event',
@@ -161,7 +162,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
         },
         validate: function(value) {
             return typeof value === 'undefined'
-                ? _Field.prototype.validate.call(this, this.validationValue)
+                ? this.inherited(arguments, [this.validationValue])
                 : this.inherited(arguments);
         },
         setValue: function(val, initial)

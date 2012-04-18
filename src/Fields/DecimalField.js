@@ -32,13 +32,15 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
             val = isNaN(val)
                 ? string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.'])
                 : string.substitute('${0}${1}${2}',
-                    [ parseInt(val, 10),
-                      Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.',
-                      val.substr(- Mobile.CultureInfo.numberFormat.currencyDecimalDigits)
+                    [
+                        parseInt(val, 10),
+                        Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.',
+                        val.substr(- Mobile.CultureInfo.numberFormat.currencyDecimalDigits)
                     ]);
-            Sage.Platform.Mobile.Fields.DecimalField.superclass.setValue.call(this, val);
+
+            this.inherited(arguments, [val]);
         },
-        getValue: function(){
+        getValue: function() {
             var value = this.inherited(arguments);
             // SData (and other functions) expect American formatted numbers
             value = value

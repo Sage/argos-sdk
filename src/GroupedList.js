@@ -18,12 +18,14 @@ define('Sage/Platform/Mobile/GroupedList', [
     'dojo/query',
     'dojo/string',
     'dojo/dom-class',
+    'dojo/dom-construct',
     'Sage/Platform/Mobile/List'
 ], function(
     declare,
     query,
     string,
     domClass,
+    domConstruct,
     List
 ) {
 
@@ -55,7 +57,7 @@ define('Sage/Platform/Mobile/GroupedList', [
             };
         },
         toggleGroup: function(params) {
-            var node = query(params.$source);
+            var node = params.$source;
             if (node)
                 domClass.toggle(node, 'collapsed');
         },
@@ -83,12 +85,13 @@ define('Sage/Platform/Mobile/GroupedList', [
 
                     if (entryGroup.tag != this._currentGroup)
                     {
-                        if (o.length > 0) query(this._currentGroupNode).append(o.join(''));
+                        if (o.length > 0)
+                            domConstruct.place(o.join(''), this._currentGroupNode, 'last');
 
                         o = [];
 
                         this._currentGroup = entryGroup.tag;
-                        query(this.contentNode).append(this.groupTemplate.apply(entryGroup, this));
+                        domConstruct.place(this.groupTemplate.apply(entryGroup, this), this.contentNode, 'last');
                         this._currentGroupNode = query("> :last-child", this.contentNode)[0];
                     }
 
@@ -97,7 +100,8 @@ define('Sage/Platform/Mobile/GroupedList', [
                     o.push(this.rowTemplate.apply(entry, this));
                 }
 
-                if (o.length > 0) query(this._currentGroupNode).append(o.join(''));
+                if (o.length > 0)
+                    domConstruct.place(o.join(''), this._currentGroupNode, 'last');
             }
 
             // todo: add more robust handling when $totalResults does not exist, i.e., hide element completely

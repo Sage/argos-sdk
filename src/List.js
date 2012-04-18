@@ -19,6 +19,7 @@ define('Sage/Platform/Mobile/List', [
     'dojo/_base/array',
     'dojo/query',
     'dojo/dom-class',
+    'dojo/dom-construct',
     'dojo/dom',
     'dojo/string',
     'Sage/Platform/Mobile/ErrorManager',
@@ -30,6 +31,7 @@ define('Sage/Platform/Mobile/List', [
     array,
     query,
     domClass,
+    domConstruct,
     dom,
     string,
     ErrorManager,
@@ -82,7 +84,8 @@ define('Sage/Platform/Mobile/List', [
                 delete this.selections[key];
                 this.count--;
 
-                if (this._fireEvents) this.onDeselect(key, selection.data, selection.tag, this);
+                if (this._fireEvents)
+                    this.onDeselect(key, selection.data, selection.tag, this);
             }
         },
         clear: function() {
@@ -419,7 +422,8 @@ define('Sage/Platform/Mobile/List', [
         postCreate: function() {
             this.inherited(arguments);
 
-            if (this._selectionModel == null) this.set('selectionModel', new ConfigurableSelectionModel());
+            if (this._selectionModel == null)
+                this.set('selectionModel', new ConfigurableSelectionModel());
 
             this.subscribe('/app/refresh', this._onRefresh);
 
@@ -457,7 +461,8 @@ define('Sage/Platform/Mobile/List', [
         destroy: function() {
 			if (this.searchWidget)
             {
-				if(!this.searchWidget._destroyed) this.searchWidget.destroyRecursive();
+				if(!this.searchWidget._destroyed)
+                    this.searchWidget.destroyRecursive();
 
 				delete this.searchWidget;
 			}
@@ -480,12 +485,14 @@ define('Sage/Platform/Mobile/List', [
             return !((this.options && this.options.selectionOnly) || (this.allowSelection));
         },        
         _onSelectionModelSelect: function(key, data, tag) {
-            var el = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
-            if (el) domClass.add(el, 'list-item-selected');
+            var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
+            if (node)
+                domClass.add(node, 'list-item-selected');
         },
         _onSelectionModelDeselect: function(key, data, tag) {
-            var el = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
-            if (el) domClass.remove(el, 'list-item-selected');
+            var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
+            if (node)
+                domClass.remove(node, 'list-item-selected');
         },
         _onSelectionModelClear: function() {
         },
@@ -493,7 +500,7 @@ define('Sage/Platform/Mobile/List', [
             var selections = this.options && this.options.previousSelections;
             if (selections)
             {
-                for(var i = 0; i < selections.length; i++)
+                for (var i = 0; i < selections.length; i++)
                 {
                     var data = selections[i],
                         key = data;
@@ -525,7 +532,8 @@ define('Sage/Platform/Mobile/List', [
                         if (App.bars['tbar'])
                             App.bars['tbar'].invokeTool({tool: this.options.singleSelectAction});
 
-                        if (this.autoClearSelection) { this._selectionModel.clear(); }
+                        if (this.autoClearSelection)
+                            this._selectionModel.clear();
                     }
                 }
                 else
@@ -630,7 +638,6 @@ define('Sage/Platform/Mobile/List', [
             /// <summary>
             ///     Navigates to the requested detail view.
             /// </summary>
-            /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
             var view = App.getView(this.detailView);
             if (view)
                 view.show({
@@ -675,7 +682,8 @@ define('Sage/Platform/Mobile/List', [
                     o.push(this.rowTemplate.apply(entry, this));
                 }
 
-                if (o.length > 0) query(this.contentNode).append(o.join('')); // this.set('listContent', o.join(''));
+                if (o.length > 0)
+                    domConstruct.place(o.join(''), this.contentNode, 'last');
             }
 
             // todo: add more robust handling when $totalResults does not exist, i.e., hide element completely
@@ -687,7 +695,8 @@ define('Sage/Platform/Mobile/List', [
 
             domClass.toggle(this.domNode, 'list-has-more', this.hasMoreData());
 
-            if (this.options.allowEmptySelection) domClass.add(this.domNode, 'list-has-empty-opt');
+            if (this.options.allowEmptySelection)
+                domClass.add(this.domNode, 'list-has-empty-opt');
 
         },
         hasMoreData: function() {
