@@ -124,10 +124,16 @@ define('Sage/Platform/Mobile/_CustomizationMixin', [
                                     row = lang.mixin(row, expand(customization.value, row));
                                     break;
                                 case 'insert':
-                                    (customization.where !== 'before'
+                                    var insertPositionArray = (customization.where !== 'before')
                                         ? insertRowsAfter
-                                        : insertRowsBefore
-                                    ).push(expand(customization.value, row));
+                                        : insertRowsBefore,
+                                        expandedValue = expand(customization.value, row);
+
+                                    if (lang.isArray(expandedValue))
+                                        insertPositionArray.push.apply(insertPositionArray, expandedValue);
+                                    else
+                                        insertPositionArray.push(expandedValue);
+
                                     break;
                             }
 
