@@ -52,4 +52,43 @@ html, body
 
     display: block;
     z-index: 10;
+
+    opacity: 0.75;
+}
+
+.view
+{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+
+    width: 100%;
+
+    border: dotted 2px white;
+}
+
+.scroll-container
+{
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+
+    opacity: 0.5;
+
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+
+    background: #000;
+}
+
+.toolbar ~ .scroll-container
+{
+    top: 47px !important;
 }

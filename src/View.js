@@ -17,18 +17,38 @@ define('Sage/Platform/Mobile/View', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dijit/_Widget',
-    'Sage/Platform/Mobile/_ActionMixin',
-    'Sage/Platform/Mobile/_CustomizationMixin',
-    'Sage/Platform/Mobile/_TemplatedWidgetMixin'
+    'dijit/_WidgetBase',
+    './_ActionMixin',
+    './_CustomizationMixin',
+    './_TemplatedWidgetMixin',
+    './_EventMapMixin',
+    './_Component',
+    './Toolbar'
 ], function(
     declare,
     lang,
     _Widget,
+    _WidgetBase,
     _ActionMixin,
     _CustomizationMixin,
-    _TemplatedWidgetMixin
+    _TemplatedWidgetMixin,
+    _EventMapMixin,
+    _Component,
+    Toolbar
 ) {
-    return declare('Sage.Platform.Mobile.View', [_Widget, _ActionMixin, _CustomizationMixin, _TemplatedWidgetMixin], {
+    return declare('Sage.Platform.Mobile.View', [_WidgetBase, _TemplatedWidgetMixin, _EventMapMixin, _Component], {
+        baseClass: 'view',
+        components: [
+        ],
+        widgetTemplate: new Simplate([
+            '<div>',
+                '<div class="toolbar"></div>',
+                '<div class="scroll-container"></div>',
+            '</div>'
+        ])
+    });
+
+    return declare('Sage.Platform.Mobile.ViewOld', [_Widget, _ActionMixin, _CustomizationMixin, _TemplatedWidgetMixin], {
         attributeMap: {
             'title': {
                 node: 'domNode',

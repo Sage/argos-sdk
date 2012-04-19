@@ -19,6 +19,7 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dojo/dom-style',
     'dojo/dom-class',
     'dijit/_Widget',
+    'dijit/_WidgetBase',
     './_EventMapMixin',
     './_Component'
 ], function(
@@ -27,10 +28,11 @@ define('Sage/Platform/Mobile/Toolbar', [
     domStyle,
     domClass,
     _Widget,
+    _WidgetBase,
     _EventMapMixin,
     _Component
 ) {
-    return declare('Sage.Platform.Mobile.Toolbar', [_Widget, _EventMapMixin, _Component], {
+    return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _Component], {
         baseClass: 'toolbar',
         fixed: 'top',
         _setFixedAttr: {node: 'domNode', type: 'attribute'},

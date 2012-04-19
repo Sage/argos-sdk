@@ -73,6 +73,10 @@ define('Sage/Platform/Mobile/_Component', [
                     if (instance.isInstanceOf(_Component))
                         instance.owner = this;
 
+                    // todo: add support for sub components defined in the array
+                    // todo: create `addComponent`, `removeComponent` methods
+                    // todo: split into _Component and _UiComponent (knows about _WidgetBase, _Container)
+
                     created.push(instance);
 
                     var attach = component.attachPoint,
