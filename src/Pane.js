@@ -17,21 +17,21 @@ define('Sage/Platform/Mobile/Pane', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojox/mobile/FixedSplitterPane',
-    './_Component',
+    './_UiComponent',
     './Toolbar',
     './View'
 ], function(
     declare,
     lang,
     FixedSplitterPane,
-    _Component,
+    _UiComponent,
     Toolbar,
     View
 ) {
-    return declare('Sage.Platform.Mobile.Pane', [FixedSplitterPane, _Component], {
+    return declare('Sage.Platform.Mobile.Pane', [FixedSplitterPane, _UiComponent], {
         components: [
             /* todo: let a view own its toolbar? */
-            {type: View, props: {}}
+
         ],
         show: function(view, options) {
             /* - add the new view to this domNode

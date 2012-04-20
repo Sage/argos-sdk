@@ -21,7 +21,7 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dijit/_Widget',
     'dijit/_WidgetBase',
     './_EventMapMixin',
-    './_Component'
+    './_UiComponent'
 ], function(
     declare,
     lang,
@@ -30,9 +30,9 @@ define('Sage/Platform/Mobile/Toolbar', [
     _Widget,
     _WidgetBase,
     _EventMapMixin,
-    _Component
+    _UiComponent
 ) {
-    return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _Component], {
+    return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _UiComponent], {
         baseClass: 'toolbar',
         fixed: 'top',
         _setFixedAttr: {node: 'domNode', type: 'attribute'},

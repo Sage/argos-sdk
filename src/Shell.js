@@ -17,21 +17,23 @@ define('Sage/Platform/Mobile/Shell', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojox/mobile/FixedSplitter',
-    './_Component',
-    './Pane'
+    './_UiComponent',
+    './Pane',
+    './View'
 ], function(
     declare,
     lang,
     FixedSplitter,
-    _Component,
-    Pane
+    _UiComponent,
+    Pane,
+    View
 ) {
-    return declare('Sage.Platform.Mobile.Shell', [FixedSplitter, _Component], {
+    return declare('Sage.Platform.Mobile.Shell', [FixedSplitter, _UiComponent], {
         orientation: 'H',
         components: [
-            {type: Pane, attachPoint: 'left', attachEvent: {}, props:{'class':'shell-left'}},
-            {type: Pane, attachPoint: 'center', attachEvent: {}, props:{'class':'shell-center'}},
-            {type: Pane, attachPoint: 'right', attachEvent: {}, props:{'class':'shell-right'}}
+            {type: Pane, attachPoint: 'left', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'shell-left'}},
+            {type: Pane, attachPoint: 'center', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'shell-center'}},
+            {type: Pane, attachPoint: 'right', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'shell-right'}}
         ],
         postCreate: function() {
             /* todo: buffer this? */

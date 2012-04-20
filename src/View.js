@@ -22,7 +22,7 @@ define('Sage/Platform/Mobile/View', [
     './_CustomizationMixin',
     './_TemplatedWidgetMixin',
     './_EventMapMixin',
-    './_Component',
+    './_UiComponent',
     './Toolbar'
 ], function(
     declare,
@@ -33,10 +33,10 @@ define('Sage/Platform/Mobile/View', [
     _CustomizationMixin,
     _TemplatedWidgetMixin,
     _EventMapMixin,
-    _Component,
+    _UiComponent,
     Toolbar
 ) {
-    return declare('Sage.Platform.Mobile.View', [_WidgetBase, _TemplatedWidgetMixin, _EventMapMixin, _Component], {
+    return declare('Sage.Platform.Mobile.View', [_WidgetBase, _TemplatedWidgetMixin, _EventMapMixin, _UiComponent], {
         baseClass: 'view',
         components: [
         ],
