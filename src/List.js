@@ -64,7 +64,7 @@ define('Sage/Platform/Mobile/List', [
         select: function(key, data, tag) {
             if (!this.selections.hasOwnProperty(key))
             {
-                this.selections[key] = {data: data, tag: tag};
+                this.selections[key] = {data: data || key, tag: tag};
                 this.count++;
 
                 if (this._fireEvents) this.onSelect(key, data, tag, this);
@@ -520,6 +520,9 @@ define('Sage/Platform/Mobile/List', [
 
             if (this._selectionModel && key)
                 this._selectionModel.toggle(key, this.entries[key], row);
+
+            if (this.options.singleSelect && this.options.singleSelectAction)
+                this.invokeSingleSelectAction();
         },
         activateEntry: function(params) {
             if (params.key)
@@ -528,19 +531,20 @@ define('Sage/Platform/Mobile/List', [
                 {
                     this._selectionModel.toggle(params.key, this.entries[params.key] || params.descriptor, params.$source);
                     if (this.options.singleSelect && this.options.singleSelectAction)
-                    {
-                        if (App.bars['tbar'])
-                            App.bars['tbar'].invokeTool({tool: this.options.singleSelectAction});
-
-                        if (this.autoClearSelection)
-                            this._selectionModel.clear();
-                    }
+                        this.invokeSingleSelectAction();
                 }
                 else
                 {
                     this.navigateToDetailView(params.key, params.descriptor);
                 }
             }
+        },
+        invokeSingleSelectAction: function() {
+            if (App.bars['tbar'])
+                App.bars['tbar'].invokeTool({tool: this.options.singleSelectAction});
+
+            if (this.autoClearSelection)
+                this._selectionModel.clear();
         },
         formatRelatedQuery: function(entry, fmt, property) {
             return string.substitute(fmt, [lang.getObject(property || '$key', false, entry)]);
