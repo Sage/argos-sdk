@@ -20,7 +20,8 @@ define('Sage/Platform/Mobile/Application', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/window',
-    'dojo/string'
+    'dojo/string',
+    'Sage/Platform/Mobile/OfflineCache'
 ], function(
     json,
     array,
@@ -28,7 +29,8 @@ define('Sage/Platform/Mobile/Application', [
     declare,
     lang,
     win,
-    string
+    string,
+    OfflineCache
 ) {
     
     lang.extend(Function, {
@@ -133,6 +135,8 @@ define('Sage/Platform/Mobile/Application', [
             {
                 if (this.isOnline())
                     this._clearSDataRequestCache();
+
+                OfflineCache.init();
             }
         },
         initConnects: function() {
@@ -195,10 +199,11 @@ define('Sage/Platform/Mobile/Application', [
             }
         },
         _createCacheKey: function(request) {
-            return 'sdata.cache[' + request.build() + ']';
+            return request.build();
         },
         _loadSDataRequest: function(request, o) {
             /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />
+            /*
             // todo: find a better way of indicating that a request can prefer cache
             if (window.localStorage)
             {
@@ -211,9 +216,32 @@ define('Sage/Platform/Mobile/Application', [
                     o.result = json.fromJson(feed);
                 }
             }
+            */
+
+      //      if (this.isOnline() && (request.allowCacheUse !== true)) return;
+
+            if (OfflineCache.supported)
+            {
+                o.bypass = this._bypassRequest;
+                o.bypassScope = this;
+            }
+        },
+        _bypassRequest: function(request, options, o) {
+            var cacheKey = this._createCacheKey(request);
+            OfflineCache.getItem(cacheKey, {
+                success: lang.hitch(this, this._bypassSuccess, options, o),
+                scope: this
+            });
+        },
+        _bypassSuccess: function(options, o, item) {
+            if (item && options.success)
+                options.success.call(options.scope || this, json.fromJson(item.entry));
+            else
+                Sage.SData.Client.Ajax.request(o)
         },
         _cacheSDataRequest: function(request, o, feed) {
             /* todo: decide how to handle PUT/POST/DELETE */
+            /*
             if (window.localStorage)
             {
                 if (/get/i.test(o.method) && typeof feed === 'object')
@@ -224,6 +252,14 @@ define('Sage/Platform/Mobile/Application', [
                     window.localStorage.setItem(key, json.toJson(feed));
                 }
             }
+            */
+
+            if (/get/i.test(o.method) && typeof feed === 'object')
+            {
+                var cacheKey = this._createCacheKey(request);
+                OfflineCache.insertItem(cacheKey, feed, {});
+            }
+
         },
         registerService: function(name, service, options) {
             options = options || {};
