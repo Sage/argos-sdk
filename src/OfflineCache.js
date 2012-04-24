@@ -60,12 +60,10 @@ define('Sage/Platform/Mobile/OfflineCache', [
         /**
          * Inserts the JSON entry into the database for the given URL
          * @param url String - The URL that uniquely identifies the entry, this will serve as a "key"
-         * @param entry JSON Object - The SData response entry/feed to be stored for offline caching.
+         * @param entry Object/JSON - The SData response entry/feed to be stored for offline caching.
          * @param options Object - Optional. The keys `success` and `failure` will used as a callback function within the scope of the `scope` key.
          */
         insertItem: function(url, entry, options) {
-            if (arguments.length < 2) return;
-
             var stamp = new Date().getTime(),
                 scope = this;
 
@@ -168,7 +166,6 @@ define('Sage/Platform/Mobile/OfflineCache', [
                 if (transaction.result)
                     item = transaction.result;
             }
-            console.log('get success', item);
 
             if (callback)
                 callback.call(scope || this, item);

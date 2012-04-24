@@ -131,9 +131,11 @@ define('Sage/Platform/Mobile/Application', [
             ReUI.init();
         },
         initCaching: function() {
+            this.online = this.isOnline();
+
             if (this.enableCaching)
             {
-                if (this.isOnline())
+                if (this.online)
                     this._clearSDataRequestCache();
 
                 OfflineCache.init();
@@ -144,6 +146,7 @@ define('Sage/Platform/Mobile/Application', [
             this._connects.push(connect.connect(win.body(), 'beforetransition', this, this._onBeforeTransition));
             this._connects.push(connect.connect(win.body(), 'aftertransition', this, this._onAfterTransition));
             this._connects.push(connect.connect(win.body(), 'show', this, this._onActivate));
+            this._connects.push(connect.subscribe('/app/offline', this, this._onOfflineChange));
         },
         initServices: function() {
             for (var name in this.connections)
@@ -203,22 +206,8 @@ define('Sage/Platform/Mobile/Application', [
         },
         _loadSDataRequest: function(request, o) {
             /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />
-            /*
-            // todo: find a better way of indicating that a request can prefer cache
-            if (window.localStorage)
-            {
-                if (this.isOnline() && (request.allowCacheUse !== true)) return;
 
-                var key = this._createCacheKey(request);
-                var feed = window.localStorage.getItem(key);
-                if (feed)
-                {
-                    o.result = json.fromJson(feed);
-                }
-            }
-            */
-
-      //      if (this.isOnline() && (request.allowCacheUse !== true)) return;
+            if (this.online && (request.allowCacheUse !== true)) return;
 
             if (OfflineCache.supported)
             {
@@ -241,18 +230,6 @@ define('Sage/Platform/Mobile/Application', [
         },
         _cacheSDataRequest: function(request, o, feed) {
             /* todo: decide how to handle PUT/POST/DELETE */
-            /*
-            if (window.localStorage)
-            {
-                if (/get/i.test(o.method) && typeof feed === 'object')
-                {
-                    var key = this._createCacheKey(request);
-
-                    window.localStorage.removeItem(key);
-                    window.localStorage.setItem(key, json.toJson(feed));
-                }
-            }
-            */
 
             if (/get/i.test(o.method) && typeof feed === 'object')
             {
@@ -260,6 +237,17 @@ define('Sage/Platform/Mobile/Application', [
                 OfflineCache.insertItem(cacheKey, feed, {});
             }
 
+        },
+        _onOfflineChange: function(o) {
+            this.online = (typeof o.state !== 'undefined') ? o.state : this.isOnline();
+            if (this.online)
+                this.disableOfflineMode();
+            else
+                this.enableOfflineMode();
+        },
+        disableOfflineMode: function() {
+        },
+        enableOfflineMode: function() {
         },
         registerService: function(name, service, options) {
             options = options || {};
