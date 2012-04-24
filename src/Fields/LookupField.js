@@ -230,11 +230,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                 if (selectionModel.getSelectionCount() == 0 && view.options.allowEmptySelection)
                     this.clearValue(true);
 
-                if (view.multi)
-                {
-                    this.setSelections(selections);
-                }
-                else
+                if (this.singleSelect)
                 {
                     for (var selectionKey in selections)
                     {
@@ -242,6 +238,10 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                         this.setSelection(val, selectionKey);
                         break;
                     }
+                }
+                else
+                {
+                    this.setSelections(selections);
                 }
 
                 selectionModel.clear();
