@@ -147,7 +147,7 @@ ReUI = {};
         {
             var data = extractInfoFromHash(link.hash),
                 page = data && D.get(data.page);
-            if (page)
+            if (page && R.legacyMode)
             {
                 D.select(link);
                     
