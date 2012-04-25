@@ -5,8 +5,6 @@ define('Sage/Platform/Mobile/OfflineCache', [
     lang,
     json
 ) {
-   window.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
-
     var _database,
         supported = (!!window.openDatabase && 'sql') || (!!window.indexedDB && 'indexeddb');
 
@@ -17,19 +15,11 @@ define('Sage/Platform/Mobile/OfflineCache', [
         version: 1,
 
         init: function() {
-            if (supported === 'sql')
+            if (this.supported === 'sql')
             {
                 _database = openDatabase('argos', this.version, this.cacheDescriptionText, 5242880);
                 this.createInitialSQLDatabase();
             }
-            else
-            {
-                var openRequest = window.indexedDB.open('argos', this.version);
-                openRequest.onsuccess = lang.hitch(this, this.onCreateIDBDatabaseSuccess);
-                openRequest.onupgradeneeded = lang.hitch(this, this.createInitialIDBDatabase);
-                openRequest.onerror = lang.hitch(this, this.onCreateError);
-            }
-
         },
 
         createInitialSQLDatabase: function() {
@@ -37,24 +27,13 @@ define('Sage/Platform/Mobile/OfflineCache', [
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS cache (id INTEGER PRIMARY KEY ASC, dateStamp DATETIME, url TEXT UNIQUE, entry TEXT)');
             });
         },
+        clearSQLDatabase: function() {
+            if (!_database) return;
 
-        createInitialIDBDatabase: function(e) {
-            if (_database) return; // catch for browsers that run onupgradeneeded AND success
-            _database = e.target.result;
-
-            var objectStore = _database.createObjectStore('cache', {keyPath: 'url'});
-            objectStore.createIndex('dateStamp', 'dateStamp', {unique: false});
-            objectStore.createIndex('entry', 'entry', {unique: false});
-        },
-
-        onCreateIDBDatabaseSuccess: function(e) {
-            if (_database) return; // catch for browsers that run onupgradeneeded AND success
-            _database = e.target.result;
-        },
-
-        onCreateError: function(e) {
-            if (console)
-                console.warn('Unable to create cache indexeddb database', e);
+            _database.transaction(function(transaction) {
+                transaction.executeSql('DROP TABLE IF EXISTS cache');
+            });
+            this.createInitialSQLDatabase();
         },
 
         /**
@@ -71,6 +50,7 @@ define('Sage/Platform/Mobile/OfflineCache', [
                 entry = json.toJson(entry);
 
             if (this.supported === 'sql')
+            {
                 _database.transaction(function(transaction) {
                     transaction.executeSql('INSERT OR REPLACE INTO cache(dateStamp, url, entry) VALUES (?,?,?)',
                         [stamp, url, entry],
@@ -78,14 +58,6 @@ define('Sage/Platform/Mobile/OfflineCache', [
                         lang.hitch(scope, scope.onInsertError, options.failure, options.scope)
                     );
                 });
-            else
-            {
-                var transaction = _database.transaction(['cache'], IDBTransaction.READ_WRITE);
-                transaction.oncomplete = lang.hitch(scope, scope.onInsertSuccess, options.success, options.scope);
-                transaction.onerror = lang.hitch(scope, scope.onInsertError, options.failure, options.scope);
-
-                var objectStore = transaction.objectStore('cache');
-                objectStore.put({dateStamp: stamp, url: url, entry: entry});
             }
         },
 
@@ -93,6 +65,7 @@ define('Sage/Platform/Mobile/OfflineCache', [
             var scope = this;
 
             if (this.supported === 'sql')
+            {
                 _database.readTransaction(function(transaction) {
                     transaction.executeSql('SELECT * FROM cache WHERE url=?',
                         [url],
@@ -100,13 +73,6 @@ define('Sage/Platform/Mobile/OfflineCache', [
                         lang.hitch(scope, scope.onGetSuccess, options.success, options.scope)
                     );
                 });
-            else
-            {
-                var transaction = _database.transaction(['cache'], IDBTransaction.READ_ONLY);
-                var objectStore = transaction.objectStore('cache');
-                var request = objectStore.get(url);
-                request.onsuccess = lang.hitch(scope, scope.onGetSuccess, options.success, options.scope, request);
-                request.onerror = lang.hitch(scope, scope.onGetSuccess, options.success, options.scope);
             }
         },
 
@@ -119,6 +85,7 @@ define('Sage/Platform/Mobile/OfflineCache', [
             var scope = this;
 
             if (this.supported === 'sql')
+            {
                 _database.transaction(function(transaction) {
                     transaction.executeSql('DELETE FROM cache WHERE dateStamp < ?',
                         [date],
@@ -126,22 +93,26 @@ define('Sage/Platform/Mobile/OfflineCache', [
                         lang.hitch(scope, scope.onDeleteError, options.failure, options.scope)
                     );
                 });
-            else
-            {
-                var deleteIndex = _database.transaction(['cache']).objectStore('cache').index('dateStamp');
-                var upperBoundKeyRange = IDBKeyRange.upperBound(date, false);
-                deleteIndex.openKeyCursor(upperBoundKeyRange).onsuccess = function(e) {
-                    var cursor = e.target.result;
-                    if (cursor)
-                    {
-                        console.log(cursor);
-//                        var deleteRequest = _database.transaction(['cache'], IDBTransaction.READ_WRITE).objectStore('cache').delete(cursor.key);
-                        deleteRequest.onsuccess = lang.hitch(scope, scope.onDeleteSuccess, options.success, options.scope);
-                        deleteRequest.onerror = lang.hitch(scope, scope.onDeleteError, options.failure, options.scope);
-                    }
-                };
-
             }
+        },
+
+        deleteEntry: function(url, options) {
+            var scope = this;
+
+            if (this.supported === 'sql')
+            {
+                _database.transaction(function(transaction) {
+                    transaction.executeSql('DELETE FROM cache WHERE url = ?',
+                        [url],
+                        lang.hitch(scope, scope.onDeleteSuccess, options.success, options.scope),
+                        lang.hitch(scope, scope.onDeleteError, options.failure, options.scope)
+                    );
+                });
+            }
+        },
+
+        clear: function() {
+            this.clearSQLDatabase();
         },
 
         onInsertSuccess: function(callback, scope, transaction, e) {
@@ -160,11 +131,6 @@ define('Sage/Platform/Mobile/OfflineCache', [
             {
                 if (results.rows.length > 0)
                     item = results.rows.item(0);
-            }
-            else
-            {
-                if (transaction.result)
-                    item = transaction.result;
             }
 
             if (callback)

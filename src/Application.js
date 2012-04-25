@@ -186,27 +186,13 @@ define('Sage/Platform/Mobile/Application', [
             return window.navigator.onLine;
         },
         _clearSDataRequestCache: function() {
-            var check = function(k) {
-                return /^sdata\.cache/i.test(k);
-            };
-
-            if (window.localStorage)
-            {
-                /* todo: find a better way to detect */
-                for (var i = window.localStorage.length - 1; i >= 0 ; i--)
-                {
-                    var key = window.localStorage.key(i);
-                    if (check(key))
-                        window.localStorage.removeItem(key);
-                }
-            }
+            OfflineCache.clear();
         },
         _createCacheKey: function(request) {
             return request.build();
         },
         _loadSDataRequest: function(request, o) {
             /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />
-
             if (this.online && (request.allowCacheUse !== true)) return;
 
             if (OfflineCache.supported)
@@ -224,9 +210,14 @@ define('Sage/Platform/Mobile/Application', [
         },
         _bypassSuccess: function(options, o, item) {
             if (item && options.success)
+            {
                 options.success.call(options.scope || this, json.fromJson(item.entry));
+            }
             else
+            {
+                // Handle not online and not in cache
                 Sage.SData.Client.Ajax.request(o)
+            }
         },
         _cacheSDataRequest: function(request, o, feed) {
             /* todo: decide how to handle PUT/POST/DELETE */
