@@ -31,7 +31,7 @@ define('Sage/Platform/Mobile/Shell', [
     return declare('Sage.Platform.Mobile.Shell', [FixedSplitter, _UiComponent], {
         orientation: 'H',
         components: [
-            {type: Pane, attachPoint: 'left', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'shell-left'}},
+            {type: Pane, attachPoint: 'left', attachEvent: {}, components: [{type: View, attachPoint: 'viewA', props: {}}], props:{'class':'shell-left'}},
             {type: Pane, attachPoint: 'center', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'shell-center'}},
             {type: Pane, attachPoint: 'right', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'shell-right'}}
         ],

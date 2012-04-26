@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/_UiComponent', [
 
             instance.destroy();
         },
-        _attachComponent: function(component, owner, instance) {
+        _attachComponent: function(component, instance, root, owner) {
             this.inherited(arguments);
 
             if (instance.isInstanceOf(_WidgetBase))

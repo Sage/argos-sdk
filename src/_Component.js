@@ -24,7 +24,8 @@ define('Sage/Platform/Mobile/_Component', [
     };
 
     var _Component = declare('Sage.Platform.Mobile._Component', null, {
-        owner: null,
+        _componentRoot: null,
+        _componentOwner: null,
         _componentSignals: null,
         startup: function() {
             this.initComponents();
@@ -54,8 +55,8 @@ define('Sage/Platform/Mobile/_Component', [
         _destroyComponent: function(instance) {
             instance.destroy();
         },
-        _attachComponent: function(component, owner, instance) {
-            var target = owner || this,
+        _attachComponent: function(component, instance, root, owner) {
+            var target = root,
                 attach = component.attachPoint,
                 events = component.attachEvent;
 
@@ -80,7 +81,7 @@ define('Sage/Platform/Mobile/_Component', [
                 }
             }
         },
-        _createComponent: function(component, owner) {
+        _createComponent: function(component, root, owner) {
             var type = component.type,
                 ctor = lang.isFunction(type) ? type : lang.getObject(type, false);
 
@@ -88,29 +89,37 @@ define('Sage/Platform/Mobile/_Component', [
 
             var instance = new ctor(lang.mixin({components: component.components}, component.props));
             if (instance.isInstanceOf(_Component))
-                instance.owner = owner;
+            {
+                instance._componentRoot = root;
+                instance._componentOwner = owner;
+            }
 
-            this._attachComponent(component, owner, instance);
+            this._attachComponent(component, instance, root, owner);
 
             return instance;
         },
-        _createComponents: function(components, owner) {
+        _createComponents: function(components, root, owner) {
             var created = [];
 
             if (components)
             {
                 for (var i = 0; i < components.length; i++)
                 {
-                    created.push(this._createComponent(components[i], owner));
+                    created.push(this._createComponent(components[i], root, owner));
                 }
             }
 
             return created;
         },
         initComponents: function() {
-            var created = this._createComponents(this.constructor.prototype.components, this);
+            var root = this._componentRoot || this,
+                owner = this;
 
-            if (this.hasOwnProperty('components')) created = created.concat(this._createComponents(this.components, this));
+            /* components defined on the prototype are always rooted locally */
+            var created = this._createComponents(this.constructor.prototype.components, owner, owner);
+
+            /* components defined on the instance always inherit the root */
+            if (this.hasOwnProperty('components')) created = created.concat(this._createComponents(this.components, root, owner));
 
             this.components = created;
         }
