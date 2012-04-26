@@ -85,7 +85,8 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                 },
                 entry: this.originalValue,
                 changes: this.currentValue,
-                entityName: this.entityName || (this.owner && this.owner.entityName)
+                entityName: this.entityName || (this.owner && this.owner.entityName),
+                negateHistory: true
             };
         },
         navigateToEditView: function() {

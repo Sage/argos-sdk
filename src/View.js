@@ -207,9 +207,15 @@ define('Sage/Platform/Mobile/View', [
         },
         getTag: function() {
         },
+        getOptionsContext: function() {
+            if (this.options && this.options.negateHistory)
+                return { negateHistory: true };
+            else
+                return this.options;
+        },
         getContext: function() {
             // todo: should we track options?
-            return {id: this.id, options: this.options};
+            return {id: this.id, options: this.getOptionsContext()};
         },
         getSecurity: function(access) {
             return this.security;

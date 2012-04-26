@@ -73,6 +73,8 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         valueKeyProperty: null,
         valueTextProperty: null,
         requireSelection: true,
+        singleSelect: true,
+
         init: function() {
             this.inherited(arguments);
 
@@ -125,16 +127,17 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         createNavigationOptions: function() {
             var options = {
                 selectionOnly: true,
-                singleSelect: (false !== this.singleSelect),
+                singleSelect: this.singleSelect,
                 singleSelectAction: this.singleSelectAction || 'complete',
                 allowEmptySelection: !this.requireSelection,
                 resourceKind: this.resourceKind,
                 resourcePredicate: this.resourcePredicate,
                 where: this.where,
                 orderBy: this.orderBy,
+                negateHistory: true,
                 tools: {
                     tbar: [{
-                        id: 'complete',                       
+                        id: 'complete',
                         fn: this.complete,
                         scope: this
                     },{
@@ -244,7 +247,6 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                     this.setSelections(selections);
                 }
 
-                selectionModel.clear();
                 ReUI.back();
 
                 // if the event is fired before the transition, any XMLHttpRequest created in an event handler and
