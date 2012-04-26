@@ -64,9 +64,8 @@ define('Sage/Platform/Mobile/List', [
         select: function(key, data, tag) {
             if (!this.selections.hasOwnProperty(key))
             {
-                this.selections[key] = {data: data || key, tag: tag};
+                this.selections[key] = {data: data, tag: tag};
                 this.count++;
-
                 if (this._fireEvents) this.onSelect(key, data, tag, this);
             }
         },
@@ -496,15 +495,16 @@ define('Sage/Platform/Mobile/List', [
         },
         _onSelectionModelClear: function() {
         },
-        _loadPreviousSelections: function(){
-            var selections = this.options && this.options.previousSelections;
-            if (selections)
+        _loadPreviousSelections: function() {
+            var previousSelections = this.options && this.options.previousSelections;
+            if (previousSelections)
             {
-                for (var i = 0; i < selections.length; i++)
+                for (var i = 0; i < previousSelections.length; i++)
                 {
-                    var data = selections[i],
-                        key = data;
-                    this._selectionModel.select(key, data);
+                    var row = query((string.substitute('[data-key="${0}"], [data-descriptor="${0}"]', [previousSelections[i]])), this.contentNode)[0];
+
+                    if (row)
+                        this.selectEntry({$source: row});
                 }
             }
         },
