@@ -18,7 +18,6 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dojo/_base/lang',
     'dojo/dom-style',
     'dojo/dom-class',
-    'dijit/_Widget',
     'dijit/_WidgetBase',
     './_EventMapMixin',
     './_UiComponent'
@@ -27,7 +26,6 @@ define('Sage/Platform/Mobile/Toolbar', [
     lang,
     domStyle,
     domClass,
-    _Widget,
     _WidgetBase,
     _EventMapMixin,
     _UiComponent

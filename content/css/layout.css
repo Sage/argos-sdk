@@ -73,19 +73,28 @@ html, body
 
 .scroll-container
 {
+    z-index: 1;
     position: absolute;
-    top: 2px;
+    top: 47px;
     bottom: 2px;
     left: 2px;
     right: 2px;
 
-    opacity: 0.5;
+    /* opacity: 0.5; */
+    background: #000;
 
+    /*
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
+    */
 
-    background: #000;
+    overflow: auto;
+}
+
+.scroll-content
+{
+    position: absolute;
 }
 
 .toolbar ~ .scroll-container
