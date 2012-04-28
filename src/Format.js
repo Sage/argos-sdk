@@ -77,6 +77,7 @@ define('Sage/Platform/Mobile/Format', [
         hourText: 'hour',
         minutesText: 'minutes',
         minuteText: 'minute',
+        shortDateFormatText: 'M/D/YYYY',
 
         encode: encode,
         decode: decode,
@@ -102,12 +103,14 @@ define('Sage/Platform/Mobile/Format', [
                 : convert.isDateString(val)
                     ? convert.toDateFromString(val)
                     : null;
-
+console.log(val, date);
             if (date)
             {
-                if (utc) date = date.clone().add({minutes: date.getTimezoneOffset()});
+                date = moment(date);
+                if (utc)
+                    date = date.add({minutes: date.zone()});
 
-                return date.toString(fmt || Date.CultureInfo.formatPatterns.shortDate);
+                return date.format(fmt || Sage.Platform.Mobile.Format.shortDateFormatText);
             }
 
             return val;

@@ -44,10 +44,10 @@ define('Sage/Platform/Mobile/Calendar', [
         calendarNode: null,
         timeNode: null,
         meridiemNode: null,
-        months: Date.CultureInfo.abbreviatedMonthNames,
-        dateFormat: Date.CultureInfo.formatPatterns.shortDate,
-        timeFormat: Date.CultureInfo.formatPatterns.shortTime,
-        is24hrTimeFormat: Date.CultureInfo.formatPatterns.shortTime.match(/H\:/),
+        months: moment.monthsShort,
+        dateFormat: moment.longDateFormat.L,
+        timeFormat: moment.longDateFormat.LT,
+        is24hrTimeFormat: moment.longDateFormat.LT.match(/H\:/),
         date: false,
         showTimePicker: false,
         timeless: false,
@@ -115,12 +115,7 @@ define('Sage/Platform/Mobile/Calendar', [
         timePickControl: null,
 
         daysInMonth: function() {
-            var dlo = (1==this.month) ? 28 : 30;
-            var dhi = (1==this.month) ? 29 : 31;
-            return (new Date(this.year, this.month, dlo).getMonth() == new Date(this.year, this.month, dhi).getMonth())
-                ? dhi
-                : dlo
-                ;
+            return moment(this.year+'-'+this.month).daysInMonth();
         },
         init: function() {
             this.inherited(arguments);
@@ -135,19 +130,20 @@ define('Sage/Platform/Mobile/Calendar', [
         validate: function() {
             this.year = this.yearNode.value;
             this.month = this.monthNode.value;
+
             // adjust dayNode selector from changes to monthNode or leap/non-leap year
             if (this.dayNode.options.length != this.daysInMonth())
             {
                 this.populateSelector(this.dayNode, this.dayNode.selectedIndex + 1, 1, this.daysInMonth());
             }
 
-            this.date = new Date(this.year, this.month, this.dayNode.value);
+            this.date = moment(new Date(this.year, this.month, this.dayNode.value));
             var isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : domAttr.get(this.meridiemNode, 'toggled') !== true,
                 hours = parseInt(this.hourNode.value, 10),
                 minutes = parseInt(this.minuteNode.value, 10);
             hours = isPM ? (hours % 12) + 12 : (hours % 12);
-            this.date.setHours(hours);
-            this.date.setMinutes(minutes);
+            this.date.hours(hours);
+            this.date.minutes(minutes);
 
             this.updateDatetimeCaption();
         },
@@ -180,11 +176,11 @@ define('Sage/Platform/Mobile/Calendar', [
         localizeViewTemplate: function() {
             var whichTemplate = arguments[0],
                 formatIndex = arguments[1],
-                fields = { y:'year', M:'month', d:'day', h:'hour', H:'hour', m:'minute' };
+                fields = { y:'year', Y:'year', M:'month', d:'day', D:'day', h:'hour', H:'hour', m:'minute' };
 
             var whichField = fields[ (3 > formatIndex)
                 ? this.dateFormat.split(/[^a-z]/i)[formatIndex].charAt(0)
-                : Date.CultureInfo.formatPatterns.shortTime.split(/[^a-z]/i)[formatIndex - 3].charAt(0)
+                : this.timeFormat.split(/[^a-z]/i)[formatIndex - 3].charAt(0)
                 ];
 
             var whichFormat = ('selectorTemplate' == whichTemplate)
@@ -200,30 +196,30 @@ define('Sage/Platform/Mobile/Calendar', [
 
             this.showTimePicker = this.options && this.options.showTimePicker;
 
-            this.date  = (this.options && this.options.date) || new Date();
-            this.year  = this.date.getFullYear();
-            this.month = this.date.getMonth();
+            this.date  = moment((this.options && this.options.date) || moment());
+            this.year  = this.date.year();
+            this.month = this.date.month();
 
             if ((this.options && this.options.timeless) || this.timeless)
-                this.date = this.date.clone().add({minutes: this.date.getTimezoneOffset()});
+                this.date.add({minutes: this.date.zone()});
 
-            var today = new Date();
+            var today = moment();
 
             this.populateSelector(this.yearNode, this.year,
-                    (this.year < today.getFullYear() - 10 ? this.year : today.getFullYear() - 10), // min 10 years in past - arbitrary min
-                    (10 + today.getFullYear()) // max 10 years into future - arbitrary limit
+                    (this.year < today.year()) - 10 ? this.year : today.year() - 10, // min 10 years in past - arbitrary min
+                    (10 + today.year()) // max 10 years into future - arbitrary limit
             );
             this.populateSelector(this.monthNode, this.month, 0, 11);
-            this.populateSelector(this.dayNode, this.date.getDate(), 1, this.daysInMonth());
+            this.populateSelector(this.dayNode, this.date.date(), 1, this.daysInMonth());
             this.populateSelector(this.hourNode,
-                this.date.getHours() > 12 && !this.is24hrTimeFormat
-                    ? this.date.getHours() - 12
-                    : (this.date.getHours() || 12),
+                this.date.hours() > 12 && !this.is24hrTimeFormat
+                    ? this.date.hours() - 12
+                    : (this.date.hours() || 12),
                 this.is24hrTimeFormat ? 0 : 1,
                 this.is24hrTimeFormat ? 23 : 12
             );
-            this.populateSelector(this.minuteNode, this.date.getMinutes(), 0, 59);
-            domAttr.set(this.meridiemNode, 'toggled', this.date.getHours() < 12);
+            this.populateSelector(this.minuteNode, this.date.minutes(), 0, 59);
+            domAttr.set(this.meridiemNode, 'toggled', this.date.hours() < 12);
 
             this.updateDatetimeCaption();
 
@@ -297,15 +293,15 @@ define('Sage/Platform/Mobile/Calendar', [
             this.validate(null, el);
         },
         updateDatetimeCaption: function() {
-            var t = this.getDateTime();
-            this.datePickControl.caption.innerHTML = t.toString('dddd'); // weekday text
+            var t = this.date;
+            this.datePickControl.caption.innerHTML = t.format('dddd'); // weekday text
             if (this.showTimePicker)
             {
-                this.timePickControl.caption.innerHTML = t.toString(this.timeFormat);
+                this.timePickControl.caption.innerHTML = t.format(this.timeFormat);
             }
         },
         getDateTime: function() {
-            var result = new Date(this.date.getTime()),
+            var result = moment(this.date),
                 isPM = this.is24hrTimeFormat ? (11 < this.hourNode.value) : domAttr.get(this.meridiemNode, 'toggled') !== true,
                 hours = parseInt(this.hourNode.value, 10),
                 minutes = parseInt(this.minuteNode.value, 10);
@@ -314,13 +310,14 @@ define('Sage/Platform/Mobile/Calendar', [
                 ? (hours % 12) + 12
                 : (hours % 12);
 
-            result.setHours(hours);
-            result.setMinutes(minutes);
-
+            result.hours(hours);
+            result.minutes(minutes);
             if ((this.options && this.options.timeless) || this.timeless)
-                result = result.clone().clearTime().add({minutes: -1*result.getTimezoneOffset(), seconds:5});
+            {
+                result = result.sod().add({minutes: -1 * result.zone(), seconds: 5});
+            }
 
-            return result;
+            return result.toDate();
         }
     });
 });
