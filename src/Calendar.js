@@ -46,7 +46,7 @@ define('Sage/Platform/Mobile/Calendar', [
         meridiemNode: null,
         months: moment.monthsShort,
         dateFormat: moment.longDateFormat.L,
-        timeFormat: moment.longDateFormat.LT,
+        timeFormatText: 'h:mm A',
         is24hrTimeFormat: moment.longDateFormat.LT.match(/H\:/),
         date: false,
         showTimePicker: false,
@@ -180,7 +180,7 @@ define('Sage/Platform/Mobile/Calendar', [
 
             var whichField = fields[ (3 > formatIndex)
                 ? this.dateFormat.split(/[^a-z]/i)[formatIndex].charAt(0)
-                : this.timeFormat.split(/[^a-z]/i)[formatIndex - 3].charAt(0)
+                : this.timeFormatText.split(/[^a-z]/i)[formatIndex - 3].charAt(0)
                 ];
 
             var whichFormat = ('selectorTemplate' == whichTemplate)
@@ -219,7 +219,18 @@ define('Sage/Platform/Mobile/Calendar', [
                 this.is24hrTimeFormat ? 23 : 12
             );
             this.populateSelector(this.minuteNode, this.date.minutes(), 0, 59);
-            domAttr.set(this.meridiemNode, 'toggled', this.date.hours() < 12);
+
+            if (this.date.hours() < 12)
+            {
+                domAttr.set(this.meridiemNode, 'toggled', true);
+                domClass.add(this.meridiemNode, 'toggleStateOn');
+            }
+            else
+            {
+                domAttr.set(this.meridiemNode, 'toggled', false);
+                domClass.remove(this.meridiemNode, 'toggleStateOn');
+            }
+
 
             this.updateDatetimeCaption();
 
@@ -293,11 +304,11 @@ define('Sage/Platform/Mobile/Calendar', [
             this.validate(null, el);
         },
         updateDatetimeCaption: function() {
-            var t = this.date;
+            var t = moment(this.getDateTime());
             this.datePickControl.caption.innerHTML = t.format('dddd'); // weekday text
             if (this.showTimePicker)
             {
-                this.timePickControl.caption.innerHTML = t.format(this.timeFormat);
+                this.timePickControl.caption.innerHTML = t.format(this.timeFormatText);
             }
         },
         getDateTime: function() {

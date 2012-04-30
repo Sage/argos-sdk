@@ -103,7 +103,7 @@ define('Sage/Platform/Mobile/Format', [
                 : convert.isDateString(val)
                     ? convert.toDateFromString(val)
                     : null;
-console.log(val, date);
+
             if (date)
             {
                 date = moment(date);
