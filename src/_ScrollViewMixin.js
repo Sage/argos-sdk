@@ -26,18 +26,27 @@ define('Sage/Platform/Mobile/_ScrollViewMixin', [
         startup: function() {
             this.inherited(arguments);
 
-            if (this.scrollContainerNode)
+            var hasTouch = 'ontouchstart' in window;
+
+            if (this.scrollContainerNode && hasTouch)
             {
-                this._scroll = new iScroll(this.scrollContainerNode, {});
+                this._scroll = new iScroll(this.scrollContainerNode, {
+                    checkDOMChanges: false
+                });
             }
         },
-        resize: function() {
-            this.inherited(arguments);
-
-            console.log('resize!');
-
+        onContentChanged: function() {
             if (this._scroll)
                 this._scroll.refresh();
+        },
+        destroy: function(preserveDom) {
+            if (this._scroll)
+            {
+                this._scroll.destroy(!preserveDom);
+                this._scroll = null;
+            }
+
+            this.inherited(arguments);
         }
     });
 
