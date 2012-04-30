@@ -152,13 +152,13 @@ define('Sage/Platform/Mobile/Format', [
             var mins  = v % 60;
 
             if (hrs)
-                hrs = hrs > 1 ? string.substitute('${0} ${1} ', [hrs, (Sage.Platform.Mobile.Format.hoursText || 'hours')])
-                              : string.substitute('${0} ${1} ', [hrs, (Sage.Platform.Mobile.Format.hourText || 'hour')]);
+                hrs = hrs > 1 ? string.substitute('${0} ${1}', [hrs, (Sage.Platform.Mobile.Format.hoursText || 'hours')])
+                              : string.substitute('${0} ${1}', [hrs, (Sage.Platform.Mobile.Format.hourText || 'hour')]);
             if (mins)
                 mins = mins > 1 ? string.substitute('${0} ${1}', [mins, (Sage.Platform.Mobile.Format.minutesText || 'minutes')])
                                 : string.substitute('${0} ${1}', [mins, (Sage.Platform.Mobile.Format.minuteText || 'minute')]);
 
-            return (hrs && mins) ? hrs + mins
+            return (hrs && mins) ? hrs +" "+ mins
                                  : hrs === 0 ? mins : hrs;
         },
         canvasDraw: function (vector, canvas, options) {
