@@ -1,21 +1,25 @@
 define('Sage/Platform/Mobile/_UiComponent', [
+    'require',
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
     'dojo/_base/connect',
+    'dojo/dom-construct',
     'dijit/_WidgetBase',
     'dijit/_Container',
     './_Component'
 ], function(
+    require,
     declare,
     array,
     lang,
     connect,
+    domConstruct,
     _WidgetBase,
     _Container,
     _Component
 ) {
-    return declare('Sage.Platform.Mobile._UiComponent', [_Component], {
+    var _UiComponent = declare('Sage.Platform.Mobile._UiComponent', [_Component], {
         _startupComponent: function(instance) {
             if (instance.isInstanceOf(_WidgetBase) && instance._started) return;
 
@@ -25,6 +29,21 @@ define('Sage/Platform/Mobile/_UiComponent', [
             if (instance.isInstanceOf(_WidgetBase) && instance._beingDestroyed) return;
 
             instance.destroy();
+        },
+        _instantiateComponent: function(component) {
+            var content = component.content,
+                tag = component.tag;
+
+            if (content || tag)
+            {
+                var node = content
+                    ? domConstruct.toDom(lang.isFunction(content) ? content.call(this, this) : content)
+                    : domConstruct.create(component.tag, component.attrs);
+
+                return new ContentComponent(lang.mixin({components: component.components}, component.props), node);
+            }
+
+            return this.inherited(arguments);
         },
         _attachComponent: function(component, instance, root, owner) {
             this.inherited(arguments);
@@ -41,4 +60,10 @@ define('Sage/Platform/Mobile/_UiComponent', [
             }
         }
     });
+
+    var ContentComponent = declare('Sage.Platform.Mobile.ContentComponent', [_WidgetBase, _UiComponent], {});
+
+    _UiComponent.ContentComponent = ContentComponent;
+
+    return _UiComponent;
 });

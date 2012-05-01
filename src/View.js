@@ -23,6 +23,7 @@ define('Sage/Platform/Mobile/View', [
     './_EventMapMixin',
     './_UiComponent',
     './_ScrollViewMixin',
+    './ScrollContainer',
     './Toolbar'
 ], function(
     declare,
@@ -34,12 +35,27 @@ define('Sage/Platform/Mobile/View', [
     _EventMapMixin,
     _UiComponent,
     _ScrollViewMixin,
+    ScrollContainer,
     Toolbar
 ) {
-    return declare('Sage.Platform.Mobile.View', [_WidgetBase, _UiComponent, _ScrollViewMixin, _TemplatedWidgetMixin, _EventMapMixin], {
+    return declare('Sage.Platform.Mobile.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
         baseClass: 'view',
         components: [
+            {tag: 'div', attrs: {'class':'toolbar'}},
+            {type: ScrollContainer, attachPoint: 'scrollContainer', subscribeEvent: {'onContentChanged':'onContentChanged'}, components: [
+                {tag: 'div', attrs: {}, components: [
+                    {content: '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus feugiat, justo id egestas luctus, risus urna tempor turpis, sit amet ornare ante purus eget ante. Aliquam tempus tempor elit, id lobortis tellus gravida in. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nam accumsan mauris nec enim sagittis vel aliquet risus pharetra. Aenean et felis quam, id pulvinar velit. Donec lacinia fermentum augue, sed ultrices odio dapibus id. Sed fringilla urna lacinia neque blandit adipiscing. Phasellus rutrum ipsum a sapien molestie vulputate. Praesent at urna nulla. Suspendisse interdum placerat varius. Sed id arcu lorem. Fusce nec nibh mauris, eget dictum mi. Proin lectus arcu, eleifend a aliquet quis, molestie laoreet massa. Praesent hendrerit, risus non ullamcorper gravida, nisl turpis euismod libero, quis sagittis massa elit eu massa. Mauris velit dui, vehicula vitae facilisis porta, faucibus id libero. Phasellus vestibulum adipiscing auctor.  Proin eget aliquam dui. Pellentesque faucibus urna nec velit porta interdum. Duis feugiat fringilla luctus. Aliquam erat volutpat. Sed sed ipsum metus. Nunc rutrum aliquam lobortis. Fusce eleifend leo viverra elit volutpat ornare. Nulla vel libero ante, pulvinar porta leo.  Vestibulum vitae urna lectus. Praesent a nibh lorem, nec porttitor ligula. Donec egestas sodales diam nec posuere. Fusce pellentesque molestie malesuada. Phasellus mi quam, condimentum a cursus sed, malesuada sed quam. Suspendisse pellentesque scelerisque sapien, id iaculis sem posuere sed. Suspendisse in felis id diam sodales accumsan quis sed neque. Proin auctor cursus pretium. Mauris accumsan leo vestibulum dui elementum dictum scelerisque odio mollis. In quis velit non mauris lacinia accumsan non convallis mauris. Morbi vitae molestie risus. Fusce in risus urna, vitae adipiscing tellus. Phasellus sollicitudin urna sed odio molestie molestie.  Praesent consectetur dui et erat bibendum at varius dui ultricies. In accumsan, nisi pretium blandit porttitor, enim lacus molestie elit, quis sodales massa tortor a eros. Nunc lorem sapien, pretium a rhoncus quis, faucibus cursus purus. Nullam a dui enim. Vestibulum ultricies sagittis turpis id laoreet. Pellentesque consectetur rutrum facilisis. Ut mattis neque sit amet quam pharetra ultricies. Praesent vitae purus et metus interdum euismod.  Donec ut neque elit, vitae varius lacus. Sed interdum sodales libero, in aliquam leo pretium quis. Quisque tristique massa sed odio venenatis ut euismod dolor sodales. Aenean gravida consequat enim vestibulum suscipit. Proin quis ipsum lacus, dictum posuere dui. Sed tristique elit in diam faucibus sit amet ornare felis consectetur. Pellentesque consectetur eleifend dui, sed tempor urna iaculis vitae. Aenean nec mi et massa porttitor consequat. Vestibulum venenatis ultrices tristique.</p>'}
+                ]}
+            ]}/*,
+            {tag: 'div', attrs: {'class':'scroll-container'}, attachPoint:'scrollContainerNode', components: [
+                {tag: 'div', attrs: {'class':'scroll-content'}, components: [
+                    {content: '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus feugiat, justo id egestas luctus, risus urna tempor turpis, sit amet ornare ante purus eget ante. Aliquam tempus tempor elit, id lobortis tellus gravida in. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nam accumsan mauris nec enim sagittis vel aliquet risus pharetra. Aenean et felis quam, id pulvinar velit. Donec lacinia fermentum augue, sed ultrices odio dapibus id. Sed fringilla urna lacinia neque blandit adipiscing. Phasellus rutrum ipsum a sapien molestie vulputate. Praesent at urna nulla. Suspendisse interdum placerat varius. Sed id arcu lorem. Fusce nec nibh mauris, eget dictum mi. Proin lectus arcu, eleifend a aliquet quis, molestie laoreet massa. Praesent hendrerit, risus non ullamcorper gravida, nisl turpis euismod libero, quis sagittis massa elit eu massa. Mauris velit dui, vehicula vitae facilisis porta, faucibus id libero. Phasellus vestibulum adipiscing auctor.  Proin eget aliquam dui. Pellentesque faucibus urna nec velit porta interdum. Duis feugiat fringilla luctus. Aliquam erat volutpat. Sed sed ipsum metus. Nunc rutrum aliquam lobortis. Fusce eleifend leo viverra elit volutpat ornare. Nulla vel libero ante, pulvinar porta leo.  Vestibulum vitae urna lectus. Praesent a nibh lorem, nec porttitor ligula. Donec egestas sodales diam nec posuere. Fusce pellentesque molestie malesuada. Phasellus mi quam, condimentum a cursus sed, malesuada sed quam. Suspendisse pellentesque scelerisque sapien, id iaculis sem posuere sed. Suspendisse in felis id diam sodales accumsan quis sed neque. Proin auctor cursus pretium. Mauris accumsan leo vestibulum dui elementum dictum scelerisque odio mollis. In quis velit non mauris lacinia accumsan non convallis mauris. Morbi vitae molestie risus. Fusce in risus urna, vitae adipiscing tellus. Phasellus sollicitudin urna sed odio molestie molestie.  Praesent consectetur dui et erat bibendum at varius dui ultricies. In accumsan, nisi pretium blandit porttitor, enim lacus molestie elit, quis sodales massa tortor a eros. Nunc lorem sapien, pretium a rhoncus quis, faucibus cursus purus. Nullam a dui enim. Vestibulum ultricies sagittis turpis id laoreet. Pellentesque consectetur rutrum facilisis. Ut mattis neque sit amet quam pharetra ultricies. Praesent vitae purus et metus interdum euismod.  Donec ut neque elit, vitae varius lacus. Sed interdum sodales libero, in aliquam leo pretium quis. Quisque tristique massa sed odio venenatis ut euismod dolor sodales. Aenean gravida consequat enim vestibulum suscipit. Proin quis ipsum lacus, dictum posuere dui. Sed tristique elit in diam faucibus sit amet ornare felis consectetur. Pellentesque consectetur eleifend dui, sed tempor urna iaculis vitae. Aenean nec mi et massa porttitor consequat. Vestibulum venenatis ultrices tristique.</p>'}
+                ]}
+            ]}*/
         ],
+        onContentChanged: function() {
+        }
+        /*
         widgetTemplate: new Simplate([
             '<div>',
                 '<div class="toolbar"></div>',
@@ -50,6 +66,7 @@ define('Sage/Platform/Mobile/View', [
                 '</div>',
             '</div>'
         ])
+        */
     });
 
     return declare('Sage.Platform.Mobile.ViewOld', [_Widget, _ActionMixin, _CustomizationMixin, _TemplatedWidgetMixin], {

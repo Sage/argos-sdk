@@ -57,37 +57,61 @@ define('Sage/Platform/Mobile/_Component', [
         },
         _attachComponent: function(component, instance, root, owner) {
             var target = root,
-                attach = component.attachPoint,
-                events = component.attachEvent;
+                attachPoint = component.attachPoint,
+                attachEvent = component.attachEvent,
+                subscribeEvent = component.subscribeEvent;
 
-            if (attach)
+            if (attachPoint)
             {
-                if (lang.getObject(attach, false, target)) throw new Error('Attach point already occupied.');
+                var points = attachPoint.split(/\s*,\s*/);
+                for (var i = 0; i < points.length; i++)
+                {
+                    var point = points[i];
 
-                lang.setObject(attach, instance, target);
+                    if (lang.getObject(point, false, target)) throw new Error('Attach point already occupied.');
+
+                    lang.setObject(point, instance, target);
+                }
             }
 
-            if (events && lang.isString(events))
-                events = parse(events);
+            if (attachEvent && lang.isString(attachEvent))
+                attachEvent = parse(attachEvent);
 
-            if (events)
+            if (attachEvent)
             {
                 /* this component is responsible for the connection */
                 this._componentSignals = (this._componentSignals || []);
 
-                for (var name in events)
+                for (var name in attachEvent)
                 {
-                    this._componentSignals.push(connect.connect(instance, name, target, events[name]));
+                    this._componentSignals.push(connect.connect(instance, name, target, attachEvent[name]));
+                }
+            }
+
+            if (subscribeEvent && lang.isString(subscribeEvent))
+                subscribeEvent = parse(subscribeEvent);
+
+            if (subscribeEvent)
+            {
+                /* this component is responsible for the connection */
+                this._componentSignals = (this._componentSignals || []);
+
+                for (var name in subscribeEvent)
+                {
+                    this._componentSignals.push(connect.connect(target, name, instance, subscribeEvent[name]));
                 }
             }
         },
-        _createComponent: function(component, root, owner) {
+        _instantiateComponent: function(component) {
             var type = component.type,
                 ctor = lang.isFunction(type) ? type : lang.getObject(type, false);
 
             if (!ctor) throw new Error('Invalid component type.');
 
-            var instance = new ctor(lang.mixin({components: component.components}, component.props));
+            return new ctor(lang.mixin({components: component.components}, component.props));
+        },
+        _createComponent: function(component, root, owner) {
+            var instance = this._instantiateComponent(component);
             if (instance.isInstanceOf(_Component))
             {
                 instance._componentRoot = root;
