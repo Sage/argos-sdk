@@ -14,14 +14,8 @@
  */
 
 define('Sage/Platform/Mobile/ContentComponent', [
-    'dojo/_base/declare',
-    'dojo/_base/lang',
-    'dijit/_WidgetBase',
     './_UiComponent'
 ], function(
-    declare,
-    lang,
-    _WidgetBase,
     _UiComponent
 ) {
     return _UiComponent.ContentComponent;

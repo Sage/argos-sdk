@@ -13,20 +13,10 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/FieldManager', [
-    'dojo/_base/lang'
+define('Sage/Platform/Mobile/DomContentComponent', [
+    './_UiComponent'
 ], function(
-    lang
+    _UiComponent
 ) {
-    var store = {};
-    // todo: move, and rename, to Fields/Registry
-    return lang.setObject('Sage.Platform.Mobile.FieldManager', {
-        types: store,
-        register: function(name, ctor) {
-            return (store[name] = ctor);
-        },
-        get: function(name) {
-            return store[name];
-        }
-    });
+    return _UiComponent.DomContentComponent;
 });

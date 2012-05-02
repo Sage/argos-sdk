@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/FieldManager', [
+define('Sage/Platform/Mobile/Fields/Registry', [
     'dojo/_base/lang'
 ], function(
     lang

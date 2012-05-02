@@ -40,7 +40,9 @@ define('Sage/Platform/Mobile/_UiComponent', [
                     ? domConstruct.toDom(lang.isFunction(content) ? content.call(this, this) : content)
                     : domConstruct.create(component.tag, component.attrs);
 
-                return new ContentComponent(lang.mixin({components: component.components}, component.props), node);
+                return component.domOnly
+                    ? new DomContentComponent(lang.mixin({components: component.components}, component.props), node)
+                    : new ContentComponent(lang.mixin({components: component.components}, component.props), node);
             }
 
             return this.inherited(arguments);
@@ -58,12 +60,39 @@ define('Sage/Platform/Mobile/_UiComponent', [
                 else if (this.isInstanceOf(_WidgetBase))
                     instance.placeAt(this.containerNode || this.domNode, component.position);
             }
+            else if (instance.isInstanceOf(DomContentComponent))
+            {
+                if (this.isInstanceOf(_WidgetBase))
+                    domConstruct.place(instance.domNode, this.containerNode || this.domNode, component.position);
+                else if (this.isInstanceOf(DomContentComponent))
+                    domConstruct.place(instance.domNode, this.containerNode || this.domNode, component.position);
+            }
         }
     });
 
     var ContentComponent = declare('Sage.Platform.Mobile.ContentComponent', [_WidgetBase, _UiComponent], {});
+    var DomContentComponent = declare('Sage.Platform.Mobile.DomContentComponent', [_UiComponent], {
+        domNode: null,
+        constructor: function(props, node) {
+            lang.mixin(this, props);
+
+            this.domNode = node;
+        },
+        destroy: function() {
+            if (this.domNode)
+            {
+                if (this.domNode.parentNode)
+                    this.domNode.parentNode.removeChild(this.domNode);
+
+                this.domNode = null;
+            }
+
+            this.inherited(arguments);
+        }
+    });
 
     _UiComponent.ContentComponent = ContentComponent;
+    _UiComponent.DomContentComponent = DomContentComponent;
 
     return _UiComponent;
 });

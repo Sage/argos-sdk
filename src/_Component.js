@@ -27,8 +27,14 @@ define('Sage/Platform/Mobile/_Component', [
         _componentRoot: null,
         _componentOwner: null,
         _componentSignals: null,
-        startup: function() {
+        constructor: function() {
+            this.$ = {};
+        },
+        postscript: function() {
+            this.inherited(arguments);
             this.initComponents();
+        },
+        startup: function() {
             this.inherited(arguments);
 
             array.forEach(this.components, function(component) {
@@ -59,7 +65,15 @@ define('Sage/Platform/Mobile/_Component', [
             var target = root,
                 attachPoint = component.attachPoint,
                 attachEvent = component.attachEvent,
-                subscribeEvent = component.subscribeEvent;
+                subscribeEvent = component.subscribeEvent,
+                name = component.name;
+
+            if (name)
+            {
+                if (owner.$[name]) throw new Error('A component with the same name already exists.');
+
+                owner.$[name] = target.$[name] = instance;
+            }
 
             if (attachPoint)
             {
