@@ -151,7 +151,7 @@ return describe('Sage.Platform.Mobile.Format', function() {
         var testStr = false;
         expect(format.yesNo(testStr)).toEqual('No');
     });
-    it('Can present any non-true string to default no string (no)', function() {
+    it('Can present any non-true string to default no string (No)', function() {
         var testStr = 'test';
         expect(format.yesNo(testStr)).toEqual('No');
     });
