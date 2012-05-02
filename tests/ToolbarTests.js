@@ -11,7 +11,13 @@ return describe('Sage.Platform.Mobile.Toolbar', function() {
 
     // mock of App
     window.App = {};
-    window.App.hasAccessTo = jasmine.createSpy().andReturn(false);
+    window.App.hasAccessTo = jasmine.createSpy().andCallFake(function(val) {
+        // for testing a rejected security call
+        if (val == 'false')
+            return false;
+        else
+            return val;
+    });
 
     it('Can show toolbar', function() {
         var bar = new Toolbar();
@@ -150,12 +156,27 @@ return describe('Sage.Platform.Mobile.Toolbar', function() {
                 security: true
             }
         ]);
-        spyOn(App.hasAccessTo, 'not').andCallFake(function(val) {return val;})
 
+        expect(App.hasAccessTo).toHaveBeenCalled();
         expect(bar.tools.test['enabled']).toEqual(true);
         expect(bar.tools.test['busy']).toEqual(false);
         expect(bar.tools.test['source'].id).toEqual('test');
         expect(bar.tools.test['source'].security).toEqual(true);
+    });
+    it('Can show tools, with falsey security', function() {
+        var bar = new Toolbar();
+        bar.showTools([
+            {
+                id: 'test',
+                security: 'false'
+            }
+        ]);
+
+        expect(App.hasAccessTo).toHaveBeenCalled();
+        expect(bar.tools.test['enabled']).toEqual(false);
+        expect(bar.tools.test['busy']).toEqual(false);
+        expect(bar.tools.test['source'].id).toEqual('test');
+        expect(bar.tools.test['source'].security).toEqual('false');
     });
 
 });
