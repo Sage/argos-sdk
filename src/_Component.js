@@ -24,11 +24,25 @@ define('Sage/Platform/Mobile/_Component', [
     };
 
     var _Component = declare('Sage.Platform.Mobile._Component', null, {
+        _components: null,
         _componentRoot: null,
         _componentOwner: null,
         _componentSignals: null,
-        constructor: function() {
+        components: null,
+        constructor: function(props) {
             this.$ = {};
+
+            if (props)
+            {
+                if (props.components) this.components = props.components;
+                /* todo: is there a better way to pass this around and still have creation in postscript? */
+                if (props._componentRoot) this._componentRoot = props._componentRoot;
+                if (props._componentOwner) this._componentOwner = props._componentOwner;
+
+                delete props.components;
+                delete props._componentRoot;
+                delete props._componentOwner;
+            }
         },
         postscript: function() {
             this.inherited(arguments);
@@ -37,8 +51,8 @@ define('Sage/Platform/Mobile/_Component', [
         startup: function() {
             this.inherited(arguments);
 
-            array.forEach(this.components, function(component) {
-                this._startupComponent(component);
+            array.forEach(this._components, function(component) {
+                this._startupChildComponent(component);
             }, this);
         },
         destroy: function() {
@@ -49,42 +63,45 @@ define('Sage/Platform/Mobile/_Component', [
 
             this.inherited(arguments);
 
-            array.forEach(this.components, function(component) {
-                this._destroyComponent(component);
+            array.forEach(this._components, function(component) {
+                this._destroyChildComponent(component);
             }, this);
 
-            this.components = null;
+            this.$ = null;
+            this._components = null;
         },
-        _startupComponent: function(instance) {
+        _startupChildComponent: function(instance) {
             instance.startup();
         },
-        _destroyComponent: function(instance) {
+        _destroyChildComponent: function(instance) {
             instance.destroy();
         },
         _attachComponent: function(component, instance, root, owner) {
             var target = root,
+                componentName = component.name,
                 attachPoint = component.attachPoint,
                 attachEvent = component.attachEvent,
-                subscribeEvent = component.subscribeEvent,
-                name = component.name;
+                subscribeEvent = component.subscribeEvent;
 
-            if (name)
+            if (componentName)
             {
-                if (owner.$[name]) throw new Error('A component with the same name already exists.');
+                if (owner.$[componentName]) throw new Error('A component with the same name already exists.');
 
-                owner.$[name] = target.$[name] = instance;
+                owner.$[componentName] = target.$[componentName] = instance;
             }
 
             if (attachPoint)
             {
-                var points = attachPoint.split(/\s*,\s*/);
+                var value = instance.getComponentValue(),
+                    points = attachPoint.split(/\s*,\s*/);
+
                 for (var i = 0; i < points.length; i++)
                 {
                     var point = points[i];
 
                     if (lang.getObject(point, false, target)) throw new Error('Attach point already occupied.');
 
-                    lang.setObject(point, instance, target);
+                    lang.setObject(point, value, target);
                 }
             }
 
@@ -116,21 +133,22 @@ define('Sage/Platform/Mobile/_Component', [
                 }
             }
         },
-        _instantiateComponent: function(component) {
+        _instantiateComponent: function(component, root, owner) {
             var type = component.type,
                 ctor = lang.isFunction(type) ? type : lang.getObject(type, false);
 
             if (!ctor) throw new Error('Invalid component type.');
 
-            return new ctor(lang.mixin({components: component.components}, component.props));
+            var props = lang.mixin({
+                components: component.components,
+                _componentRoot: root,
+                _componentOwner: owner
+            }, component.props);
+
+            return new ctor(props);
         },
         _createComponent: function(component, root, owner) {
-            var instance = this._instantiateComponent(component);
-            if (instance.isInstanceOf(_Component))
-            {
-                instance._componentRoot = root;
-                instance._componentOwner = owner;
-            }
+            var instance = this._instantiateComponent(component, root, owner);
 
             this._attachComponent(component, instance, root, owner);
 
@@ -149,6 +167,15 @@ define('Sage/Platform/Mobile/_Component', [
 
             return created;
         },
+        getComponentRoot: function() {
+            return this._componentRoot || this;
+        },
+        getComponentOwner: function() {
+            return this._componentOwner || this;
+        },
+        getComponentValue: function() {
+            return this;
+        },
         initComponents: function() {
             var root = this._componentRoot || this,
                 owner = this;
@@ -159,7 +186,7 @@ define('Sage/Platform/Mobile/_Component', [
             /* components defined on the instance always inherit the root */
             if (this.hasOwnProperty('components')) created = created.concat(this._createComponents(this.components, root, owner));
 
-            this.components = created;
+            this._components = created;
         }
     });
 

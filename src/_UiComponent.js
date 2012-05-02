@@ -20,29 +20,34 @@ define('Sage/Platform/Mobile/_UiComponent', [
     _Component
 ) {
     var _UiComponent = declare('Sage.Platform.Mobile._UiComponent', [_Component], {
-        _startupComponent: function(instance) {
+        _startupChildComponent: function(instance) {
             if (instance.isInstanceOf(_WidgetBase) && instance._started) return;
 
             instance.startup();
         },
-        _destroyComponent: function(instance) {
+        _destroyChildComponent: function(instance) {
             if (instance.isInstanceOf(_WidgetBase) && instance._beingDestroyed) return;
 
             instance.destroy();
         },
-        _instantiateComponent: function(component) {
+        _instantiateComponent: function(component, root, owner) {
             var content = component.content,
                 tag = component.tag;
 
             if (content || tag)
             {
                 var node = content
-                    ? domConstruct.toDom(lang.isFunction(content) ? content.call(this, this) : content)
-                    : domConstruct.create(component.tag, component.attrs);
+                        ? domConstruct.toDom(lang.isFunction(content) ? content.call(this, this) : content)
+                        : domConstruct.create(component.tag, component.attrs),
+                    props = lang.mixin({
+                        components: component.components,
+                        _componentRoot: root,
+                        _componentOwner: owner
+                    }, component.props);
 
-                return component.domOnly
-                    ? new DomContentComponent(lang.mixin({components: component.components}, component.props), node)
-                    : new ContentComponent(lang.mixin({components: component.components}, component.props), node);
+                return component.domOnly !== false
+                    ? new DomContentComponent(props, node)
+                    : new ContentComponent(props, node);
             }
 
             return this.inherited(arguments);
@@ -88,6 +93,9 @@ define('Sage/Platform/Mobile/_UiComponent', [
             }
 
             this.inherited(arguments);
+        },
+        getComponentValue: function() {
+            return this.domNode;
         }
     });
 
