@@ -43,13 +43,6 @@ define('Sage/Platform/Mobile/View', [
         createToolLayout: function() {
             return this.tools || {};
         },
-        /**
-         * Called once the first time the view is about to be transitioned to.
-         * @deprecated
-         */
-        load: function() {
-            // todo: remove load entirely?
-        },
         refreshRequiredFor: function(options) {
             if (this.options)
                 return !!options; // if options provided, then refresh
@@ -59,7 +52,7 @@ define('Sage/Platform/Mobile/View', [
         refresh: function() {
         },
         onContentChanged: function() {
-       },
+        },
         /**
          * The onBeforeTransitionAway event.
          * @param self

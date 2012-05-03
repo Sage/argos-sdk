@@ -81,38 +81,33 @@ define('Sage/Platform/Mobile/Application', [
     });
     
     return declare('Sage.Platform.Mobile.Application', null, {
-        _connects: null,
-        _subscribes: null,
         _started: false,
-        customizations: null,
-        services: null,
-        modules: null,
-        views: null,
-        bars: null,
+        _signals: null,
+        _customizations: null,
+        _connections: null,
+        _modules: null,
+
         enableCaching: false,
-        defaultService: null,
-        resizeTimer: null,
+
         constructor: function(options) {
-            this._connects = [];
-            this._subscribes = [];
-            
+            this._signals = [];
+            this._modules = [];
+            this._customizations = {};
+            this._registeredViews = {};
+            this._activeViews = {};
+
             this.customizations = {};
             this.services = {};
             this.modules = [];
             this.views = {};
-            this.bars = {};
 
             this.context = {};
 
             lang.mixin(this, options);
         },
         destroy: function() {
-            array.forEach(this._connects, function(handle) {
-                connect.disconnect(handle);
-            });
-
-            array.forEach(this._subscribes, function(handle){
-                connect.unsubscribe(handle);
+            array.forEach(this._signals, function(signal) {
+                signal.remove();
             });
 
             this.uninitialize();
@@ -120,56 +115,42 @@ define('Sage/Platform/Mobile/Application', [
         uninitialize: function() {
 
         },
-        initReUI: function() {
-            // prevent ReUI from attempting to load the URLs view as we handle that ourselves.
-            // todo: add support for handling the URL?
-            window.location.hash = '';
-
-            ReUI.init();
-        },
-        initCaching: function() {
+        _startupCaching: function() {
             if (this.enableCaching)
             {
                 if (this.isOnline())
                     this._clearSDataRequestCache();
             }
         },
-        initConnects: function() {
-            this._connects.push(connect.connect(window, 'resize', this, this.onResize));
-            this._connects.push(connect.connect(win.body(), 'beforetransition', this, this._onBeforeTransition));
-            this._connects.push(connect.connect(win.body(), 'aftertransition', this, this._onAfterTransition));
-            this._connects.push(connect.connect(win.body(), 'show', this, this._onActivate));
+        _startupEvents: function() {
+            this._signals.push(connect.connect(window, 'resize', this, this.onResize));
         },
-        initServices: function() {
-            for (var name in this.connections) this.registerService(name, this.connections[name]);
+        _startupConnections: function() {
+            for (var name in this.connections)
+                if (this.connections.hasOwnProperty(name)) this.registerConnection(name, this.connections[name]);
         },
-        initModules: function() {
+        _startupModules: function() {
             for (var i = 0; i < this.modules.length; i++)
-                this.modules[i].init(this);
-        },
-        initViews: function() {
-            for (var n in this.views) this.views[n].init(); // todo: change to startup
-        },
-        initToolbars: function() {
-            for (var n in this.bars) this.bars[n].init(); // todo: change to startup
+                this.modules[i].startup(this);
         },
         activate: function() {
-            window.App = this;
+            win.global.App = this;
         },
-        init: function() {
+        startup: function() {
             /// <summary>
             ///     Initializes this application as well as the toolbar and all currently registered views.
             /// </summary>
-            this.initConnects();
-            this.initCaching();
-            this.initServices();
-            this.initModules();
-            this.initToolbars();
-            this.initViews();
-            this.initReUI();
+
+            if (this._started) return;
+
+            this._startupEvents();
+            this._startupCaching();
+            this._startupConnections();
+            this._startupModules();
+            this._started = true;
         },
         run: function() {
-            this._started = true;
+            this.startup();
         },
         isOnline: function() {
             return window.navigator.onLine;
@@ -221,30 +202,30 @@ define('Sage/Platform/Mobile/Application', [
                 }
             }
         },
-        registerService: function(name, service, options) {
+        registerConnection: function(name, connection, options) {
             options = options || {};
 
-            var instance = service instanceof Sage.SData.Client.SDataService
-                ? service
-                : new Sage.SData.Client.SDataService(service);
+            var instance = connection instanceof Sage.SData.Client.SDataService
+                ? connection
+                : new Sage.SData.Client.SDataService(connection);
 
-            this.services[name] = instance;
+            this._connections[name] = instance;
 
-            if (this.enableCaching && (options.offline || service.offline))
+            if (this.enableCaching && (options.offline || connection.offline))
             {
                 instance.on('beforerequest', this._loadSDataRequest, this);
                 instance.on('requestcomplete', this._cacheSDataRequest, this);
             }
 
-            if ((options.isDefault || service.isDefault) || !this.defaultService)
+            if ((options.isDefault || connection.isDefault) || !this.defaultService)
                 this.defaultService = instance;
 
             return this;
         },
-        hasService: function(name) {
-            return !!this.services[name];
+        hasConnection: function(name) {
+            return !!this._connections[name];
         },
-        registerView: function(view) {
+        registerView: function(key, definition) {
             /// <summary>
             ///     Registers a view with the application.  If the application has already been
             ///     initialized, the view is immediately initialized as well.
