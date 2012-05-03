@@ -49,6 +49,4 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
             return parseFloat(value);
         }
     });
-
-    return FieldManager.register('decimal', control);
 });

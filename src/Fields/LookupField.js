@@ -441,6 +441,4 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             this.setValue(null, initial);
         }
     });
-
-    return FieldManager.register('lookup', control);
 });

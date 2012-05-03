@@ -95,6 +95,4 @@ define('Sage/Platform/Mobile/Fields/DateField', [
             return this.inherited(arguments);
         }
     });
-
-    return FieldManager.register('date', control);
 });

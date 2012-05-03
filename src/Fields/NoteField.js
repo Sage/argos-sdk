@@ -78,6 +78,4 @@ define('Sage/Platform/Mobile/Fields/NoteField', [
             this.set('noteText', text);
         }
     });
-
-    return FieldManager.register('note', control);
 });

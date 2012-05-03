@@ -74,6 +74,4 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
             return (this.originalValue != this.getValue());
         }
     });
-
-    return FieldManager.register('boolean', control);
 });

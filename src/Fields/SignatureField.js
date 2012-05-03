@@ -91,6 +91,4 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
             return val;
         }
     });
-
-    return FieldManager.register('signature', control);
 });

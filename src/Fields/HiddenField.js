@@ -36,6 +36,4 @@ define('Sage/Platform/Mobile/Fields/HiddenField', [
             this.inherited(arguments);
         }
     });
-
-    return FieldManager.register('hidden', control);
 });

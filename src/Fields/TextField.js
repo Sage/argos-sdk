@@ -137,6 +137,4 @@ define('Sage/Platform/Mobile/Fields/TextField', [
             return (this.originalValue != this.getValue());
         }
     });
-
-    return FieldManager.register('text', control);
 });

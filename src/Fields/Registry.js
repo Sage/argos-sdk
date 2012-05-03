@@ -14,19 +14,56 @@
  */
 
 define('Sage/Platform/Mobile/Fields/Registry', [
-    'dojo/_base/lang'
+    'dojo/_base/lang',
+    './BooleanField',
+    './DateField',
+    './DecimalField',
+    './DurationField',
+    './HiddenField',
+    './LookupField',
+    './NoteField',
+    './PhoneField',
+    './SelectField',
+    './SignatureField',
+    './TextAreaField',
+    './TextField'
 ], function(
-    lang
+    lang,
+    BooleanField,
+    DateField,
+    DecimalField,
+    DurationField,
+    HiddenField,
+    LookupField,
+    NoteField,
+    PhoneField,
+    SelectField,
+    SignatureField,
+    TextAreaField,
+    TextField
 ) {
-    var store = {};
-    // todo: move, and rename, to Fields/Registry
-    return lang.setObject('Sage.Platform.Mobile.FieldManager', {
-        types: store,
-        register: function(name, ctor) {
-            return (store[name] = ctor);
-        },
-        get: function(name) {
-            return store[name];
+    var fromType = {
+        'boolean': BooleanField,
+        'date': DateField,
+        'decimal': DecimalField,
+        'duration': DurationField,
+        'hidden': HiddenField,
+        'lookup': LookupField,
+        'note': NoteField,
+        'phone': PhoneField,
+        'select': SelectField,
+        'signature': SignatureField,
+        'textarea': TextAreaField,
+        'text': TextField
+    };
+
+    return lang.setObject('Sage.Platform.Mobile.Fields.Registry', {
+        fromType: fromType,
+        getFieldFor: function(props, fallback) {
+            var name = typeof props == 'string'
+                ? props
+                : props['type'];
+            return this.fromType[name] || ((fallback !== false) && TextField);
         }
     });
 });

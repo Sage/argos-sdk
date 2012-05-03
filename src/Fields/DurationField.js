@@ -184,6 +184,4 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
             }
         }
     });
-    
-    return FieldManager.register('duration', control);
 });

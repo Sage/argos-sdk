@@ -30,6 +30,4 @@ define('Sage/Platform/Mobile/Fields/TextAreaField', [
             '<textarea data-dojo-attach-point="inputNode" name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %}></textarea>'
         ])
     });
-
-    return FieldManager.register('textarea', control);
 });

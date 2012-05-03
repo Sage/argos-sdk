@@ -21,9 +21,10 @@ define('Sage/Platform/Mobile/List', [
     'dojo/dom-class',
     'dojo/dom',
     'dojo/string',
-    'Sage/Platform/Mobile/ErrorManager',
-    'Sage/Platform/Mobile/View',
-    'Sage/Platform/Mobile/SearchWidget'
+    './ErrorManager',
+    './View',
+    './ScrollContainer',
+    './Toolbar'
 ], function(
     declare,
     lang,
@@ -34,7 +35,8 @@ define('Sage/Platform/Mobile/List', [
     string,
     ErrorManager,
     View,
-    SearchWidget
+    ScrollContainer,
+    Toolbar
 ) {
 
     var SelectionModel = declare('Sage.Platform.Mobile.SelectionModel', null, {
@@ -133,6 +135,15 @@ define('Sage/Platform/Mobile/List', [
 
             this.inherited(arguments);
         }
+    });
+
+    return declare('Sage.Platform.Mobile.List', [View], {
+        components: [
+            {name: 'top', type: Toolbar},
+            {name: 'scroll', type: ScrollContainer, subscribeEvent: {'onContentChanged':'onContentChanged'}, components: [
+                {tag: 'div', attachPoint: 'contentNode', components:[{content: 'test'}]}
+            ]}
+        ]
     });
 
     /**

@@ -31,6 +31,4 @@ define('Sage/Platform/Mobile/Fields/SelectField', [
             return options;
         }        
     });
-
-    return FieldManager.register('select', control);
 });

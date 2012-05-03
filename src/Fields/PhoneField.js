@@ -98,6 +98,4 @@ define('Sage/Platform/Mobile/Fields/PhoneField', [
             this.inherited(arguments);
         }
     });
-
-    return FieldManager.register('phone', control);
 });
