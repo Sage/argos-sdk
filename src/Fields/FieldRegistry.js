@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/Registry', [
+define('Sage/Platform/Mobile/Fields/FieldRegistry', [
     'dojo/_base/lang',
     './BooleanField',
     './DateField',
@@ -57,7 +57,7 @@ define('Sage/Platform/Mobile/Fields/Registry', [
         'text': TextField
     };
 
-    return lang.setObject('Sage.Platform.Mobile.Fields.Registry', {
+    return lang.setObject('Sage.Platform.Mobile.Fields.FieldRegistry', {
         fromType: fromType,
         getFieldFor: function(props, fallback) {
             var name = typeof props == 'string'

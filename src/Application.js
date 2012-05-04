@@ -81,6 +81,16 @@ define('Sage/Platform/Mobile/Application', [
         'localize': localize,
         'mergeConfiguration': mergeConfiguration
     });
+
+    var ViewShim = declare('Sage.Platform.Mobile.ViewShim', null, {
+        id: null,
+        constructor: function(options) {
+            lang.mixin(this, options);
+        },
+        show: function(options) {
+            win.global.App.showView(this.id, options);
+        }
+    });
     
     return declare('Sage.Platform.Mobile.Application', null, {
         _started: false,
@@ -242,40 +252,45 @@ define('Sage/Platform/Mobile/Application', [
             return this;
         },
         getViews: function() {
-            /// <returns elementType="Sage.Platform.Mobile.View">An array containing the currently registered views.</returns>
-            var r = [];
-            for (var n in this.views) r.push(this.views[n]);
-            return r;
+            // todo: how to handle this now?
         },
         isViewActive: function(view) {
             // todo: add check for multiple active views.
             return (this.getPrimaryActiveView() === view);
         },
         getPrimaryActiveView: function() {
-            /// <returns type="Sage.Platform.Mobile.View">The currently active view.</returns>
-            var el = ReUI.getCurrentPage() || ReUI.getCurrentDialog();
-            if (el) return this.getView(el);
-
             return null;
         },
-        hasView: function(key) {
-            return !!this.getView(key);
+        hasView: function(name) {
+            return !!(this._activeViews[name] || this._registeredViews[name]);
         },
-        getView: function(key) {
-            /// <returns type="Sage.Platform.Mobile.View">The requested view.</returns>
-            /// <param name="key" type="String">
-            ///     1: id - The id of the view to get.
-            ///     2: element - The main element of the view to get.
-            /// <param>
-            if (key)
+        /**
+         * @deprecated
+         * @param name
+         * @return {*}
+         */
+        getView: function(name) {
+            if (this._activeViews[name]) return this._activeViews[name];
+            if (this._registeredViews[name])
             {
-                if (typeof key === 'string')
-                    return this.views[key];
-
-                if (typeof key === 'object' && typeof key.id === 'string')
-                    return this.views[key.id];
+                return new ViewShim({
+                    id: name
+                });
             }
+
             return null;
+        },
+        getRegisteredView: function(name) {
+            return this._registeredViews[name];
+        },
+        showView: function(name, options) {
+            if (this._activeViews[name]))
+            {
+                this._shell.show(this._activeViews[name], options);
+            }
+            else
+            {
+            }
         },
         getViewSecurity: function(key, access) {
             var view = this.getView(key);
@@ -287,12 +302,6 @@ define('Sage/Platform/Mobile/Application', [
                 return this.services[name];
 
             return this.defaultService;
-        },
-        setPrimaryTitle: function(title) {
-            /// <summary>Sets the applications current title.</summary>
-            /// <param name="title" type="String">The new title.</summary>
-            for (var n in this.bars)
-                if (this.bars[n].managed) this.bars[n].set('title', title);
         },
         onResize: function() {
             if (this.resizeTimer) clearTimeout(this.resizeTimer);
