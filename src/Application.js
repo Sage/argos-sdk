@@ -20,7 +20,8 @@ define('Sage/Platform/Mobile/Application', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/window',
-    'dojo/string'
+    'dojo/string',
+    './View'
 ], function(
     json,
     array,
@@ -28,7 +29,8 @@ define('Sage/Platform/Mobile/Application', [
     declare,
     lang,
     win,
-    string
+    string,
+    View
 ) {
     
     lang.extend(Function, {
@@ -202,22 +204,22 @@ define('Sage/Platform/Mobile/Application', [
                 }
             }
         },
-        registerConnection: function(name, connection, options) {
+        registerConnection: function(name, definition, options) {
             options = options || {};
 
-            var instance = connection instanceof Sage.SData.Client.SDataService
-                ? connection
-                : new Sage.SData.Client.SDataService(connection);
+            var instance = definition instanceof Sage.SData.Client.SDataService
+                ? definition
+                : new Sage.SData.Client.SDataService(definition);
 
             this._connections[name] = instance;
 
-            if (this.enableCaching && (options.offline || connection.offline))
+            if (this.enableCaching && (options.offline || definition.offline))
             {
                 instance.on('beforerequest', this._loadSDataRequest, this);
                 instance.on('requestcomplete', this._cacheSDataRequest, this);
             }
 
-            if ((options.isDefault || connection.isDefault) || !this.defaultService)
+            if ((options.isDefault || definition.isDefault) || !this.defaultService)
                 this.defaultService = instance;
 
             return this;
@@ -225,35 +227,17 @@ define('Sage/Platform/Mobile/Application', [
         hasConnection: function(name) {
             return !!this._connections[name];
         },
-        registerView: function(key, definition) {
-            /// <summary>
-            ///     Registers a view with the application.  If the application has already been
-            ///     initialized, the view is immediately initialized as well.
-            /// </summary>
-            /// <param name="view" type="Sage.Platform.Mobile.View">The view to be registered.</param>
-            this.views[view.id] = view;
-
-            if (this._started) view.init();
-
-            view.placeAt(win.body(), 'first');
-
-            this.onRegistered(view);
-
-            return this;
-        },
-        registerToolbar: function(name, tbar)
-        {
-            if (typeof name === 'object')
+        registerView: function(name, definition) {
+            if (definition instanceof View)
             {
-                tbar = name;
-                name = tbar.name;
+                this._activeViews[name] = definition;
+            }
+            else
+            {
+                this._registeredViews[name] = definition;
             }
 
-            this.bars[name] = tbar;
-
-            if (this._started) tbar.init();
-
-            tbar.placeAt(win.body(), 'last');
+            /* todo: how to handle home screen support? */
 
             return this;
         },
