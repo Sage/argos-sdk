@@ -26,12 +26,12 @@ html, body
 }
 /* dojo mobile: themes/common/FixedSplitter.css */
 
-.shell-left
+.layout-left
 {
     width: 200px;
 }
 
-.shell-center
+.layout-center
 {
     width: 300px;
 }

@@ -76,6 +76,19 @@ define('Sage/Platform/Mobile/Utility', [
             if (typeof path[0] !== "undefined")
                 current[path[0]] = val;
             return o;
+        },
+        bindDelegate: function(scope) {
+            var fn = this;
+
+            if (arguments.length == 1) return function() {
+                return fn.apply(scope || this, arguments);
+            };
+
+            var optional = Array.prototype.slice.call(arguments, 1);
+            return function() {
+                var called = Array.prototype.slice.call(arguments, 0);
+                return fn.apply(scope || this, called.concat(optional));
+            };
         }
     });
 });

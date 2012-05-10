@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Shell', [
+define('Sage/Platform/Mobile/Layout', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojox/mobile/FixedSplitter',
@@ -28,12 +28,12 @@ define('Sage/Platform/Mobile/Shell', [
     Pane,
     View
 ) {
-    return declare('Sage.Platform.Mobile.Shell', [FixedSplitter, _UiComponent], {
+    return declare('Sage.Platform.Mobile.Layout', [FixedSplitter, _UiComponent], {
         orientation: 'H',
         components: [
-            {type: Pane, attachPoint: 'left', attachEvent: {}, components: [{type: View, attachPoint: 'viewA,viewAB', props: {}}], props:{'class':'shell-left'}},
-            {type: Pane, attachPoint: 'center', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'shell-center'}},
-            {type: Pane, attachPoint: 'right', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'shell-right'}}
+            {type: Pane, attachPoint: 'left', attachEvent: {}, components: [{type: View, attachPoint: 'viewA,viewAB', props: {}}], props:{'class':'layout-left'}},
+            {type: Pane, attachPoint: 'center', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'layout-center'}},
+            {type: Pane, attachPoint: 'right', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'layout-right'}}
         ],
         postCreate: function() {
             /* todo: buffer this? */

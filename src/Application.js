@@ -21,7 +21,9 @@ define('Sage/Platform/Mobile/Application', [
     'dojo/_base/lang',
     'dojo/_base/window',
     'dojo/string',
-    './View'
+    './_Component',
+    './SceneManager',
+    './Utility'
 ], function(
     json,
     array,
@@ -30,23 +32,13 @@ define('Sage/Platform/Mobile/Application', [
     lang,
     win,
     string,
-    View
+    _Component,
+    SceneManager,
+    Utility
 ) {
     
     lang.extend(Function, {
-        bindDelegate: function(scope) {
-            var fn = this;
-
-            if (arguments.length == 1) return function() {
-                return fn.apply(scope || this, arguments);
-            };
-
-            var optional = Array.prototype.slice.call(arguments, 1);
-            return function() {
-                var called = Array.prototype.slice.call(arguments, 0);
-                return fn.apply(scope || this, called.concat(optional));
-            };
-        }
+        bindDelegate: Utility.bindDelegate
     });
 
     var applyLocalizationTo = function(object, localization) {
@@ -88,30 +80,29 @@ define('Sage/Platform/Mobile/Application', [
             lang.mixin(this, options);
         },
         show: function(options) {
-            win.global.App.showView(this.id, options);
+            win.global.App.viewManager.showView(this.id, options);
         }
     });
     
-    return declare('Sage.Platform.Mobile.Application', null, {
+    return declare('Sage.Platform.Mobile.Application', [_Component], {
         _started: false,
         _signals: null,
         _customizations: null,
         _connections: null,
         _modules: null,
 
+        components: [
+            {type: SceneManager, attachPoint: 'sceneManager'}
+        ],
         enableCaching: false,
+        sceneManager: null,
+        context: null,
 
         constructor: function(options) {
             this._signals = [];
             this._modules = [];
+            this._connections = {};
             this._customizations = {};
-            this._registeredViews = {};
-            this._activeViews = {};
-
-            this.customizations = {};
-            this.services = {};
-            this.modules = [];
-            this.views = {};
 
             this.context = {};
 
@@ -134,6 +125,11 @@ define('Sage/Platform/Mobile/Application', [
                     this._clearSDataRequestCache();
             }
         },
+        getSceneManager: function() {
+            return this.sceneManager;
+        },
+        _startupSceneManager: function() {
+        },
         _startupEvents: function() {
             this._signals.push(connect.connect(window, 'resize', this, this.onResize));
         },
@@ -149,15 +145,14 @@ define('Sage/Platform/Mobile/Application', [
             win.global.App = this;
         },
         startup: function() {
-            /// <summary>
-            ///     Initializes this application as well as the toolbar and all currently registered views.
-            /// </summary>
-
             if (this._started) return;
+
+            this.inherited(arguments);
 
             this._startupEvents();
             this._startupCaching();
             this._startupConnections();
+            this._startupSceneManager();
             this._startupModules();
             this._started = true;
         },
@@ -229,40 +224,18 @@ define('Sage/Platform/Mobile/Application', [
                 instance.on('requestcomplete', this._cacheSDataRequest, this);
             }
 
-            if ((options.isDefault || definition.isDefault) || !this.defaultService)
-                this.defaultService = instance;
+            if ((options.isDefault || definition.isDefault) || !this._connections['default'])
+                this._connections['default'] = instance;
 
             return this;
         },
         hasConnection: function(name) {
             return !!this._connections[name];
         },
-        registerView: function(name, definition) {
-            if (definition instanceof View)
-            {
-                this._activeViews[name] = definition;
-            }
-            else
-            {
-                this._registeredViews[name] = definition;
-            }
+        getConnection: function(name) {
+            if (this._connections[name]) return this._connections[name];
 
-            /* todo: how to handle home screen support? */
-
-            return this;
-        },
-        getViews: function() {
-            // todo: how to handle this now?
-        },
-        isViewActive: function(view) {
-            // todo: add check for multiple active views.
-            return (this.getPrimaryActiveView() === view);
-        },
-        getPrimaryActiveView: function() {
-            return null;
-        },
-        hasView: function(name) {
-            return !!(this._activeViews[name] || this._registeredViews[name]);
+            return this._connections['default'];
         },
         /**
          * @deprecated
@@ -270,7 +243,7 @@ define('Sage/Platform/Mobile/Application', [
          * @return {*}
          */
         getView: function(name) {
-            if (this._activeViews[name]) return this._activeViews[name];
+            if (this._instancedViews[name]) return this._activeViews[name];
             if (this._registeredViews[name])
             {
                 return new ViewShim({
@@ -280,28 +253,9 @@ define('Sage/Platform/Mobile/Application', [
 
             return null;
         },
-        getRegisteredView: function(name) {
-            return this._registeredViews[name];
-        },
-        showView: function(name, options) {
-            if (this._activeViews[name]))
-            {
-                this._shell.show(this._activeViews[name], options);
-            }
-            else
-            {
-            }
-        },
         getViewSecurity: function(key, access) {
             var view = this.getView(key);
             return (view && view.getSecurity(access));
-        },
-        getService: function(name) {
-            /// <returns type="Sage.SData.Client.SDataService">The application's SData service instance.</returns>
-            if (typeof name === 'string' && this.services[name])
-                return this.services[name];
-
-            return this.defaultService;
         },
         onResize: function() {
             if (this.resizeTimer) clearTimeout(this.resizeTimer);

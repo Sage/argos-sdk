@@ -50,26 +50,19 @@ define('Sage/Platform/Mobile/ApplicationModule', [
         uninitialize: function() {
 
         },
-        init: function(application) {
+        startup: function(application) {
             this.application = application;
 
             this.loadCustomizations();
-            this.loadToolbars();
             this.loadViews();
         },
         loadCustomizations: function() {
         },
         loadViews: function() {
         },
-        loadToolbars: function() {
-        },
         registerView: function(view) {
             if (this.application)
                 this.application.registerView(view);
-        },
-        registerToolbar: function(name, toolbar) {
-            if (this.application)
-                this.application.registerToolbar(name, toolbar);
         },
         registerCustomization: function(set, id, spec) {
             if (this.application)

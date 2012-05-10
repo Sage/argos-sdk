@@ -1,14 +1,14 @@
-.shell-left
+.layout-left
 {
     background: #ff9900;
 }
 
-.shell-center
+.layout-center
 {
     background: #99ff00;
 }
 
-.shell-right
+.layout-right
 {
     background: #0099ff;
 }

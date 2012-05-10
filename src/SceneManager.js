@@ -1,0 +1,100 @@
+/* Copyright (c) 2010, Sage Software, Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+define('Sage/Platform/Mobile/SceneManager', [
+    'require',
+    'dojo/_base/array',
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/_base/window',
+    './_Component',
+    './Layout',
+    './View'
+], function(
+    require,
+    array,
+    declare,
+    lang,
+    win,
+    _Component,
+    Layout,
+    View
+) {
+    return declare('Sage.Platform.Mobile.SceneManager', [_Component], {
+        _registeredViews: null,
+        _instancedViews: null,
+        _state: null,
+
+        components: [
+            {type: Layout, attachPoint: 'layout'}
+        ],
+        layout: null,
+
+        constructor: function(options) {
+            this._registeredViews = {};
+            this._instancedViews = {};
+
+            this._state = {};
+
+            lang.mixin(this, options);
+        },
+        startup: function() {
+            this.layout.placeAt(win.body());
+            this.layout.resize();
+        },
+        registerAll: function(definitions) {
+            for (var name in definitions) this.register(name, definitions[name]);
+        },
+        register: function(name, definition) {
+            if (definition instanceof View)
+            {
+                this._instancedViews[name] = definition;
+            }
+            else
+            {
+                this._registeredViews[name] = definition;
+            }
+
+            /* todo: how to handle home screen support? */
+
+            return this;
+        },
+        has: function(name) {
+            return !!(this._instancedViews[name] || this._registeredViews[name]);
+        },
+        show: function(name, options) {
+            var instance = this._instancedViews[name];
+            if (instance)
+            {
+                if (this.layout)
+                    this.layout.show(instance, options);
+
+                return;
+            }
+
+            var definition = this._registeredViews[name];
+            if (definition)
+            {
+                require([definition.type], lang.hitch(this, this._showOnRequired, options, definition));
+            }
+        },
+        _showOnRequired: function(options, definition, ctor) {
+            var instance = new ctor(definition.props);
+
+            if (this.layout)
+                this.layout.show(instance, options);
+        }
+    });
+});
