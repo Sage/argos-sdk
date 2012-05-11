@@ -51,6 +51,8 @@ define('Sage/Platform/Mobile/_Component', [
         startup: function() {
             this.inherited(arguments);
 
+            this.onStartup();
+
             array.forEach(this._components, function(component) {
                 this._startupChildComponent(component);
             }, this);
@@ -62,6 +64,8 @@ define('Sage/Platform/Mobile/_Component', [
             this._componentSignals = null;
 
             this.inherited(arguments);
+
+            this.onDestroy();
 
             array.forEach(this._components, function(component) {
                 this._destroyChildComponent(component);
@@ -166,6 +170,10 @@ define('Sage/Platform/Mobile/_Component', [
             }
 
             return created;
+        },
+        onStartup: function() {
+        },
+        onDestroy: function() {
         },
         getComponentRoot: function() {
             return this._componentRoot || this;

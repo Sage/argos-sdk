@@ -22,7 +22,7 @@ define('Sage/Platform/Mobile/Application', [
     'dojo/_base/window',
     'dojo/string',
     './_Component',
-    './SceneManager',
+    './Scene',
     './Utility'
 ], function(
     json,
@@ -33,7 +33,7 @@ define('Sage/Platform/Mobile/Application', [
     win,
     string,
     _Component,
-    SceneManager,
+    Scene,
     Utility
 ) {
     
@@ -92,11 +92,11 @@ define('Sage/Platform/Mobile/Application', [
         _modules: null,
 
         components: [
-            {type: SceneManager, attachPoint: 'sceneManager'}
+            {type: Scene, attachPoint: 'scene'}
         ],
         enableCaching: false,
-        sceneManager: null,
         context: null,
+        scene: null,
 
         constructor: function(options) {
             this._signals = [];
@@ -114,6 +114,8 @@ define('Sage/Platform/Mobile/Application', [
             });
 
             this.uninitialize();
+
+            this.inherited(arguments);
         },
         uninitialize: function() {
 
@@ -125,21 +127,26 @@ define('Sage/Platform/Mobile/Application', [
                     this._clearSDataRequestCache();
             }
         },
-        getSceneManager: function() {
-            return this.sceneManager;
-        },
-        _startupSceneManager: function() {
-        },
         _startupEvents: function() {
             this._signals.push(connect.connect(window, 'resize', this, this.onResize));
         },
         _startupConnections: function() {
             for (var name in this.connections)
                 if (this.connections.hasOwnProperty(name)) this.registerConnection(name, this.connections[name]);
+
+            /* todo: should we be mixing this in? */
+            delete this.connections;
         },
         _startupModules: function() {
-            for (var i = 0; i < this.modules.length; i++)
-                this.modules[i].startup(this);
+            array.forEach(this.modules, function(module) {
+                this._modules.push(module);
+
+                module.setApplication(this);
+                module.startup();
+            }, this);
+
+            /* todo: should we be mixing this in? */
+            delete this.modules;
         },
         activate: function() {
             win.global.App = this;
@@ -152,7 +159,6 @@ define('Sage/Platform/Mobile/Application', [
             this._startupEvents();
             this._startupCaching();
             this._startupConnections();
-            this._startupSceneManager();
             this._startupModules();
             this._started = true;
         },

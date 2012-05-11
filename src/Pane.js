@@ -42,6 +42,8 @@ define('Sage/Platform/Mobile/Pane', [
              * - or have several configurations of views, one for tablets, and one for mobile?
              *   where views are assigned directly to containers?
              */
+
+            view.placeAt(this.domNode);
         }
     });
 });

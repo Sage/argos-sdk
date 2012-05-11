@@ -31,9 +31,9 @@ define('Sage/Platform/Mobile/Layout', [
     return declare('Sage.Platform.Mobile.Layout', [FixedSplitter, _UiComponent], {
         orientation: 'H',
         components: [
-            {type: Pane, attachPoint: 'left', attachEvent: {}, components: [{type: View, attachPoint: 'viewA,viewAB', props: {}}], props:{'class':'layout-left'}},
-            {type: Pane, attachPoint: 'center', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'layout-center'}},
-            {type: Pane, attachPoint: 'right', attachEvent: {}, components: [{type: View, props: {}}], props:{'class':'layout-right'}}
+            {type: Pane, attachPoint: 'left', props:{'class':'layout-left'}},
+            {type: Pane, attachPoint: 'center', props:{'class':'layout-center'}},
+            {type: Pane, attachPoint: 'right', props:{'class':'layout-right'}}
         ],
         postCreate: function() {
             /* todo: buffer this? */

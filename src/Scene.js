@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/SceneManager', [
+define('Sage/Platform/Mobile/Scene', [
     'require',
     'dojo/_base/array',
     'dojo/_base/declare',
@@ -32,7 +32,7 @@ define('Sage/Platform/Mobile/SceneManager', [
     Layout,
     View
 ) {
-    return declare('Sage.Platform.Mobile.SceneManager', [_Component], {
+    return declare('Sage.Platform.Mobile.Scene', [_Component], {
         _registeredViews: null,
         _instancedViews: null,
         _state: null,
@@ -52,12 +52,24 @@ define('Sage/Platform/Mobile/SceneManager', [
         },
         startup: function() {
             this.layout.placeAt(win.body());
-            this.layout.resize();
+
+            this.inherited(arguments);
         },
-        registerAll: function(definitions) {
-            for (var name in definitions) this.register(name, definitions[name]);
+        destroy: function() {
+            this.inherited(arguments);
+
+            for (var name in this._instancedViews)
+            {
+                this._instancedViews[name].destroy();
+            }
         },
-        register: function(name, definition) {
+        registerViews: function(definitions) {
+            for (var name in definitions)
+            {
+                this.registerView(name, definitions[name]);
+            }
+        },
+        registerView: function(name, definition) {
             if (definition instanceof View)
             {
                 this._instancedViews[name] = definition;
@@ -71,15 +83,15 @@ define('Sage/Platform/Mobile/SceneManager', [
 
             return this;
         },
-        has: function(name) {
+        hasView: function(name) {
             return !!(this._instancedViews[name] || this._registeredViews[name]);
         },
-        show: function(name, options) {
+        showView: function(name, options, at) {
             var instance = this._instancedViews[name];
             if (instance)
             {
                 if (this.layout)
-                    this.layout.show(instance, options);
+                    this.layout.show(instance, options, at); /* todo: at will not be passed, but determined */
 
                 return;
             }
@@ -87,11 +99,14 @@ define('Sage/Platform/Mobile/SceneManager', [
             var definition = this._registeredViews[name];
             if (definition)
             {
-                require([definition.type], lang.hitch(this, this._showOnRequired, options, definition));
+                require([definition.type], lang.hitch(this, this._showViewOnRequired, name, options, definition));
             }
         },
-        _showOnRequired: function(options, definition, ctor) {
-            var instance = new ctor(definition.props);
+        _showViewOnRequired: function(name, options, definition, ctor) {
+            /* todo: allways replace id with name? */
+            var instance = new ctor(lang.mixin({id: name}, definition.props));
+
+            this._instancedViews[name] = instance;
 
             if (this.layout)
                 this.layout.show(instance, options);
