@@ -64,19 +64,23 @@ define('Sage/Platform/Mobile/SearchWidget', [
             this.set('queryValue', '');
         },
         search: function() {
-            var query = this.queryNode.value,
-                isCustomMatch = query && this.customSearchRE.test(query),
-                isHashTagMatch = query && this.hashTagSearchRE.test(query);
+            var searchQuery = this.queryNode.value,
+                formattedQuery,
+                isCustomMatch = searchQuery && this.customSearchRE.test(searchQuery),
+                isHashTagMatch = searchQuery && this.hashTagSearchRE.test(searchQuery);
 
             switch(true) {
-                case isCustomMatch: query = this.customSearch(query);
+                case isCustomMatch: formattedQuery = this.customSearch(searchQuery);
                     break;
-                case isHashTagMatch: query = this.hashTagSearch(query);
+                case isHashTagMatch: formattedQuery = this.hashTagSearch(searchQuery);
                     break;
-                default: query = this.formatSearchQuery(query);
+                default: formattedQuery = this.formatSearchQuery(searchQuery);
             }
 
-            this.onSearchExpression(query, this);
+            if (lang.trim(searchQuery) === '')
+                formattedQuery = null;
+
+            this.onSearchExpression(formattedQuery, this);
         },
         /**
          * Returns an unmodified search query which allows a user
