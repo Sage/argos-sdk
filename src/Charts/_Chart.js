@@ -17,6 +17,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
+    'dojo/string',
     'dojo/dom-class',
     'dojox/charting/Chart',
     'dojox/charting/widget/Legend',
@@ -28,6 +29,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     declare,
     lang,
     array,
+    string,
     domClass,
     Chart,
     Legend,
@@ -118,8 +120,29 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
          *     data: [...]
          * }
          * For multi series return an array of objects defining name/data
+         *
+         * By default it assumes the processed feed is an array of objects with
+         * $descriptor and value keys
          */
         getSeries: function(feed) {
+            var values = [];
+
+            for (var i = 1; i <= feed.length; i++)
+            {
+                var o = feed[i-1],
+                    description = (this.seriesLabelFormat) ? this.seriesLabelFormat(o['$descriptor']) : o['$descriptor'],
+                    value = o['value'];
+
+                if (description)
+                    values.push({
+                        x: i,
+                        y: value,
+                        text: description,
+                        legend: string.substitute('${0} (${1})',[description, value])
+                    });
+            }
+
+            return {name: 'series1', data: values};
         },
 
         renderTo: function(node) {
