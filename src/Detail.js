@@ -24,6 +24,7 @@ define('Sage/Platform/Mobile/Detail', [
     'Sage/Platform/Mobile/Format',
     'Sage/Platform/Mobile/Utility',
     'Sage/Platform/Mobile/ErrorManager',
+    'Sage/Platform/Mobile/ChartManager',
     'Sage/Platform/Mobile/View'
 ], function(
     dojo,
@@ -36,6 +37,7 @@ define('Sage/Platform/Mobile/Detail', [
     format,
     utility,
     ErrorManager,
+    ChartManager,
     View
 ) {
 
@@ -384,6 +386,22 @@ define('Sage/Platform/Mobile/Detail', [
             {
                 this.set('detailContent', '');
             }
+        },
+        placeChart: function(row, node, value, entry, whereQueryFmt) {
+            if (whereQueryFmt)
+            {
+                if (row.chart.where)
+                    row.chart.where['_activeFilter'] = string.substitute(whereQueryFmt, [value]);
+                else
+                    row.chart.where = {
+                        '_activeFilter': string.substitute(whereQueryFmt, [value])
+                    };
+            }
+
+            var current = row.chart,
+                ctor = ChartManager.get(current['type']),
+                chart = new ctor(current);
+            chart.renderTo(node);
         },
         onRequestDataFailure: function(response, o) {
             if (response && response.status == 404)

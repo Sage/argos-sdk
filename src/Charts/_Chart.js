@@ -40,23 +40,20 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     return declare('Sage.Platform.Mobile.Charts._Chart', [_Widget, _ActionMixin, _Templated], {
         widgetTemplate: new Simplate([
             '<div class="panel panel-content chart-panel">',
-            '<h2 data-dojo-attach-point="titleNode">{%: $.name %}</h2>',
-            '<div class="chart" data-dojo-attach-point="chartNode" style="width:100%; height:100%;"></div>',
-            '<div class="legend" data-dojo-attach-point="legendNode"></div>',
-            '{%! $.loadingTemplate %}',
+                '<div class="chart" data-dojo-attach-point="chartNode"></div>',
+                '<div class="legend" data-dojo-attach-point="legendNode"></div>',
+                '{%! $.loadingTemplate %}',
             '</div>'
         ]),
         loadingTemplate: new Simplate([
             '<div class="panel-loading-indicator">',
-            '<div class="row"><div>{%: $.loadingText %}</div></div>',
+                '<div class="row"><div>{%: $.loadingText %}</div></div>',
             '</div>'
         ]),
         chartNode: null,
         legendNode: null,
 
-        name: 'Chart',
         loadingText: 'loading...',
-
 
         chart: null,
         defaultTheme: theme,
@@ -65,6 +62,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         yAxis: null,
         plotOptions: null,
         legendOptions: {},
+        titleOptions: {},
 
         constructor: function(o) {
             lang.mixin(this, o);
@@ -91,7 +89,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
          * Returns charting theme object
          */
         getTheme: function() {
-            return this.defaultTheme;
+            return this.theme || this.defaultTheme;
         },
 
         /**
@@ -114,20 +112,12 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         },
 
         /**
-         * Returns a series object defining a name and data:
+         * Returns a series object defining name and data:
          * return {
          *     name: 'Population',
          *     data: [...]
          * }
-         * If an array is returned, multiple series will be set:
-         * return [{
-         *     name: 'APL'
-         *     data: [...]
-         * },
-         * {
-         *     name: 'IBM',
-         *     data: [...]
-         * }]
+         * For multi series return an array of objects defining name/data
          */
         getSeries: function(feed) {
         },
@@ -188,10 +178,10 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
             this.render();
         },
         processFeed: function(feed) {
-            this.feed = feed;
+            this.feed = feed['$resources'];
         },
         render: function() {
-            var chart = new Chart(this.chartNode);
+            var chart = new Chart(this.chartNode, this.titleOptions);
 
             chart.setTheme(this.getTheme());
             chart.addPlot('default', this.getType());

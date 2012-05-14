@@ -49,18 +49,20 @@ define('Sage/Platform/Mobile/Charts/BarChart', [
         setSize: function() {
             var box = win.getBox(),
                 ratio = 1.618,
-                newHeight, newWidth;
-            box.h -= 80;
+                height = (box.h > this.maxHeight) ? this.maxHeight : box.h,
+                width = box.w,
+                newHeight = 0,
+                newWidth = 0;
 
-            if (box.w > box.h && box.h * ratio < box.w)
+            if (width > height && height * ratio < width)
             {
-                newWidth = Math.floor(box.h * 1.618);
-                newHeight = box.h;
+                newWidth = Math.floor(height * ratio);
+                newHeight = height;
             }
             else
             {
-                newWidth = box.w;
-                newHeight = Math.floor(box.w / 1.618);
+                newWidth = width;
+                newHeight = Math.floor(width / ratio);
             }
 
             domGeom.setMarginBox(this.chartNode, {
@@ -69,7 +71,7 @@ define('Sage/Platform/Mobile/Charts/BarChart', [
             });
 
 
-            if (this.chart && this.chart.axes['x'] && this.feed && this.feed['$resources'])
+            if (this.chart && this.chart.axes['x'] && this.feed)
             {
                 var axes = this.getAxes();
                 this.chart.addAxis(axes[0].axis, axes[0].options);

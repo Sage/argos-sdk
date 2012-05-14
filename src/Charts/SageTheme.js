@@ -10,6 +10,10 @@ define('Sage/Platform/Mobile/Charts/SageTheme', [
 		defaultFill = {type: "linear", space: "shape", x1: 0, y1: 0, x2: 0, y2: 100};
 
 	var sageTheme = new Theme({
+        chart: {
+            titleFont: 'normal normal bold 0.8em inherit',
+            titleFontColor: '#0079A7'
+        },
 		seriesThemes: gradientGenerator.generateMiniTheme(colors, defaultFill, 85, 65, 100)
 	});
 
