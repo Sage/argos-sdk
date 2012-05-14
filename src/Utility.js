@@ -89,6 +89,12 @@ define('Sage/Platform/Mobile/Utility', [
                 var called = Array.prototype.slice.call(arguments, 0);
                 return fn.apply(scope || this, called.concat(optional));
             };
+        },
+        expandExpression: function(expression) {
+            if (typeof expression === 'function')
+                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
+            else
+                return expression;
         }
     });
 });

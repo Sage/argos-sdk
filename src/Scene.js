@@ -86,12 +86,12 @@ define('Sage/Platform/Mobile/Scene', [
         hasView: function(name) {
             return !!(this._instancedViews[name] || this._registeredViews[name]);
         },
-        showView: function(name, options, at) {
+        showView: function(name, options, at) { /* todo: at will not be passed, but determined */
             var instance = this._instancedViews[name];
             if (instance)
             {
                 if (this.layout)
-                    this.layout.show(instance, options, at); /* todo: at will not be passed, but determined */
+                    this.layout.show(instance, options, at);
 
                 return;
             }
@@ -103,8 +103,11 @@ define('Sage/Platform/Mobile/Scene', [
             }
         },
         _showViewOnRequired: function(name, options, definition, ctor) {
-            /* todo: allways replace id with name? */
+            /* todo: always replace id with name? */
             var instance = new ctor(lang.mixin({id: name}, definition.props));
+
+            /* todo: safe to call this here? (not added to DOM yet) */
+            instance.startup();
 
             this._instancedViews[name] = instance;
 

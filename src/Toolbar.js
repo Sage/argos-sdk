@@ -20,7 +20,8 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dojo/dom-class',
     'dijit/_WidgetBase',
     './_EventMapMixin',
-    './_UiComponent'
+    './_UiComponent',
+    './Utility'
 ], function(
     declare,
     lang,
@@ -32,9 +33,27 @@ define('Sage/Platform/Mobile/Toolbar', [
 ) {
     return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _UiComponent], {
         baseClass: 'toolbar',
-        fixed: 'top',
-        _setFixedAttr: {node: 'domNode', type: 'attribute'},
-        _getFixedAttr: {node: 'domNode', type: 'attribute'}
+        position: 'top',
+
+        _getPositionAttr: function() {
+            return this.position;
+        },
+        _setPositionAttr: function(value) {
+            var previous = this.position;
+
+            domClass.remove(this.domNode, 'toolbar-' + previous);
+            domClass.add(this.domNode, 'toolbar-' + value);
+
+            this.position = value;
+
+            this.onPositionChange(value, previous);
+        },
+        onPositionChange: function(position, previous) {
+        },
+        onCreate: function() {
+            this.inherited(arguments);
+            this.onPositionChange(this.position, null);
+        }
     });
 
     /*

@@ -39,14 +39,11 @@ html, body
 .toolbar
 {
     position: absolute;
-    top: 0;
-    left: 0;
 
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
 
-    height: 45px;
     width: 100%;
     padding: 4px 4px;
 
@@ -54,6 +51,36 @@ html, body
     z-index: 10;
 
     opacity: 0.75;
+}
+
+.toolbar-top
+{
+    top: 0;
+    left: 0;
+    height: 45px;
+}
+
+.toolbar-bottom
+{
+    bottom: 0;
+    left: 0;
+    height: 45px;
+}
+
+.toolbar-right
+{
+    top: 0;
+    right: 0;
+    width: 45px;
+    height: 100%;
+}
+
+.toolbar-left
+{
+    top: 0;
+    left: 0;
+    width: 45px;
+    height: 100%;
 }
 
 .view
@@ -97,7 +124,12 @@ html, body
     position: absolute;
 }
 
-.toolbar ~ .scroll-container
+.has-toolbar-top > .scroll-container
 {
     top: 47px !important;
+}
+
+.has-toolbar-bottom > .scroll-container
+{
+    bottom: 47px !important;
 }

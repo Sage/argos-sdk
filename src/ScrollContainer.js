@@ -26,6 +26,7 @@ define('Sage/Platform/Mobile/ScrollContainer', [
     _WidgetBase,
     _UiComponent
 ) {
+    /* todo: going to need some way to temporarily turn off the iScroll container when view is not visible, i.e. resize events. */
     return declare('Sage.Platform.Mobile.ScrollContainer', [_WidgetBase, _UiComponent], {
         baseClass: 'scroll-container',
         startup: function() {
@@ -42,7 +43,7 @@ define('Sage/Platform/Mobile/ScrollContainer', [
                 });
             }
         },
-        onContentChanged: function() {
+        onContentChange: function() {
             console.log('content changed!');
             if (this._scroll)
                 this._scroll.refresh();

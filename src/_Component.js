@@ -51,7 +51,7 @@ define('Sage/Platform/Mobile/_Component', [
         startup: function() {
             this.inherited(arguments);
 
-            this.onStartup();
+            this.onCreate();
 
             array.forEach(this._components, function(component) {
                 this._startupChildComponent(component);
@@ -171,7 +171,7 @@ define('Sage/Platform/Mobile/_Component', [
 
             return created;
         },
-        onStartup: function() {
+        onCreate: function() {
         },
         onDestroy: function() {
         },

@@ -16,19 +16,23 @@
 define('Sage/Platform/Mobile/View', [
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/dom-class',
     'dijit/_WidgetBase',
     './_CustomizationMixin',
     './_EventMapMixin',
     './_UiComponent',
-    './ScrollContainer',
-    './Toolbar'
+    './Toolbar',
+    './ScrollContainer'
 ], function(
     declare,
     lang,
+    domClass,
     _WidgetBase,
     _CustomizationMixin,
     _EventMapMixin,
-    _UiComponent
+    _UiComponent,
+    Toolbar,
+    ScrollContainer
 ) {
     return declare('Sage.Platform.Mobile.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
         baseClass: 'view',
@@ -37,6 +41,17 @@ define('Sage/Platform/Mobile/View', [
         security: null,
         serviceName: false,
 
+        components: [
+            {type: Toolbar, name: 'top', attachPoint: 'toolbars.top', attachEvent: 'onPositionChange:_onToolbarPositionChange'},
+            {type: Toolbar, name: 'bottom', attachPoint: 'toolbars.bottom', attachEvent: 'onPositionChange:_onToolbarPositionChange', props: {position: 'bottom'}},
+            {type: ScrollContainer, name: 'scroll', attachPoint: 'scrollContainer', subscribeEvent: 'onContentChange:onContentChange'}
+        ],
+
+        _onToolbarPositionChange: function(position, previous) {
+            if (previous) domClass.remove(this.domNode, 'has-toolbar-' + previous);
+
+            domClass.add(this.domNode, 'has-toolbar-' + position);
+        },
         getTools: function() {
             return this._createCustomizedLayout(this.createToolLayout(), 'tools');
         },
@@ -51,7 +66,7 @@ define('Sage/Platform/Mobile/View', [
         },
         refresh: function() {
         },
-        onContentChanged: function() {
+        onContentChange: function() {
         },
         /**
          * The onBeforeTransitionAway event.
