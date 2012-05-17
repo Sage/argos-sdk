@@ -62,6 +62,8 @@ define('Sage/Platform/Mobile/Scene', [
             {
                 this._instancedViews[name].destroy();
             }
+
+            this._instancedViews = null;
         },
         registerViews: function(definitions) {
             for (var name in definitions)

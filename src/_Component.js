@@ -24,25 +24,27 @@ define('Sage/Platform/Mobile/_Component', [
     };
 
     var _Component = declare('Sage.Platform.Mobile._Component', null, {
+        $: null,
         _components: null,
         _componentRoot: null,
         _componentOwner: null,
-        _componentSignals: null,
+        _componentContext: null,
         components: null,
         constructor: function(props) {
-            this.$ = {};
-
             if (props)
             {
                 if (props.components) this.components = props.components;
+
                 /* todo: is there a better way to pass this around and still have creation in postscript? */
+                /* in case props aren't mixed in by default */
                 if (props._componentRoot) this._componentRoot = props._componentRoot;
                 if (props._componentOwner) this._componentOwner = props._componentOwner;
-
-                delete props.components;
-                delete props._componentRoot;
-                delete props._componentOwner;
+                if (props._componentSource) this._componentSource = props._componentSource;
             }
+
+            this.$ = {};
+            this._components = [];
+            this._componentContext = [];
         },
         postscript: function() {
             this.inherited(arguments);
@@ -53,26 +55,27 @@ define('Sage/Platform/Mobile/_Component', [
 
             this.onCreate();
 
-            array.forEach(this._components, function(component) {
-                this._startupChildComponent(component);
+            array.forEach(this._components, function(instance, slot) {
+                this._startupChildComponent(instance);
             }, this);
         },
         destroy: function() {
-            array.forEach(this._componentSignals, function(signal) {
-                signal.remove();
-            });
-            this._componentSignals = null;
-
             this.inherited(arguments);
 
             this.onDestroy();
 
-            array.forEach(this._components, function(component) {
-                this._destroyChildComponent(component);
+            if (this._componentOwner)
+                this._componentOwner.removeComponent(this);
+
+            array.forEach(this._components, function(instance, slot) {
+                var context = this._componentContext[slot];
+                this._handleComponentRemoval(instance, context);
+                this._destroyChildComponent(instance);
             }, this);
 
             this.$ = null;
             this._components = null;
+            this._componentContext = null;
         },
         _startupChildComponent: function(instance) {
             instance.startup();
@@ -80,32 +83,105 @@ define('Sage/Platform/Mobile/_Component', [
         _destroyChildComponent: function(instance) {
             instance.destroy();
         },
-        _attachComponent: function(component, instance, root, owner) {
-            var target = root,
-                componentName = component.name,
+        addComponent: function(instance) {
+            if (instance._componentOwner) return;
+
+            var slot = (this._components.push(instance) - 1),
+                context = {
+                    remote: true
+                };
+
+            this._componentContext[slot] = context;
+
+            this._attachRemoteComponent(instance, context, this);
+        },
+        removeComponent: function(instance) {
+            var slot = this._components.indexOf(instance);
+            if (slot > -1)
+            {
+                var context = this._componentContext[slot];
+
+                this._handleComponentRemoval(instance, context);
+
+                this._componentContext.splice(slot, 1);
+                this._components.splice(slot, 1);
+            }
+        },
+        _handleComponentRemoval: function(instance, context) {
+            if (context)
+            {
+                /* todo: should _componentOwner and _componentRoot be tracked by the context? */
+                if (context.remote)
+                    this._detachRemoteComponent(instance, context, instance._componentOwner);
+                else
+                    this._detachLocalComponent(instance, context, instance._componentRoot, instance._componentOwner);
+
+                instance._componentRemoved = true;
+            }
+        },
+        _attachRemoteComponent: function(instance, context, owner) {
+            var component = instance._componentSource,
+                componentName = context.componentName = component && component.name;
+
+            instance._componentRoot = owner;
+            instance._componentOwner = owner;
+
+            if (componentName)
+            {
+                if (owner.$[componentName]) throw new Error('A component with the same name already exists.');
+
+                owner.$[componentName] = instance;
+            }
+        },
+        _detachRemoteComponent: function(instance, context, owner) {
+            var componentName = context.componentName;
+
+            instance._componentRoot = null;
+            instance._componentOwner = null;
+
+            if (componentName)
+            {
+                if (owner.$[componentName]) throw new Error('A component with the same name already exists.');
+
+                delete owner.$[componentName];
+            }
+        },
+        /**
+         * Attaches a child component into the component heirarchy.  The reason the top-down approach is used, instead of
+         * a component attaching itself to the heirarchy, is due to the need to support "components" that
+         * are not true components, in that they do not inherit from `_Component`.  The primary use case for this is
+         * for widgets, so that they may be used as child components, without extra code.
+         * @param component
+         * @param instance
+         * @param root
+         * @param owner
+         * @private
+         */
+        _attachLocalComponent: function(component, instance, context, root, owner) {
+            var componentName = context.componentName = component.name,
                 attachPoint = component.attachPoint,
                 attachEvent = component.attachEvent,
                 subscribeEvent = component.subscribeEvent;
 
             if (componentName)
             {
-                if (owner.$[componentName]) throw new Error('A component with the same name already exists.');
+                if (owner.$[componentName] || root.$[componentName]) throw new Error('A component with the same name already exists.');
 
-                owner.$[componentName] = target.$[componentName] = instance;
+                owner.$[componentName] = root.$[componentName] = instance;
             }
 
             if (attachPoint)
             {
                 var value = instance.getComponentValue(),
-                    points = attachPoint.split(/\s*,\s*/);
+                    points = context.points = attachPoint.split(/\s*,\s*/);
 
                 for (var i = 0; i < points.length; i++)
                 {
                     var point = points[i];
 
-                    if (lang.getObject(point, false, target)) throw new Error('Attach point already occupied.');
+                    if (lang.getObject(point, false, root)) throw new Error('Attach point already occupied.');
 
-                    lang.setObject(point, value, target);
+                    lang.setObject(point, value, root);
                 }
             }
 
@@ -115,11 +191,11 @@ define('Sage/Platform/Mobile/_Component', [
             if (attachEvent)
             {
                 /* this component is responsible for the connection */
-                this._componentSignals = (this._componentSignals || []);
+                context.signals = (context.signals || []);
 
                 for (var name in attachEvent)
                 {
-                    this._componentSignals.push(connect.connect(instance, name, target, attachEvent[name]));
+                    context.signals.push(connect.connect(instance, name, root, attachEvent[name]));
                 }
             }
 
@@ -129,12 +205,43 @@ define('Sage/Platform/Mobile/_Component', [
             if (subscribeEvent)
             {
                 /* this component is responsible for the connection */
-                this._componentSignals = (this._componentSignals || []);
+                context.signals = (context.signals || []);
 
                 for (var name in subscribeEvent)
                 {
-                    this._componentSignals.push(connect.connect(target, name, instance, subscribeEvent[name]));
+                    context.signals.push(connect.connect(root, name, instance, subscribeEvent[name]));
                 }
+            }
+        },
+        _detachLocalComponent: function(instance, context, root, owner) {
+            var componentName = context.componentName,
+                points = context.points,
+                signals = context.signals;
+
+            instance._componentRoot = null;
+            instance._componentOwner = null;
+
+            if (componentName)
+            {
+                delete owner.$[componentName];
+                delete root.$[componentName];
+            }
+
+            if (points)
+            {
+                for (var i = 0; i < points.length; i++)
+                {
+                    var point = points[i];
+
+                    lang.setObject(point, null, root);
+                }
+            }
+
+            if (signals)
+            {
+                array.forEach(signals, function(signal) {
+                    signal.remove();
+                });
             }
         },
         _instantiateComponent: function(component, root, owner) {
@@ -146,7 +253,8 @@ define('Sage/Platform/Mobile/_Component', [
             var props = lang.mixin({
                 components: component.components,
                 _componentRoot: root,
-                _componentOwner: owner
+                _componentOwner: owner,
+                _componentSource: component
             }, component.props);
 
             return new ctor(props);
@@ -154,22 +262,26 @@ define('Sage/Platform/Mobile/_Component', [
         _createComponent: function(component, root, owner) {
             var instance = this._instantiateComponent(component, root, owner);
 
-            this._attachComponent(component, instance, root, owner);
+            var slot = (this._components.push(instance) - 1),
+                context = {
+                    remote: false,
+                    signals: null
+                };
+
+            this._componentContext[slot] = context;
+
+            this._attachLocalComponent(component, instance, context, root, owner);
 
             return instance;
         },
         _createComponents: function(components, root, owner) {
-            var created = [];
-
             if (components)
             {
                 for (var i = 0; i < components.length; i++)
                 {
-                    created.push(this._createComponent(components[i], root, owner));
+                    this._createComponent(components[i], root, owner);
                 }
             }
-
-            return created;
         },
         onCreate: function() {
         },
@@ -189,12 +301,10 @@ define('Sage/Platform/Mobile/_Component', [
                 owner = this;
 
             /* components defined on the prototype are always rooted locally */
-            var created = this._createComponents(this.constructor.prototype.components, owner, owner);
+            this._createComponents(this.constructor.prototype.components, owner, owner);
 
             /* components defined on the instance always inherit the root */
-            if (this.hasOwnProperty('components')) created = created.concat(this._createComponents(this.components, root, owner));
-
-            this._components = created;
+            if (this.hasOwnProperty('components')) this._createComponents(this.components, root, owner);
         }
     });
 
