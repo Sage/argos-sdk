@@ -88,6 +88,38 @@
           "path": "../src"
         },
         {
+          "text": "ChartManager.js",
+          "path": "../src"
+        },
+        {
+          "text": "_Chart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "AreaChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "BarChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "ColumnChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "LineChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "PieChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "SageTheme.js",
+          "path": "../src/Charts"
+        },
+        {
           "text": "FieldManager.js",
           "path": "../src"
         },
@@ -177,6 +209,10 @@
         },
         {
           "text": "Signature.js",
+          "path": "../src/Views"
+        },
+        {
+          "text": "Chart.js",
           "path": "../src/Views"
         },
         {
