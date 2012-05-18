@@ -15,9 +15,7 @@
 
 define('Sage/Platform/Mobile/Charts/ColumnChart', [
     'dojo/_base/declare',
-    'dojo/window',
     'dojo/dom-geometry',
-    'dojo/dom-style',
     'Sage/Platform/Mobile/Charts/_Chart',
     'Sage/Platform/Mobile/ChartManager',
     'dojox/charting/plot2d/Columns',
@@ -25,67 +23,29 @@ define('Sage/Platform/Mobile/Charts/ColumnChart', [
     'dojox/charting/axis2d/Default'
 ], function(
     declare,
-    win,
     domGeom,
-    domStyle,
     _Chart,
     ChartManager,
     Columns
 ) {
     var chart = declare('Sage.Platform.Mobile.Charts.ColumnChart', [_Chart], {
-        xAxis: {
-            natural: true,
-            trailingSymbol: '...'
-        },
-        yAxis: {
-            vertical: true,
-            fixLower: 'major',
-            fixUpper: 'major',
-            minorTicks: false
-        },
         plotType: Columns,
+
         plotOptions: {
             markers: true,
             gap: 5
         },
 
-        getAxes: function() {
-            var axes = this.inherited(arguments);
-
-            if (this.feed && this.feed['$resources'])
-                axes[0].options.maxLabelSize = Math.floor(domGeom.getMarginBox(this.chartNode).w / (this.feed['$resources'].length + 3.5));
-
-            return axes;
+        xAxis: {
+            natural: true,
+            trailingSymbol: '...'
         },
 
-        setSize: function() {
-            var box = win.getBox(),
-                ratio = 1.618,
-                newHeight, newWidth;
-            box.h -= 80;
-
-            if (box.w > box.h && box.h * ratio < box.w)
-            {
-                newWidth = Math.floor(box.h * 1.618);
-                newHeight = box.h;
-            }
-            else
-            {
-                newWidth = box.w;
-                newHeight = Math.floor(box.w / 1.618);
-            }
-
-            domGeom.setMarginBox(this.chartNode, {
-                h: newHeight,
-                w: newWidth
-            });
-
-
-            if (this.chart && this.chart.axes['x'] && this.feed && this.feed['$resources'])
-            {
-                var axes = this.getAxes();
-                this.chart.addAxis(axes[0].axis, axes[0].options);
-            }
+        yAxis: {
+            vertical: true,
+            fixLower: 'major',
+            fixUpper: 'major',
+            minorTicks: false
         }
     });
 

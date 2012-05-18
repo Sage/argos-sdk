@@ -32,7 +32,13 @@ define('Sage/Platform/Mobile/Charts/PieChart', [
     var chart = declare('Sage.Platform.Mobile.Charts.PieChart', [_Chart], {
         plotType: PiePlot,
         plotOptions: {
-            labelOffset: '-15'
+            labelStyle: 'columns',
+            labelWiring: '#ccc',
+            htmlLabels: true
+        },
+        legend: true,
+        legendOptions: {
+            horizontal: false
         },
         _onResize: function() {
             var radius = this.getRadius();

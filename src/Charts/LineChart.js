@@ -49,36 +49,16 @@ define('Sage/Platform/Mobile/Charts/LineChart', [
         getAxes: function() {
             var axes = this.inherited(arguments);
 
-            if (this.feed && this.feed['$resources'])
-                axes[0].options.maxLabelSize = Math.floor(domGeom.getMarginBox(this.chartNode).w / (this.feed['$resources'].length + 3.5));
+            if (this.feed)
+                axes[0].options.maxLabelSize = Math.floor(domGeom.getMarginBox(this.chartNode).w / (this.feed.length + 3.5));
 
             return axes;
         },
 
         setSize: function() {
-            var box = win.getBox(),
-                ratio = 1.618,
-                newHeight, newWidth;
-            box.h -= 80;
+            this.inherited(arguments);
 
-            if (box.w > box.h && box.h * ratio < box.w)
-            {
-                newWidth = Math.floor(box.h * 1.618);
-                newHeight = box.h;
-            }
-            else
-            {
-                newWidth = box.w;
-                newHeight = Math.floor(box.w / 1.618);
-            }
-
-            domGeom.setMarginBox(this.chartNode, {
-                h: newHeight,
-                w: newWidth
-            });
-
-
-            if (this.chart && this.chart.axes['x'] && this.feed && this.feed['$resources'])
+            if (this.chart && this.chart.axes['x'])
             {
                 var axes = this.getAxes();
                 this.chart.addAxis(axes[0].axis, axes[0].options);

@@ -740,7 +740,8 @@ h2 > .collapsed-indicator
 .collapsed + fieldset,
 .collapsed + div
 {
-    display: none !important;
+    position: absolute !important;
+    left: -9999px !important;
 }
 
 .action-list > li > a.disabled
@@ -785,4 +786,31 @@ h2 > .collapsed-indicator
 
 .invisible {
     visibility: hidden;
+}
+
+.chart-panel
+{
+    width: 100%;
+    height: 100%;
+}
+.chart-panel > .chart
+{
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+}
+.chart-panel > .dojoxLegendNode
+{
+    width: 20%;
+    display: inline-block;
+    vertical-align: top;
+    margin: 16px 0 0 6px;
+}
+.chart-panel > .dojoxLegendNode td
+{
+    white-space: nowrap;
+}
+.chart-panel > .dojoxLegendNode .dojoxLegendText
+{
+    padding-left: 6px;
 }

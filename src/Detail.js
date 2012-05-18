@@ -125,6 +125,9 @@ define('Sage/Platform/Mobile/Detail', [
         notAvailableTemplate: new Simplate([
             '<div class="not-available">{%: $.notAvailableText %}</div>'
         ]),
+        chartRowTemplate: new Simplate([
+            '<div class="row chart-row {%= $.cls %}" data-property="{%= $.name %}"></div>'
+        ]),
         id: 'generic_detail',
         layout: null,
         security: false,
@@ -354,9 +357,24 @@ define('Sage/Platform/Mobile/Detail', [
                                 ? useListTemplate
                                     ? this.actionTemplate
                                     : this.actionPropertyTemplate
-                                : this.propertyTemplate;
+                                : current['chart']
+                                    ? this.chartRowTemplate
+                                    : this.propertyTemplate;
 
                 var rowNode = domConstruct.place(template.apply(data, this), sectionNode);
+
+                if (current['chart'])
+                {
+                    var currentChart = current['chart'];
+                    if (currentChart.where && currentChart.where['_activeFilter'])
+                    {
+                        currentChart.where['_activeFilter'] = string.substitute(currentChart.where['_activeFilter'], [value]);
+                    }
+
+                    var ctor = ChartManager.get(currentChart.type),
+                        chart = new ctor(currentChart);
+                    chart.renderTo(rowNode);
+                }
 
                 if(current['onCreate'])
                     callbacks.push({row: current, node: rowNode, value: value, entry: entry});
@@ -386,22 +404,6 @@ define('Sage/Platform/Mobile/Detail', [
             {
                 this.set('detailContent', '');
             }
-        },
-        placeChart: function(row, node, value, entry, whereQueryFmt) {
-            if (whereQueryFmt)
-            {
-                if (row.chart.where)
-                    row.chart.where['_activeFilter'] = string.substitute(whereQueryFmt, [value]);
-                else
-                    row.chart.where = {
-                        '_activeFilter': string.substitute(whereQueryFmt, [value])
-                    };
-            }
-
-            var current = row.chart,
-                ctor = ChartManager.get(current['type']),
-                chart = new ctor(current);
-            chart.renderTo(node);
         },
         onRequestDataFailure: function(response, o) {
             if (response && response.status == 404)

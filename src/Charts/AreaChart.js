@@ -46,18 +46,6 @@ define('Sage/Platform/Mobile/Charts/AreaChart', [
         plotOptions: {
             markers: false,
             tension: 'X'
-        },
-
-        getSeries: function() {
-            return {name: 'APL', data: this.getData()};
-        },
-        getData: function() {
-            var data = [];
-            for (var i=0; i < 10; i++)
-            {
-                data.push(Math.floor(Math.random() * (1000 - 100 + 1)) + 100);
-            }
-            return data;
         }
     });
 

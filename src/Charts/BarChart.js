@@ -46,30 +46,16 @@ define('Sage/Platform/Mobile/Charts/BarChart', [
             gap: 5
         },
 
+        getAxes: function() {
+            var axes = this.inherited(arguments);
+
+            if (this.feed)
+                axes[0].options.maxLabelSize = Math.floor(domGeom.getMarginBox(this.chartNode).w / (this.feed.length + 3.5));
+
+            return axes;
+        },
         setSize: function() {
-            var box = win.getBox(),
-                ratio = 1.618,
-                height = (box.h > this.maxHeight) ? this.maxHeight : box.h,
-                width = box.w,
-                newHeight = 0,
-                newWidth = 0;
-
-            if (width > height && height * ratio < width)
-            {
-                newWidth = Math.floor(height * ratio);
-                newHeight = height;
-            }
-            else
-            {
-                newWidth = width;
-                newHeight = Math.floor(width / ratio);
-            }
-
-            domGeom.setMarginBox(this.chartNode, {
-                h: newHeight,
-                w: newWidth
-            });
-
+            this.inherited(arguments);
 
             if (this.chart && this.chart.axes['x'] && this.feed)
             {

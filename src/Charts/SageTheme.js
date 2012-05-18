@@ -11,7 +11,7 @@ define('Sage/Platform/Mobile/Charts/SageTheme', [
 
 	var sageTheme = new Theme({
         chart: {
-            titleFont: 'normal normal bold 0.8em inherit',
+            titleFont: 'normal normal bold 1.5em inherit',
             titleFontColor: '#0079A7'
         },
 		seriesThemes: gradientGenerator.generateMiniTheme(colors, defaultFill, 85, 65, 100)

@@ -34,6 +34,12 @@ define('Sage/Platform/Mobile/Views/Chart', [
     View
 ) {
 
+    var count = 0;
+    function generateChartId() {
+        count++;
+        return 'chart-'+count;
+    }
+
     return declare('Sage.Platform.Mobile.Views.Chart', [View], {
         // Localization
         titleText: 'Chart',
@@ -51,14 +57,15 @@ define('Sage/Platform/Mobile/Views/Chart', [
         charts: {},
 
         processChart: function(o) {
-            if (!o) return;
+            this.charts = {};
+
             if (!lang.isArray[o]) o = [o];
 
             for (var i = 0; i < o.length; i++)
             {
                 var current = o[i],
                     ctor = ChartManager.get(current['type']),
-                    chart = this.charts[current['name']] = new ctor(current);
+                    chart = this.charts[generateChartId()] = new ctor(current);
                 chart.renderTo(this.contentNode);
             }
 
@@ -66,7 +73,14 @@ define('Sage/Platform/Mobile/Views/Chart', [
         refresh: function() {
             this.inherited(arguments);
             this.clear();
-            this.processChart(this.options.chart);
+            if (this.options && this.options.chart)
+                this.processChart(this.options.chart);
+            else
+                for (var chart in this.charts)
+                {
+                    console.log('for charts, calling renderTo');
+                    this.charts[chart].renderTo(this.contentNode);
+                }
         },
         clear: function() {
             domConstruct.empty(this.contentNode);
