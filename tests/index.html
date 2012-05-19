@@ -58,8 +58,10 @@
         'ApplicationModuleTests',
         'CalendarTests',
         'ConvertTests',
+        'ErrorManagerTests',
         'FieldManagerTests',
         'FormatTests',
+        'GroupedListTests',
         'MainToolbarTests',
         'SearchWidgetTests',
         'ToolbarTests',
@@ -79,7 +81,7 @@
 
         var wait = [],
             preload = [
-                'feeds/TestFeed.json' // if running this test through IIS, be sure to have the appropriate mime type, 'application/json', set for '.json'.
+                'feeds/GroupListFeed.json' // if running this test through IIS, be sure to have the appropriate mime type, 'application/json', set for '.json'.
             ];
 
         array.forEach(preload, function(item) {
@@ -87,6 +89,8 @@
                 url: item,
                 handleAs: 'text'
             }).then(function(result) {
+                try { result = JSON.parse(result); } catch(e) {}
+
                 Resources.set(item, result);
             }));
         });

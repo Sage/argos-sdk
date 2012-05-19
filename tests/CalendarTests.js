@@ -134,9 +134,5 @@ return describe('Sage.Platform.Mobile.Calendar', function() {
         expect(domAttr.get(select.options[0],'value')).toEqual('0');
     });
 
-
-
-
-
 });
 });

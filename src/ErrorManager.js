@@ -38,6 +38,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
     return lang.setObject('Sage.Platform.Mobile.ErrorManager', {
         //Localization
         abortedText: 'Aborted',
+        scopeSaveText: 'Scope is not saved in error report',
 
         /**
          * Total amount of errors to keep
@@ -160,7 +161,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
                             break;
                         }
                         if(key === 'scope') { // eliminate recursive self call
-                            obj[key] = 'Scope is not saved in error report';
+                            obj[key] = this.scopeSaveText;
                             break;
                         }
                         obj[key] = this.serializeValues(obj[key]);
