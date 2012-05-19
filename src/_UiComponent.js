@@ -37,7 +37,7 @@ define('Sage/Platform/Mobile/_UiComponent', [
             if (content || tag)
             {
                 var node = content
-                        ? domConstruct.toDom(lang.isFunction(content) ? content.call(this, this) : content)
+                        ? domConstruct.toDom(lang.isFunction(content) ? content.call(root, root, owner, this) : content)
                         : domConstruct.create(component.tag, component.attrs),
                     props = lang.mixin({
                         components: component.components,
@@ -81,6 +81,8 @@ define('Sage/Platform/Mobile/_UiComponent', [
                 if (this.isInstanceOf(_Container))
                     this.addChild(instance, position);
                 else if (this.isInstanceOf(_WidgetBase))
+                    instance.placeAt(this.containerNode || this.domNode, position);
+                else if (this.isInstanceOf(DomContentComponent))
                     instance.placeAt(this.containerNode || this.domNode, position);
             }
             else if (instance.isInstanceOf(DomContentComponent))

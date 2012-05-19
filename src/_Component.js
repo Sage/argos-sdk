@@ -24,13 +24,19 @@ define('Sage/Platform/Mobile/_Component', [
     };
 
     var _Component = declare('Sage.Platform.Mobile._Component', null, {
-        $: null,
         _components: null,
         _componentRoot: null,
         _componentOwner: null,
         _componentContext: null,
+        $: null,
         components: null,
         constructor: function(props) {
+            this._components = [];
+            this._componentContext = [];
+
+            this.$ = {};
+            this.components = [];
+
             if (props)
             {
                 if (props.components) this.components = props.components;
@@ -41,10 +47,6 @@ define('Sage/Platform/Mobile/_Component', [
                 if (props._componentOwner) this._componentOwner = props._componentOwner;
                 if (props._componentSource) this._componentSource = props._componentSource;
             }
-
-            this.$ = {};
-            this._components = [];
-            this._componentContext = [];
         },
         postscript: function() {
             this.inherited(arguments);
@@ -296,15 +298,21 @@ define('Sage/Platform/Mobile/_Component', [
         getComponentValue: function() {
             return this;
         },
+        _getProtoComponentDeclarations: function() {
+            return this.constructor.prototype.components;
+        },
+        _getInstanceComponentDeclarations: function() {
+            return this.components;
+        },
         initComponents: function() {
             var root = this._componentRoot || this,
                 owner = this;
 
             /* components defined on the prototype are always rooted locally */
-            this._createComponents(this.constructor.prototype.components, owner, owner);
+            this._createComponents(this._getProtoComponentDeclarations(), owner, owner);
 
             /* components defined on the instance always inherit the root */
-            if (this.hasOwnProperty('components')) this._createComponents(this.components, root, owner);
+            this._createComponents(this._getInstanceComponentDeclarations(), root, owner);
         }
     });
 

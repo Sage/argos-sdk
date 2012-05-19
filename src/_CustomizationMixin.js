@@ -15,47 +15,52 @@
 
 define('Sage/Platform/Mobile/_CustomizationMixin', [
     'dojo/_base/declare',
-    'dojo/_base/lang'
+    'dojo/_base/lang',
+    'argos!application'
 ], function(
     declare,
-    lang
+    lang,
+    application
 ) {
 
     var expand = function(expression) {
-        if (typeof expression === 'function')
-            return expression.apply(this, Array.prototype.slice.call(arguments, 1));
-        else
-            return expression;
-    };
+            if (typeof expression === 'function')
+                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
+            else
+                return expression;
+        },
+        _layoutCompiled = {},
+        _layoutCompiledFrom = {};
 
-    return declare('Sage.Platform.Mobile._CustomizationMixin', null, {
-        _layoutCompiled: null,
-        _layoutCompiledFrom: null,
+    var _CustomizationMixin = declare('Sage.Platform.Mobile._CustomizationMixin', null, {
+        _layoutCompiled: _layoutCompiled, /* global */
+        _layoutCompiledFrom: _layoutCompiledFrom, /* global */
         id: null,
         customizationSet: null,
         enableCustomizations: true,
         constructor: function() {
-            this._layoutCompiled = {};
-            this._layoutCompiledFrom = {};
+            //this._layoutCompiled = {};
+            //this._layoutCompiledFrom = {};
         },
-        _getCustomizationsFor: function(customizationSubSet) {
-            var customizationSet = customizationSubSet
-                ? this.customizationSet + '/' + customizationSubSet
-                : this.customizationSet;
-            return App.getCustomizationsFor(customizationSet, this.id);
-        },
-        _createCustomizedLayout: function(layout, customizationSubSet) {
+        _createCustomizedLayout: function(layout, customizationSubSet, onlyCustomizationSet, onlySpecificResult) {
             var customizationSet = customizationSubSet
                     ? this.customizationSet + '/' + customizationSubSet
                     : this.customizationSet,
-                key = customizationSet + '#' + this.id,
+                key = onlyCustomizationSet
+                    ? customizationSet
+                    : customizationSet + '#' + this.id,
                 source = layout;
+
+            console.log('search for customizations for "%s" (%s)', key, onlySpecificResult);
+
             if (source === this._layoutCompiledFrom[key] && this._layoutCompiled[key])
                 return this._layoutCompiled[key]; // same source layout, no changes
 
             if (this.enableCustomizations)
             {
-                var customizations = this._getCustomizationsFor(customizationSubSet);
+                console.log('compiling customizations for "%s" (%s)', key, onlySpecificResult);
+
+                var customizations = application().getCustomizationsFor(key, onlySpecificResult);
                 if (customizations && customizations.length > 0)
                 {
                     layout = this._compileCustomizedLayout(customizations, source, null);
@@ -141,7 +146,7 @@ define('Sage/Platform/Mobile/_CustomizationMixin', [
 
                     if (row)
                     {
-                        var children = (row['children'] && 'children') || (row['as'] && 'as');
+                        var children = (row['children'] && 'children') || (row['components'] && 'components') || (row['as'] && 'as');
                         if (children)
                         {
                             // make a shallow copy if we haven't already
@@ -190,4 +195,9 @@ define('Sage/Platform/Mobile/_CustomizationMixin', [
             return output;
         }
     });
+
+    _CustomizationMixin._layoutCompiled = _layoutCompiled;
+    _CustomizationMixin._layoutCompiledFrom = _layoutCompiledFrom;
+
+    return _CustomizationMixin;
 });

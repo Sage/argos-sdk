@@ -392,15 +392,16 @@ define('Sage/Platform/Mobile/Application', [
                     : customizationSet;
             }
             
-            var container = this.customizations[path] || (this.customizations[path] = []);
+            var container = this._customizations[path] || (this._customizations[path] = []);
             if (container) container.push(spec);
         },
         /**
          * legacy: getCustomizationsFor(set, id);
          * { action: 'remove|modify|insert|replace', at: (index|fn), or: (fn), where: 'before|after', value: {} }
          */
-        getCustomizationsFor: function(path) {
-            if (arguments.length > 1)
+        getCustomizationsFor: function(path, specific) {
+            /* @deprecated */
+            if (arguments.length > 1 && typeof arguments[1] === 'string')
             {
                 path = arguments[1]
                     ? arguments[0] + '#' + arguments[1]
@@ -410,8 +411,10 @@ define('Sage/Platform/Mobile/Application', [
             var segments = path.split('#'),
                 customizationSet = segments[0];
 
-            var forPath = this.customizations[path] || [],
-                forSet = this.customizations[customizationSet] || [];
+            var forSet = this._customizations[customizationSet] || [],
+                forPath = this._customizations[path] || [];
+
+            if (forPath === forSet || specific) return forPath;
 
             return forPath.concat(forSet);
         },

@@ -24,6 +24,7 @@ define('Sage/Platform/Mobile/List', [
     './ErrorManager',
     './View',
     './ScrollContainer',
+    './ContentComponent',
     './Toolbar'
 ], function(
     declare,
@@ -36,6 +37,7 @@ define('Sage/Platform/Mobile/List', [
     ErrorManager,
     View,
     ScrollContainer,
+    ContentComponent,
     Toolbar
 ) {
 
@@ -137,14 +139,46 @@ define('Sage/Platform/Mobile/List', [
         }
     });
 
-    return declare('Sage.Platform.Mobile.List', [View], {
+    /*
+     '<div class="list-remaining"><span data-dojo-attach-point="remainingContentNode"></span></div>',
+     '<button class="button" data-action="more">',
+     '<span>{%= $.moreText %}</span>',
+     '</button>',
+     */
+
+    var MoreButton = declare([ContentComponent], {
+        baseCLass: 'list-more',
+        components: [
+            {tag: 'span', attachPoint: 'remainingContentNode'},
+            {content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
+        ],
+        moreText: 'More'
+    });
+
+    var List = declare('Sage.Platform.Mobile.List', [View], {
+        baseClass: 'list',
         components: [
             {name: 'top', type: Toolbar},
-            {name: 'scroll', type: ScrollContainer, subscribeEvent: {'onContentChanged':'onContentChanged'}, components: [
-                {tag: 'div', attachPoint: 'contentNode', components:[{content: 'test'}]}
+            {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
+            {name: 'scroll', type: ScrollContainer, subscribeEvent: {'onContentChange':'onContentChange'}, components: [
+                {tag: 'div', components: [
+                    {tag: 'ul', attachPoint: 'contentNode'},
+                    {type: MoreButton, attachPoint: 'moreButton'}
+                ]}
             ]}
-        ]
+        ],
+        customizationSet: 'list',
+        _getProtoComponentDeclarations: function() {
+            return this._createCustomizedLayout(this.inherited(arguments), 'components', true, true);
+        },
+        _getInstanceComponentDeclarations: function() {
+            return this._createCustomizedLayout(this.inherited(arguments), 'components', false, true);
+        },
+        onContentChange: function() {
+        }
     });
+
+    return List;
 
     /**
      * A base list view.

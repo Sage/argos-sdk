@@ -34,7 +34,7 @@ define('Sage/Platform/Mobile/View', [
     Toolbar,
     ScrollContainer
 ) {
-    return declare('Sage.Platform.Mobile.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
+    return declare('Sage.Platform.Mobile.View', [_WidgetBase, _UiComponent, _EventMapMixin, _CustomizationMixin], {
         baseClass: 'view',
         titleText: 'Generic View',
         tools: null,
