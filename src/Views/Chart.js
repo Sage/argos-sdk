@@ -77,10 +77,7 @@ define('Sage/Platform/Mobile/Views/Chart', [
                 this.processChart(this.options.chart);
             else
                 for (var chart in this.charts)
-                {
-                    console.log('for charts, calling renderTo');
                     this.charts[chart].renderTo(this.contentNode);
-                }
         },
         clear: function() {
             domConstruct.empty(this.contentNode);

@@ -19,6 +19,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     'dojo/_base/array',
     'dojo/string',
     'dojo/dom-class',
+    'dojo/dom-construct',
     'dojo/dom-style',
     'dojo/window',
     'dojox/charting/Chart',
@@ -33,6 +34,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     array,
     string,
     domClass,
+    domConstruct,
     domStyle,
     win,
     Chart,
@@ -161,6 +163,11 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
 
             if (this.chart)
                 this.chart.resize();
+        },
+        clear: function() {
+            if (this.chart)
+                this.chart.destroy();
+            domConstruct.empty(this.chartNode);
         },
 
         /**
@@ -305,13 +312,12 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         },
 
         renderTo: function(node) {
+            this.clear();
+
             this.containerNode = node;
             this.placeAt(node);
 
-            if (this.chart)
-                this.chart.render();
-            else
-                this.requestData();
+            this.requestData();
         },
 
         expandExpression: function(expression) {
@@ -340,14 +346,16 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
             whereArgs['format'] = 'json';
 
             for (var arg in whereArgs)
-                request.setQueryArg(arg, whereArgs[arg]);
+            {
+                var argValue = this.expandExpression(whereArgs[arg], this.entry);
+                request.setQueryArg(arg, argValue);
+            }
 
             return request;
         },
 
         requestData: function() {
             domClass.add(this.chartNode, 'panel-loading');
-
             var request = this.createRequest();
             if (request)
                 request.read({

@@ -179,7 +179,7 @@ define('Sage/Platform/Mobile/Detail', [
         },
         formatRelatedQuery: function(entry, fmt, property) {
             property = property || '$key';
-            return string.substitute(fmt, [utility.getValue(entry, property)]);
+            return string.substitute(fmt, [utility.getValue(entry || this.entry, property)]);
         },
         toggleSection: function(params) {
             var node = dom.byId(params.$source);
@@ -366,13 +366,12 @@ define('Sage/Platform/Mobile/Detail', [
                 if (current['chart'])
                 {
                     var currentChart = current['chart'];
-                    if (currentChart.where && currentChart.where['_activeFilter'])
-                    {
-                        currentChart.where['_activeFilter'] = string.substitute(currentChart.where['_activeFilter'], [value]);
-                    }
+
+                    currentChart.entry = entry;
 
                     var ctor = ChartManager.get(currentChart.type),
                         chart = new ctor(currentChart);
+
                     chart.renderTo(rowNode);
                 }
 
