@@ -80,10 +80,10 @@ define('Sage/Platform/Mobile/_Component', [
             this._componentContext = null;
         },
         _startupChildComponent: function(instance) {
-            instance.startup();
+            if (typeof instance.startup === 'function') instance.startup();
         },
         _destroyChildComponent: function(instance) {
-            instance.destroy();
+            if (typeof instance.destroy === 'function') instance.destroy();
         },
         addComponent: function(instance) {
             if (instance._componentOwner) return;
@@ -174,7 +174,9 @@ define('Sage/Platform/Mobile/_Component', [
 
             if (attachPoint)
             {
-                var value = instance.getComponentValue(),
+                var value = instance.isInstanceOf(_Component)
+                        ? instance.getComponentValue()
+                        : instance,
                     points = context.points = attachPoint.split(/\s*,\s*/);
 
                 for (var i = 0; i < points.length; i++)
@@ -302,7 +304,7 @@ define('Sage/Platform/Mobile/_Component', [
             return this.constructor.prototype.components;
         },
         _getInstanceComponentDeclarations: function() {
-            return this.components;
+            return this.hasOwnProperty('components') && this.components;
         },
         initComponents: function() {
             var root = this._componentRoot || this,

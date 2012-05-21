@@ -146,15 +146,6 @@ define('Sage/Platform/Mobile/List', [
      '</button>',
      */
 
-    var MoreButton = declare([ContentComponent], {
-        baseCLass: 'list-more',
-        components: [
-            {tag: 'span', attachPoint: 'remainingContentNode'},
-            {content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
-        ],
-        moreText: 'More'
-    });
-
     var List = declare('Sage.Platform.Mobile.List', [View], {
         baseClass: 'list',
         components: [
@@ -162,21 +153,29 @@ define('Sage/Platform/Mobile/List', [
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroll', type: ScrollContainer, subscribeEvent: {'onContentChange':'onContentChange'}, components: [
                 {tag: 'div', components: [
-                    {tag: 'ul', attachPoint: 'contentNode'},
-                    {type: MoreButton, attachPoint: 'moreButton'}
+                    {name: 'content', tag: 'ul', attachPoint: 'contentNode'},
+                    {tag: 'div', attrs: {'class': 'list-more'}, components: [
+                        {name: 'remaining', tag: 'span', attachPoint: 'remainingContentNode'},
+                        {name: 'more', content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
+                    ]}
                 ]}
             ]}
         ],
         customizationSet: 'list',
-        _getProtoComponentDeclarations: function() {
-            return this._createCustomizedLayout(this.inherited(arguments), 'components', true, true);
-        },
-        _getInstanceComponentDeclarations: function() {
-            return this._createCustomizedLayout(this.inherited(arguments), 'components', false, true);
-        },
+        moreText: 'More',
         onContentChange: function() {
         }
     });
+
+    var MoreButton = declare('Sage.Platform.Mobile.List.MoreButton', [ContentComponent], {
+        baseCLass: 'list-more',
+        components: [
+
+        ],
+        moreText: 'More'
+    });
+
+    List.MoreButton = MoreButton;
 
     return List;
 

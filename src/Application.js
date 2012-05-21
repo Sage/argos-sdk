@@ -23,6 +23,7 @@ define('Sage/Platform/Mobile/Application', [
     'dojo/string',
     './_Component',
     './Scene',
+    './CustomizationSet',
     './Utility'
 ], function(
     json,
@@ -34,6 +35,7 @@ define('Sage/Platform/Mobile/Application', [
     string,
     _Component,
     Scene,
+    CustomizationSet,
     Utility
 ) {
     
@@ -87,13 +89,14 @@ define('Sage/Platform/Mobile/Application', [
     return declare('Sage.Platform.Mobile.Application', [_Component], {
         _started: false,
         _signals: null,
-        _customizations: null,
         _connections: null,
         _modules: null,
 
         components: [
-            {type: Scene, attachPoint: 'scene'}
+            {type: Scene, attachPoint: 'scene'},
+            {type: CustomizationSet, attachPoint: 'customizations'}
         ],
+        customizations: null,
         enableCaching: false,
         context: null,
         scene: null,
@@ -102,7 +105,6 @@ define('Sage/Platform/Mobile/Application', [
             this._signals = [];
             this._modules = [];
             this._connections = {};
-            this._customizations = {};
 
             this.context = {};
 
@@ -112,6 +114,16 @@ define('Sage/Platform/Mobile/Application', [
             array.forEach(this._signals, function(signal) {
                 signal.remove();
             });
+
+            for (var name in this._connections)
+            {
+                var connection = this._connections[name];
+                if (connection)
+                {
+                    connection.un('beforerequest', this._loadSDataRequest, this);
+                    connection.un('requestcomplete', this._cacheSDataRequest, this);
+                }
+            }
 
             this.uninitialize();
 
@@ -391,9 +403,8 @@ define('Sage/Platform/Mobile/Application', [
                     ? customizationSet + '#' + id
                     : customizationSet;
             }
-            
-            var container = this._customizations[path] || (this._customizations[path] = []);
-            if (container) container.push(spec);
+
+            this.customizations.register(path, spec);
         },
         /**
          * legacy: getCustomizationsFor(set, id);
@@ -408,15 +419,7 @@ define('Sage/Platform/Mobile/Application', [
                     : arguments[0];
             }
 
-            var segments = path.split('#'),
-                customizationSet = segments[0];
-
-            var forSet = this._customizations[customizationSet] || [],
-                forPath = this._customizations[path] || [];
-
-            if (forPath === forSet || specific) return forPath;
-
-            return forPath.concat(forSet);
+            return this.customizations.get(path, specific);
         },
         hasAccessTo: function(security) {
             return true;
