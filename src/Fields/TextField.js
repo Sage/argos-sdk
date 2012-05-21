@@ -43,10 +43,11 @@ define('Sage/Platform/Mobile/Fields/TextField', [
             '{% } %}',
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
         ]),
-        
+        inputNode: null,
+        clearNode: null,
+
         notificationTrigger: false,
         validationTrigger: false,
-        inputNode: null,
 		inputType: 'text',
         enableClearButton: true,
         validInputOnly: false,
@@ -68,7 +69,7 @@ define('Sage/Platform/Mobile/Fields/TextField', [
             domAttr.set(this.inputNode, 'disabled', true);
         },
         _onKeyPress: function(evt) {
-            var v = this.getValue() + String.fromCharCode(evt.getCharCode());
+            var v = this.getValue() + evt.keyChar;
             if (this.validate(v))
             {
                 event.stop(evt);

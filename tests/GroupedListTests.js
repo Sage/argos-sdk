@@ -53,6 +53,20 @@ return describe('Sage.Platform.Mobile.GroupedList', function() {
         expect(query('> ul > li', list.contentNode).length).toEqual(feed['$totalResults']);
     });
 
+    it('Can split list items into groups', function() {
+        var feed = Resources.get('feeds/GroupListFeed.json');
+
+        list.getGroupForEntry = function(entry) {
+            return {
+                tag: entry.view ? 0 : 1,
+                title: entry.view ? 'Views' : 'Actions'
+            }
+        };
+
+        list.processFeed(feed);
+
+        expect(query('> ul', list.contentNode).length).toEqual(2);
+    });
 
 
 });
