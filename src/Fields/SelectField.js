@@ -15,14 +15,12 @@
 
 define('Sage/Platform/Mobile/Fields/SelectField', [
     'dojo/_base/declare',
-    'Sage/Platform/Mobile/Fields/LookupField',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/Fields/LookupField'
 ], function(
     declare,
-    LookupField,
-    FieldManager
+    LookupField
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.SelectField', [LookupField], {
+    return declare('Sage.Platform.Mobile.Fields.SelectField', [LookupField], {
         valueKeyProperty: false,
         valueTextProperty: false,
         createNavigationOptions: function() {

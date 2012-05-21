@@ -16,15 +16,13 @@
 define('Sage/Platform/Mobile/Fields/DecimalField', [
     'dojo/_base/declare',
     'dojo/string',
-    'Sage/Platform/Mobile/Fields/TextField',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/Fields/TextField'
 ], function(
     declare,
     string,
-    TextField,
-    FieldManager
+    TextField
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.DecimalField', [TextField], {
+    return declare('Sage.Platform.Mobile.Fields.DecimalField', [TextField], {
         precision: 2,
         enableClearButton: false,
         setValue: function(val) {

@@ -18,7 +18,6 @@ define('Sage/Platform/Mobile/Fields/DateField', [
     'dojo/string',
     'dojo/dom-class',
     'Sage/Platform/Mobile/Format',
-    'Sage/Platform/Mobile/FieldManager',
     'Sage/Platform/Mobile/Fields/EditorField',
     'Sage/Platform/Mobile/Calendar'
 ], function(
@@ -26,10 +25,10 @@ define('Sage/Platform/Mobile/Fields/DateField', [
     string,
     domClass,
     format,
-    FieldManager,
-    EditorField
+    EditorField,
+    Calendar
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.DateField', [EditorField], {
+    return declare('Sage.Platform.Mobile.Fields.DateField', [EditorField], {
         // Localization
         emptyText: '',
         dateFormatText: 'MM/dd/yyyy',

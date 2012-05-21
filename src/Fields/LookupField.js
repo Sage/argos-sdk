@@ -20,8 +20,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     'dojo/string',
     'dojo/query',
     'Sage/Platform/Mobile/Utility',
-    'Sage/Platform/Mobile/Fields/_Field',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/Fields/_Field'
 ], function(
     array,
     declare,
@@ -30,10 +29,9 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     string,
     query,
     utility,
-    _Field,
-    FieldManager
+    _Field
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.LookupField', [_Field], {
+    return declare('Sage.Platform.Mobile.Fields.LookupField', [_Field], {
         attributeMap: {
             inputValue: {
                 node: 'inputNode',

@@ -18,17 +18,15 @@ define('Sage/Platform/Mobile/Fields/TextField', [
     'dojo/_base/event',
     'dojo/dom-attr',
     'dojo/dom-class',
-    'Sage/Platform/Mobile/Fields/_Field',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/Fields/_Field'
 ], function(
     declare,
     event,
     domAttr,
     domClass,
-    _Field,
-    FieldManager
+    _Field
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.TextField', [_Field], {
+    return declare('Sage.Platform.Mobile.Fields.TextField', [_Field], {
         attributeMap: {
             inputValue: {
                 node: 'inputNode',

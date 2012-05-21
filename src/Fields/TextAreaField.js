@@ -15,14 +15,12 @@
 
 define('Sage/Platform/Mobile/Fields/TextAreaField', [
     'dojo/_base/declare',
-    'Sage/Platform/Mobile/Fields/TextField',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/Fields/TextField'
 ], function(
     declare,
-    TextField,
-    FieldManager
+    TextField
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.TextAreaField', [TextField], {
+    return declare('Sage.Platform.Mobile.Fields.TextAreaField', [TextField], {
         rows: 4,
         enableClearButton: false,
         widgetTemplate: new Simplate([
