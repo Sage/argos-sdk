@@ -18,7 +18,8 @@ define('Sage/Platform/Mobile/MainToolbar', [
     'dojo/query',
     'dojo/dom-class',
     'dojo/dom-construct',
-    'Sage/Platform/Mobile/Toolbar'
+    'Sage/Platform/Mobile/Toolbar',
+    'dojo/NodeList-manipulate'
 ], function(
     declare,
     query,
@@ -73,7 +74,7 @@ define('Sage/Platform/Mobile/MainToolbar', [
                     count[tools[i].side || 'right'] += 1;
                     var toolTemplate = tools[i].template || this.toolTemplate;
 
-                    domConstruct.place(toolTemplate.apply(tools[i], this.tools[tools[i].id]), this.domNode, 'lastl');
+                    domConstruct.place(toolTemplate.apply(tools[i], this.tools[tools[i].id]), this.domNode, 'last');
                 }
 
                 this.size = Math.max(count.left, count.right);
