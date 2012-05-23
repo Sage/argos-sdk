@@ -327,6 +327,16 @@
     height: 24px;
 }
 
+.list .item-static-icon
+{
+    width: 24px;
+    height: 24px;
+    color: #ff0;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+}
+
 /* grouped list */
 .group-content > h2
 {
