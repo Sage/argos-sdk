@@ -19,26 +19,26 @@ define('Sage/Platform/Mobile/SearchWidget', [
     'dojo/_base/event',
     'dojo/string',
     'dojo/dom-class',
-    'dijit/_Widget',
-    'Sage/Platform/Mobile/_Templated'
+    'dijit/_WidgetBase',
+    './_TemplatedWidgetMixin'
 ], function(
     declare,
     lang,
     event,
     string,
     domClass,
-    _Widget,
-    _Templated
+    _WidgetBase,
+    _TemplatedWidgetMixin
 ) {
-    return declare('Sage.Platform.Mobile.SearchWidget', [_Widget, _Templated], {
+    return declare('Sage.Platform.Mobile.SearchWidget', [_WidgetBase, _TemplatedWidgetMixin], {
         attributeMap: {
             queryValue: { node: 'queryNode', type: 'attribute', attribute: 'value' }
         },
         widgetTemplate: new Simplate([
-            '<div class="search-widget">',
+            '<div class="search-header">',
                 '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="queryNode" data-dojo-attach-event="onfocus:_onFocus,onblur:_onBlur,onkeypress:_onKeyPress" />',
-                '<button class="clear-button" data-dojo-attach-event="onclick: _onClearClick"></button>',
-                '<button class="subHeaderButton searchButton" data-dojo-attach-event="click: search">{%= $.searchText %}</button>',
+                '<button class="search-clear" data-dojo-attach-event="onclick: _onClearClick"></button>',
+                '<button class="search-button sub-header-button" data-dojo-attach-event="click: search">{%= $.searchText %}</button>',
                 '<label data-dojo-attach-point="labelNode">{%= $.searchText %}</label>',
             '</div>'
         ]),

@@ -1,7 +1,46 @@
+/* fixes */
+/* http://code.google.com/p/android/issues/detail?id=6059 */
+.android-6059-fix
+{
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    color: transparent;
+    height: 1px;
+    width: 1px;
+    cursor: default;
+}
+
+/* general */
 html, body
 {
     height: 100%;
     margin: 0;
+}
+
+h3
+{
+	font-size: .75em;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+h4
+{
+	font-size: .5em;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+img
+{
+	border: none 0 black;
 }
 
 /* dojo mobile: themes/common/FixedSplitter.css */
@@ -26,6 +65,7 @@ html, body
 }
 /* dojo mobile: themes/common/FixedSplitter.css */
 
+/* layout */
 .layout-left
 {
     width: 200px;
@@ -36,6 +76,7 @@ html, body
     width: 300px;
 }
 
+/* toolbar */
 .toolbar
 {
     position: absolute;
@@ -49,8 +90,6 @@ html, body
 
     display: block;
     z-index: 10;
-
-    opacity: 0.75;
 }
 
 .toolbar-top
@@ -83,6 +122,37 @@ html, body
     height: 100%;
 }
 
+.toolbar > h1 {
+    overflow: hidden;
+    display: block;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+    line-height: 34px;
+    font-weight: normal;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    z-index: 0;
+}
+
+.toolbar-size-1 > h1
+{
+    left: 50px;
+    right: 50px;
+}
+
+.toolbar-size-2 > h1
+{
+    left: 100px;
+    right: 100px;
+}
+
+/* view */
 .view
 {
     position: absolute;
@@ -94,10 +164,29 @@ html, body
     -moz-box-sizing: border-box;
 
     width: 100%;
-
-    border: dotted 2px white;
 }
 
+.has-toolbar-top > .scroll-container
+{
+    top: 47px !important;
+}
+
+.has-toolbar-bottom > .scroll-container
+{
+    bottom: 47px !important;
+}
+
+.has-search-header > .scroll-container
+{
+    top: 47px !important;
+}
+
+.has-toolbar-top.has-search-header > .scroll-container
+{
+    top: 94px !important;
+}
+
+/* list */
 .scroll-container
 {
     z-index: 1;
@@ -106,9 +195,6 @@ html, body
     bottom: 2px;
     left: 2px;
     right: 2px;
-
-    /* opacity: 0.5; */
-    background: #000;
 
     /*
     box-sizing: border-box;
@@ -124,12 +210,205 @@ html, body
     position: absolute;
 }
 
-.has-toolbar-top > .scroll-container
+.list-content
 {
-    top: 47px !important;
+    margin: 0;
+    padding: 0;
 }
 
-.has-toolbar-bottom > .scroll-container
+.list-content > li
 {
-    bottom: 47px !important;
+    font-size: 1.25em;
+    font-weight: bold;
+    list-style: none;
+    margin: 0;
+    padding: 8px 0px 8px 10px;
+    position: relative;
+    border-bottom: solid 1px #ddd;
+}
+.list-content > li:last-child
+{
+    border-bottom: none;
+}
+
+.list-content > li
+{
+    padding: 8px 32px 8px 36px;
+}
+
+.list-content > li > img.icon,
+.list-content > li > * > img.icon
+{
+    border: none 0 black;
+    margin: 0 .5em 0 0;
+    width: 24px;
+    height: 24px;
+    float: left;
+}
+
+
+.list-content > li > a
+{
+    padding: 8px 32px 8px 36px;
+}
+
+.list-content > li > .item
+{
+    font-weight: normal;
+}
+
+.list-content > li > input.list-selector
+{
+    float: left;
+    margin: 2px 0 0 0px;
+}
+
+.list-more,
+.list-empty
+{
+    display: none;
+    padding: 12px;
+    border-bottom: 1px solid #DDD;
+}
+
+.list-more > .button,
+.list-empty > .button
+{
+    height: 40px;
+    line-height: 40px;
+    cursor: pointer;
+    font-size: .9em;
+}
+
+.list-more > .list-remaining
+{
+    display: none;
+}
+
+.list-content > .loading-indicator
+{
+    display: none;
+}
+
+.has-more .list-more,
+.has-empty .list-empty
+{
+    display: block;
+}
+
+.has-more .list-more > .button,
+.has-empty .list-empty > .button
+{
+    width: 100%;
+}
+
+.has-more .list-remaining
+{
+    display: block;
+    text-align: center;
+    padding: 0px 0 12px 0;
+    font-size: .8em;
+    font-weight: bold;
+}
+
+.is-loading .list-content > .loading-indicator
+{
+    display: block;
+    text-align: center;
+    font-size: 1em;
+    font-weight: normal;
+    line-height: 1.5em;
+    padding: 1em;
+}
+
+.is-loading .list-content > .loading-indicator > div
+{
+	display: inline-block;
+    text-align: center;
+}
+
+/* search */
+.search-header
+{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    display: none;
+    height: 45px;
+    padding: 6px;
+}
+
+.search-header > input
+{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    height: 32px;
+    margin: 0 !important;
+    width: 100%;
+}
+
+.search-header > .search-button
+{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    position: absolute;
+    display: inline-block;
+    height: 32px;
+    width: 64px;
+    right: 6px;
+    top: 6px;
+    border: solid 1px black;
+}
+
+.search-header > .search-clear {
+    position: absolute !important;
+    right: 70px;
+    margin: 1px 1px 0 0 !important;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index:101;
+    width:30px;
+    height:30px;
+}
+
+.search-header > .clear-button
+{
+    right: 70px;
+}
+
+.search-header > label
+{
+    position: absolute;
+    top: 6px;
+    left: 6px;
+}
+
+.search-active > label
+{
+    display: none;
+}
+
+.search-active > .dismiss-button
+{
+    display: block;
+}
+
+.has-search-header > .search-header
+{
+    display: block;
+    position: absolute;
+    top: 45px;
+    width: 100%;
+}
+
+/* button */
+.button
+{
+	height: 30px;
+	line-height: 30px;
+	padding: 0 2px 0 2px;
 }

@@ -20,6 +20,7 @@ define('Sage/Platform/Mobile/View', [
     'dijit/_WidgetBase',
     './_EventMapMixin',
     './_UiComponent',
+    'argos!application',
     'argos!customizations'
 ], function(
     declare,
@@ -28,6 +29,7 @@ define('Sage/Platform/Mobile/View', [
     _WidgetBase,
     _EventMapMixin,
     _UiComponent,
+    application,
     customizations
 ) {
     return declare('Sage.Platform.Mobile.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
@@ -37,6 +39,7 @@ define('Sage/Platform/Mobile/View', [
         layout: null,
         security: null,
         serviceName: false,
+        connectionName: false,
         customizationSet: 'view',
         _getProtoComponentDeclarations: function() {
             var customizationSet = customizations();
@@ -177,12 +180,15 @@ define('Sage/Platform/Mobile/View', [
 
             this.onTransitionAway(this);
         },
+        /**
+         * @deprecated
+         * @return {*}
+         */
         getService: function() {
-            /// <summary>
-            ///     Returns the primary SDataService instance for the view.
-            /// </summary>
-            /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>
-            return App.getService(this.serviceName); /* if false is passed, the default service will be returned */
+            return this.getConnection();
+        },
+        getConnection: function() {
+            return application().getConnection(this.connectionName || this.serviceName);
         },
         getTag: function() {
         },
