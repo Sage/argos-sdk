@@ -1,4 +1,4 @@
-define('Fields/SignatureFieldTests', ['dojo/query','Sage/Platform/Mobile/Fields/SignatureField'], function(query, Signature) {
+define('Fields/SignatureFieldTests', ['Sage/Platform/Mobile/Fields/SignatureField'], function(Signature) {
 return describe('Sage.Platform.Mobile.Fields.SignatureField', function() {
 
     it('Can clear value', function() {
