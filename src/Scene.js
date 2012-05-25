@@ -101,10 +101,16 @@ define('Sage/Platform/Mobile/Scene', [
             var definition = this._registeredViews[name];
             if (definition)
             {
-                require([definition.type], lang.hitch(this, this._showViewOnRequired, name, options, definition));
+                /* todo: figure out why a `setTimeout` is required here */
+                /* if `require` is called within a `require` as part of `dojo/domReady!`, the
+                   page `load` event will not fire. */
+                setTimeout(lang.hitch(this, this._loadView, name, options, definition, at), 0);
             }
         },
-        _showViewOnRequired: function(name, options, definition, ctor) {
+        _loadView: function(name, options, definition, at) {
+            require([definition.type], lang.hitch(this, this._showViewOnRequired, name, options, definition, at));
+        },
+        _showViewOnRequired: function(name, options, definition, at, ctor) {
             /* todo: always replace id with name? */
             var instance = new ctor(lang.mixin({id: name}, definition.props));
 
@@ -114,7 +120,7 @@ define('Sage/Platform/Mobile/Scene', [
             this._instancedViews[name] = instance;
 
             if (this.layout)
-                this.layout.show(instance, options);
+                this.layout.show(instance, options, at);
         }
     });
 });

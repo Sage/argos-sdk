@@ -1,6 +1,29 @@
 body
 {
-    background: #fbfdf0;
+	font-family: Helvetica, Arial;
+	background: #fbfdf0;
+	color: #000;
+}
+
+h3
+{
+    font-size: 1em;
+    font-weight: normal;
+}
+
+h4
+{
+    color: #00338D;
+    font-weight: normal;
+    font-size: .75em;
+}
+
+h5
+{
+    margin: 0;
+    padding: 0;
+    font-size: .8em;
+    font-weight: normal;
 }
 
 /* layout */

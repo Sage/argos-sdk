@@ -21,10 +21,10 @@ define('Sage/Platform/Mobile/Application', [
     'dojo/_base/lang',
     'dojo/_base/window',
     'dojo/string',
+    './Utility',
     './_Component',
     './Scene',
-    './CustomizationSet',
-    './Utility'
+    './CustomizationSet'
 ], function(
     json,
     array,
@@ -33,14 +33,14 @@ define('Sage/Platform/Mobile/Application', [
     lang,
     win,
     string,
+    utility,
     _Component,
     Scene,
-    CustomizationSet,
-    Utility
+    CustomizationSet
 ) {
     
     lang.extend(Function, {
-        bindDelegate: Utility.bindDelegate
+        bindDelegate: utility.bindDelegate
     });
 
     var applyLocalizationTo = function(object, localization) {
@@ -175,7 +175,7 @@ define('Sage/Platform/Mobile/Application', [
             this._started = true;
         },
         run: function() {
-            this.startup();
+
         },
         isOnline: function() {
             return window.navigator.onLine;

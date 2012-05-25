@@ -166,35 +166,15 @@ img
     width: 100%;
 }
 
-.has-toolbar-top > .scroll-container
-{
-    top: 47px !important;
-}
-
-.has-toolbar-bottom > .scroll-container
-{
-    bottom: 47px !important;
-}
-
-.has-search-header > .scroll-container
-{
-    top: 47px !important;
-}
-
-.has-toolbar-top.has-search-header > .scroll-container
-{
-    top: 94px !important;
-}
-
 /* list */
 .scroll-container
 {
     z-index: 1;
     position: absolute;
-    top: 47px;
-    bottom: 2px;
-    left: 2px;
-    right: 2px;
+    top: 45px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
 
     /*
     box-sizing: border-box;
@@ -205,9 +185,30 @@ img
     overflow: auto;
 }
 
+.has-toolbar-top > .scroll-container
+{
+    top: 45px !important;
+}
+
+.has-toolbar-bottom > .scroll-container
+{
+    bottom: 45px !important;
+}
+
+.has-search-header > .scroll-container
+{
+    top: 45px !important;
+}
+
+.has-toolbar-top.has-search-header > .scroll-container
+{
+    top: 90px !important;
+}
+
 .scroll-content
 {
     position: absolute;
+    width: 100%;
 }
 
 .list-content
@@ -222,18 +223,14 @@ img
     font-weight: bold;
     list-style: none;
     margin: 0;
-    padding: 8px 0px 8px 10px;
+    padding: 8px 32px 8px 36px;
     position: relative;
     border-bottom: solid 1px #ddd;
+    cursor: pointer;
 }
 .list-content > li:last-child
 {
     border-bottom: none;
-}
-
-.list-content > li
-{
-    padding: 8px 32px 8px 36px;
 }
 
 .list-content > li > img.icon,
@@ -245,7 +242,6 @@ img
     height: 24px;
     float: left;
 }
-
 
 .list-content > li > a
 {
@@ -336,6 +332,7 @@ img
     display: none;
     height: 45px;
     padding: 6px;
+    z-index: 5;
 }
 
 .search-header > input

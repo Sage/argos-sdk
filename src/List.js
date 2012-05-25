@@ -147,13 +147,29 @@ define('Sage/Platform/Mobile/List', [
         }
     });
 
+    var parseOrderByRE = /((?:\w+)(?:\.\w+)?)(?:\s+(asc|desc))?/g,
+        parseOrderBy = function(expression) {
+            if (typeof expression !== 'string') return expression;
+
+            var match,
+                result = [];
+
+            while (match = parseOrderByRE.exec(expression))
+            {
+                result.push({
+                    attribute: match[1],
+                    descending: match[2] && match[2].toLowerCase() == 'desc'
+                });
+            }
+
+            return result;
+        };
+
     var List = declare('Sage.Platform.Mobile.List', [View], {
+        events: {
+            'click': true
+        },
         baseClass: 'view list has-search-header',
-        contentNode:null,
-        remainingContentNode: null,
-        emptySelectionNode: null,
-        remainingNode: null,
-        moreNode: null,
         components: [
             {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
             {name: 'search', type: SearchWidget, attachEvent: 'onSearchExpression:_onSearchExpression'},
@@ -171,6 +187,11 @@ define('Sage/Platform/Mobile/List', [
                 ]}
             ]}
         ],
+        contentNode:null,
+        remainingContentNode: null,
+        emptySelectionNode: null,
+        remainingNode: null,
+        moreNode: null,
         _setListContentAttr: {node: 'contentNode', type: 'innerHTML'},
         _setRemainingContentAttr: {node: 'remainingContentNode', type: 'innerHTML'},
         /**
@@ -362,8 +383,6 @@ define('Sage/Platform/Mobile/List', [
          * @type {String}
          */
         requestErrorText: 'A server error occurred while requesting data.',
-        customizationSet: 'list',
-        moreText: 'More',
         customizationSet: 'list',
         _selectionModel: null,
         _selectionConnects: null,
@@ -570,9 +589,8 @@ define('Sage/Platform/Mobile/List', [
             /**
              * for backwards compatibility, check for an implementation of `createRequest` that differs from
              * the above.
-             *
-             * todo: should we keep this considering `processFeed` is no longer used?
              */
+            /* todo: should we keep this considering `processFeed` is no longer used? */
             if (this.constructor.prototype.createRequest !== List.prototype.createRequest)
             {
                 return new SDataStore({
@@ -585,24 +603,20 @@ define('Sage/Platform/Mobile/List', [
             {
                 return new SDataStore({
                     service: this.getConnection(),
-                    contractName: this.contractName,
-                    resourceKind: this.resourceKind,
-                    resourceProperty: this.resourceProperty,
-                    resourcePredicate: this.resourcePredicate,
-                    orderBy: this.queryOrderBy,
-                    include: this.queryInclude,
-                    select: this.querySelect,
-                    where: this.queryWhere,
+                    contractName: this.expandExpression(this.contractName),
+                    resourceKind: this.expandExpression(this.resourceKind),
+                    resourceProperty: this.expandExpression(this.resourceProperty),
+                    resourcePredicate: this.expandExpression(this.resourcePredicate),
+                    include: this.expandExpression(this.queryInclude),
+                    select: this.expandExpression(this.querySelect),
+                    where: this.expandExpression(this.queryWhere),
+                    orderBy: this.expandExpression(this.queryOrderBy),
                     labelAttribute: this.descriptorProperty,
                     identityAttribute: this.keyProperty
                 });
             }
         },
         navigateToDetailView: function(key, descriptor) {
-            /// <summary>
-            ///     Navigates to the requested detail view.
-            /// </summary>
-            /// <param name="el" type="Ext.Element">The element that initiated the navigation.</param>
             var view = App.getView(this.detailView);
             if (view)
                 view.show({
@@ -664,44 +678,56 @@ define('Sage/Platform/Mobile/List', [
 
             domClass.remove(this.domNode, 'is-loading');
         },
-        _onFetchError: function(error, options, xhr, xhrOptions) {
-            alert(string.substitute(this.requestErrorText, [error, options, xhr, xhrOptions]));
+        _onFetchError: function(error, keywordArgs, xhr, xhrOptions) {
+            alert(string.substitute(this.requestErrorText, [error, keywordArgs, xhr, xhrOptions]));
             ErrorManager.addError(xhr, xhrOptions, this.options, 'failure');
             domClass.remove(this.domNode, 'is-loading');
         },
-        _onFetchAbort: function(error, options, xhr, xhrOptions) {
+        _onFetchAbort: function(error, keywordArgs, xhr, xhrOptions) {
             this.options = false; // force a refresh
             ErrorManager.addError(xhr, xhrOptions, this.options, 'aborted');
             domClass.remove(this.domNode, 'is-loading');
+        },
+        _parseOrderBy: function() {
+
         },
         requestData: function() {
             domClass.add(this.domNode, 'is-loading');
 
             var store = this.store || (this.store = this.createStore()),
-                options = this.options;
+                options = this.options,
+                conditions = [],
+                keywordArgs = {
+                    scope: this,
+                    onBegin: this._onFetchBegin,
+                    onError: this._onFetchError,
+                    onAbort: this._onFetchAbort,
+                    onComplete: this._onFetchComplete,
+                    count: this.pageSize,
+                    start: this.position
+                };
 
-            return store.fetch({
-                /* common options */
-                start: this.position,
-                count: this.pageSize,
-                sort: options && (options.sort || options.orderBy), /* `orderBy` is @deprecated */
-                query: options && (options.query || options.where), /* `where` is @deprecated */
+            if (options && options.where)
+                conditions.push(this.expandExpression(options.where));
 
-                /* sdata only options */
-                contractName: options && options.contractName,
-                resourceKind: options && options.resourceKind,
-                resourceProperty: options && options.resourceProperty,
-                resourcePredicate: options && options.resourcePredicate,
-                select: options && options.select,
-                include: options && options.include,
+            if (this.query)
+                conditions.push(this.query);
 
-                /* callbacks */
-                scope: this,
-                onBegin: this._onFetchBegin,
-                onComplete: this._onFetchComplete,
-                onError: this._onFetchError,
-                onAbort: this._onFetchAbort
-            });
+            if (conditions.length > 0)
+                keywordArgs.query = ('(' + conditions.join(') and (') + ')');
+
+            if (options)
+            {
+                if (options.select) keywordArgs.select = this.expandExpression(options.select);
+                if (options.include) keywordArgs.include = this.expandExpression(options.include);
+                if (options.orderBy) keywordArgs.sort = parseOrderBy(this.expandExpression(options.orderBy));
+                if (options.contractName) keywordArgs.contractName = this.expandExpression(options.contractName);
+                if (options.resourceKind) keywordArgs.resourceKind = this.expandExpression(options.resourceKind);
+                if (options.resourceProperty) keywordArgs.resourceProperty = this.expandExpression(options.resourceProperty);
+                if (options.resourcePredicate) keywordArgs.resourcePredicate = this.expandExpression(options.resourcePredicate);
+            }
+
+            return store.fetch(keywordArgs);
         },
         more: function() {
             /// <summary>
@@ -723,7 +749,6 @@ define('Sage/Platform/Mobile/List', [
             {
                 if (options)
                 {
-                    if (this.expandExpression(this.options.stateKey) != this.expandExpression(options.stateKey)) return true;
                     if (this.expandExpression(this.options.where) != this.expandExpression(options.where)) return true;
                     if (this.expandExpression(this.options.query) != this.expandExpression(options.query)) return true;
                     if (this.expandExpression(this.options.resourceKind) != this.expandExpression(options.resourceKind)) return true;
@@ -743,8 +768,8 @@ define('Sage/Platform/Mobile/List', [
         beforeTransitionTo: function() {
             this.inherited(arguments);
 
-            domClass.toggle(this.domNode, 'list-hide-search', this.hideSearch);
-            domClass.toggle(this.domNode, 'list-show-selectors', !this.isSelectionDisabled());
+            domClass.toggle(this.domNode, 'has-search', this.hideSearch);
+            domClass.toggle(this.domNode, 'has-selectors', !this.isSelectionDisabled());
 
             if (this._selectionModel && !this.isSelectionDisabled())
                 this._selectionModel.useSingleSelection(this.options.singleSelect);
