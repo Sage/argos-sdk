@@ -181,7 +181,7 @@ define('Sage/Platform/Mobile/List', [
                     ]},
                     {name: 'content', tag: 'ul', attrs: {'class': 'list-content'}, attachPoint: 'contentNode'},
                     {name: 'more', tag: 'div', attrs: {'class': 'list-more'}, components: [
-                        {name: 'moreRemaining', tag: 'span', attachPoint: 'remainingContentNode'},
+                        {name: 'moreRemaining', tag: 'span', attrs: {'class': 'list-remaining'}, attachPoint: 'remainingContentNode'},
                         {name: 'moreButton', content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
                     ]}
                 ]}

@@ -88,12 +88,16 @@ define('Sage/Platform/Mobile/Scene', [
         hasView: function(name) {
             return !!(this._instancedViews[name] || this._registeredViews[name]);
         },
-        showView: function(name, options, at) { /* todo: at will not be passed, but determined */
+        hideView: function(view) {
+            this._hideViewInstance(view);
+        },
+        showView: function(name, options, at) {
             var instance = this._instancedViews[name];
             if (instance)
             {
-                if (this.layout)
-                    this.layout.show(instance, options, at);
+                /* the instance may be active somewhere, hide it */
+                this._hideViewInstance(instance);
+                this._showViewInstance(instance, options, at);
 
                 return;
             }
@@ -107,6 +111,22 @@ define('Sage/Platform/Mobile/Scene', [
                 setTimeout(lang.hitch(this, this._loadView, name, options, definition, at), 0);
             }
         },
+        _hideViewInstance: function(view) {
+            /* todo: navigation context tracking */
+
+            /* we've removed it from the logical representation of the view state, now we */
+            /* remove it from the physical representation of the view state */
+            if (this.layout)
+                this.layout.hide(view);
+        },
+        _showViewInstance: function(view, options, at) {
+            /* todo: navigation context tracking */
+
+            /* we've added it to the logical representation of the view state, now we */
+            /* add it to the physical representation of the view state */
+            if (this.layout)
+                this.layout.show(view, options, at);
+        },
         _loadView: function(name, options, definition, at) {
             require([definition.type], lang.hitch(this, this._showViewOnRequired, name, options, definition, at));
         },
@@ -119,8 +139,8 @@ define('Sage/Platform/Mobile/Scene', [
 
             this._instancedViews[name] = instance;
 
-            if (this.layout)
-                this.layout.show(instance, options, at);
+            /* the instance is new, so no need to hide it */
+            this._showViewInstance(instance, options, at);
         }
     });
 });

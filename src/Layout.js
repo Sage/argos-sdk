@@ -30,22 +30,34 @@ define('Sage/Platform/Mobile/Layout', [
 ) {
     return declare('Sage.Platform.Mobile.Layout', [FixedSplitter, _UiComponent], {
         orientation: 'H',
+        panes: null,
         components: [
-            {type: Pane, attachPoint: 'left', props:{'class':'layout-left'}},
-            {type: Pane, attachPoint: 'center', props:{'class':'layout-center'}},
-            {type: Pane, attachPoint: 'right', props:{'class':'layout-right'}}
+            {name: 'left', type: Pane, attachPoint: 'panes.left', props:{'class':'layout-left'}},
+            {name: 'right', type: Pane, attachPoint: 'panes.center', props:{'class':'layout-center'}},
+            {name: 'center', type: Pane, attachPoint: 'panes.right', props:{'class':'layout-right'}}
         ],
-        postCreate: function() {
-            /* todo: buffer this? */
-            this.connect(window, 'onresize', this.resize);
+        constructor: function() {
+            this.panes = {};
         },
         startup: function() {
+            this.connect(window, 'onresize', this.resize);
+
             this.inherited(arguments);
         },
         show: function(view, options, at) {
             /* for now, just show it in the chosen container */
             /* is it going to be performant to move DOM nodes around? */
-            this[at || 'right'].show(view, options);
+            this.panes[at || 'right'].show(view, options);
+        },
+        hide: function(view) {
+            /*
+            for (var name in this.panes)
+            {
+                var pane = this.panes[name];
+                if (pane.active === view)
+                    pane.remove(view);
+            }
+            */
         }
     });
 });

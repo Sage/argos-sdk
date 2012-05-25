@@ -103,6 +103,7 @@ define('Sage/Platform/Mobile/View', [
          */
         onShow: function(self) {
         },
+        /*
         activate: function(tag, data) {
             // todo: use tag only?
             if (data && this.refreshRequiredFor(data.options))
@@ -134,6 +135,7 @@ define('Sage/Platform/Mobile/View', [
 
             ReUI.show(this.domNode, lang.mixin(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
         },
+        */
         /**
          * @param expression
          * @return {*}

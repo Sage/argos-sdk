@@ -16,6 +16,7 @@
 define('Sage/Platform/Mobile/Pane', [
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/dom-style',
     'dojox/mobile/FixedSplitterPane',
     './_UiComponent',
     './Toolbar',
@@ -23,6 +24,7 @@ define('Sage/Platform/Mobile/Pane', [
 ], function(
     declare,
     lang,
+    domStyle,
     FixedSplitterPane,
     _UiComponent,
     Toolbar,
@@ -31,8 +33,8 @@ define('Sage/Platform/Mobile/Pane', [
     return declare('Sage.Platform.Mobile.Pane', [FixedSplitterPane, _UiComponent], {
         components: [
             /* todo: let a view own its toolbar? */
-
         ],
+        active: null,
         show: function(view, options) {
             /* - add the new view to this domNode
              * - do transition, remove old view from domNode ?
@@ -43,7 +45,17 @@ define('Sage/Platform/Mobile/Pane', [
              *   where views are assigned directly to containers?
              */
 
+            /*
+            domStyle.set(view.domNode, {
+                'display': 'none'
+            });
+            */
             view.placeAt(this.domNode);
+
+
+            if (this.active)
+            {
+            }
         }
     });
 });
