@@ -178,6 +178,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
         },
         createNavigationOptions: function() {
             var options = this.inherited(arguments);
+            options.hideSearch = true;
             options.data = this.expandExpression(this.data);
             return options;
         },

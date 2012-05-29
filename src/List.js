@@ -797,7 +797,10 @@ define('Sage/Platform/Mobile/List', [
         beforeTransitionTo: function() {
             this.inherited(arguments);
 
-            domClass.toggle(this.domNode, 'list-hide-search', this.hideSearch);
+            domClass.toggle(this.domNode, 'list-hide-search', (this.options && typeof this.options.hideSearch !== 'undefined')
+                ? this.options.hideSearch
+                : this.hideSearch);
+
             domClass.toggle(this.domNode, 'list-show-selectors', !this.isSelectionDisabled());
 
             if (this._selectionModel && !this.isSelectionDisabled())
