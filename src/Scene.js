@@ -36,7 +36,7 @@ define('Sage/Platform/Mobile/Scene', [
         _registeredViews: null,
         _instancedViews: null,
         _state: null,
-
+        _panes: null,
         components: [
             {type: Layout, attachPoint: 'layout'}
         ],
@@ -46,12 +46,22 @@ define('Sage/Platform/Mobile/Scene', [
             this._registeredViews = {};
             this._instancedViews = {};
 
-            this._state = {};
+            this._state = [];
+            this._panes = [];
 
             lang.mixin(this, options);
         },
         startup: function() {
             this.layout.placeAt(win.body());
+
+            for (var name in this.layout.panes)
+            {
+                var pane = this.layout.panes[name];
+                if (pane.tier !== false)
+                {
+                    this._panes[pane.tier] = pane;
+                }
+            }
 
             this.inherited(arguments);
         },
@@ -63,7 +73,11 @@ define('Sage/Platform/Mobile/Scene', [
                 this._instancedViews[name].destroy();
             }
 
+            this._registeredViews = null;
             this._instancedViews = null;
+
+            this._state = null;
+            this._panes = null;
         },
         registerViews: function(definitions) {
             for (var name in definitions)
@@ -88,15 +102,10 @@ define('Sage/Platform/Mobile/Scene', [
         hasView: function(name) {
             return !!(this._instancedViews[name] || this._registeredViews[name]);
         },
-        hideView: function(view) {
-            this._hideViewInstance(view);
-        },
         showView: function(name, options, at) {
             var instance = this._instancedViews[name];
             if (instance)
             {
-                /* the instance may be active somewhere, hide it */
-                this._hideViewInstance(instance);
                 this._showViewInstance(instance, options, at);
 
                 return;
@@ -111,19 +120,22 @@ define('Sage/Platform/Mobile/Scene', [
                 setTimeout(lang.hitch(this, this._loadView, name, options, definition, at), 0);
             }
         },
-        _hideViewInstance: function(view) {
-            /* todo: navigation context tracking */
+        _createStateSet: function(view, at) {
 
-            /* we've removed it from the logical representation of the view state, now we */
-            /* remove it from the physical representation of the view state */
-            if (this.layout)
-                this.layout.hide(view);
         },
         _showViewInstance: function(view, options, at) {
+            if (typeof at === 'number') at = {tier: at};
+            if (typeof at === 'string') at = {tier: this.layout.panes[at].tier};
+
+            at = at || {tier: view.tier};
+
             /* todo: navigation context tracking */
 
             /* we've added it to the logical representation of the view state, now we */
             /* add it to the physical representation of the view state */
+
+
+
             if (this.layout)
                 this.layout.show(view, options, at);
         },
@@ -139,7 +151,6 @@ define('Sage/Platform/Mobile/Scene', [
 
             this._instancedViews[name] = instance;
 
-            /* the instance is new, so no need to hide it */
             this._showViewInstance(instance, options, at);
         }
     });

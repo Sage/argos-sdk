@@ -32,9 +32,9 @@ define('Sage/Platform/Mobile/Layout', [
         orientation: 'H',
         panes: null,
         components: [
-            {name: 'left', type: Pane, attachPoint: 'panes.left', props:{'class':'layout-left'}},
-            {name: 'right', type: Pane, attachPoint: 'panes.center', props:{'class':'layout-center'}},
-            {name: 'center', type: Pane, attachPoint: 'panes.right', props:{'class':'layout-right'}}
+            {name: 'navigation', type: Pane, attachPoint: 'panes.navigation', props:{'class':'layout-left', tier: false}},
+            {name: 'list', type: Pane, attachPoint: 'panes.list', props:{'class':'layout-center', tier: 0}},
+            {name: 'detail', type: Pane, attachPoint: 'panes.detail', props:{'class':'layout-right', tier: 1}}
         ],
         constructor: function() {
             this.panes = {};
@@ -44,10 +44,11 @@ define('Sage/Platform/Mobile/Layout', [
 
             this.inherited(arguments);
         },
+        /* todo: remove from the layout */
         show: function(view, options, at) {
             /* for now, just show it in the chosen container */
             /* is it going to be performant to move DOM nodes around? */
-            this.panes[at || 'right'].show(view, options);
+            this.panes[at || 'detail'].show(view, options);
         },
         hide: function(view) {
             /*
