@@ -22,10 +22,11 @@ define('Sage/Platform/Mobile/Detail', [
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/query',
-    'Sage/Platform/Mobile/Format',
-    'Sage/Platform/Mobile/Utility',
-    'Sage/Platform/Mobile/ErrorManager',
-    'Sage/Platform/Mobile/View'
+    './Format',
+    './Utility',
+    './ErrorManager',
+    './View',
+    './Data/SDataStore'
 ], function(
     dojo,
     declare,
@@ -38,19 +39,21 @@ define('Sage/Platform/Mobile/Detail', [
     format,
     utility,
     ErrorManager,
-    View
+    View,
+    SDataStore
 ) {
 
-    return declare('Sage.Platform.Mobile.Detail', [View], {
-        attributeMap: {
-            detailContent: {node: 'contentNode', type: 'innerHTML'}
+    var Detail = declare('Sage.Platform.Mobile.Detail', [View], {
+        events: {
+            'click': true
         },
-        widgetTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="detail panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
-            '{%! $.loadingTemplate %}',
-            '<div class="panel-content" data-dojo-attach-point="contentNode"></div>',
-            '</div>'
-        ]),
+        components: [
+            {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
+            {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
+            {name: 'content', tag: 'div', attrs: {'class': 'detail-content'}, attachPoint: 'contentNode'}
+        ],
+        baseClass: 'view detail',
+        _setDetailContentAttr: {node: 'contentNode', type: 'innerHTML'},
         emptyTemplate: new Simplate([
         ]),
         loadingTemplate: new Simplate([
@@ -125,11 +128,11 @@ define('Sage/Platform/Mobile/Detail', [
         notAvailableTemplate: new Simplate([
             '<div class="not-available">{%: $.notAvailableText %}</div>'
         ]),
-        id: 'generic_detail',
+        keyProperty: '$key',
+        descriptorProperty: '$descriptor',
         layout: null,
         security: false,
         customizationSet: 'detail',
-        expose: false,
         editText: 'Edit',
         titleText: 'Detail',
         detailsText: 'Details',
@@ -140,7 +143,7 @@ define('Sage/Platform/Mobile/Detail', [
         editView: false,
         _navigationOptions: null,
 
-        postCreate: function() {
+        startup: function() {
             this.inherited(arguments);
             this.subscribe('/app/refresh', this._onRefresh);
             this.clear();
@@ -227,6 +230,128 @@ define('Sage/Platform/Mobile/Detail', [
                 request.setContractName(this.contractName);
 
             return request;
+        },
+        createStore: function() {
+                    /**
+         * for backwards compatibility, check for an implementation of `createRequest` that differs from
+         * the above.
+         */
+        /* todo: should we keep this considering `processFeed` is no longer used? */
+        if (this.constructor.prototype.createRequest !== Detail.prototype.createRequest)
+        {
+            return new SDataStore({
+                request: this.createRequest(),
+                labelAttribute: this.descriptorProperty,
+                identityAttribute: this.keyProperty
+            });
+        }
+        else
+        {
+            return new SDataStore({
+                service: this.getConnection(),
+                contractName: this.expandExpression(this.contractName),
+                resourceProperty: this.expandExpression(this.resourceProperty),
+                resourcePredicate: this.expandExpression(this.resourcePredicate),
+                include: this.expandExpression(this.queryInclude),
+                select: this.expandExpression(this.querySelect),
+                where: this.expandExpression(this.queryWhere),
+                orderBy: this.expandExpression(this.queryOrderBy),
+                labelAttribute: this.descriptorProperty,
+                identityAttribute: this.keyProperty
+            });
+        }
+    },
+        _onFetchBegin: function(size, request) {
+            if (size === 0)
+            {
+                this.set('listContent', this.noDataTemplate.apply(this));
+            }
+            else
+            {
+                var remaining = size > -1
+                    ? size - (request['start'] + request['count'])
+                    : -1;
+
+                if (remaining !== -1)
+                    this.set('remainingContent', string.substitute(this.remainingText, [remaining]));
+
+                domClass.toggle(this.domNode, 'has-more', (remaining === -1 || remaining > 0));
+
+                this.position = this.position + request['count'];
+            }
+
+            /* todo: move to a more appropriate location */
+            if (this.options && this.options.allowEmptySelection) domClass.add(this.domNode, 'has-empty');
+        },
+        _onFetchComplete: function(items, request) {
+            var count = items.length;
+            if (count > 0)
+            {
+                var output = [];
+
+                for (var i = 0; i < count; i++)
+                {
+                    var item = items[i];
+
+                    this.items[this.store.getIdentity(item)] = item;
+
+                    output.push(this.rowTemplate.apply(item, this));
+                }
+
+                query(this.contentNode).append(output.join(''));
+            }
+
+            domClass.remove(this.domNode, 'is-loading');
+
+            this.onContentChange();
+        },
+        _onFetchError: function(error, keywordArgs, xhr, xhrOptions) {
+            alert(string.substitute(this.requestErrorText, [error, keywordArgs, xhr, xhrOptions]));
+            ErrorManager.addError(xhr, xhrOptions, this.options, 'failure');
+            domClass.remove(this.domNode, 'is-loading');
+        },
+        _onFetchAbort: function(error, keywordArgs, xhr, xhrOptions) {
+            this.options = false; // force a refresh
+            ErrorManager.addError(xhr, xhrOptions, this.options, 'aborted');
+            domClass.remove(this.domNode, 'is-loading');
+        },
+        requestData: function() {
+            domClass.add(this.domNode, 'is-loading');
+
+            var store = this.store || (this.store = this.createStore()),
+                options = this.options,
+                conditions = [],
+                keywordArgs = {
+                    scope: this,
+                    onBegin: this._onFetchBegin,
+                    onError: this._onFetchError,
+                    onAbort: this._onFetchAbort,
+                    onComplete: this._onFetchComplete,
+                    count: this.pageSize,
+                    start: this.position
+                };
+
+            if (options && options.where)
+                conditions.push(this.expandExpression(options.where));
+
+            if (this.query)
+                conditions.push(this.query);
+
+            if (conditions.length > 0)
+                keywordArgs.query = ('(' + conditions.join(') and (') + ')');
+
+            if (options)
+            {
+                if (options.select) keywordArgs.select = this.expandExpression(options.select);
+                if (options.include) keywordArgs.include = this.expandExpression(options.include);
+                if (options.orderBy) keywordArgs.sort = parseOrderBy(this.expandExpression(options.orderBy));
+                if (options.contractName) keywordArgs.contractName = this.expandExpression(options.contractName);
+                if (options.resourceKind) keywordArgs.resourceKind = this.expandExpression(options.resourceKind);
+                if (options.resourceProperty) keywordArgs.resourceProperty = this.expandExpression(options.resourceProperty);
+                if (options.resourcePredicate) keywordArgs.resourcePredicate = this.expandExpression(options.resourcePredicate);
+            }
+
+            return store.fetch(keywordArgs);
         },
         createLayout: function() {
             return this.layout || [];
@@ -436,12 +561,6 @@ define('Sage/Platform/Mobile/Detail', [
 
             this.inherited(arguments);
         },
-        show: function(options) {
-            if (options && options.descriptor)
-                options.title = options.title || options.descriptor;
-
-            this.inherited(arguments);
-        },
         getTag: function() {
             return this.options && this.options.key;
         },
@@ -473,9 +592,11 @@ define('Sage/Platform/Mobile/Detail', [
             this.inherited(arguments);
         },
         clear: function() {
-            this.set('detailContent', this.emptyTemplate.apply(this));
+            this.set('detailContent', this.loadingTemplate.apply(this));
 
             this._navigationOptions = [];
         }
     });
+
+    return Detail;
 });

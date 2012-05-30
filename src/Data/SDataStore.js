@@ -10,7 +10,6 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
     string
 ) {
     return declare('Sage.Data.SDataStore', null, {
-        executeReadWith: 'read',
         where: null,
         select: null,
         include: null,
@@ -24,6 +23,8 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
         labelAttribute: '$descriptor',
         identityAttribute: '$key',
         itemsAttribute: '$resources',
+        executeFetchAs: null,
+        executeFetchItemAs: null,
         constructor: function(options) {
             lang.mixin(this, options);
 
@@ -41,7 +42,49 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             else
                 return expression;
         },
-        _createRequest: function(keywordArgs) {
+        _createEntryRequest: function(keywordArgs) {
+            var request = this.expandExpression(keywordArgs.request || this.request);
+            if (request)
+            {
+                request = request.clone();
+            }
+            else
+            {
+                var contractName = this.expandExpression(keywordArgs.contractName || this.contractName),
+                    resourceKind = this.expandExpression(keywordArgs.resourceKind || this.resourceKind),
+                    resourceProperty = this.expandExpression(keywordArgs.resourceProperty || this.resourceProperty),
+                    resourcePredicate = keywordArgs.identity
+                        ? string.substitute("'${0}'", [keywordArgs.identity])
+                        : this.expandExpression(keywordArgs.resourcePredicate || this.resourcePredicate);
+
+                if (resourceProperty)
+                {
+                    request = new Sage.SData.Client.SDataResourcePropertyRequest(this.service)
+                        .setResourceProperty(resourceProperty)
+                        .setResourceSelector(resourcePredicate);
+                }
+                else
+                {
+                    request = new Sage.SData.Client.SDataSingleResourceRequest(this.service)
+                        .setResourceSelector(resourcePredicate);
+                }
+
+                if (contractName) request.setContractName(contractName);
+                if (resourceKind) request.setResourceKind(resourceKind);
+            }
+
+            var select = this.expandExpression(keywordArgs.select || this.select),
+                include = this.expandExpression(keywordArgs.include || this.include);
+
+            if (select && select.length > 0)
+                request.setQueryArg('select', select.join(','));
+
+            if (include && include.length > 0)
+                request.setQueryArg('include', include.join(','));
+
+            return request;
+        },
+        _createFeedRequest: function(keywordArgs) {
             var request = this.expandExpression(keywordArgs.request || this.request);
             if (request)
             {
@@ -55,14 +98,26 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
                     resourceProperty = this.expandExpression(keywordArgs.resourceProperty || this.resourceProperty),
                     resourcePredicate = this.expandExpression(keywordArgs.resourcePredicate || this.resourcePredicate);
 
-                request = queryName
-                    ? new Sage.SData.Client.SDataNamedQueryRequest(this.service).setQueryName(queryName)
-                    : new Sage.SData.Client.SDataResourceCollectionRequest(this.service);
+                if (queryName)
+                {
+                    request = new Sage.SData.Client.SDataNamedQueryRequest(this.service)
+                        .setQueryName(queryName);
+
+                    if (resourcePredicate) request.getUri().setCollectionPredicate(resourcePredicate);
+                }
+                else if (resourceProperty)
+                {
+                    request = new Sage.SData.Client.SDataResourcePropertyRequest(this.service)
+                        .setResourceProperty(resourceProperty)
+                        .setResourceSelector(resourcePredicate);
+                }
+                else
+                {
+                    request = new Sage.SData.Client.SDataResourceCollectionRequest(this.service);
+                }
 
                 if (contractName) request.setContractName(contractName);
                 if (resourceKind) request.setResourceKind(resourceKind);
-                if (resourceProperty) request.getUri().setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, resourceProperty);
-                if (resourcePredicate) request.getUri().setCollectionPredicate(resourcePredicate);
             }
 
             var select = this.expandExpression(keywordArgs.select || this.select),
@@ -114,27 +169,47 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             return request;
         },
         fetch: function(keywordArgs) {
-            var request = this._createRequest(keywordArgs),
+            var request = this._createFeedRequest(keywordArgs),
                 requestObject = lang.mixin({
                     store: this
                 }, keywordArgs);
-            var handle = request[this.executeReadWith]({
-                success: lang.hitch(this, this._onFetchSuccess, keywordArgs, requestObject),
-                failure: lang.hitch(this, this._onFetchFailure, keywordArgs, requestObject),
-                abort: lang.hitch(this, this._onFetchAbort, keywordArgs, requestObject),
+
+            var method = this.executeFetchAs
+                ? request[this.executeFetchAs]
+                : request instanceof Sage.SData.Client.SDataResourcePropertyRequest
+                    ? request.readFeed
+                    : request.read;
+
+            var handle = method.call(request, {
+                success: lang.hitch(this, this._onRequestFeedSuccess, keywordArgs, requestObject),
+                failure: lang.hitch(this, this._onRequestFailure, keywordArgs, requestObject),
+                abort: lang.hitch(this, this._onRequestAbort, keywordArgs, requestObject),
                 httpMethodOverride: keywordArgs.queryOptions && keywordArgs.queryOptions['httpMethodOverride']
             });
+
             requestObject['abort'] = lang.hitch(this, this._abortRequest, handle);
+
             return requestObject;
         },
         fetchItemByIdentity: function(keywordArgs) {
-            var predicate = (/(\s+)/.test(keywordArgs.identity))
-                ? keywordArgs.identity
-                : string.substitute("'${0}'", [keywordArgs.identity]);
+            var request = this._createEntryRequest(keywordArgs),
+                requestObject = lang.mixin({
+                    store: this
+                }, keywordArgs);
 
-            return this.fetch(lang.mixin({
-                resourcePredicate: predicate
-            }, keywordArgs));
+            var method = this.executeFetchItemAs
+                ? request[this.executeFetchItemAs]
+                : request.read;
+
+            var handle = method.call(request, {
+                success: lang.hitch(this, this._onRequestEntrySuccess, keywordArgs, requestObject),
+                failure: lang.hitch(this, this._onRequestFailure, keywordArgs, requestObject),
+                abort: lang.hitch(this, this._onRequestAbort, keywordArgs, requestObject)
+            });
+
+            requestObject['abort'] = lang.hitch(this, this._abortRequest, handle);
+
+            return requestObject;
         },
         close: function(request) {
             request.abort();
@@ -142,18 +217,11 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
         _abortRequest: function(handle) {
             this.service.abortRequest(handle);
         },
-        _onFetchSuccess: function(keywordArgs, requestObject, result) {
+        _onRequestFeedSuccess: function(keywordArgs, requestObject, result) {
             if (result)
             {
-                if (result['$resources'])
-                    requestObject['feed'] = result['$resources'];
-                else
-                    requestObject['entry'] = result;
-
                 var items = lang.getObject(this.itemsAttribute, false, result) || [result],
-                    size = result['$resources']
-                        ? result['$totalResults'] || -1
-                        : 1;
+                    size = result['$totalResults'] || -1;
 
                 if (keywordArgs.onBegin)
                     keywordArgs.onBegin.call(keywordArgs.scope || this, size, requestObject);
@@ -171,15 +239,27 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
                     keywordArgs.onError.call(keywordArgs.scope || this, 'invalid feed', keywordArgs);
             }
         },
-        _onFetchFailure: function(keywordArgs, requestObject, xhr, xhrOptions) {
+        _onRequestEntrySuccess: function(keywordArgs, requestObject, result) {
+            if (result)
+            {
+                if (keywordArgs.onItem)
+                    keywordArgs.onItem.call(keywordArgs.scope || this, result, requestObject);
+            }
+            else
+            {
+                if (keywordArgs.onError)
+                    keywordArgs.onError.call(keywordArgs.scope || this, 'invalid feed', keywordArgs);
+            }
+        },
+        _onRequestFailure: function(keywordArgs, requestObject, xhr, xhrOptions) {
             if (keywordArgs.onError)
                 keywordArgs.onError.call(keywordArgs.scope || this, xhr.responseText, keywordArgs, xhr, xhrOptions);
         },
-        _onFetchAbort: function(keywordArgs, requestObject, xhr, xhrOptions) {
+        _onRequestAbort: function(keywordArgs, requestObject, xhr, xhrOptions) {
             if (keywordArgs.onAbort)
                 keywordArgs.onAbort.call(keywordArgs.scope || this, xhr.responseText, keywordArgs, xhr, xhrOptions);
             else
-                this._onFetchFailure(keywordArgs, requestObject, xhr, xhrOptions);
+                this._onRequestFailure(keywordArgs, requestObject, xhr, xhrOptions);
         },
         getLabel: function(item) {
             return this.getValue(item, this.labelAttribute, '');

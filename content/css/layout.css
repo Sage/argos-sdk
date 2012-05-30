@@ -68,12 +68,19 @@ img
 /* layout */
 .layout-left
 {
-    width: 200px;
+    width: 50px;
+    z-index: 100;
 }
 
 .layout-center
 {
-    width: 300px;
+    width: 400px;
+    z-index: 75;
+}
+
+.layout-right
+{
+    z-index: 50;
 }
 
 /* toolbar */

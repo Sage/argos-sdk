@@ -30,11 +30,17 @@ h5
 .layout-left
 {
     background: #ff9900;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
+    -moz-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
+    box-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
 }
 
 .layout-center
 {
     background: #99ff00;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
+    -moz-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
+    box-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
 }
 
 .layout-right

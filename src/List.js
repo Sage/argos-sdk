@@ -679,6 +679,8 @@ define('Sage/Platform/Mobile/List', [
             }
 
             domClass.remove(this.domNode, 'is-loading');
+
+            this.onContentChange();
         },
         _onFetchError: function(error, keywordArgs, xhr, xhrOptions) {
             alert(string.substitute(this.requestErrorText, [error, keywordArgs, xhr, xhrOptions]));
@@ -689,9 +691,6 @@ define('Sage/Platform/Mobile/List', [
             this.options = false; // force a refresh
             ErrorManager.addError(xhr, xhrOptions, this.options, 'aborted');
             domClass.remove(this.domNode, 'is-loading');
-        },
-        _parseOrderBy: function() {
-
         },
         requestData: function() {
             domClass.add(this.domNode, 'is-loading');
