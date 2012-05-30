@@ -97,33 +97,7 @@ define('Sage/Platform/Mobile/View', [
          */
         onActivate: function(self) {
         },
-        /**
-         * The onShow event.
-         * @param self
-         */
-        onShow: function(self) {
-        },
-        /*
-        activate: function(tag, data) {
-            // todo: use tag only?
-            if (data && this.refreshRequiredFor(data.options))
-            {
-                this.refreshRequired = true;
-            }
-
-            this.options = data.options || this.options || {};
-
-            (this.options.title) ? this.set('title', this.options.title) : this.set('title', this.titleText);
-
-            this.onActivate(this);
-        },
-        show: function(options, transitionOptions) {
-            /// <summary>
-            ///     Shows the view using iUI in order to transition to the new element.
-            /// </summary>
-
-            if (this.onShow(this) === false) return;
-
+        activate: function(options) {
             if (this.refreshRequiredFor(options))
             {
                 this.refreshRequired = true;
@@ -133,9 +107,8 @@ define('Sage/Platform/Mobile/View', [
 
             (this.options.title) ? this.set('title', this.options.title) : this.set('title', this.titleText);
 
-            ReUI.show(this.domNode, lang.mixin(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
+            this.onActivate(this);
         },
-        */
         /**
          * @param expression
          * @return {*}

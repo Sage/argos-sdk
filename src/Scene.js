@@ -36,7 +36,6 @@ define('Sage/Platform/Mobile/Scene', [
         _registeredViews: null,
         _instancedViews: null,
         _state: null,
-        _panes: null,
         components: [
             {type: Layout, attachPoint: 'layout'}
         ],
@@ -47,21 +46,11 @@ define('Sage/Platform/Mobile/Scene', [
             this._instancedViews = {};
 
             this._state = [];
-            this._panes = [];
 
             lang.mixin(this, options);
         },
         startup: function() {
             this.layout.placeAt(win.body());
-
-            for (var name in this.layout.panes)
-            {
-                var pane = this.layout.panes[name];
-                if (pane.tier !== false)
-                {
-                    this._panes[pane.tier] = pane;
-                }
-            }
 
             this.inherited(arguments);
         },
@@ -77,7 +66,6 @@ define('Sage/Platform/Mobile/Scene', [
             this._instancedViews = null;
 
             this._state = null;
-            this._panes = null;
         },
         registerViews: function(definitions) {
             for (var name in definitions)
@@ -120,24 +108,84 @@ define('Sage/Platform/Mobile/Scene', [
                 setTimeout(lang.hitch(this, this._loadView, name, options, definition, at), 0);
             }
         },
-        _createStateSet: function(view, at) {
+        _createStateSet: function(view, location) {
+            var context = view.getContext(),
+                tag = view.getTag(),
+                hash = [view.id].concat(tag ? tag : []).join(';'),
+                stateSet = [],
+                stateMark = this._state.length - 1;
 
+            /* todo: add position adjustment */
+            /* todo: add pane maximization */
+            for (var tier = 0; tier < this.layout.tiers; tier++)
+            {
+                /* inherit the state of the higher priority tiers */
+                stateSet[tier] = this._state[stateMark] && tier < location.tier ? this._state[stateMark][tier] : null;
+            }
+
+            stateSet[location.tier] = { hash: hash, context: context };
+
+            return stateSet;
+        },
+        _createViewSet: function(stateSet) {
+            var viewSet = [];
+
+            for (var i = 0; i < stateSet.length; i++)
+            {
+                var entry = stateSet[i],
+                    context = entry && entry.context;
+
+                /* todo: add information for how to transition based on how navigation is happening */
+                /* i.e. forward => queue tier 0 ... n
+                        backward => queue tier n ... 0
+
+                        with: list => list, detail (detail panel should slide in L to R)
+                              list, detail => list (detail panel should pop out) */
+                if (context)
+                    viewSet.push({
+                        view: this._instancedViews[context.id]
+                    });
+                else
+                    viewSet.push({});
+            }
+
+            return viewSet;
         },
         _showViewInstance: function(view, options, at) {
-            if (typeof at === 'number') at = {tier: at};
-            if (typeof at === 'string') at = {tier: this.layout.panes[at].tier};
+            /* todo: is `activate` the right name for this? */
+            /* needs to be called here to setup the tag and context */
+            view.activate(options);
 
-            at = at || {tier: view.tier};
+            var location;
 
-            /* todo: navigation context tracking */
+            if (typeof at === 'string')
+            {
+                /* todo: remember the last view shown? */
+                /* the location is not a tracked pane, simply show the view */
+                if (this.layout.panes[at].tier === false) return this.layout.show(view, at);
 
-            /* we've added it to the logical representation of the view state, now we */
-            /* add it to the physical representation of the view state */
+                location = {tier: this.layout.panes[at].tier};
+            }
+            else if (typeof at === 'number')
+            {
+                location = {tier: at};
+            }
 
+            location = location || {tier: view.tier};
 
+            var stateSet = this._createStateSet(view, location),
+                viewSet = this._createViewSet(stateSet);
 
-            if (this.layout)
-                this.layout.show(view, options, at);
+            /* todo: do trim */
+
+            this._state.push(stateSet);
+
+            console.log('state: %o', this._state);
+            console.log('view: %o', viewSet);
+
+            /* todo: layout needs to potentially switch a number of things */
+            this.layout.apply(viewSet);
+            //this.layout.show(view, options, at.tier);
         },
         _loadView: function(name, options, definition, at) {
             require([definition.type], lang.hitch(this, this._showViewOnRequired, name, options, definition, at));

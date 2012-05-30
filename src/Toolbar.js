@@ -34,7 +34,10 @@ define('Sage/Platform/Mobile/Toolbar', [
     return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _UiComponent], {
         baseClass: 'toolbar',
         position: 'top',
-
+        components: [
+            {tag: 'h1', attrs: {'class':'toolbar-title'}, attachPoint: 'titleNode'}
+        ],
+        _setTitleAttr: {node: 'titleNode', type: 'innerHTML'},
         _getPositionAttr: function() {
             return this.position;
         },

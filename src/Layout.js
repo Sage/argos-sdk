@@ -29,36 +29,54 @@ define('Sage/Platform/Mobile/Layout', [
     View
 ) {
     return declare('Sage.Platform.Mobile.Layout', [FixedSplitter, _UiComponent], {
-        orientation: 'H',
-        panes: null,
         components: [
             {name: 'navigation', type: Pane, attachPoint: 'panes.navigation', props:{'class':'layout-left', tier: false}},
             {name: 'list', type: Pane, attachPoint: 'panes.list', props:{'class':'layout-center', tier: 0}},
             {name: 'detail', type: Pane, attachPoint: 'panes.detail', props:{'class':'layout-right', tier: 1}}
         ],
+        panes: null,
+        panesByTier: null,
+        tiers: 2,
+        maximized: -1,
+        orientation: 'H',
         constructor: function() {
             this.panes = {};
+            this.panesByTier = [];
         },
         startup: function() {
             this.connect(window, 'onresize', this.resize);
 
-            this.inherited(arguments);
-        },
-        /* todo: remove from the layout */
-        show: function(view, options, at) {
-            /* for now, just show it in the chosen container */
-            /* is it going to be performant to move DOM nodes around? */
-            this.panes[at || 'detail'].show(view, options);
-        },
-        hide: function(view) {
-            /*
             for (var name in this.panes)
             {
-                var pane = this.panes[name];
-                if (pane.active === view)
-                    pane.remove(view);
+                if (this.panes[name].tier !== false)
+                    this.panesByTier[this.panes[name].tier] = this.panes[name];
             }
-            */
+
+            this.inherited(arguments);
+        },
+        apply: function(viewSet) {
+            for (var tier = 0; tier < viewSet.length; tier++)
+            {
+                var entry = viewSet[tier];
+                if (entry.view)
+                {
+                    this.panesByTier[tier].show(entry.view);
+                }
+                else
+                {
+                    this.panesByTier[tier].empty();
+                }
+            }
+        },
+        show: function(view, at) {
+            var pane = this.panes[at];
+            if (pane)
+            {
+                if (view)
+                    pane.show(view);
+                else
+                    pane.empty();
+            }
         }
     });
 });

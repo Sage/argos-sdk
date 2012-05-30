@@ -169,7 +169,6 @@ define('Sage/Platform/Mobile/List', [
         events: {
             'click': true
         },
-        baseClass: 'view list has-search-header',
         components: [
             {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
             {name: 'search', type: SearchWidget, attachEvent: 'onSearchExpression:_onSearchExpression'},
@@ -187,13 +186,15 @@ define('Sage/Platform/Mobile/List', [
                 ]}
             ]}
         ],
-        contentNode:null,
+        baseClass: 'view list has-search-header',
+        contentNode: null,
         remainingContentNode: null,
         emptySelectionNode: null,
         remainingNode: null,
         moreNode: null,
         _setListContentAttr: {node: 'contentNode', type: 'innerHTML'},
         _setRemainingContentAttr: {node: 'remainingContentNode', type: 'innerHTML'},
+        _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
         /**
          * The template used to render the loading message when the view is requesting more data.
          *
@@ -248,6 +249,7 @@ define('Sage/Platform/Mobile/List', [
          */
         keyProperty: '$key',
         descriptorProperty: '$descriptor',
+        tier: 0,
         /**
          * @cfg {String} resourceKind
          * The SData resource kind the view is responsible for.  This will be used as the default resource kind
