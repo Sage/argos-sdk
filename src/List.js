@@ -18,10 +18,13 @@ define('Sage/Platform/Mobile/List', [
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/query',
+    'dojo/dom-attr',
     'dojo/dom-class',
     'dojo/dom-construct',
+    'dojo/dom-geometry',
     'dojo/dom',
     'dojo/string',
+    'dojo/window',
     'Sage/Platform/Mobile/ErrorManager',
     'Sage/Platform/Mobile/View',
     'Sage/Platform/Mobile/SearchWidget'
@@ -30,10 +33,13 @@ define('Sage/Platform/Mobile/List', [
     lang,
     array,
     query,
+    domAttr,
     domClass,
     domConstruct,
+    domGeom,
     dom,
     string,
+    win,
     ErrorManager,
     View,
     SearchWidget
@@ -159,6 +165,7 @@ define('Sage/Platform/Mobile/List', [
             '{%! $.emptySelectionTemplate %}',
             '<ul class="list-content" data-dojo-attach-point="contentNode"></ul>',
             '{%! $.moreTemplate %}',
+            '{%! $.listActionTemplate %}',
             '</div>'
         ]),
         /**
@@ -220,8 +227,10 @@ define('Sage/Platform/Mobile/List', [
          * The template used to render a row in the view.  This template includes {@link #itemTemplate}.
          */
         rowTemplate: new Simplate([
-            '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
-            '<div data-action="selectEntry" class="list-item-selector"></div>',
+            '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}" data-type="{%: $.Type || $$.defaultActionType %}">',
+            '<div data-action="selectEntry" class="list-item-selector {% if ($$.enableActions) { %}',
+                'button nonGlossExtraWhiteButton',
+            '{% } %}"><img src="{%= $$.selectIcon %}" class="icon" /></div>',
             '{%! $$.itemTemplate %}',
             '</li>'
         ]),
@@ -248,12 +257,23 @@ define('Sage/Platform/Mobile/List', [
             '<h3>{%= $.noDataText %}</h3>',
             '</li>'
         ]),
+        listActionTemplate: new Simplate([
+            '<li data-dojo-attach-point="actionsNode" data-type="{%: $.actionType %}" class="list-item-actions"></li>'
+        ]),
+        listActionItemTemplate: new Simplate([
+            '<div data-action="invokeActionItem" data-id="{%= $.id %}" data-type="{%: $.actionType %}" aria-label="{%: $.title || $.id %}"">',
+                '<img src="{%= $.icon %}" alt="{%= $.id %}" class="action-icon" />',
+                '<div class="action-label">{%: $.label %}</div>',
+            '</div>'
+        ]),
+            
         contentNode:null,
         remainingContentNode: null,
         searchNode: null,
         emptySelectionNode: null,
         remainingNode: null,
         moreNode: null,
+        actionsNode: null,
         /**
          * @cfg {String} id
          * The id for the view, and it's main DOM element.
@@ -309,6 +329,7 @@ define('Sage/Platform/Mobile/List', [
          * True to hide the search bar (defaults to false).
          * @type {Boolean}
          */
+        enableActions: false,
         hideSearch: false,
         /**
          * True to allow selection in the view (defaults to false).
@@ -395,6 +416,7 @@ define('Sage/Platform/Mobile/List', [
          */
         requestErrorText: 'A server error occurred while requesting data.',
         customizationSet: 'list',
+        selectIcon: 'content/images/icons/OK_24.png',
         searchWidget: null,
         searchWidgetClass: SearchWidget,
         _selectionModel: null,
@@ -456,6 +478,8 @@ define('Sage/Platform/Mobile/List', [
                     'hashTagQueries': this._createCustomizedLayout(this.createHashTagQueryLayout(), 'hashTagQueries'),
                     'formatSearchQuery': lang.hitch(this, this.formatSearchQuery)
                 });
+
+            this.createActions(this._createCustomizedLayout(this.createActionLayout(), 'actions'));
         },
         destroy: function() {
 			if (this.searchWidget)
@@ -477,11 +501,58 @@ define('Sage/Platform/Mobile/List', [
                 }]
             });
         },
+        createActionLayout: function() {
+            return this.actions || {};
+        },
+        createActions: function(actions) {
+            for (var i = 0; i < actions.length; i++)
+            {
+                var action = actions[i],
+                    options = {
+                        enabled: typeof action.enabled != 'undefined' ? action.enabled : true
+                    },
+                    actionTemplate = action.template || this.listActionItemTemplate;
+
+                lang.mixin(action, options);
+
+                domConstruct.place(actionTemplate.apply(action, action.id), this.actionsNode, 'last');
+            }
+
+            this.actions = actions;
+        },
+        invokeActionItem: function(parameters, evt, node) {
+            var id = parameters['id'],
+                action = null,
+                key = domAttr.get(this.actionsNode, 'data-key'),
+                descriptor = domAttr.get(this.actionsNode, 'data-descriptor');
+
+            array.some(this.actions, function(item) {
+                if (item.id === id)
+                {
+                    action = item;
+                    return true;
+                }
+            });
+
+            if (action.enabled)
+            {
+                if (action.fn)
+                {
+                    action.fn.call(action.scope || this, action, key, descriptor);
+                }
+                else if (action.action)
+                {
+                    var view = App.getPrimaryActiveView();
+                    if (view && view.hasAction(action.action))
+                        view.invokeAction(action.action, lang.mixin(parameters, {'$action': action, 'key': key, 'descriptor': descriptor}), evt, node);
+                }
+            }
+        },
         isNavigationDisabled: function() {
             return ((this.options && this.options.selectionOnly) || (this.selectionOnly));
         },
         isSelectionDisabled: function() {
-            return !((this.options && this.options.selectionOnly) || (this.allowSelection));
+            return !((this.options && this.options.selectionOnly) || this.enableActions || this.allowSelection);
         },        
         _onSelectionModelSelect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
@@ -514,9 +585,47 @@ define('Sage/Platform/Mobile/List', [
                 this.refreshRequired = true;
             }
         },
+        toggleActionsFor: function(buttonNode, params) {
+            var actionNode = this.actionsNode;
+            if (domClass.contains(buttonNode, 'button-active-bottom'))
+            {
+                domClass.remove(buttonNode, 'button-active-bottom');
+                domClass.remove(actionNode, 'list-item-actions-selected');
+                domAttr.set(actionNode, 'data-key', '');
+                domAttr.set(actionNode, 'data-descriptor', '');
+            }
+            else
+            {
+                query('li > .list-item-selector', this.contentNode).removeClass('button-active-bottom');
+
+                var targetRow = query(buttonNode).closest('li')[0];
+
+                domClass.add(buttonNode, 'button-active-bottom');
+
+                domConstruct.place(actionNode, targetRow, 'after');
+                domAttr.set(actionNode, 'data-key', params['key']);
+                domAttr.set(actionNode, 'data-descriptor', params['descriptor']);
+                domClass.add(actionNode, 'list-item-actions-selected');
+
+                var coords = domGeom.position(actionNode);
+                if (coords.y + coords.h + 48 > win.getBox().h)
+                    actionNode.scrollIntoView(false);
+            }
+        },
         selectEntry: function(params) {
             var row = query(params.$source).closest('[data-key]')[0],
-                key = row ? row.getAttribute('data-key') : false;
+                key = row ? row.getAttribute('data-key') : false,
+                descriptor = row ? row.getAttribute('data-descriptor') : false;
+
+            if (this.enableActions)
+            {
+                this.toggleActionsFor(params.$source, {
+                    type: row.getAttribute('data-type'),
+                    key: key,
+                    descriptor: descriptor
+                });
+                return;
+            }
 
             if (this._selectionModel && key)
                 this._selectionModel.toggle(key, this.entries[key], row);
@@ -648,6 +757,15 @@ define('Sage/Platform/Mobile/List', [
                     descriptor: descriptor,
                     key: key
                 });
+        },
+        navigateToEditView: function(params) {
+            var view = App.getView(this.editView || this.insertView);
+            if (view)
+            {
+                view.show({
+                    key: params['key']
+                });
+            }
         },
         navigateToInsertView: function(el) {
             var view = App.getView(this.insertView || this.editView);

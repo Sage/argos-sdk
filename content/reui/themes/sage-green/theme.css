@@ -592,6 +592,20 @@ textarea:focus
     );
 }
 
+.button-active-bottom
+{
+    background-color: #eaf1df !important;
+    background-image: none !important;
+    border-bottom: 0px none #eaf1df !important;
+    -webkit-border-radius: 3px 3px 0px 0px;
+    border-radius: 3px 3px 0px 0px;
+    bottom: -5px;
+    height: auto !important;
+    box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
+
 .toolButton-disabled
 {
     opacity: 0.25;
@@ -634,7 +648,7 @@ textarea:focus
 }
 
 .subHeaderButton:active,
-.whiteButton:active
+.whiteButton:active,
 {
     background-color: #e6e6e6;
     background-image: linear-gradient(
@@ -697,4 +711,39 @@ textarea:focus
         color-stop(1, #cccccc)
     );
     background-image: -moz-linear-gradient(bottom, #e6e6e6, #cccccc);
+}
+
+.nonGlossExtraWhiteButton
+{
+    color: #000;
+    text-shadow: #fff 0px 1px 0px;
+
+    border-color: #dbdbdb;
+
+    background-color: #fcfcfc;
+    background-image: linear-gradient(top, #fcfcfc, #dfdfdf);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #fcfcfc),
+        color-stop(1, #dfdfdf)
+    );
+    background-image: -moz-linear-gradient(top, #fcfcfc, #dfdfdf);
+
+    /*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#fcfcfc, endColorstr=#dfdfdf)";*/
+}
+
+.nonGlossExtraWhiteButton:active
+{
+    background-color: #fcfcfc;
+    background-image: linear-gradient(bottom, #e6e6e6, #cccccc);
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0, #fcfcfc),
+        color-stop(1, #f8f8f8)
+    );
+    background-image: -moz-linear-gradient(bottom, #fcfcfc, #f8f8f8);
 }
