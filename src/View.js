@@ -65,6 +65,13 @@ define('Sage/Platform/Mobile/View', [
         },
         refresh: function() {
         },
+        reload: function() {
+            if (this.refreshRequired)
+            {
+                this.refreshRequired = false;
+                this.refresh();
+            }
+        },
         onContentChange: function() {
         },
         /**

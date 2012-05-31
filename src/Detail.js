@@ -26,7 +26,9 @@ define('Sage/Platform/Mobile/Detail', [
     './Utility',
     './ErrorManager',
     './View',
-    './Data/SDataStore'
+    './Toolbar',
+    './Data/SDataStore',
+    'argos!customizations'
 ], function(
     dojo,
     declare,
@@ -40,7 +42,9 @@ define('Sage/Platform/Mobile/Detail', [
     utility,
     ErrorManager,
     View,
-    SDataStore
+    Toolbar,
+    SDataStore,
+    customizations
 ) {
 
     var Detail = declare('Sage.Platform.Mobile.Detail', [View], {
@@ -57,7 +61,7 @@ define('Sage/Platform/Mobile/Detail', [
         emptyTemplate: new Simplate([
         ]),
         loadingTemplate: new Simplate([
-            '<div class="panel-loading-indicator">',
+            '<div class="loading-indicator">',
             '<div class="row"><div>{%: $.loadingText %}</div></div>',
             '</div>'
         ]),
@@ -130,6 +134,7 @@ define('Sage/Platform/Mobile/Detail', [
         ]),
         keyProperty: '$key',
         descriptorProperty: '$descriptor',
+        tier: 1,
         layout: null,
         security: false,
         customizationSet: 'detail',
@@ -204,115 +209,50 @@ define('Sage/Platform/Mobile/Detail', [
             if (view && options)
                 view.show(options);
         },
-        createRequest: function() {
-            var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
-
-            /* test for complex selector */
-            /* todo: more robust test required? */
-            if (/(\s+)/.test(this.options.key))
-                request.setResourceSelector(this.options.key);
-            else
-                request.setResourceSelector(string.substitute("'${0}'", [this.options.key]));
-
-            if (this.resourceKind)
-                request.setResourceKind(this.resourceKind);
-
-            if (this.querySelect)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, this.querySelect.join(','));
-
-            if (this.queryInclude)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, this.queryInclude.join(','));
-
-            if (this.queryOrderBy)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, this.queryOrderBy);
-
-            if (this.contractName)
-                request.setContractName(this.contractName);
-
-            return request;
-        },
         createStore: function() {
-                    /**
-         * for backwards compatibility, check for an implementation of `createRequest` that differs from
-         * the above.
-         */
-        /* todo: should we keep this considering `processFeed` is no longer used? */
-        if (this.constructor.prototype.createRequest !== Detail.prototype.createRequest)
-        {
-            return new SDataStore({
-                request: this.createRequest(),
-                labelAttribute: this.descriptorProperty,
-                identityAttribute: this.keyProperty
-            });
-        }
-        else
-        {
-            return new SDataStore({
-                service: this.getConnection(),
-                contractName: this.expandExpression(this.contractName),
-                resourceProperty: this.expandExpression(this.resourceProperty),
-                resourcePredicate: this.expandExpression(this.resourcePredicate),
-                include: this.expandExpression(this.queryInclude),
-                select: this.expandExpression(this.querySelect),
-                where: this.expandExpression(this.queryWhere),
-                orderBy: this.expandExpression(this.queryOrderBy),
-                labelAttribute: this.descriptorProperty,
-                identityAttribute: this.keyProperty
-            });
-        }
-    },
-        _onFetchBegin: function(size, request) {
-            if (size === 0)
+            return null;
+        },
+        processItem: function(item) {
+            return item;
+        },
+        _onFetchItem: function(item) {
+            var customizationSet = customizations(),
+                layout = customizationSet.apply(customizationSet.toPath(this.customizationSet, null, this.id), this.createLayout());
+
+            this.entry = this.processItem(item);
+
+            if (this.entry)
             {
-                this.set('listContent', this.noDataTemplate.apply(this));
+                this.processLayout(layout, this.entry);
             }
             else
             {
-                var remaining = size > -1
-                    ? size - (request['start'] + request['count'])
-                    : -1;
-
-                if (remaining !== -1)
-                    this.set('remainingContent', string.substitute(this.remainingText, [remaining]));
-
-                domClass.toggle(this.domNode, 'has-more', (remaining === -1 || remaining > 0));
-
-                this.position = this.position + request['count'];
+                this.set('detailContent', '');
             }
 
-            /* todo: move to a more appropriate location */
-            if (this.options && this.options.allowEmptySelection) domClass.add(this.domNode, 'has-empty');
+            domClass.remove(this.domNode, 'is-loading');
         },
-        _onFetchComplete: function(items, request) {
-            var count = items.length;
-            if (count > 0)
+        _onFetchError: function(error, keywordArgs) {
+            if (error.status == 404)
             {
-                var output = [];
+                query(this.contentNode).append(this.notAvailableTemplate.apply(this));
+            }
+            else
+            {
+                alert(string.substitute(this.requestErrorText, [error]));
 
-                for (var i = 0; i < count; i++)
-                {
-                    var item = items[i];
-
-                    this.items[this.store.getIdentity(item)] = item;
-
-                    output.push(this.rowTemplate.apply(item, this));
-                }
-
-                query(this.contentNode).append(output.join(''));
+                ErrorManager.addError(error, keywordArgs, this.options, 'failure');
             }
 
-            domClass.remove(this.domNode, 'is-loading');
+            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'failure');
 
-            this.onContentChange();
-        },
-        _onFetchError: function(error, keywordArgs, xhr, xhrOptions) {
-            alert(string.substitute(this.requestErrorText, [error, keywordArgs, xhr, xhrOptions]));
-            ErrorManager.addError(xhr, xhrOptions, this.options, 'failure');
             domClass.remove(this.domNode, 'is-loading');
         },
-        _onFetchAbort: function(error, keywordArgs, xhr, xhrOptions) {
+        _onFetchAbort: function(error, keywordArgs) {
             this.options = false; // force a refresh
-            ErrorManager.addError(xhr, xhrOptions, this.options, 'aborted');
+
+            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'aborted');
+
             domClass.remove(this.domNode, 'is-loading');
         },
         requestData: function() {
@@ -320,38 +260,25 @@ define('Sage/Platform/Mobile/Detail', [
 
             var store = this.store || (this.store = this.createStore()),
                 options = this.options,
-                conditions = [],
                 keywordArgs = {
                     scope: this,
-                    onBegin: this._onFetchBegin,
                     onError: this._onFetchError,
                     onAbort: this._onFetchAbort,
-                    onComplete: this._onFetchComplete,
-                    count: this.pageSize,
-                    start: this.position
+                    onItem: this._onFetchItem
                 };
-
-            if (options && options.where)
-                conditions.push(this.expandExpression(options.where));
-
-            if (this.query)
-                conditions.push(this.query);
-
-            if (conditions.length > 0)
-                keywordArgs.query = ('(' + conditions.join(') and (') + ')');
 
             if (options)
             {
+                if (options.key) keywordArgs.identity = options.key;
                 if (options.select) keywordArgs.select = this.expandExpression(options.select);
                 if (options.include) keywordArgs.include = this.expandExpression(options.include);
-                if (options.orderBy) keywordArgs.sort = parseOrderBy(this.expandExpression(options.orderBy));
                 if (options.contractName) keywordArgs.contractName = this.expandExpression(options.contractName);
                 if (options.resourceKind) keywordArgs.resourceKind = this.expandExpression(options.resourceKind);
                 if (options.resourceProperty) keywordArgs.resourceProperty = this.expandExpression(options.resourceProperty);
                 if (options.resourcePredicate) keywordArgs.resourcePredicate = this.expandExpression(options.resourcePredicate);
             }
 
-            return store.fetch(keywordArgs);
+            return store.fetchItemByIdentity(keywordArgs);
         },
         createLayout: function() {
             return this.layout || [];
@@ -498,52 +425,6 @@ define('Sage/Platform/Mobile/Detail', [
                 this.processLayout(current, entry);
             }
         },
-        processEntry: function(entry) {
-            this.entry = entry;
-
-            if (this.entry)
-            {
-                this.processLayout(this._createCustomizedLayout(this.createLayout()), this.entry);
-            }
-            else
-            {
-                this.set('detailContent', '');
-            }
-        },
-        onRequestDataFailure: function(response, o) {
-            if (response && response.status == 404)
-            {
-                query(this.contentNode).append(this.notAvailableTemplate.apply(this));
-            }
-            else
-            {
-                alert(string.substitute(this.requestErrorText, [response, o]));
-                ErrorManager.addError(response, o, this.options, 'failure');
-            }
-
-            domClass.remove(this.domNode, 'panel-loading');
-        },
-        onRequestDataAborted: function(response, o) {
-            this.options = false; // force a refresh
-            ErrorManager.addError(response, o, this.options, 'aborted');
-            domClass.remove(this.domNode, 'panel-loading');
-        },
-        onRequestDataSuccess: function(entry) {
-            this.processEntry(entry);
-            domClass.remove(this.domNode, 'panel-loading');
-        },
-        requestData: function() {
-            domClass.add(this.domNode, 'panel-loading');
-
-            var request = this.createRequest();
-            if (request)
-                request.read({
-                    success: this.onRequestDataSuccess,
-                    failure: this.onRequestDataFailure,
-                    aborted: this.onRequestDataAborted,
-                    scope: this
-                });
-        },
         refreshRequiredFor: function(options) {
             if (this.options) {
                 if (options) {
@@ -595,6 +476,52 @@ define('Sage/Platform/Mobile/Detail', [
             this.set('detailContent', this.loadingTemplate.apply(this));
 
             this._navigationOptions = [];
+        }
+    });
+
+    /**
+     * SData enablement for the Detail view.
+     */
+    lang.extend(Detail, {
+        /**
+         * @cfg {String} resourceKind
+         * The SData resource kind the view is responsible for.  This will be used as the default resource kind
+         * for all SData requests.
+         * @type {String}
+         */
+        resourceKind: '',
+        /**
+         * A list of fields to be selected in an SData request.
+         * @type {Array.<String>}
+         */
+        querySelect: null,
+        /**
+         * A list of child properties to be included in an SData request.
+         * @type {Array.<String>}
+         */
+        queryInclude: null,
+        /**
+         * The default resource property for an SData request.
+         * @type {String|Function}
+         */
+        resourceProperty: null,
+        /**
+         * The default resource predicate for an SData request.
+         * @type {String|Function}
+         */
+        resourcePredicate: null,
+        createStore: function() {
+            return new SDataStore({
+                service: this.getConnection(),
+                contractName: this.expandExpression(this.contractName),
+                resourceKind: this.expandExpression(this.resourceKind),
+                resourceProperty: this.expandExpression(this.resourceProperty),
+                resourcePredicate: this.expandExpression(this.resourcePredicate),
+                include: this.expandExpression(this.queryInclude),
+                select: this.expandExpression(this.querySelect),
+                labelAttribute: this.descriptorProperty,
+                identityAttribute: this.keyProperty
+            });
         }
     });
 

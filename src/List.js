@@ -251,43 +251,6 @@ define('Sage/Platform/Mobile/List', [
         descriptorProperty: '$descriptor',
         tier: 0,
         /**
-         * @cfg {String} resourceKind
-         * The SData resource kind the view is responsible for.  This will be used as the default resource kind
-         * for all SData requests.
-         * @type {String}
-         */
-        resourceKind: '',
-        /**
-         * A list of fields to be selected in an SData request.
-         * @type {Array.<String>}
-         */
-        querySelect: null,
-        /**
-         * A list of child properties to be included in an SData request.
-         * @type {Array.<String>}
-         */
-        queryInclude: null,
-        /**
-         * The default order by expression for an SData request.
-         * @type {String}
-         */
-        queryOrderBy: null,
-        /**
-         * The default where expression for an SData request.
-         * @type {String|Function}
-         */
-        queryWhere: null,
-        /**
-         * The default resource property for an SData request.
-         * @type {String|Function}
-         */
-        resourceProperty: null,
-        /**
-         * The default resource predicate for an SData request.
-         * @type {String|Function}
-         */
-        resourcePredicate: null,
-        /**
          * The page size (defaults to 20).
          * @type {Number}
          */
@@ -526,97 +489,8 @@ define('Sage/Platform/Mobile/List', [
                     'context': this.getContext()
                 });
         },
-        /**
-         * @deprecated
-         * @return {*}
-         */
-        createRequest:function() {
-            var where = [],
-                options = this.options,
-                pageSize = this.pageSize,
-                startIndex = this.feed && this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0
-                    ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
-                    : 1;
-
-            var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())
-                .setCount(pageSize)
-                .setStartIndex(startIndex);
-
-            var contractName = this.expandExpression((options && options.contractName) || this.contractName);
-            if (contractName)
-                request.setContractName(contractName);
-
-            var resourceKindExpr = this.expandExpression((options && options.resourceKind) || this.resourceKind);
-            if (resourceKindExpr)
-                request.setResourceKind(this.resourceKind);
-
-            var resourcePropertyExpr = this.expandExpression((options && options.resourceProperty) || this.resourceProperty);
-            if (resourcePropertyExpr)
-                request
-                    .getUri()
-                    .setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, resourcePropertyExpr);
-
-            var resourcePredicateExpr = this.expandExpression((options && options.resourcePredicate) || this.resourcePredicate);
-            if (resourcePredicateExpr)
-                request
-                    .getUri()
-                    .setCollectionPredicate(resourcePredicateExpr);
-
-            var querySelectExpr = this.expandExpression((options && options.select) || this.querySelect);
-            if (querySelectExpr)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, querySelectExpr.join(','));
-
-            var queryIncludeExpr = this.expandExpression(this.queryInclude);
-            if (queryIncludeExpr)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, queryIncludeExpr.join(','));
-
-            var queryOrderByExpr = this.expandExpression((options && options.orderBy) || this.queryOrderBy);
-            if (queryOrderByExpr)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, queryOrderByExpr);
-
-            var queryWhereExpr = this.expandExpression((options && options.where) || this.queryWhere);
-            if (queryWhereExpr)
-                where.push(queryWhereExpr);
-
-            if (this.query)
-                where.push(this.query);
-
-
-            if (where.length > 0)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Where, where.join(' and '));
-
-            return request;
-        },
         createStore: function() {
-            /**
-             * for backwards compatibility, check for an implementation of `createRequest` that differs from
-             * the above.
-             */
-            /* todo: should we keep this considering `processFeed` is no longer used? */
-            if (this.constructor.prototype.createRequest !== List.prototype.createRequest)
-            {
-                return new SDataStore({
-                    request: this.createRequest(),
-                    labelAttribute: this.descriptorProperty,
-                    identityAttribute: this.keyProperty
-                });
-            }
-            else
-            {
-                return new SDataStore({
-                    service: this.getConnection(),
-                    contractName: this.expandExpression(this.contractName),
-                    resourceKind: this.expandExpression(this.resourceKind),
-                    resourceProperty: this.expandExpression(this.resourceProperty),
-                    resourcePredicate: this.expandExpression(this.resourcePredicate),
-                    include: this.expandExpression(this.queryInclude),
-                    select: this.expandExpression(this.querySelect),
-                    where: this.expandExpression(this.queryWhere),
-                    orderBy: this.expandExpression(this.queryOrderBy),
-                    labelAttribute: this.descriptorProperty,
-                    identityAttribute: this.keyProperty
-                });
-            }
+            return null;
         },
         navigateToDetailView: function(key, descriptor) {
             var view = App.getView(this.detailView);
@@ -660,6 +534,9 @@ define('Sage/Platform/Mobile/List', [
             /* todo: move to a more appropriate location */
             if (this.options && this.options.allowEmptySelection) domClass.add(this.domNode, 'has-empty');
         },
+        processItem: function(item) {
+            return item;
+        },
         _onFetchComplete: function(items, request) {
             var count = items.length;
             if (count > 0)
@@ -668,7 +545,7 @@ define('Sage/Platform/Mobile/List', [
 
                 for (var i = 0; i < count; i++)
                 {
-                    var item = items[i];
+                    var item = this.processItem(items[i]);
 
                     this.items[this.store.getIdentity(item)] = item;
 
@@ -682,14 +559,18 @@ define('Sage/Platform/Mobile/List', [
 
             this.onContentChange();
         },
-        _onFetchError: function(error, keywordArgs, xhr, xhrOptions) {
-            alert(string.substitute(this.requestErrorText, [error, keywordArgs, xhr, xhrOptions]));
-            ErrorManager.addError(xhr, xhrOptions, this.options, 'failure');
+        _onFetchError: function(error, keywordArgs) {
+            alert(string.substitute(this.requestErrorText, [error]));
+
+            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'failure');
+
             domClass.remove(this.domNode, 'is-loading');
         },
-        _onFetchAbort: function(error, keywordArgs, xhr, xhrOptions) {
+        _onFetchAbort: function(error, keywordArgs) {
             this.options = false; // force a refresh
-            ErrorManager.addError(xhr, xhrOptions, this.options, 'aborted');
+
+            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'aborted');
+
             domClass.remove(this.domNode, 'is-loading');
         },
         requestData: function() {
@@ -809,11 +690,11 @@ define('Sage/Platform/Mobile/List', [
         refresh: function() {
             this.requestData();
         },
+        /**
+         *
+         * @param [all]
+         */
         clear: function(all) {
-            /// <summary>
-            ///     Clears the view and re-applies the default content template.
-            /// </summary>
-
             if (this._selectionModel)
             {
                 this._selectionModel.suspendEvents();
@@ -831,6 +712,64 @@ define('Sage/Platform/Mobile/List', [
             domClass.remove(this.domNode, 'has-more');
 
             this.set('listContent', this.loadingTemplate.apply(this));
+        }
+    });
+
+    /**
+     * SData enablement for the List view.
+     */
+    lang.extend(List, {
+        /**
+         * @cfg {String} resourceKind
+         * The SData resource kind the view is responsible for.  This will be used as the default resource kind
+         * for all SData requests.
+         * @type {String}
+         */
+        resourceKind: '',
+        /**
+         * A list of fields to be selected in an SData request.
+         * @type {Array.<String>}
+         */
+        querySelect: null,
+        /**
+         * A list of child properties to be included in an SData request.
+         * @type {Array.<String>}
+         */
+        queryInclude: null,
+        /**
+         * The default order by expression for an SData request.
+         * @type {String}
+         */
+        queryOrderBy: null,
+        /**
+         * The default where expression for an SData request.
+         * @type {String|Function}
+         */
+        queryWhere: null,
+        /**
+         * The default resource property for an SData request.
+         * @type {String|Function}
+         */
+        resourceProperty: null,
+        /**
+         * The default resource predicate for an SData request.
+         * @type {String|Function}
+         */
+        resourcePredicate: null,
+        createStore: function() {
+            return new SDataStore({
+                service: this.getConnection(),
+                contractName: this.expandExpression(this.contractName),
+                resourceKind: this.expandExpression(this.resourceKind),
+                resourceProperty: this.expandExpression(this.resourceProperty),
+                resourcePredicate: this.expandExpression(this.resourcePredicate),
+                include: this.expandExpression(this.queryInclude),
+                select: this.expandExpression(this.querySelect),
+                where: this.expandExpression(this.queryWhere),
+                orderBy: this.expandExpression(this.queryOrderBy),
+                labelAttribute: this.descriptorProperty,
+                identityAttribute: this.keyProperty
+            });
         }
     });
 

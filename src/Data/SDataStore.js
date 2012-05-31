@@ -2,12 +2,14 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
-    'dojo/string'
+    'dojo/string',
+    'dojo/json'
 ], function (
     declare,
     lang,
     array,
-    string
+    string,
+    json
 ) {
     return declare('Sage.Data.SDataStore', null, {
         where: null,
@@ -54,7 +56,7 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
                     resourceKind = this.expandExpression(keywordArgs.resourceKind || this.resourceKind),
                     resourceProperty = this.expandExpression(keywordArgs.resourceProperty || this.resourceProperty),
                     resourcePredicate = keywordArgs.identity
-                        ? string.substitute("'${0}'", [keywordArgs.identity])
+                        ? json.stringify(keywordArgs.identity) /* string keys are quoted, numeric keys are left alone */
                         : this.expandExpression(keywordArgs.resourcePredicate || this.resourcePredicate);
 
                 if (resourceProperty)
@@ -248,18 +250,36 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             else
             {
                 if (keywordArgs.onError)
-                    keywordArgs.onError.call(keywordArgs.scope || this, 'invalid feed', keywordArgs);
+                    keywordArgs.onError.call(keywordArgs.scope || this, 'invalid entry', keywordArgs);
             }
         },
         _onRequestFailure: function(keywordArgs, requestObject, xhr, xhrOptions) {
             if (keywordArgs.onError)
-                keywordArgs.onError.call(keywordArgs.scope || this, xhr.responseText, keywordArgs, xhr, xhrOptions);
+            {
+                var error = new Error('An error occurred requesting: ' + xhrOptions.url);
+
+                error.xhr = xhr;
+                error.status = xhr.status;
+                error.responseText = xhr.responseText;
+
+                keywordArgs.onError.call(keywordArgs.scope || this, error, keywordArgs, xhr, xhrOptions);
+            }
         },
         _onRequestAbort: function(keywordArgs, requestObject, xhr, xhrOptions) {
             if (keywordArgs.onAbort)
-                keywordArgs.onAbort.call(keywordArgs.scope || this, xhr.responseText, keywordArgs, xhr, xhrOptions);
+            {
+                var error = new Error('An abort occurred requesting data: ' + xhrOptions.url);
+
+                error.xhr = xhr;
+                error.status = xhr.status;
+                error.responseText = xhr.responseText;
+
+                keywordArgs.onAbort.call(keywordArgs.scope || this, error, keywordArgs, xhr, xhrOptions);
+            }
             else
+            {
                 this._onRequestFailure(keywordArgs, requestObject, xhr, xhrOptions);
+            }
         },
         getLabel: function(item) {
             return this.getValue(item, this.labelAttribute, '');

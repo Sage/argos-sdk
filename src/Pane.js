@@ -47,9 +47,8 @@ define('Sage/Platform/Mobile/Pane', [
 
             if (this.active === view)
             {
-                /* todo: fix ... there should be a way to tell a view to refresh if required. */
-                view.beforeTransitionTo();
-                view.transitionTo();
+                /* todo: is `reload` an appropriate name for this? */
+                view.reload();
 
                 return;
             }
