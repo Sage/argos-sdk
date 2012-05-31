@@ -227,11 +227,11 @@ define('Sage/Platform/Mobile/List', [
          * The template used to render a row in the view.  This template includes {@link #itemTemplate}.
          */
         rowTemplate: new Simplate([
-            '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}" data-type="{%: $.Type || $$.defaultActionType %}">',
+            '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
             '<div data-action="selectEntry" class="list-item-selector {% if ($$.enableActions) { %}',
                 'button nonGlossExtraWhiteButton',
             '{% } %}"><img src="{%= $$.selectIcon %}" class="icon" /></div>',
-            '{%! $$.itemTemplate %}',
+            '<div class="list-item-content">{%! $$.itemTemplate %}</div>',
             '</li>'
         ]),
         /**
@@ -509,9 +509,14 @@ define('Sage/Platform/Mobile/List', [
             {
                 var action = actions[i],
                     options = {
-                        enabled: typeof action.enabled != 'undefined' ? action.enabled : true
+                        enabled: typeof action.enabled != 'undefined' ? this.expandExpression(action.enabled) : true,
+                        scope: action.scope || this
                     },
                     actionTemplate = action.template || this.listActionItemTemplate;
+
+                // if action is enabled, check security
+                if (options.enabled && action.security)
+                    options.enabled = App.hasAccessTo(this.expandExpression(action.security));
 
                 lang.mixin(action, options);
 
@@ -544,7 +549,7 @@ define('Sage/Platform/Mobile/List', [
                 {
                     var view = App.getPrimaryActiveView();
                     if (view && view.hasAction(action.action))
-                        view.invokeAction(action.action, lang.mixin(parameters, {'$action': action, 'key': key, 'descriptor': descriptor}), evt, node);
+                        view.invokeAction(action.action, action, key, descriptor);
                 }
             }
         },
@@ -746,7 +751,16 @@ define('Sage/Platform/Mobile/List', [
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Where, where.join(' and '));
 
             return request;
-        },                
+        },
+        navigateToRelatedView:  function(params, key, descriptor, viewId, whereQueryFmt) {
+            var view = App.getView(viewId),
+                options = {
+                    where: string.substitute(whereQueryFmt, [key])
+                };
+
+            if (view && options)
+                view.show(options);
+        },
         navigateToDetailView: function(key, descriptor) {
             /// <summary>
             ///     Navigates to the requested detail view.
@@ -758,12 +772,12 @@ define('Sage/Platform/Mobile/List', [
                     key: key
                 });
         },
-        navigateToEditView: function(params) {
+        navigateToEditView: function(params, key, description) {
             var view = App.getView(this.editView || this.insertView);
             if (view)
             {
                 view.show({
-                    key: params['key']
+                    key: key
                 });
             }
         },
