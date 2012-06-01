@@ -247,8 +247,6 @@ define('Sage/Platform/Mobile/List', [
         /**
          * The property containing the key for the items in the data store.
          */
-        keyProperty: '$key',
-        descriptorProperty: '$descriptor',
         tier: 0,
         /**
          * The page size (defaults to 20).
@@ -756,6 +754,8 @@ define('Sage/Platform/Mobile/List', [
          * @type {String|Function}
          */
         resourcePredicate: null,
+        keyProperty: '$key',
+        descriptorProperty: '$descriptor',
         createStore: function() {
             return new SDataStore({
                 service: this.getConnection(),

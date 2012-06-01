@@ -16,6 +16,8 @@
 define('Sage/Platform/Mobile/Layout', [
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/Deferred',
+    'dojo/DeferredList',
     'dojox/mobile/FixedSplitter',
     './_UiComponent',
     './Pane',
@@ -23,6 +25,7 @@ define('Sage/Platform/Mobile/Layout', [
 ], function(
     declare,
     lang,
+    Deferred,
     FixedSplitter,
     _UiComponent,
     Pane,
@@ -55,6 +58,8 @@ define('Sage/Platform/Mobile/Layout', [
             this.inherited(arguments);
         },
         apply: function(viewSet) {
+            var deferred = new Deferred();
+
             for (var tier = 0; tier < viewSet.length; tier++)
             {
                 var entry = viewSet[tier];
@@ -66,6 +71,20 @@ define('Sage/Platform/Mobile/Layout', [
                 {
                     this.panesByTier[tier].empty();
                 }
+            }
+
+            return deferred;
+        },
+        _applyViewToPane: function(entry, pane) {
+            var deferred = new Deferred();
+
+            if (entry.view)
+            {
+                pane.show(entry.view);
+            }
+            else
+            {
+                this.panesByTier[tier].empty();
             }
         },
         show: function(view, at) {

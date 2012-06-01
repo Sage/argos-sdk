@@ -138,8 +138,6 @@ define('Sage/Platform/Mobile/Detail', [
         notAvailableTemplate: new Simplate([
             '<div class="not-available">{%: $.notAvailableText %}</div>'
         ]),
-        keyProperty: '$key',
-        descriptorProperty: '$descriptor',
         tier: 1,
         layout: null,
         security: false,
@@ -175,6 +173,7 @@ define('Sage/Platform/Mobile/Detail', [
             return this.inherited(arguments);
         },
         _onRefresh: function(o) {
+            /* todo: change to be something non-sdata specific */
             var descriptor = o.data && o.data['$descriptor'];
 
             if (this.options && this.options.key === o.key) {
@@ -279,6 +278,7 @@ define('Sage/Platform/Mobile/Detail', [
 
             if (options)
             {
+                /* todo: how to extract the remaining SData options */
                 if (options.key) keywordArgs.identity = options.key;
                 if (options.select) keywordArgs.select = this.expandExpression(options.select);
                 if (options.include) keywordArgs.include = this.expandExpression(options.include);
@@ -286,6 +286,8 @@ define('Sage/Platform/Mobile/Detail', [
                 if (options.resourceKind) keywordArgs.resourceKind = this.expandExpression(options.resourceKind);
                 if (options.resourceProperty) keywordArgs.resourceProperty = this.expandExpression(options.resourceProperty);
                 if (options.resourcePredicate) keywordArgs.resourcePredicate = this.expandExpression(options.resourcePredicate);
+
+                if (options.identity) keywordArgs.identity = options.identity;
             }
 
             return store.fetchItemByIdentity(keywordArgs);
@@ -520,6 +522,8 @@ define('Sage/Platform/Mobile/Detail', [
          * @type {String|Function}
          */
         resourcePredicate: null,
+        keyProperty: '$key',
+        descriptorProperty: '$descriptor',
         createStore: function() {
             return new SDataStore({
                 service: this.getConnection(),

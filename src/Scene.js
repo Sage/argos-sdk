@@ -152,17 +152,21 @@ define('Sage/Platform/Mobile/Scene', [
             return viewSet;
         },
         _showViewInstance: function(view, options, at) {
-            /* todo: is `activate` the right name for this? */
-            /* needs to be called here to setup the tag and context */
-            view.activate(options);
-
             var location;
 
             if (typeof at === 'string')
             {
                 /* todo: remember the last view shown? */
                 /* the location is not a tracked pane, simply show the view */
-                if (this.layout.panes[at].tier === false) return this.layout.show(view, at);
+                if (this.layout.panes[at].tier === false)
+                {
+                    this.layout.show(view, at).then(
+                        lang.hitch(this._onLayoutShowComplete),
+                        lang.hitch(this._onLayoutShowError)
+                    );
+
+                    return;
+                }
 
                 location = {tier: this.layout.panes[at].tier};
             }
@@ -173,24 +177,56 @@ define('Sage/Platform/Mobile/Scene', [
 
             location = location || {tier: view.tier};
 
+            /* todo: is `activate` the right name for this? */
+            view.activate(options); /* activation required in order to build context (i.e. hash, etc.) */
+
             var stateSet = this._createStateSet(view, location),
                 viewSet = this._createViewSet(stateSet);
 
-            /* todo: do trim */
-
-            this._state.push(stateSet);
+            /* todo: trim state to item before match of `stateSet` */
 
             console.log('state: %o', this._state);
             console.log('view: %o', viewSet);
 
-            /* todo: layout needs to potentially switch a number of things */
-            this.layout.apply(viewSet);
-            //this.layout.show(view, options, at.tier);
+            /*
+              A scene tells the layout to apply a view set.  This causes the layout to invoke
+              one or more transitions (usually only one, but potentially more).  The scene
+              should not show another view until the transitions are all complete.  Each pane is
+              responsible for it's own transition.
+
+              scene => layout (apply)
+              scene <= layout (deferred)
+              scene wait
+
+              layout => pane 0 (show)
+              layout <= pane 0 (deferred)
+              ...
+              layout => pane N (show)
+              layout <= pane N (deferred)
+              layout wait 0..N
+              layout complete scene deferred
+
+              scene save state
+             */
+            this.layout.apply(viewSet).then(
+                lang.hitch(this._onLayoutApplyComplete, stateSet),
+                lang.hitch(this._onLayoutApplyError, stateSet)
+            );
+        },
+        _onLayoutShowComplete: function() {
+
+        },
+        _onLayoutShowError: function() {
+        },
+        _onLayoutApplyComplete: function(stateSet) {
+            this._state.push(stateSet);
+        },
+        _onLayoutApplyError: function(stateSet) {
         },
         _loadView: function(name, options, definition, at) {
-            require([definition.type], lang.hitch(this, this._showViewOnRequired, name, options, definition, at));
+            require([definition.type], lang.hitch(this, this._onRequireComplete, name, options, definition, at));
         },
-        _showViewOnRequired: function(name, options, definition, at, ctor) {
+        _onRequireComplete: function(name, options, definition, at, ctor) {
             /* todo: always replace id with name? */
             var instance = new ctor(lang.mixin({id: name}, definition.props));
 
