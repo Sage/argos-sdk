@@ -229,7 +229,7 @@ define('Sage/Platform/Mobile/List', [
         rowTemplate: new Simplate([
             '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
             '<div data-action="selectEntry" class="list-item-selector {% if ($$.enableActions) { %}',
-                'button nonGlossExtraWhiteButton',
+                'button nonGlossExtraWhiteButton actions-enabled',
             '{% } %}"><img src="{%= $$.selectIcon %}" class="icon" /></div>',
             '<div class="list-item-content">{%! $$.itemTemplate %}</div>',
             '</li>'
@@ -625,7 +625,6 @@ define('Sage/Platform/Mobile/List', [
             if (this.enableActions)
             {
                 this.toggleActionsFor(params.$source, {
-                    type: row.getAttribute('data-type'),
                     key: key,
                     descriptor: descriptor
                 });
@@ -933,10 +932,13 @@ define('Sage/Platform/Mobile/List', [
                 ? this.options.hideSearch
                 : this.hideSearch);
 
-            domClass.toggle(this.domNode, 'list-show-selectors', !this.isSelectionDisabled());
+            domClass.toggle(this.domNode, 'list-show-selectors', !this.isSelectionDisabled() && !this.options.singleSelect);
 
             if (this._selectionModel && !this.isSelectionDisabled())
                 this._selectionModel.useSingleSelection(this.options.singleSelect);
+
+            if (typeof this.options.enableActions !== 'undefined')
+                this.enableActions = this.options.enableActions;
 
             if (this.refreshRequired)
             {

@@ -28,6 +28,7 @@ define('Sage/Platform/Mobile/Fields/SelectField', [
         createNavigationOptions: function() {
             var options = this.inherited(arguments);
             options.hideSearch = true;
+            options.enableActions = false;
             options.data = this.expandExpression(this.data);
             return options;
         }        

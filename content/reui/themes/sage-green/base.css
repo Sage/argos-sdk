@@ -253,7 +253,16 @@ input:not([type|=radio]):not([type|=checkbox]) {
 
 .list-content > li
 {
-    padding: 8px 32px 6px 49px;
+    padding: 8px 32px 8px 6px;
+}
+.list-show-selectors .list-item-content,
+.list-item-static-selector + .list-item-content
+{
+    padding-left: 42px;
+}
+.actions-enabled + .list-item-content
+{
+    padding-left: 48px;
 }
 
 .list-content > li > img.icon,

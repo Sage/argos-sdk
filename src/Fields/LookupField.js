@@ -126,6 +126,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         },
         createNavigationOptions: function() {
             var options = {
+                enableActions: false,
                 selectionOnly: true,
                 singleSelect: this.singleSelect,
                 singleSelectAction: this.singleSelectAction || 'complete',
