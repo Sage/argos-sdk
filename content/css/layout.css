@@ -409,6 +409,214 @@ img
     width: 100%;
 }
 
+/* detail */
+.detail-content > h2
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 32px;
+    line-height: 32px;
+    margin: 0;
+    padding: 0 0 0 6px;
+    font-size: 1em;
+    z-index: 5;
+    position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.detail-content > ul > li
+{
+    list-style: none;
+    line-height: 28px;
+    clear: both;
+}
+
+.detail-validation-summary > ul > li
+{
+    list-style: none;
+    clear: both;
+}
+
+.detail-content > ul > li > img.icon,
+.detail-content > ul > li > * > img.icon
+{
+    border: none 0 black;
+    margin: 0 .5em 0 0;
+    width: 24px;
+    height: 24px;
+    float: left;
+}
+
+.detail-content > div,
+.detail-content > ul
+{
+    margin: 0;
+    padding: 0 0 1.5em 0;
+}
+
+.detail-content > ul:last-child,
+.detail-content > div:last-child
+{
+    margin: 0;
+    padding: 0 0 0 0;
+}
+
+.detail-content > ul > li
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.detail-content > ul > li > a
+{
+    padding: 8px;
+    margin: 0px;
+    display: block;
+}
+
+.row > div > label,
+.row > label
+{
+	margin: 0px;
+	padding: 0;
+	position: relative;
+	float: left;
+	width: 100px;
+	text-align: right;
+	font-size: 0.8em;
+}
+
+.row
+{
+	text-align: left;
+	clear: both;
+    line-height: 1.5em;
+    padding: 0 .75em;
+}
+
+.row > div > span,
+.row > div > a,
+.row > span,
+.row > a
+{
+	display: block;
+	margin: 0 0 0 0;
+	padding: 0 0 0 12px;
+	position: relative;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.row > * > a
+{
+    border-bottom: 1px dotted #00338D;
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.not-available
+{
+    text-align: center;
+    padding: 8px 32px 8px 36px !important;
+    font-size: 1.25em;
+}
+
+.no-data
+{
+	text-align: center;
+}
+
+.collapsed
+{
+    margin-bottom: -1px !important;
+}
+
+h2 > .collapsed-indicator
+{
+    height: 30px;
+    width: 30px;
+    float: right;
+    margin: 0 4px 0 0;
+}
+
+.collapsed > .collapsed-indicator
+{
+
+}
+
+.collapsed + ul,
+.collapsed + div
+{
+    display: none !important;
+}
+
+.action-list > li > a.disabled
+{
+    opacity: 0.3;
+}
+
+.action-list > ul > li > a
+{
+    text-overflow: ellipsis;
+}
+
+.action-list > li
+{
+    line-height: 1em !important;
+    cursor: pointer !important;
+}
+
+.action-list > li > a > label
+{
+    cursor: pointer !important;
+    display: block;
+    line-height: inherit;
+    padding: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.action-list > li > a > span
+{
+    display: block;
+    font-size: 0.75em;
+    min-height: 1em;
+    line-height: inherit;
+    padding: 2px 0 0 0;
+    color: #777;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.detail-content > .loading-indicator
+{
+    display: none;
+}
+
+.is-loading .detail-content > .loading-indicator
+{
+    display: block;
+    text-align: center;
+    font-size: 1em;
+    font-weight: normal;
+    line-height: 1.5em;
+    padding: 1em;
+}
+
+.is-loading .detail-content > .loading-indicator > div
+{
+	display: inline-block;
+    text-align: center;
+}
+
 /* button */
 .button
 {

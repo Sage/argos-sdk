@@ -26,6 +26,7 @@ define('Sage/Platform/Mobile/Detail', [
     './Utility',
     './ErrorManager',
     './View',
+    './ScrollContainer',
     './Toolbar',
     './Data/SDataStore',
     'argos!customizations'
@@ -42,6 +43,7 @@ define('Sage/Platform/Mobile/Detail', [
     utility,
     ErrorManager,
     View,
+    ScrollContainer,
     Toolbar,
     SDataStore,
     customizations
@@ -54,7 +56,11 @@ define('Sage/Platform/Mobile/Detail', [
         components: [
             {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
-            {name: 'content', tag: 'div', attrs: {'class': 'detail-content'}, attachPoint: 'contentNode'}
+            {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
+                {name: 'scroll', tag: 'div', components: [
+                    {name: 'content', tag: 'div', attrs: {'class': 'detail-content'}, attachPoint: 'contentNode'}
+                ]}
+            ]}
         ],
         baseClass: 'view detail',
         _setDetailContentAttr: {node: 'contentNode', type: 'innerHTML'},
@@ -215,6 +221,8 @@ define('Sage/Platform/Mobile/Detail', [
         processItem: function(item) {
             return item;
         },
+        onContentChange: function() {
+        },
         _onFetchItem: function(item) {
             var customizationSet = customizations(),
                 layout = customizationSet.apply(customizationSet.toPath(this.customizationSet, null, this.id), this.createLayout());
@@ -229,6 +237,8 @@ define('Sage/Platform/Mobile/Detail', [
             {
                 this.set('detailContent', '');
             }
+
+            this.onContentChange();
 
             domClass.remove(this.domNode, 'is-loading');
         },

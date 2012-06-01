@@ -188,6 +188,97 @@ h5
     background: url('../images/delete.png') no-repeat 50% 50%;
 }
 
+/* detail */
+
+.detail-content
+{
+    background-color: #fff;
+    border: none 0px black;
+    border-bottom: solid 1px #ddd;
+}
+
+.detail-content > h2
+{
+    border-bottom: 1px solid #000;
+    border-top: 1px solid #000;
+    background-color: #e6e6e6;
+    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(1, #cccccc)
+    );
+    background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+    box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    color: #000;
+    text-shadow: #fff 0px 1px 0px;
+    font-weight: bold;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#cccccc)";
+}
+
+.detail-content > h2:first-child
+{
+    border-top: solid 1px #e6e6e6;
+}
+
+.detail-content > div
+{
+    border: none 0px black;
+}
+
+.detail-content > ul
+{
+    border: none 0px black;
+    background-color: #fff;
+}
+
+.detail-content > ul > li
+{
+    border-top: solid 1px #ddd;
+    cursor: pointer;
+}
+
+.detail-content > ul > li:first-child
+{
+    border-top: none 0 black;
+}
+
+.detail-content > ul a
+{
+    color: inherit;
+    text-decoration: none;
+}
+
+.detail-content > div > .row
+{
+    padding: .25em;
+    min-height: 1.5em;
+    border-top: solid 1px #ddd;
+}
+
+.detail-content > div > .row:first-child
+{
+    border-top: none 0px black;
+}
+
+.detail-content > div > .row > div > label,
+.detail-content > div > .row > label
+{
+    font-weight: bold;
+    color: #0079A7;
+}
+
+.is-loading .detail-content > .loading-indicator > div
+{
+    background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
+    padding: 0 0 0 20px;
+}
+
 /* button */
 .button
 {

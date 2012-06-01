@@ -555,9 +555,9 @@ define('Sage/Platform/Mobile/List', [
                 query(this.contentNode).append(output.join(''));
             }
 
-            domClass.remove(this.domNode, 'is-loading');
-
             this.onContentChange();
+
+            domClass.remove(this.domNode, 'is-loading');
         },
         _onFetchError: function(error, keywordArgs) {
             alert(string.substitute(this.requestErrorText, [error]));
