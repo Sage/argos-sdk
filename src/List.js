@@ -228,9 +228,13 @@ define('Sage/Platform/Mobile/List', [
          */
         rowTemplate: new Simplate([
             '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
-            '<div data-action="selectEntry" class="list-item-selector {% if ($$.enableActions) { %}',
-                'button nonGlossExtraWhiteButton actions-enabled',
-            '{% } %}"><img src="{%= $$.selectIcon %}" class="icon" /></div>',
+            '{% if ($$.enableActions) { %}',
+                '<div data-action="selectEntry" class="list-item-selector button nonGlossExtraWhiteButton actions-enabled">',
+                '<img src="{%= $$.icon %}" class="icon" /></div>',
+                '{% } else { %}">',
+                '<div data-action="selectEntry" class="list-item-selector">',
+                '<img src="{%= $$.selectIcon %}" class="icon" /></div>',
+            '{% } %}">',
             '<div class="list-item-content">{%! $$.itemTemplate %}</div>',
             '</li>'
         ]),
@@ -258,10 +262,10 @@ define('Sage/Platform/Mobile/List', [
             '</li>'
         ]),
         listActionTemplate: new Simplate([
-            '<li data-dojo-attach-point="actionsNode" data-type="{%: $.actionType %}" class="list-item-actions"></li>'
+            '<li data-dojo-attach-point="actionsNode" class="list-item-actions"></li>'
         ]),
         listActionItemTemplate: new Simplate([
-            '<div data-action="invokeActionItem" data-id="{%= $.id %}" data-type="{%: $.actionType %}" aria-label="{%: $.title || $.id %}"">',
+            '<div data-action="invokeActionItem" data-id="{%= $.id %}" aria-label="{%: $.title || $.id %}"">',
                 '<img src="{%= $.icon %}" alt="{%= $.id %}" class="action-icon" />',
                 '<div class="action-label">{%: $.label %}</div>',
             '</div>'
@@ -528,8 +532,14 @@ define('Sage/Platform/Mobile/List', [
         invokeActionItem: function(parameters, evt, node) {
             var id = parameters['id'],
                 action = null,
-                key = domAttr.get(this.actionsNode, 'data-key'),
-                descriptor = domAttr.get(this.actionsNode, 'data-descriptor');
+                selectedItems = this._selectionModel.getSelections(),
+                selection = null;
+
+            for (var key in selectedItems)
+            {
+                selection = selectedItems[key];
+                break;
+            }
 
             array.some(this.actions, function(item) {
                 if (item.id === id)
@@ -543,13 +553,12 @@ define('Sage/Platform/Mobile/List', [
             {
                 if (action.fn)
                 {
-                    action.fn.call(action.scope || this, action, key, descriptor);
+                    action.fn.call(action.scope || this, action, selection);
                 }
                 else if (action.action)
                 {
-                    var view = App.getPrimaryActiveView();
-                    if (view && view.hasAction(action.action))
-                        view.invokeAction(action.action, action, key, descriptor);
+                    if (this.hasAction(action.action))
+                        this.invokeAction(action.action, action, selection);
                 }
             }
         },
@@ -561,13 +570,34 @@ define('Sage/Platform/Mobile/List', [
         },        
         _onSelectionModelSelect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
-            if (node)
+            if (!node) return;
+
+            if (this.enableActions)
+            {
+                domClass.add(node, 'list-action-selected');
+                domConstruct.place(this.actionsNode, node, 'after');
+
+                var coords = domGeom.position(this.actionsNode);
+                if (coords.y + coords.h + 48 > win.getBox().h)
+                    this.actionsNode.scrollIntoView(false);
+            }
+            else
+            {
                 domClass.add(node, 'list-item-selected');
+            }
         },
         _onSelectionModelDeselect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
-            if (node)
+            if (!node) return;
+            if (this.enableActions)
+            {
+                domClass.remove(node, 'list-action-selected');
+                this._selectionModel.clear();
+            }
+            else
+            {
                 domClass.remove(node, 'list-item-selected');
+            }
         },
         _onSelectionModelClear: function() {
         },
@@ -590,49 +620,15 @@ define('Sage/Platform/Mobile/List', [
                 this.refreshRequired = true;
             }
         },
-        toggleActionsFor: function(buttonNode, params) {
-            var actionNode = this.actionsNode;
-            if (domClass.contains(buttonNode, 'button-active-bottom'))
-            {
-                domClass.remove(buttonNode, 'button-active-bottom');
-                domClass.remove(actionNode, 'list-item-actions-selected');
-                domAttr.set(actionNode, 'data-key', '');
-                domAttr.set(actionNode, 'data-descriptor', '');
-            }
-            else
-            {
-                query('li > .list-item-selector', this.contentNode).removeClass('button-active-bottom');
-
-                var targetRow = query(buttonNode).closest('li')[0];
-
-                domClass.add(buttonNode, 'button-active-bottom');
-
-                domConstruct.place(actionNode, targetRow, 'after');
-                domAttr.set(actionNode, 'data-key', params['key']);
-                domAttr.set(actionNode, 'data-descriptor', params['descriptor']);
-                domClass.add(actionNode, 'list-item-actions-selected');
-
-                var coords = domGeom.position(actionNode);
-                if (coords.y + coords.h + 48 > win.getBox().h)
-                    actionNode.scrollIntoView(false);
-            }
-        },
         selectEntry: function(params) {
             var row = query(params.$source).closest('[data-key]')[0],
-                key = row ? row.getAttribute('data-key') : false,
-                descriptor = row ? row.getAttribute('data-descriptor') : false;
-
-            if (this.enableActions)
-            {
-                this.toggleActionsFor(params.$source, {
-                    key: key,
-                    descriptor: descriptor
-                });
-                return;
-            }
+                key = row ? row.getAttribute('data-key') : false;
 
             if (this._selectionModel && key)
                 this._selectionModel.toggle(key, this.entries[key], row);
+
+            if (this.enableActions)
+                return;
 
             if (this.options.singleSelect && this.options.singleSelectAction)
                 this.invokeSingleSelectAction();
@@ -751,10 +747,10 @@ define('Sage/Platform/Mobile/List', [
 
             return request;
         },
-        navigateToRelatedView:  function(params, key, descriptor, viewId, whereQueryFmt) {
+        navigateToRelatedView:  function(data, viewId, whereQueryFmt) {
             var view = App.getView(viewId),
                 options = {
-                    where: string.substitute(whereQueryFmt, [key])
+                    where: string.substitute(whereQueryFmt, [data.entry['$key']])
                 };
 
             if (view && options)
@@ -771,12 +767,12 @@ define('Sage/Platform/Mobile/List', [
                     key: key
                 });
         },
-        navigateToEditView: function(params, key, description) {
+        navigateToEditView: function(data) {
             var view = App.getView(this.editView || this.insertView);
             if (view)
             {
                 view.show({
-                    key: key
+                    key: data.entry['$key']
                 });
             }
         },
@@ -939,6 +935,10 @@ define('Sage/Platform/Mobile/List', [
 
             if (typeof this.options.enableActions !== 'undefined')
                 this.enableActions = this.options.enableActions;
+
+            if (this.enableActions)
+                this._selectionModel.useSingleSelection(true);
+
 
             if (this.refreshRequired)
             {
