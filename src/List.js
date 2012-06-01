@@ -231,10 +231,10 @@ define('Sage/Platform/Mobile/List', [
             '{% if ($$.enableActions) { %}',
                 '<div data-action="selectEntry" class="list-item-selector button nonGlossExtraWhiteButton actions-enabled">',
                 '<img src="{%= $$.icon %}" class="icon" /></div>',
-                '{% } else { %}">',
+                '{% } else { %}',
                 '<div data-action="selectEntry" class="list-item-selector">',
                 '<img src="{%= $$.selectIcon %}" class="icon" /></div>',
-            '{% } %}">',
+            '{% } %}',
             '<div class="list-item-content">{%! $$.itemTemplate %}</div>',
             '</li>'
         ]),
