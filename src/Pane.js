@@ -16,6 +16,7 @@
 define('Sage/Platform/Mobile/Pane', [
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/_base/Deferred',
     'dojo/dom-style',
     'dojox/mobile/FixedSplitterPane',
     './_UiComponent',
@@ -24,6 +25,7 @@ define('Sage/Platform/Mobile/Pane', [
 ], function(
     declare,
     lang,
+    Deferred,
     domStyle,
     FixedSplitterPane,
     _UiComponent,
@@ -36,6 +38,8 @@ define('Sage/Platform/Mobile/Pane', [
         ],
         active: null,
         show: function(view, options) {
+            var deferred = new Deferred();
+
             /* - add the new view to this domNode
              * - do transition, remove old view from domNode ?
              * - or leave view in the container until it is needed elsewhere?
@@ -50,7 +54,9 @@ define('Sage/Platform/Mobile/Pane', [
                 /* todo: is `reload` an appropriate name for this? */
                 view.reload();
 
-                return;
+                deferred.resolve(true);
+
+                return deferred;
             }
 
             domStyle.set(view.domNode, 'display', 'none');
@@ -71,10 +77,19 @@ define('Sage/Platform/Mobile/Pane', [
             if (previous) previous.transitionAway();
 
             this.active = view;
+
+            deferred.resolve(true);
+
+            return deferred;
         },
         empty: function() {
-            var previous = this.active;
+            var deferred = new Deferred(),
+                previous = this.active;
             if (previous) previous.domNode.parentNode.removeChild(previous.domNode);
+
+            deferred.resolve(true);
+
+            return deferred;
         }
     });
 });

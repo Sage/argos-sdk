@@ -36,6 +36,10 @@ define('Sage/Platform/Mobile/Scene', [
         _registeredViews: null,
         _instancedViews: null,
         _state: null,
+        _queue: null,
+        _idle: true,
+        _wait: null,
+        _last: null,
         components: [
             {type: Layout, attachPoint: 'layout'}
         ],
@@ -46,6 +50,9 @@ define('Sage/Platform/Mobile/Scene', [
             this._instancedViews = {};
 
             this._state = [];
+            this._queue = [];
+            this._wait = {};
+            this._idle = true;
 
             lang.mixin(this, options);
         },
@@ -94,7 +101,14 @@ define('Sage/Platform/Mobile/Scene', [
             var instance = this._instancedViews[name];
             if (instance)
             {
-                this._showViewInstance(instance, options, at);
+                if (this._idle)
+                {
+                    this._showViewInstance(name, instance, options, at);
+                }
+                else
+                {
+                    this._queue.push([name, instance, options, at]);
+                }
 
                 return;
             }
@@ -102,6 +116,17 @@ define('Sage/Platform/Mobile/Scene', [
             var definition = this._registeredViews[name];
             if (definition)
             {
+                if (this._last)
+                {
+                    console.log('%s is waiting for %s', name, this._last);
+
+                    this._wait[name] = this._last;
+                }
+
+                console.log('last is now %s', name);
+
+                this._last = name;
+
                 /* todo: figure out why a `setTimeout` is required here */
                 /* if `require` is called within a `require` as part of `dojo/domReady!`, the
                    page `load` event will not fire. */
@@ -151,8 +176,27 @@ define('Sage/Platform/Mobile/Scene', [
 
             return viewSet;
         },
-        _showViewInstance: function(view, options, at) {
-            var location;
+        _showViewInstance: function(name, view, options, at) {
+            this._idle = false;
+
+            /* we are no longer idle and can remove the instance from the require wait list */
+            console.log('removing waits for %s', name);
+
+            for (var search in this._wait)
+            {
+                if (this._wait[search] == name) delete this._wait[search];
+            }
+
+            /* the instance is the last require, can clear out the flag */
+            if (this._last === name)
+            {
+                console.log('removing last for %s', name);
+
+                this._last = false;
+            }
+
+            var location,
+                deferred;
 
             if (typeof at === 'string')
             {
@@ -160,9 +204,10 @@ define('Sage/Platform/Mobile/Scene', [
                 /* the location is not a tracked pane, simply show the view */
                 if (this.layout.panes[at].tier === false)
                 {
-                    this.layout.show(view, at).then(
-                        lang.hitch(this._onLayoutShowComplete),
-                        lang.hitch(this._onLayoutShowError)
+                    deferred = this.layout.show(view, at);
+                    deferred.then(
+                        lang.hitch(this, this._onLayoutShowComplete),
+                        lang.hitch(this, this._onLayoutShowError)
                     );
 
                     return;
@@ -185,8 +230,7 @@ define('Sage/Platform/Mobile/Scene', [
 
             /* todo: trim state to item before match of `stateSet` */
 
-            console.log('state: %o', this._state);
-            console.log('view: %o', viewSet);
+            console.log('view set to apply: %o', viewSet);
 
             /*
               A scene tells the layout to apply a view set.  This causes the layout to invoke
@@ -208,20 +252,51 @@ define('Sage/Platform/Mobile/Scene', [
 
               scene save state
              */
-            this.layout.apply(viewSet).then(
-                lang.hitch(this._onLayoutApplyComplete, stateSet),
-                lang.hitch(this._onLayoutApplyError, stateSet)
+            deferred = this.layout.apply(viewSet);
+            deferred.then(
+                lang.hitch(this, this._onLayoutApplyComplete, stateSet),
+                lang.hitch(this, this._onLayoutApplyError, stateSet)
             );
         },
         _onLayoutShowComplete: function() {
-
+            this._processQueue();
         },
         _onLayoutShowError: function() {
+            console.log('show error!');
         },
         _onLayoutApplyComplete: function(stateSet) {
             this._state.push(stateSet);
+
+            console.log('current state: %o', this._state);
+
+            this._processQueue();
         },
         _onLayoutApplyError: function(stateSet) {
+            console.log('show error!');
+        },
+        _processQueue: function() {
+            var next,
+                remaining = [];
+
+            console.log('processing queue');
+
+            while (next = this._queue.shift())
+            {
+                var name = next[0];
+                if (this._wait[name])
+                {
+                    console.log('%s is still waiting for %s', name, this._wait[name]);
+
+                    remaining.push(next);
+                }
+                else
+                {
+                    this._showViewInstance.apply(this, next);
+                }
+            }
+
+            this._idle = remaining.length === 0;
+            this._queue = remaining;
         },
         _loadView: function(name, options, definition, at) {
             require([definition.type], lang.hitch(this, this._onRequireComplete, name, options, definition, at));
@@ -235,7 +310,23 @@ define('Sage/Platform/Mobile/Scene', [
 
             this._instancedViews[name] = instance;
 
-            this._showViewInstance(instance, options, at);
+            if (this._idle)
+            {
+                if (this._wait[name])
+                {
+                    console.log('queuing show of %s due to wait for %s', name, this._wait[name]);
+                    this._queue.push([name, instance, options, at]);
+                }
+                else
+                {
+                    this._showViewInstance(name, instance, options, at);
+                }
+            }
+            else
+            {
+                console.log('queuing show of %s due to activity', name);
+                this._queue.push([name, instance, options, at]);
+            }
         }
     });
 });

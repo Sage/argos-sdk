@@ -16,7 +16,7 @@
 define('Sage/Platform/Mobile/Layout', [
     'dojo/_base/declare',
     'dojo/_base/lang',
-    'dojo/Deferred',
+    'dojo/_base/Deferred',
     'dojo/DeferredList',
     'dojox/mobile/FixedSplitter',
     './_UiComponent',
@@ -26,6 +26,7 @@ define('Sage/Platform/Mobile/Layout', [
     declare,
     lang,
     Deferred,
+    DeferredList,
     FixedSplitter,
     _UiComponent,
     Pane,
@@ -58,44 +59,34 @@ define('Sage/Platform/Mobile/Layout', [
             this.inherited(arguments);
         },
         apply: function(viewSet) {
-            var deferred = new Deferred();
+            var wait = [];
 
             for (var tier = 0; tier < viewSet.length; tier++)
             {
                 var entry = viewSet[tier];
                 if (entry.view)
                 {
-                    this.panesByTier[tier].show(entry.view);
+                    wait.push(this.panesByTier[tier].show(entry.view));
                 }
                 else
                 {
-                    this.panesByTier[tier].empty();
+                    wait.push(this.panesByTier[tier].empty());
                 }
             }
 
-            return deferred;
-        },
-        _applyViewToPane: function(entry, pane) {
-            var deferred = new Deferred();
-
-            if (entry.view)
-            {
-                pane.show(entry.view);
-            }
-            else
-            {
-                this.panesByTier[tier].empty();
-            }
+            return new DeferredList(wait, false, true, true);
         },
         show: function(view, at) {
             var pane = this.panes[at];
             if (pane)
             {
                 if (view)
-                    pane.show(view);
+                    return pane.show(view);
                 else
-                    pane.empty();
+                    return pane.empty();
             }
+
+            /* todo: return empty deferred? */
         }
     });
 });

@@ -30,6 +30,17 @@ h5
 .layout-left
 {
     background: #ff9900;
+
+    background-color: #e6e6e6;
+    background-image: linear-gradient(left, #e6e6e6, #cccccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        right top,
+        color-stop(0, #e6e6e6),
+        color-stop(1, #cccccc)
+    );
+
     -webkit-box-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
     -moz-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
     box-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
@@ -38,6 +49,9 @@ h5
 .layout-center
 {
     background: #99ff00;
+
+    background: #fff;
+
     -webkit-box-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
     -moz-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
     box-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
@@ -46,6 +60,8 @@ h5
 .layout-right
 {
     background: #0099ff;
+
+    background: #fbfdf0;
 }
 
 /* toolbar */
@@ -221,7 +237,7 @@ h5
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#cccccc)";
 }
 
-.detail-content > h2:first-child
+.detail-content > h2:first-of-type
 {
     border-top: solid 1px #e6e6e6;
 }
