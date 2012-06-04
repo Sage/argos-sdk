@@ -3,9 +3,11 @@ define('Sage/Platform/Mobile/_EventMapMixin', [
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
+    'dojo/_base/event',
     'dojo/dom-attr',
-    'dojo/query' /* required for delegation */
-], function(on, declare, array, lang, domAttr, query) {
+    'dojo/query' /* required for delegation */,
+    'dojo/NodeList-traverse'
+], function(on, declare, array, lang, event, domAttr, query, nodeListTraverse) {
     var proxy = function(fn, scope) {
         return function(evt) {
             /* `this` is the matched element for delegation */
@@ -47,14 +49,14 @@ define('Sage/Platform/Mobile/_EventMapMixin', [
                                 : item.event || name;
                             fn = lang.isFunction(this[item.action])
                                 ? this[item.action]
-                                : this._invokeDynamicAction;
+                                : this._handleDynamicEvent;
                         }
                         else
                         {
                             event = name;
                             fn = lang.isFunction(this[item])
                                 ? this[item]
-                                : this._invokeDynamicAction;
+                                : this._handleDynamicEvent;
                         }
 
                         this._eventSignals.push(
@@ -64,9 +66,26 @@ define('Sage/Platform/Mobile/_EventMapMixin', [
                 }
             }
         },
-        _invokeDynamicAction: function(evt, node) {
-            var action = domAttr.get(node, 'data-action'),
-                fn = lang.isFunction(this[action]) ? this[action] : null;
+        _handleDynamicEvent: function(evt) {
+            var node = query(evt.target).closest('[data-action]')[0],
+                action = node && domAttr.get(node, 'data-action');
+
+            var contained = this.domNode.contains
+                ? this.domNode != node && this.domNode.contains(node)
+                : !!(this.domNode.compareDocumentPosition(node) & 16);
+
+            if (action && this._hasDynamicAction(action) && (contained || this.domNode === node))
+            {
+                this._invokeDynamicAction(action, evt, node);
+
+                event.stop(evt);
+            }
+        },
+        _hasDynamicAction: function(name) {
+            return lang.isFunction(this[name]);
+        },
+        _invokeDynamicAction: function(name, evt, node) {
+            var fn = this[name];
             if (fn) fn.call(this, evt, node);
         },
         uninitialize: function() {

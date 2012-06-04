@@ -431,19 +431,21 @@ define('Sage/Platform/Mobile/List', [
                 this.refreshRequired = true;
             }
         },
-        selectEntry: function(params) {
-            var row = query(params.$source).closest('[data-key]')[0],
+        selectEntry: function(evt, node) {
+            var row = query(node).closest('[data-key]')[0],
                 key = row ? row.getAttribute('data-key') : false;
 
             if (this._selectionModel && key)
                 this._selectionModel.toggle(key, this.entries[key], row);
         },
-        activateEntry: function(params) {
-            if (params.key)
+        activateEntry: function(evt, node) {
+            var descriptor = node && node.getAttribute('data-descriptor'),
+                key = node && node.getAttribute('data-key');
+            if (key)
             {
                 if (this._selectionModel && this.isNavigationDisabled())
                 {
-                    this._selectionModel.toggle(params.key, this.entries[params.key] || params.descriptor, params.$source);
+                    this._selectionModel.toggle(key, this.entries[key] || descriptor, node);
                     if (this.options.singleSelect && this.options.singleSelectAction)
                     {
                         if (App.bars['tbar'])
@@ -454,7 +456,7 @@ define('Sage/Platform/Mobile/List', [
                 }
                 else
                 {
-                    this.navigateToDetailView(params.key, params.descriptor);
+                    this.navigateToDetailView(key, descriptor);
                 }
             }
         },
@@ -491,12 +493,10 @@ define('Sage/Platform/Mobile/List', [
             return null;
         },
         navigateToDetailView: function(key, descriptor) {
-            var view = App.getView(this.detailView);
-            if (view)
-                view.show({
-                    descriptor: descriptor,
-                    key: key
-                });
+            scene().showView(this.detailView, {
+                descriptor: descriptor,
+                key: key
+            });
         },
         navigateToInsertView: function(el) {
             var view = App.getView(this.insertView || this.editView);

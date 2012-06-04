@@ -473,6 +473,7 @@ define('Sage/Platform/Mobile/Detail', [
             }
         },
         refresh: function() {
+            /* todo: why is this here? */
             if (this.security && !App.hasAccessTo(this.expandExpression(this.security)))
             {
                 query(this.contentNode).append(this.notAvailableTemplate.apply(this));
