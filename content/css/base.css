@@ -226,12 +226,8 @@
     height: 38px;
     left: 6px;
 }
-.actions-enabled > img
-{
-    padding: 4px 0px 0px 4px;
-}
 
-.list-item-selected > .list-item-selector,
+.list-item-selected > .list-item-selector
 {
     visibility: visible !important;
 }
@@ -259,19 +255,17 @@
     background: #eaf1df;
     border-top: none !important;
     border-bottom: 1px solid #b3b3b3;
-    padding: 3px 0px 9px 0px !important;
-    -webkit-box-shadow: inset 0px 2px 3px 0px rgba(0, 0, 0, .5), inset 0px -2px 3px 0px rgba(0, 0, 0, .5);
-    box-shadow: inset 0px 2px 3px 0px rgba(0, 0, 0, .5), inset 0px -2px 3px 0px rgba(0, 0, 0, .5);
+    padding: 0 !important;
 }
 
-.list-item-actions > div
+.list-item-actions > .action-button
 {
     position: relative;
     float: left;
     margin-left: 6px;
     width: 64px;
     height: 42px;
-    padding: 6px 0px 0px 0px;
+    padding: 6px 0px 6px 0px;
     text-align: center;
 }
 
@@ -294,11 +288,15 @@
     border-bottom: 0px none #eaf1df !important;
     -webkit-border-radius: 3px 3px 0px 0px;
     border-radius: 3px 3px 0px 0px;
-    bottom: -5px;
+    bottom: -1px;
     height: auto !important;
     box-shadow: none !important;
     -moz-box-shadow: none !important;
     -webkit-box-shadow: none !important;
+
+    -moz-box-sizing:    border-box;
+    -webkit-box-sizing: border-box;
+     box-sizing:        border-box;
 }
 
 .action-label
@@ -312,6 +310,7 @@
 {
     width: 24px;
     height: 24px;
+    padding: 4px 0px 0px 4px;
     border: none 0 black;
 }
 

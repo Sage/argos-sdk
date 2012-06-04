@@ -43,6 +43,10 @@ h5
 {
     background-color: #D5EFFA;
 }
+.list-content > li div.action-button:active
+{
+    background-color: #80d0ef;
+}
 
 .list-content > li span
 {

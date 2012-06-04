@@ -265,7 +265,7 @@ define('Sage/Platform/Mobile/List', [
             '<li data-dojo-attach-point="actionsNode" class="list-item-actions"></li>'
         ]),
         listActionItemTemplate: new Simplate([
-            '<div data-action="invokeActionItem" data-id="{%= $.id %}" aria-label="{%: $.title || $.id %}"">',
+            '<div class="action-button" data-action="invokeActionItem" data-id="{%= $.id %}" aria-label="{%: $.title || $.id %}"">',
                 '<img src="{%= $.icon %}" alt="{%= $.id %}" class="action-icon" />',
                 '<div class="action-label">{%: $.label %}</div>',
             '</div>'
@@ -747,10 +747,10 @@ define('Sage/Platform/Mobile/List', [
 
             return request;
         },
-        navigateToRelatedView:  function(data, viewId, whereQueryFmt) {
+        navigateToRelatedView:  function(action, data, viewId, whereQueryFmt) {
             var view = App.getView(viewId),
                 options = {
-                    where: string.substitute(whereQueryFmt, [data.entry['$key']])
+                    where: string.substitute(whereQueryFmt, [data.data['$key']])
                 };
 
             if (view && options)
@@ -767,12 +767,12 @@ define('Sage/Platform/Mobile/List', [
                     key: key
                 });
         },
-        navigateToEditView: function(data) {
+        navigateToEditView: function(action, data) {
             var view = App.getView(this.editView || this.insertView);
             if (view)
             {
                 view.show({
-                    key: data.entry['$key']
+                    key: data.data['$key']
                 });
             }
         },
