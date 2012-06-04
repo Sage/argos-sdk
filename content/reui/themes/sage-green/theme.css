@@ -708,32 +708,30 @@ textarea:focus
     color: #000;
     text-shadow: #fff 0px 1px 0px;
 
-    border-color: #dbdbdb;
+    border-color: #ececec;
 
-    background-color: #fcfcfc;
+    background-color: #ffffff;
     background-image: linear-gradient(top, #fcfcfc, #dfdfdf);
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0, #fcfcfc),
-        color-stop(1, #dfdfdf)
+        color-stop(0, #ffffff),
+        color-stop(1, #ececec)
     );
-    background-image: -moz-linear-gradient(top, #fcfcfc, #dfdfdf);
-
-    /*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#fcfcfc, endColorstr=#dfdfdf)";*/
+    background-image: -moz-linear-gradient(top, #ffffff, #ececec);
 }
 
 .nonGlossExtraWhiteButton:active
 {
-    background-color: #fcfcfc;
+    background-color: #ffffff;
     background-image: linear-gradient(bottom, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
         linear,
         left bottom,
         left top,
-        color-stop(0, #fcfcfc),
-        color-stop(1, #f8f8f8)
+        color-stop(0, #ffffff),
+        color-stop(1, #ffffff)
     );
-    background-image: -moz-linear-gradient(bottom, #fcfcfc, #f8f8f8);
+    background-image: -moz-linear-gradient(bottom, #ffffff, #ffffff);
 }

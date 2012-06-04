@@ -244,6 +244,11 @@
     z-index: 10;
 }
 
+.actions-enabled > img
+{
+    padding: 4px 0px 0px 4px;
+    border: none 0 black;
+}
 .list-action-selected + .list-item-actions
 {
     display: block !important;
@@ -310,8 +315,6 @@
 {
     width: 24px;
     height: 24px;
-    padding: 4px 0px 0px 4px;
-    border: none 0 black;
 }
 
 /* grouped list */

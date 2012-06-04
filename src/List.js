@@ -130,7 +130,6 @@ define('Sage/Platform/Mobile/List', [
             if (this.singleSelection != !!val) //false != undefined = true, false != !!undefined = false
             {
                 this.singleSelection = val;
-                this.clear();
             }
         },
         select: function(key, data, tag) {
@@ -265,7 +264,7 @@ define('Sage/Platform/Mobile/List', [
             '<li data-dojo-attach-point="actionsNode" class="list-item-actions"></li>'
         ]),
         listActionItemTemplate: new Simplate([
-            '<div class="action-button" data-action="invokeActionItem" data-id="{%= $.id %}" aria-label="{%: $.title || $.id %}"">',
+            '<div class="action-button" data-action="invokeActionItem" data-id="{%= $.actionIndex %}" aria-label="{%: $.title || $.id %}"">',
                 '<img src="{%= $.icon %}" alt="{%= $.id %}" class="action-icon" />',
                 '<div class="action-label">{%: $.label %}</div>',
             '</div>'
@@ -513,8 +512,8 @@ define('Sage/Platform/Mobile/List', [
             {
                 var action = actions[i],
                     options = {
-                        enabled: typeof action.enabled != 'undefined' ? this.expandExpression(action.enabled) : true,
-                        scope: action.scope || this
+                        actionIndex: i,
+                        enabled: typeof action.enabled !== 'undefined' ? this.expandExpression(action.enabled) : true
                     },
                     actionTemplate = action.template || this.listActionItemTemplate;
 
@@ -530,10 +529,12 @@ define('Sage/Platform/Mobile/List', [
             this.actions = actions;
         },
         invokeActionItem: function(parameters, evt, node) {
-            var id = parameters['id'],
-                action = null,
+            var index = parameters['id'],
+                action = this.actions[index],
                 selectedItems = this._selectionModel.getSelections(),
                 selection = null;
+
+            if (!action.enabled) return;
 
             for (var key in selectedItems)
             {
@@ -541,26 +542,23 @@ define('Sage/Platform/Mobile/List', [
                 break;
             }
 
-            array.some(this.actions, function(item) {
-                if (item.id === id)
-                {
-                    action = item;
-                    return true;
-                }
-            });
+            if (action['fn'])
+                action['fn'].call(action['scope'] || this, action, selection);
+            else
+                if (action['action'])
+                    if (this.hasAction(action['action']))
+                        this.invokeAction(action['action'], action, selection);
+        },
+        showActionPanel: function(rowNode) {
+            domClass.add(rowNode, 'list-action-selected');
+            domConstruct.place(this.actionsNode, rowNode, 'after');
 
-            if (action.enabled)
-            {
-                if (action.fn)
-                {
-                    action.fn.call(action.scope || this, action, selection);
-                }
-                else if (action.action)
-                {
-                    if (this.hasAction(action.action))
-                        this.invokeAction(action.action, action, selection);
-                }
-            }
+            var coords = domGeom.position(this.actionsNode);
+            if (coords.y + coords.h + 48 > win.getBox().h)
+                this.actionsNode.scrollIntoView(false);
+        },
+        hideActionPanel: function(rowNode) {
+            domClass.remove(rowNode, 'list-action-selected');
         },
         isNavigationDisabled: function() {
             return ((this.options && this.options.selectionOnly) || (this.selectionOnly));
@@ -574,12 +572,7 @@ define('Sage/Platform/Mobile/List', [
 
             if (this.enableActions)
             {
-                domClass.add(node, 'list-action-selected');
-                domConstruct.place(this.actionsNode, node, 'after');
-
-                var coords = domGeom.position(this.actionsNode);
-                if (coords.y + coords.h + 48 > win.getBox().h)
-                    this.actionsNode.scrollIntoView(false);
+                this.showActionPanel(node);
             }
             else
             {
@@ -589,10 +582,10 @@ define('Sage/Platform/Mobile/List', [
         _onSelectionModelDeselect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
             if (!node) return;
+
             if (this.enableActions)
             {
-                domClass.remove(node, 'list-action-selected');
-                this._selectionModel.clear();
+                this.hideActionPanel(node);
             }
             else
             {
@@ -947,7 +940,7 @@ define('Sage/Platform/Mobile/List', [
             else
             {
                 // if enabled, clear any pre-existing selections
-                if (this._selectionModel && this.autoClearSelection)
+                if (this._selectionModel && this.autoClearSelection && !this.enableActions)
                     this._selectionModel.clear();
             }
         },
@@ -978,7 +971,6 @@ define('Sage/Platform/Mobile/List', [
             /// <summary>
             ///     Clears the view and re-applies the default content template.
             /// </summary>
-
             if (this._selectionModel)
             {
                 this._selectionModel.suspendEvents();
