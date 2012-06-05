@@ -531,7 +531,7 @@ define('Sage/Platform/Mobile/List', [
         invokeActionItem: function(parameters, evt, node) {
             var index = parameters['id'],
                 action = this.actions[index],
-                selectedItems = this._selectionModel.getSelections(),
+                selectedItems = this.get('selectionModel').getSelections(),
                 selection = null;
 
             if (!action.enabled) return;
@@ -567,30 +567,28 @@ define('Sage/Platform/Mobile/List', [
             return !((this.options && this.options.selectionOnly) || this.enableActions || this.allowSelection);
         },        
         _onSelectionModelSelect: function(key, data, tag) {
-            var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
+            var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.contentNode)[0];
             if (!node) return;
 
             if (this.enableActions)
             {
                 this.showActionPanel(node);
+                return;
             }
-            else
-            {
-                domClass.add(node, 'list-item-selected');
-            }
+
+            domClass.add(node, 'list-item-selected');
         },
         _onSelectionModelDeselect: function(key, data, tag) {
-            var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
+            var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.contentNode)[0];
             if (!node) return;
 
             if (this.enableActions)
             {
                 this.hideActionPanel(node);
+                return;
             }
-            else
-            {
-                domClass.remove(node, 'list-item-selected');
-            }
+
+            domClass.remove(node, 'list-item-selected');
         },
         _onSelectionModelClear: function() {
         },
@@ -740,10 +738,10 @@ define('Sage/Platform/Mobile/List', [
 
             return request;
         },
-        navigateToRelatedView:  function(action, data, viewId, whereQueryFmt) {
+        navigateToRelatedView:  function(action, selection, viewId, whereQueryFmt) {
             var view = App.getView(viewId),
                 options = {
-                    where: string.substitute(whereQueryFmt, [data.data['$key']])
+                    where: string.substitute(whereQueryFmt, [selection.data['$key']])
                 };
 
             if (view && options)
@@ -760,12 +758,12 @@ define('Sage/Platform/Mobile/List', [
                     key: key
                 });
         },
-        navigateToEditView: function(action, data) {
+        navigateToEditView: function(action, selection) {
             var view = App.getView(this.editView || this.insertView);
             if (view)
             {
                 view.show({
-                    key: data.data['$key']
+                    key: selection.data['$key']
                 });
             }
         },
