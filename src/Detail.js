@@ -190,10 +190,8 @@ define('Sage/Platform/Mobile/Detail', [
             property = property || '$key';
             return string.substitute(fmt, [utility.getValue(entry, property)]);
         },
-        toggleSection: function(params) {
-            var node = dom.byId(params.$source);
-            if (node)
-                domClass.toggle(node, 'collapsed');
+        toggleSection: function(evt, node) {
+            if (node) domClass.toggle(node, 'collapsed');
         },
         activateRelatedEntry: function(params) {
             if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context, 10), params.descriptor);

@@ -332,6 +332,9 @@ img
 
 .list-grouped .list-content > h2
 {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -623,6 +626,11 @@ h2 > .collapsed-indicator
 }
 
 .detail-content > .loading-indicator
+{
+    display: none;
+}
+
+.is-loading .detail-content > *
 {
     display: none;
 }
