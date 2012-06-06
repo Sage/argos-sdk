@@ -65,19 +65,19 @@ define('Sage/Platform/Mobile/GroupedList', [
 
                     if (itemGroup.tag != this._currentGroup)
                     {
-                        if (output.length > 0 && this._currentGroupNode) query(this._currentGroupNode).append(output.join(''));
+                        if (output.length > 0 && this._currentGroupNode) domConstruct.place(output.join(''), this._currentGroupNode, 'last');
 
                         output = [];
 
                         this._currentGroup = itemGroup.tag;
-                        query(this.contentNode).append(this.groupTemplate.apply(itemGroup, this));
+                        domConstruct.place(this.groupTemplate.apply(itemGroup, this), this.contentNode, 'last');
                         this._currentGroupNode = query("> :last-child", this.contentNode)[0];
                     }
 
                     output.push(this.rowTemplate.apply(item, this));
                 }
 
-                if (this._currentGroupNode) query(this._currentGroupNode).append(output.join(''));
+                if (output.length > 0 && this._currentGroupNode) domConstruct.place(output.join(''), this._currentGroupNode, 'last');
             }
 
             this.onContentChange();

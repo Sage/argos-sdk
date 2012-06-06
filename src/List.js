@@ -561,7 +561,7 @@ define('Sage/Platform/Mobile/List', [
                     output.push(this.rowTemplate.apply(item, this));
                 }
 
-                query(this.contentNode).append(output.join(''));
+                if (output.length > 0) domConstruct.place(output.join(''), this.contentNode, 'last');
             }
 
             this.onContentChange();
