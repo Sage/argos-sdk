@@ -330,6 +330,32 @@ img
     text-align: center;
 }
 
+.list-grouped .list-content > h2
+{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 32px;
+    line-height: 32px;
+    margin: 0;
+    padding: 0 0 0 6px;
+    font-size: 1em;
+    z-index: 5;
+    position: relative;
+}
+
+.list-grouped .list-content > ul
+{
+    margin: 0;
+    padding: 0 0 1.5em 0;
+}
+
+.list-grouped .list-content > ul:last-child
+{
+    margin: 0;
+    padding: 0 0 0 0;
+}
+
 /* search */
 .search-header
 {

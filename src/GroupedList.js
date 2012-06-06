@@ -28,86 +28,59 @@ define('Sage/Platform/Mobile/GroupedList', [
 ) {
 
     return declare('Sage.Platform.Mobile.GroupedList', [List], {
-        // Localization
-        toggleCollapseText: 'toggle collapse',
-
-        widgetTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list grouped-list{%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
-            '<div data-dojo-attach-point="searchNode"></div>',
-            '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',
-            '{%! $.emptySelectionTemplate %}',
-            '<div class="group-content" data-dojo-attach-point="contentNode"></div>',
-            '{%! $.moreTemplate %}',
-            '</div>'
-        ]),
+        baseClass: 'view list list-grouped has-search-header',
         groupTemplate: new Simplate([
             '<h2 data-action="toggleGroup" class="{% if ($.collapsed) { %}collapsed{% } %}">',
             '{%: $.title %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
-            '<ul data-group="{%= $.tag %}" class="list-content {%= $.cls %}"></ul>'
+            '<ul data-group="{%= $.tag %}" class="list-content"></ul>'
         ]),
         _currentGroup: null,
         _currentGroupNode: null,
-        getGroupForEntry: function(entry) {
+        // Localization
+        toggleCollapseText: 'toggle collapse',
+        getGroupForItem: function(item) {
             return {
                 tag: 1,
                 title: 'Default'
             };
         },
-        toggleGroup: function(params) {
-            var node = query(params.$source);
-            if (node)
-                domClass.toggle(node, 'collapsed');
+        toggleGroup: function(evt, node) {
+            if (node) domClass.toggle(node, 'collapsed');
         },
-        processFeed: function(feed) {
-            /// <summary>
-            ///     Processes the feed result from the SData request and renders out the resource feed entries.
-            /// </summary>
-            /// <param name="feed" type="Object">The feed object.</param>
-            if (!this.feed) this.set('listContent', '');
-
-            this.feed = feed;
-
-            if (this.feed['$totalResults'] === 0)
+        _onFetchComplete: function(items, request) {
+            var count = items.length;
+            if (count > 0)
             {
-                this.set('listContent', this.noDataTemplate.apply(this));               
-            }
-            else if (feed['$resources'])
-            {
-                var o = [];
+                var output = [];
 
-                for (var i = 0; i < feed['$resources'].length; i++)
+                for (var i = 0; i < count; i++)
                 {
-                    var entry = feed['$resources'][i],
-                        entryGroup = this.getGroupForEntry(entry);
+                    var item = this.processItem(items[i]),
+                        itemGroup = this.getGroupForItem(item);
 
-                    if (entryGroup.tag != this._currentGroup)
+                    this.items[this.store.getIdentity(item)] = item;
+
+                    if (itemGroup.tag != this._currentGroup)
                     {
-                        if (o.length > 0) query(this._currentGroupNode).append(o.join(''));
+                        if (output.length > 0 && this._currentGroupNode) query(this._currentGroupNode).append(output.join(''));
 
-                        o = [];
+                        output = [];
 
-                        this._currentGroup = entryGroup.tag;
-                        query(this.contentNode).append(this.groupTemplate.apply(entryGroup, this));
+                        this._currentGroup = itemGroup.tag;
+                        query(this.contentNode).append(this.groupTemplate.apply(itemGroup, this));
                         this._currentGroupNode = query("> :last-child", this.contentNode)[0];
                     }
 
-                    this.entries[entry.$key] = entry;
-
-                    o.push(this.rowTemplate.apply(entry, this));
+                    output.push(this.rowTemplate.apply(item, this));
                 }
 
-                if (o.length > 0) query(this._currentGroupNode).append(o.join(''));
+                if (this._currentGroupNode) query(this._currentGroupNode).append(output.join(''));
             }
 
-            // todo: add more robust handling when $totalResults does not exist, i.e., hide element completely
-            if (typeof this.feed['$totalResults'] !== 'undefined')
-            {
-                var remaining = this.feed['$totalResults'] - (this.feed['$startIndex'] + this.feed['$itemsPerPage'] - 1);
-                this.set('remainingContent', string.substitute(this.remainingText, [remaining]));
-            }
+            this.onContentChange();
 
-            domClass.toggle(this.domNode, 'list-has-more', this.hasMoreData());
+            domClass.remove(this.domNode, 'is-loading');
         },
         clear: function() {
             this.inherited(arguments);

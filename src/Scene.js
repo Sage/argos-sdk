@@ -97,6 +97,9 @@ define('Sage/Platform/Mobile/Scene', [
         hasView: function(name) {
             return !!(this._instancedViews[name] || this._registeredViews[name]);
         },
+        getViewRegistration: function(name) {
+            return this._registeredViews[name];
+        },
         showView: function(name, options, at) {
             var instance = this._instancedViews[name];
             if (instance)
@@ -131,6 +134,35 @@ define('Sage/Platform/Mobile/Scene', [
                 /* if `require` is called within a `require` as part of `dojo/domReady!`, the
                    page `load` event will not fire. */
                 setTimeout(lang.hitch(this, this._loadView, name, options, definition, at), 0);
+            }
+        },
+        _isEquivalentStateSet: function(a, b) {
+            if (a.length != b.length) return false;
+
+            for (var i = 0; i < a.length; i++)
+            {
+                if (a[i] && !b[i]) return false;
+                if (b[i] && !a[i]) return false;
+
+                if (a[i] && b[i] && a[i].hash != b[i].hash) return false;
+            }
+
+            return true;
+        },
+        _trimStateTo: function(stateSet) {
+            for (var i = this._state.length - 1; i >= 0; i--)
+            {
+                if (this._isEquivalentStateSet(this._state[i], stateSet)) break;
+            }
+
+            if (i >= 0)
+            {
+                /* todo: sync browser history state */
+
+                console.log('found trim state at %d', i);
+                this._state.splice(i, this._state.length - i);
+
+                /* todo: persist new state */
             }
         },
         _createStateSet: function(view, location) {
@@ -229,6 +261,7 @@ define('Sage/Platform/Mobile/Scene', [
                 viewSet = this._createViewSet(stateSet);
 
             /* todo: trim state to item before match of `stateSet` */
+            this._trimStateTo(stateSet);
 
             console.log('view set to apply: %o', viewSet);
 
@@ -257,6 +290,8 @@ define('Sage/Platform/Mobile/Scene', [
                 lang.hitch(this, this._onLayoutApplyComplete, stateSet),
                 lang.hitch(this, this._onLayoutApplyError, stateSet)
             );
+
+            return deferred;
         },
         _onLayoutShowComplete: function() {
             this._processQueue();
@@ -327,6 +362,34 @@ define('Sage/Platform/Mobile/Scene', [
                 console.log('queuing show of %s due to activity', name);
                 this._queue.push([name, instance, options, at]);
             }
+        },
+        back: function() {
+            /* todo: let browser history handle this for us? use hashchange to do this? */
+            if (this._state.length <= 1) return;
+
+            this._idle = false;
+
+            this._state.pop();
+
+            var stateSet = this._state[this._state.length - 1],
+                viewSet = this._createViewSet(stateSet);
+
+            array.forEach(viewSet, function(item, index) {
+                if (item.view) item.view.activate(stateSet[index].context.options);
+            });
+
+            /* todo: trim state to item before match of `stateSet` */
+            this._trimStateTo(stateSet);
+
+            console.log('view set to apply: %o', viewSet);
+
+            var deferred = this.layout.apply(viewSet);
+            deferred.then(
+                lang.hitch(this, this._onLayoutApplyComplete, stateSet),
+                lang.hitch(this, this._onLayoutApplyError, stateSet)
+            );
+
+            return deferred;
         }
     });
 });

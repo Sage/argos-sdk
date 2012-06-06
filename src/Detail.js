@@ -64,6 +64,7 @@ define('Sage/Platform/Mobile/Detail', [
         ],
         baseClass: 'view detail',
         _setDetailContentAttr: {node: 'contentNode', type: 'innerHTML'},
+        _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
         emptyTemplate: new Simplate([
         ]),
         loadingTemplate: new Simplate([
@@ -302,11 +303,13 @@ define('Sage/Platform/Mobile/Detail', [
                 }),
                 sectionQueue = [],
                 sectionStarted = false,
-                callbacks = [];
+                callbacks = [],
+                i, current;
 
-            for (var i = 0; i < rows.length; i++) {
-                var current = rows[i],
-                    section,
+            for (i = 0; i < rows.length; i++) {
+                current = rows[i];
+
+                var section,
                     sectionNode,
                     include = this.expandExpression(current['include'], entry),
                     exclude = this.expandExpression(current['exclude'], entry);
@@ -424,15 +427,15 @@ define('Sage/Platform/Mobile/Detail', [
                     callbacks.push({row: current, node: rowNode, value: value, entry: entry});
             }
 
-            for (var i = 0; i < callbacks.length; i++)
+            for (i = 0; i < callbacks.length; i++)
             {
-                var item = callbacks[i];
-                item.row['onCreate'].apply(this, [item.row, item.node, item.value, item.entry]);
+                current = callbacks[i];
+                current.row['onCreate'].apply(this, [current.row, current.node, current.value, current.entry]);
             }
 
-            for (var i = 0; i < sectionQueue.length; i++)
+            for (i = 0; i < sectionQueue.length; i++)
             {
-                var current = sectionQueue[i];
+                current = sectionQueue[i];
 
                 this.processLayout(current, entry);
             }
@@ -447,8 +450,7 @@ define('Sage/Platform/Mobile/Detail', [
             else
                 return this.inherited(arguments);
         },
-        activate: function(tag, data) {
-            var options = data && data.options;
+        activate: function(options) {
             if (options && options.descriptor)
                 options.title = options.title || options.descriptor;
 

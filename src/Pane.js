@@ -87,6 +87,8 @@ define('Sage/Platform/Mobile/Pane', [
                 previous = this.active;
             if (previous) previous.domNode.parentNode.removeChild(previous.domNode);
 
+            this.active = null;
+
             deferred.resolve(true);
 
             return deferred;

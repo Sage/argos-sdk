@@ -66,11 +66,11 @@ define('Sage/Platform/Mobile/View', [
         refresh: function() {
         },
         reload: function() {
-            if (this.refreshRequired)
-            {
-                this.refreshRequired = false;
-                this.refresh();
-            }
+            /* todo: is this the right implementation? even though no transition is actually happening? */
+            /* most of the full refresh logic is split between these two functions; that which needs to happen behind the scenes and that
+               which needs to happen after it is visible */
+            this.beforeTransitionTo();
+            this.transitionTo();
         },
         onContentChange: function() {
         },
