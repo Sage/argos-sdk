@@ -19,6 +19,7 @@ define('Sage/Platform/Mobile/FieldManager', [
     lang
 ) {
     var store = {};
+    // todo: move, and rename, to Fields/Registry
     return lang.setObject('Sage.Platform.Mobile.FieldManager', {
         types: store,
         register: function(name, ctor) {

@@ -17,14 +17,12 @@
 
 define('Sage/Platform/Mobile/Fields/NoteField', [
     'dojo/_base/declare',
-    'Sage/Platform/Mobile/Fields/EditorField',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/Fields/EditorField'
 ], function(
     declare,
-    EditorField,
-    FieldManager
+    EditorField
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.NoteField', [EditorField], {
+    return declare('Sage.Platform.Mobile.Fields.NoteField', [EditorField], {
         attributeMap: {
             noteText: {
                 node: 'inputNode',
@@ -81,6 +79,4 @@ define('Sage/Platform/Mobile/Fields/NoteField', [
             this.set('noteText', text);
         }
     });
-
-    return FieldManager.register('note', control);
 });

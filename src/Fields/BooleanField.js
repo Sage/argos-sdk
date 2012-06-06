@@ -16,17 +16,13 @@
 define('Sage/Platform/Mobile/Fields/BooleanField', [
     'dojo/_base/declare',
     'dojo/dom-attr',
-    'dojo/dom-class',
-    'Sage/Platform/Mobile/Fields/_Field',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/Fields/_Field'
 ], function(
     declare,
     domAttr,
-    domClass,
-    Field,
-    FieldManager
+    Field
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.BooleanField', [Field], {
+    return declare('Sage.Platform.Mobile.Fields.BooleanField', [Field], {
         attributeMap: {
             toggled:{
                 node: 'toggleNode',
@@ -83,6 +79,4 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
             return (this.originalValue != this.getValue());
         }
     });
-
-    return FieldManager.register('boolean', control);
 });

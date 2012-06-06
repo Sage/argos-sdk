@@ -18,25 +18,37 @@ define('Sage/Platform/Mobile/List', [
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/query',
+    'dojo/NodeList-manipulate',
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/dom',
     'dojo/string',
-    'Sage/Platform/Mobile/ErrorManager',
-    'Sage/Platform/Mobile/View',
-    'Sage/Platform/Mobile/SearchWidget'
+    './Data/SDataStore',
+    './View',
+    './ErrorManager',
+    './ScrollContainer',
+    './SearchWidget',
+    './Toolbar',
+    'argos!scene',
+    'argos!customizations'
 ], function(
     declare,
     lang,
     array,
     query,
+    queryManipulate,
     domClass,
     domConstruct,
     dom,
     string,
-    ErrorManager,
+    SDataStore,
     View,
-    SearchWidget
+    ErrorManager,
+    ScrollContainer,
+    SearchWidget,
+    Toolbar,
+    scene,
+    customizations
 ) {
 
     var SelectionModel = declare('Sage.Platform.Mobile.SelectionModel', null, {
@@ -137,30 +149,54 @@ define('Sage/Platform/Mobile/List', [
         }
     });
 
-    /**
-     * A base list view.
-     * @constructor
-     * @extends Sage.Platform.Mobile.View
-     * @param {Object} options The options for the view
-     */
-    return declare('Sage.Platform.Mobile.List', [View], {
-        attributeMap: {
-            listContent: {node: 'contentNode', type: 'innerHTML'},
-            remainingContent: {node: 'remainingContentNode', type: 'innerHTML'}
+    var parseOrderByRE = /((?:\w+)(?:\.\w+)?)(?:\s+(asc|desc))?/g,
+        parseOrderBy = function(expression) {
+            if (typeof expression !== 'string') return expression;
+
+            var match,
+                result = [];
+
+            while (match = parseOrderByRE.exec(expression))
+            {
+                result.push({
+                    attribute: match[1],
+                    descending: match[2] && match[2].toLowerCase() == 'desc'
+                });
+            }
+
+            return result;
+        };
+
+    var List = declare('Sage.Platform.Mobile.List', [View], {
+        events: {
+            'click': true
         },
-        /**
-         * The template used to render the view's main DOM element when the view is initialized.
-         * This template includes {@link #searchTemplate} and {@link #moreTemplate}.
-         */
-        widgetTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
-            '<div data-dojo-attach-point="searchNode"></div>',
-            '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',                
-            '{%! $.emptySelectionTemplate %}',
-            '<ul class="list-content" data-dojo-attach-point="contentNode"></ul>',
-            '{%! $.moreTemplate %}',
-            '</div>'
-        ]),
+        components: [
+            {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
+            {name: 'search', type: SearchWidget, attachEvent: 'onSearchExpression:_onSearchExpression'},
+            {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
+            {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
+                {name: 'scroll', tag: 'div', components: [
+                    {name: 'empty', tag: 'div', attrs: {'class': 'list-empty'}, attachPoint: 'emptySelectionNode', components: [
+                        {name: 'emptyButton', content: Simplate.make('<button class="button" data-action="emptySelection"><span>{%: $.emptySelectionText %}</span></button>')}
+                    ]},
+                    {name: 'content', tag: 'ul', attrs: {'class': 'list-content'}, attachPoint: 'contentNode'},
+                    {name: 'more', tag: 'div', attrs: {'class': 'list-more'}, components: [
+                        {name: 'moreRemaining', tag: 'span', attrs: {'class': 'list-remaining'}, attachPoint: 'remainingContentNode'},
+                        {name: 'moreButton', content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
+                    ]}
+                ]}
+            ]}
+        ],
+        baseClass: 'view list has-search-header',
+        contentNode: null,
+        remainingContentNode: null,
+        emptySelectionNode: null,
+        remainingNode: null,
+        moreNode: null,
+        _setListContentAttr: {node: 'contentNode', type: 'innerHTML'},
+        _setRemainingContentAttr: {node: 'remainingContentNode', type: 'innerHTML'},
+        _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
         /**
          * The template used to render the loading message when the view is requesting more data.
          *
@@ -171,50 +207,7 @@ define('Sage/Platform/Mobile/List', [
          *      loadingText         The text to display while loading.
          */
         loadingTemplate: new Simplate([
-            '<li class="list-loading-indicator"><div>{%= $.loadingText %}</div></li>'
-        ]),
-        /**
-         * The template used to render the pager at the bottom of the view.  This template is not directly rendered, but is
-         * included in {@link #viewTemplate}.
-         *
-         * The default template uses the following properties:
-         *
-         *      name                description
-         *      ----------------------------------------------------------------
-         *      moreText            The text to display on the more button.
-         *
-         * The default template exposes the following actions:
-         *
-         * * more
-         */
-        moreTemplate: new Simplate([
-            '<div class="list-more" data-dojo-attach-point="moreNode">',
-            '<div class="list-remaining"><span data-dojo-attach-point="remainingContentNode"></span></div>',
-            '<button class="button" data-action="more">',
-            '<span>{%= $.moreText %}</span>',
-            '</button>',
-            '</div>'
-        ]),
-        /**
-         * Template used on lookups to have empty Selection option.
-         * This template is not directly rendered but included in {@link #viewTemplate}.
-         *
-         * The default template uses the following properties:
-         *
-         *      name                description
-         *      ----------------------------------------------------------------
-         *      emptySelectionText  The text to display on the empty Selection button.
-         *
-         * The default template exposes the following actions:
-         *
-         * * emptySelection
-         */
-        emptySelectionTemplate: new Simplate([
-            '<div class="list-empty-opt" data-dojo-attach-point="emptySelectionNode">',
-            '<button class="button" data-action="emptySelection">',
-            '<span>{%= $.emptySelectionText %}</span>',
-            '</button>',
-            '</div>'
+            '<li class="loading-indicator"><div>{%= $.loadingText %}</div></li>'
         ]),
         /**
          * The template used to render a row in the view.  This template includes {@link #itemTemplate}.
@@ -248,54 +241,15 @@ define('Sage/Platform/Mobile/List', [
             '<h3>{%= $.noDataText %}</h3>',
             '</li>'
         ]),
-        contentNode:null,
-        remainingContentNode: null,
-        searchNode: null,
-        emptySelectionNode: null,
-        remainingNode: null,
-        moreNode: null,
         /**
          * @cfg {String} id
          * The id for the view, and it's main DOM element.
          */
         id: 'generic_list',
         /**
-         * @cfg {String} resourceKind
-         * The SData resource kind the view is responsible for.  This will be used as the default resource kind
-         * for all SData requests.
-         * @type {String}
+         * The property containing the key for the items in the data store.
          */
-        resourceKind: '',
-        /**
-         * A list of fields to be selected in an SData request.
-         * @type {Array.<String>}
-         */
-        querySelect: null,
-        /**
-         * A list of child properties to be included in an SData request.
-         * @type {Array.<String>}
-         */
-        queryInclude: null,
-        /**
-         * The default order by expression for an SData request.
-         * @type {String}
-         */
-        queryOrderBy: null,
-        /**
-         * The default where expression for an SData request.
-         * @type {String|Function}
-         */
-        queryWhere: null,
-        /**
-         * The default resource property for an SData request.
-         * @type {String|Function}
-         */
-        resourceProperty: null,
-        /**
-         * The default resource predicate for an SData request.
-         * @type {String|Function}
-         */
-        resourcePredicate: null,
+        tier: 0,
         /**
          * The page size (defaults to 20).
          * @type {Number}
@@ -395,8 +349,6 @@ define('Sage/Platform/Mobile/List', [
          */
         requestErrorText: 'A server error occurred while requesting data.',
         customizationSet: 'list',
-        searchWidget: null,
-        searchWidgetClass: SearchWidget,
         _selectionModel: null,
         _selectionConnects: null,
         _setSelectionModelAttr: function(selectionModel) {
@@ -418,7 +370,7 @@ define('Sage/Platform/Mobile/List', [
         _getSelectionModelAttr: function() {
             return this._selectionModel;
         },
-        postCreate: function() {
+        startup: function() {
             this.inherited(arguments);
 
             if (this._selectionModel == null)
@@ -426,48 +378,19 @@ define('Sage/Platform/Mobile/List', [
 
             this.subscribe('/app/refresh', this._onRefresh);
 
-            if (this.enableSearch)
-            {
-                var searchWidgetCtor = lang.isString(this.searchWidgetClass)
-                    ? lang.getObject(this.searchWidgetClass, false)
-                    : this.searchWidgetClass;
+            domClass.toggle(this.domNode, 'has-search', this.hideSearch);
 
-                this.searchWidget = this.searchWidget || new searchWidgetCtor({
-                    'class': 'list-search',
-                    'owner': this,
-                    'onSearchExpression': lang.hitch(this, this._onSearchExpression)
-                });
-                this.searchWidget.placeAt(this.searchNode, 'replace');
-            }
-            else
-            {
-                this.searchWidget = null;
-            }
+            this.clear(true);
 
-            domClass.toggle(this.domNode, 'list-hide-search', this.hideSearch);
-
-            this.clear();
-        },
-        startup: function() {
-            this.inherited(arguments);
-
-            if (this.searchWidget)
-                this.searchWidget.configure({
-                    'hashTagQueries': this._createCustomizedLayout(this.createHashTagQueryLayout(), 'hashTagQueries'),
-                    'formatSearchQuery': lang.hitch(this, this.formatSearchQuery)
+            if (this.$.search)
+                this.$.search.configure({
+                    'formatSearchQuery': lang.hitch(this, this.formatSearchQuery),
+                    'hashTagQueries': customizations().apply(
+                        customizations().toPath(this.customizationSet, 'hashTagQueries', this.id),
+                        this.createHashTagQueryLayout()
+                    )
                 });
         },
-        destroy: function() {
-			if (this.searchWidget)
-            {
-				if(!this.searchWidget._destroyed)
-                    this.searchWidget.destroyRecursive();
-
-				delete this.searchWidget;
-			}
-            
-			this.inherited(arguments);
-		},
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'tbar': [{
@@ -482,7 +405,7 @@ define('Sage/Platform/Mobile/List', [
         },
         isSelectionDisabled: function() {
             return !((this.options && this.options.selectionOnly) || (this.allowSelection));
-        },        
+        },
         _onSelectionModelSelect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
             if (node)
@@ -514,8 +437,8 @@ define('Sage/Platform/Mobile/List', [
                 this.refreshRequired = true;
             }
         },
-        selectEntry: function(params) {
-            var row = query(params.$source).closest('[data-key]')[0],
+        selectEntry: function(evt, node) {
+            var row = query(node).closest('[data-key]')[0],
                 key = row ? row.getAttribute('data-key') : false;
 
             if (this._selectionModel && key)
@@ -524,18 +447,20 @@ define('Sage/Platform/Mobile/List', [
             if (this.options.singleSelect && this.options.singleSelectAction)
                 this.invokeSingleSelectAction();
         },
-        activateEntry: function(params) {
-            if (params.key)
+        activateEntry: function(evt, node) {
+            var descriptor = node && node.getAttribute('data-descriptor'),
+                key = node && node.getAttribute('data-key');
+            if (key)
             {
                 if (this._selectionModel && this.isNavigationDisabled())
                 {
-                    this._selectionModel.toggle(params.key, this.entries[params.key] || params.descriptor, params.$source);
+                    this._selectionModel.toggle(key, this.entries[key] || descriptor, node);
                     if (this.options.singleSelect && this.options.singleSelectAction)
                         this.invokeSingleSelectAction();
                 }
                 else
                 {
-                    this.navigateToDetailView(params.key, params.descriptor);
+                    this.navigateToDetailView(key, descriptor);
                 }
             }
         },
@@ -567,87 +492,22 @@ define('Sage/Platform/Mobile/List', [
 
             this.requestData();
         },
-        configureSearch: function() {
+        _configureSearch: function() {
             this.query = this.options && this.options.query || null;
-            if (this.searchWidget)
-                this.searchWidget.configure({
+
+            if (this.$.search)
+                this.$.search.configure({
                     'context': this.getContext()
                 });
         },
-        createRequest:function(o) {
-            /// <summary>
-            ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.
-            /// </summary>
-            /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest">An SDataResourceCollectionRequest instance.<returns>
-
-            // todo: should we cache the request? the only thing that needs to change on subsequent requests is the paging.
-
-            var where = [],
-                options = this.options,
-                pageSize = this.pageSize,
-                startIndex = this.feed && this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0
-                    ? this.feed['$startIndex'] + this.feed['$itemsPerPage']
-                    : 1;
-
-            var request = new Sage.SData.Client.SDataResourceCollectionRequest(this.getService())
-                .setCount(pageSize)
-                .setStartIndex(startIndex);
-
-            var contractName = this.expandExpression((options && options.contractName) || this.contractName);
-            if (contractName)
-                request.setContractName(contractName);
-
-            var resourceKindExpr = this.expandExpression((options && options.resourceKind) || this.resourceKind);
-            if (resourceKindExpr)
-                request.setResourceKind(this.resourceKind);
-
-            var resourcePropertyExpr = this.expandExpression((options && options.resourceProperty) || this.resourceProperty);
-            if (resourcePropertyExpr)
-                request
-                    .getUri()
-                    .setPathSegment(Sage.SData.Client.SDataUri.ResourcePropertyIndex, resourcePropertyExpr);
-
-            var resourcePredicateExpr = this.expandExpression((options && options.resourcePredicate) || this.resourcePredicate);
-            if (resourcePredicateExpr)
-                request
-                    .getUri()
-                    .setCollectionPredicate(resourcePredicateExpr);
-
-            var querySelectExpr = this.expandExpression((options && options.select) || this.querySelect);
-            if (querySelectExpr)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, querySelectExpr.join(','));
-
-            var queryIncludeExpr = this.expandExpression(this.queryInclude);
-            if (queryIncludeExpr)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, queryIncludeExpr.join(','));
-
-            var queryOrderByExpr = this.expandExpression((options && options.orderBy) || this.queryOrderBy);
-            if (queryOrderByExpr)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, queryOrderByExpr);
-
-            var queryWhereExpr = this.expandExpression((options && options.where) || this.queryWhere);
-            if (queryWhereExpr)
-                where.push(queryWhereExpr);
-
-            if (this.query)
-                where.push(this.query);
-
-
-            if (where.length > 0)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Where, where.join(' and '));
-
-            return request;
-        },                
+        createStore: function() {
+            return null;
+        },
         navigateToDetailView: function(key, descriptor) {
-            /// <summary>
-            ///     Navigates to the requested detail view.
-            /// </summary>
-            var view = App.getView(this.detailView);
-            if (view)
-                view.show({
-                    descriptor: descriptor,
-                    key: key
-                });
+            scene().showView(this.detailView, {
+                descriptor: descriptor,
+                key: key
+            });
         },
         navigateToInsertView: function(el) {
             var view = App.getView(this.insertView || this.editView);
@@ -659,103 +519,106 @@ define('Sage/Platform/Mobile/List', [
                 });
             }
         },
-        processFeed: function(feed) {
-            /// <summary>
-            ///     Processes the feed result from the SData request and renders out the resource feed entries.
-            /// </summary>
-            /// <param name="feed" type="Object">The feed object.</param>
-            if (!this.feed) this.set('listContent', '');
-
-            this.feed = feed;
-            if (this.feed['$totalResults'] === 0)
-            {
-                this.set('listContent', this.noDataTemplate.apply(this));                
-            }
-            else if (feed['$resources'])
-            {
-                var o = [];
-
-                for (var i = 0; i < feed['$resources'].length; i++)
-                {
-                    var entry = feed['$resources'][i];
-
-                    entry['$descriptor'] = entry['$descriptor'] || feed['$descriptor'];
-
-                    this.entries[entry.$key] = entry;
-
-                    o.push(this.rowTemplate.apply(entry, this));
-                }
-
-                if (o.length > 0)
-                    domConstruct.place(o.join(''), this.contentNode, 'last');
-            }
-
-            // todo: add more robust handling when $totalResults does not exist, i.e., hide element completely
-            if (typeof this.feed['$totalResults'] !== 'undefined')
-            {
-                var remaining = this.feed['$totalResults'] - (this.feed['$startIndex'] + this.feed['$itemsPerPage'] - 1);
-                this.set('remainingContent', string.substitute(this.remainingText, [remaining]));
-            }
-
-            domClass.toggle(this.domNode, 'list-has-more', this.hasMoreData());
-
-            if (this.options.allowEmptySelection)
-                domClass.add(this.domNode, 'list-has-empty-opt');
-
+        onContentChange: function() {
         },
-        hasMoreData: function() {
-            /// <summary>
-            ///     Deterimines if there is more data to be shown by inspecting the last feed result.
-            /// </summary>
-            /// <returns type="Boolean">True if the feed has more data; False otherwise.</returns>
-            if (this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0 && this.feed['$totalResults'] >= 0)
+        _onFetchBegin: function(size, request) {
+            if (size === 0)
             {
-                var start = this.feed['$startIndex'];
-                var count = this.feed['$itemsPerPage'];
-                var total = this.feed['$totalResults'];
-
-                return (start + count <= total);
+                this.set('listContent', this.noDataTemplate.apply(this));
             }
             else
             {
-                return true; // no way to determine, always assume more data
+                var remaining = size > -1
+                    ? size - (request['start'] + request['count'])
+                    : -1;
+
+                if (remaining !== -1)
+                    this.set('remainingContent', string.substitute(this.remainingText, [remaining]));
+
+                domClass.toggle(this.domNode, 'has-more', (remaining === -1 || remaining > 0));
+
+                this.position = this.position + request['count'];
             }
+
+            /* todo: move to a more appropriate location */
+            if (this.options && this.options.allowEmptySelection) domClass.add(this.domNode, 'has-empty');
         },
-        onRequestDataFailure: function(response, o) {
-            /// <summary>
-            ///     Called when an error occurs while request data from the SData endpoint.
-            /// </summary>
-            /// <param name="response" type="Object">The response object.</param>
-            /// <param name="o" type="Object">The options that were passed to Ext when creating the Ajax request.</param>
-            alert(string.substitute(this.requestErrorText, [response, o]));
-            ErrorManager.addError(response, o, this.options, 'failure');
-            domClass.remove(this.domNode, 'list-loading');
+        processItem: function(item) {
+            return item;
         },
-        onRequestDataAborted: function(response, o) {
+        _onFetchComplete: function(items, request) {
+            var count = items.length;
+            if (count > 0)
+            {
+                var output = [];
+
+                for (var i = 0; i < count; i++)
+                {
+                    var item = this.processItem(items[i]);
+
+                    this.items[this.store.getIdentity(item)] = item;
+
+                    output.push(this.rowTemplate.apply(item, this));
+                }
+
+                query(this.contentNode).append(output.join(''));
+            }
+
+            this.onContentChange();
+
+            domClass.remove(this.domNode, 'is-loading');
+        },
+        _onFetchError: function(error, keywordArgs) {
+            alert(string.substitute(this.requestErrorText, [error]));
+
+            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'failure');
+
+            domClass.remove(this.domNode, 'is-loading');
+        },
+        _onFetchAbort: function(error, keywordArgs) {
             this.options = false; // force a refresh
-            ErrorManager.addError(response, o, this.options, 'aborted');
 
-            domClass.remove(this.domNode, 'list-loading');
-        },
-        onRequestDataSuccess: function(feed) {
-            this.processFeed(feed);
+            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'aborted');
 
-            domClass.remove(this.domNode, 'list-loading');
+            domClass.remove(this.domNode, 'is-loading');
         },
         requestData: function() {
-            /// <summary>
-            ///     Initiates the SData request.
-            /// </summary>
+            domClass.add(this.domNode, 'is-loading');
 
-            domClass.add(this.domNode, 'list-loading');
+            var store = this.store || (this.store = this.createStore()),
+                options = this.options,
+                conditions = [],
+                keywordArgs = {
+                    scope: this,
+                    onBegin: this._onFetchBegin,
+                    onError: this._onFetchError,
+                    onAbort: this._onFetchAbort,
+                    onComplete: this._onFetchComplete,
+                    count: this.pageSize,
+                    start: this.position
+                };
 
-            var request = this.createRequest();
-            request.read({
-                success: this.onRequestDataSuccess,
-                failure: this.onRequestDataFailure,
-                aborted: this.onRequestDataAborted,
-                scope: this
-            });
+            if (options && options.where)
+                conditions.push(this.expandExpression(options.where));
+
+            if (this.query)
+                conditions.push(this.query);
+
+            if (conditions.length > 0)
+                keywordArgs.query = ('(' + conditions.join(') and (') + ')');
+
+            if (options)
+            {
+                if (options.select) keywordArgs.select = this.expandExpression(options.select);
+                if (options.include) keywordArgs.include = this.expandExpression(options.include);
+                if (options.orderBy) keywordArgs.sort = parseOrderBy(this.expandExpression(options.orderBy));
+                if (options.contractName) keywordArgs.contractName = this.expandExpression(options.contractName);
+                if (options.resourceKind) keywordArgs.resourceKind = this.expandExpression(options.resourceKind);
+                if (options.resourceProperty) keywordArgs.resourceProperty = this.expandExpression(options.resourceProperty);
+                if (options.resourcePredicate) keywordArgs.resourcePredicate = this.expandExpression(options.resourcePredicate);
+            }
+
+            return store.fetch(keywordArgs);
         },
         more: function() {
             /// <summary>
@@ -777,7 +640,6 @@ define('Sage/Platform/Mobile/List', [
             {
                 if (options)
                 {
-                    if (this.expandExpression(this.options.stateKey) != this.expandExpression(options.stateKey)) return true;
                     if (this.expandExpression(this.options.where) != this.expandExpression(options.where)) return true;
                     if (this.expandExpression(this.options.query) != this.expandExpression(options.query)) return true;
                     if (this.expandExpression(this.options.resourceKind) != this.expandExpression(options.resourceKind)) return true;
@@ -797,11 +659,8 @@ define('Sage/Platform/Mobile/List', [
         beforeTransitionTo: function() {
             this.inherited(arguments);
 
-            domClass.toggle(this.domNode, 'list-hide-search', (this.options && typeof this.options.hideSearch !== 'undefined')
-                ? this.options.hideSearch
-                : this.hideSearch);
-
-            domClass.toggle(this.domNode, 'list-show-selectors', !this.isSelectionDisabled());
+            domClass.toggle(this.domNode, 'has-search', this.hideSearch);
+            domClass.toggle(this.domNode, 'has-selectors', !this.isSelectionDisabled());
 
             if (this._selectionModel && !this.isSelectionDisabled())
                 this._selectionModel.useSingleSelection(this.options.singleSelect);
@@ -819,10 +678,10 @@ define('Sage/Platform/Mobile/List', [
         },
         transitionTo: function()
         {
-            this.configureSearch();
+            this._configureSearch();
 
             if (this._selectionModel) this._loadPreviousSelections();
-            
+
             this.inherited(arguments);
         },
         createHashTagQueryLayout: function() {
@@ -840,11 +699,11 @@ define('Sage/Platform/Mobile/List', [
         refresh: function() {
             this.requestData();
         },
+        /**
+         *
+         * @param [all]
+         */
         clear: function(all) {
-            /// <summary>
-            ///     Clears the view and re-applies the default content template.
-            /// </summary>
-
             if (this._selectionModel)
             {
                 this._selectionModel.suspendEvents();
@@ -852,16 +711,78 @@ define('Sage/Platform/Mobile/List', [
                 this._selectionModel.resumeEvents();
             }
 
-            this.requestedFirstPage = false;
-            this.entries = {};
-            this.feed = false;
+            this.items = {};
+            this.position = 0;
             this.query = false; // todo: rename to searchQuery
 
-            if (all !== false && this.searchWidget) this.searchWidget.clear();
+            if (this.$.search && all !== false)
+                this.$.search.clear();
 
-            domClass.remove(this.domNode, 'list-has-more');
+            domClass.remove(this.domNode, 'has-more');
 
             this.set('listContent', this.loadingTemplate.apply(this));
         }
     });
+
+    /**
+     * SData enablement for the List view.
+     */
+    lang.extend(List, {
+        /**
+         * @cfg {String} resourceKind
+         * The SData resource kind the view is responsible for.  This will be used as the default resource kind
+         * for all SData requests.
+         * @type {String}
+         */
+        resourceKind: '',
+        /**
+         * A list of fields to be selected in an SData request.
+         * @type {Array.<String>}
+         */
+        querySelect: null,
+        /**
+         * A list of child properties to be included in an SData request.
+         * @type {Array.<String>}
+         */
+        queryInclude: null,
+        /**
+         * The default order by expression for an SData request.
+         * @type {String}
+         */
+        queryOrderBy: null,
+        /**
+         * The default where expression for an SData request.
+         * @type {String|Function}
+         */
+        queryWhere: null,
+        /**
+         * The default resource property for an SData request.
+         * @type {String|Function}
+         */
+        resourceProperty: null,
+        /**
+         * The default resource predicate for an SData request.
+         * @type {String|Function}
+         */
+        resourcePredicate: null,
+        keyProperty: '$key',
+        descriptorProperty: '$descriptor',
+        createStore: function() {
+            return new SDataStore({
+                service: this.getConnection(),
+                contractName: this.expandExpression(this.contractName),
+                resourceKind: this.expandExpression(this.resourceKind),
+                resourceProperty: this.expandExpression(this.resourceProperty),
+                resourcePredicate: this.expandExpression(this.resourcePredicate),
+                include: this.expandExpression(this.queryInclude),
+                select: this.expandExpression(this.querySelect),
+                where: this.expandExpression(this.queryWhere),
+                orderBy: this.expandExpression(this.queryOrderBy),
+                labelAttribute: this.descriptorProperty,
+                identityAttribute: this.keyProperty
+            });
+        }
+    });
+
+    return List;
 });

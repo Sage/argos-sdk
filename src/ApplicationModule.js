@@ -27,53 +27,54 @@ define('Sage/Platform/Mobile/ApplicationModule', [
 ) {
 
     return declare('Sage.Platform.Mobile.ApplicationModule', null, {
-        _connects: null,
-        _subscribes: null,
+        _signals: null,
         application: null,
         constructor: function(options) {
-            this._connects = [];
-            this._subscribes = [];
+            this._signals = [];
 
             lang.mixin(this, options);
         },
         destroy: function() {
-            array.forEach(this._connects, function(handle) {
-                connect.disconnect(handle);
+            array.forEach(this._signals, function(signal) {
+                signal.remove();
             });
-
-            array.forEach(this._subscribes, function(handle){
-                connect.unsubscribe(handle);
-            });
+            this._signals = null;
 
             this.uninitialize();
         },
         uninitialize: function() {
 
         },
-        init: function(application) {
+        startup: function() {
+            this.loadCustomizations(this.application); /* todo: potentially replace application with customization set */
+            this.loadViews(this.application && this.application.scene);
+        },
+        setApplication: function(application) {
             this.application = application;
-
-            this.loadCustomizations();
-            this.loadToolbars();
-            this.loadViews();
         },
-        loadCustomizations: function() {
+        loadCustomizations: function(customizationSet) {
         },
-        loadViews: function() {
+        loadViews: function(scene) {
         },
-        loadToolbars: function() {
-        },
+        /**
+         * @deprecated
+         * @param view
+         */
         registerView: function(view) {
-            if (this.application)
-                this.application.registerView(view);
+            var scene = this.application && this.application.scene;
+            if (scene)
+                scene.registerView(view.id, view);
         },
-        registerToolbar: function(name, toolbar) {
-            if (this.application)
-                this.application.registerToolbar(name, toolbar);
-        },
+        /**
+         * @deprecated
+         * @param set
+         * @param id
+         * @param spec
+         */
         registerCustomization: function(set, id, spec) {
-            if (this.application)
-                this.application.registerCustomization(set, id, spec);
+            var customizationSet = this.application;
+            if (customizationSet)
+                customizationSet.registerCustomization(set, id, spec);
         }
     });
 });

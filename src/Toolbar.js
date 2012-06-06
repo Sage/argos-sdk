@@ -18,18 +18,48 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dojo/_base/lang',
     'dojo/dom-style',
     'dojo/dom-class',
-    'dijit/_Widget',
-    'Sage/Platform/Mobile/_ActionMixin',
-    'Sage/Platform/Mobile/_Templated'
+    'dijit/_WidgetBase',
+    './_EventMapMixin',
+    './_UiComponent',
+    './Utility'
 ], function(
     declare,
     lang,
     domStyle,
     domClass,
-    _Widget,
-    _ActionMixin,
-    _Templated
+    _WidgetBase,
+    _EventMapMixin,
+    _UiComponent
 ) {
+    return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _UiComponent], {
+        baseClass: 'toolbar',
+        position: 'top',
+        components: [
+            {tag: 'h1', attrs: {'class':'toolbar-title'}, attachPoint: 'titleNode'}
+        ],
+        _setTitleAttr: {node: 'titleNode', type: 'innerHTML'},
+        _getPositionAttr: function() {
+            return this.position;
+        },
+        _setPositionAttr: function(value) {
+            var previous = this.position;
+
+            domClass.remove(this.domNode, 'toolbar-' + previous);
+            domClass.add(this.domNode, 'toolbar-' + value);
+
+            this.position = value;
+
+            this.onPositionChange(value, previous);
+        },
+        onPositionChange: function(position, previous) {
+        },
+        onCreate: function() {
+            this.inherited(arguments);
+            this.onPositionChange(this.position, null);
+        }
+    });
+
+    /*
     return declare('Sage.Platform.Mobile.Toolbar', [_Widget, _ActionMixin, _Templated], {
         widgetTemplate: new Simplate([
             '<div class="toolbar">',
@@ -125,4 +155,5 @@ define('Sage/Platform/Mobile/Toolbar', [
             }
         }
     });
+    */
 });

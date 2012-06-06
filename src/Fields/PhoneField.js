@@ -18,16 +18,15 @@ define('Sage/Platform/Mobile/Fields/PhoneField', [
     'dojo/has',
     'dojo/string',
     'Sage/Platform/Mobile/Fields/TextField',
-    'Sage/Platform/Mobile/FieldManager',
     'dojo/_base/sniff'
 ], function(
     declare,
     has,
     string,
     TextField,
-    FieldManager
+    sniff
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.PhoneField', [TextField], {
+    return declare('Sage.Platform.Mobile.Fields.PhoneField', [TextField], {
         /*
             {0}: original value
             {1}: cleaned value
@@ -99,6 +98,4 @@ define('Sage/Platform/Mobile/Fields/PhoneField', [
             this.inherited(arguments);
         }
     });
-
-    return FieldManager.register('phone', control);
 });

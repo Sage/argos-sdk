@@ -19,10 +19,9 @@ define('Sage/Platform/Mobile/Fields/HiddenField', [
     'Sage/Platform/Mobile/FieldManager'
 ], function(
     declare,
-    TextField,
-    FieldManager
+    TextField
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.HiddenField', [TextField], {
+    return declare('Sage.Platform.Mobile.Fields.HiddenField', [TextField], {
         propertyTemplate: new Simplate([
             '<div style="display: none;" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'
@@ -36,6 +35,4 @@ define('Sage/Platform/Mobile/Fields/HiddenField', [
             this.inherited(arguments);
         }
     });
-
-    return FieldManager.register('hidden', control);
 });

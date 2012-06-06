@@ -18,18 +18,15 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
     'dojo/_base/json',
     'dojo/dom-attr',
     'Sage/Platform/Mobile/Format',
-    'Sage/Platform/Mobile/Fields/EditorField',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/Fields/EditorField'
 ], function(
     declare,
     json,
     domAttr,
     format,
-    EditorField,
-    FieldManager
+    EditorField
 ) {
-
-    var control = declare('Sage.Platform.Mobile.Fields.SignatureField', [EditorField], {
+    return declare('Sage.Platform.Mobile.Fields.SignatureField', [EditorField], {
         // Localization
         emptyText: '',
         titleText: 'Signature',
@@ -94,6 +91,4 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
             return val;
         }
     });
-
-    return FieldManager.register('signature', control);
 });

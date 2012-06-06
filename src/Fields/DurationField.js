@@ -18,17 +18,15 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
     'dojo/string',
     'dojo/dom-class',
     'Sage/Platform/Mobile/Format',
-    'Sage/Platform/Mobile/Fields/LookupField',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/Fields/LookupField'
 ], function(
     declare,
     string,
     domClass,
     format,
-    LookupField,
-    FieldManager
+    LookupField
 ) {
-    var control = declare('Sage.Platform.Mobile.Fields.DurationField', [LookupField], {
+    return declare('Sage.Platform.Mobile.Fields.DurationField', [LookupField], {
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -198,6 +196,4 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
             }
         }
     });
-    
-    return FieldManager.register('duration', control);
 });

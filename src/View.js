@@ -16,66 +16,46 @@
 define('Sage/Platform/Mobile/View', [
     'dojo/_base/declare',
     'dojo/_base/lang',
-    'dijit/_Widget',
-    'Sage/Platform/Mobile/_ActionMixin',
-    'Sage/Platform/Mobile/_CustomizationMixin',
-    'Sage/Platform/Mobile/_Templated'
+    'dojo/dom-class',
+    'dijit/_WidgetBase',
+    './_EventMapMixin',
+    './_UiComponent',
+    'argos!application',
+    'argos!customizations'
 ], function(
     declare,
     lang,
-    _Widget,
-    _ActionMixin,
-    _CustomizationMixin,
-    _Templated
+    domClass,
+    _WidgetBase,
+    _EventMapMixin,
+    _UiComponent,
+    application,
+    customizations
 ) {
-    return declare('Sage.Platform.Mobile.View', [_Widget, _ActionMixin, _CustomizationMixin, _Templated], {
-        attributeMap: {
-            'title': {
-                node: 'domNode',
-                type: 'attribute',
-                attribute: 'title'
-            },
-            'selected': {
-                node: 'domNode',
-                type: 'attribute',
-                attribute: 'selected'
-            }
-        },
-        widgetTemplate: new Simplate([
-            '<ul id="{%= $.id %}" title="{%= $.titleText %}" class="{%= $.cls %}">',
-            '</ul>'
-        ]),
-        _loadConnect: null,
-        id: 'generic_view',
+    return declare('Sage.Platform.Mobile.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
+        baseClass: 'view',
         titleText: 'Generic View',
         tools: null,
+        layout: null,
         security: null,
         serviceName: false,
+        connectionName: false,
+        customizationSet: 'view',
+        _getProtoComponentDeclarations: function() {
+            var customizationSet = customizations();
+            return customizationSet.apply(customizationSet.toPath(this.customizationSet, 'components', this.id), this.inherited(arguments));
+        },
+        _onToolbarPositionChange: function(position, previous) {
+            if (previous) domClass.remove(this.domNode, 'has-toolbar-' + previous);
 
+            domClass.add(this.domNode, 'has-toolbar-' + position);
+        },
         getTools: function() {
-            return this._createCustomizedLayout(this.createToolLayout(), 'tools');
+            var customizationSet = customizations();
+            return customizationSet.apply(customizationSet.toPath(this.customizationSet, 'tools', this.id), this.createToolLayout());
         },
         createToolLayout: function() {
             return this.tools || {};
-        },
-        init: function() {
-            this.startup();
-            this.initConnects();
-        },
-        initConnects: function() {
-            this._loadConnect = this.connect(this.domNode, 'onload', this._onLoad);
-        },
-        _onLoad: function(evt, el, o) {
-            this.disconnect(this._loadConnect);
-
-            this.load(evt, el, o);
-        },
-        /**
-         * Called once the first time the view is about to be transitioned to.
-         * @deprecated
-         */
-        load: function() {
-            // todo: remove load entirely?
         },
         refreshRequiredFor: function(options) {
             if (this.options)
@@ -84,6 +64,15 @@ define('Sage/Platform/Mobile/View', [
                 return true;
         },
         refresh: function() {
+        },
+        reload: function() {
+            /* todo: is this the right implementation? even though no transition is actually happening? */
+            /* most of the full refresh logic is split between these two functions; that which needs to happen behind the scenes and that
+               which needs to happen after it is visible */
+            this.beforeTransitionTo();
+            this.transitionTo();
+        },
+        onContentChange: function() {
         },
         /**
          * The onBeforeTransitionAway event.
@@ -115,32 +104,7 @@ define('Sage/Platform/Mobile/View', [
          */
         onActivate: function(self) {
         },
-        /**
-         * The onShow event.
-         * @param self
-         */
-        onShow: function(self) {
-        },
-        activate: function(tag, data) {
-            // todo: use tag only?
-            if (data && this.refreshRequiredFor(data.options))
-            {
-                this.refreshRequired = true;
-            }
-
-            this.options = data.options || this.options || {};
-
-            (this.options.title) ? this.set('title', this.options.title) : this.set('title', this.titleText);
-
-            this.onActivate(this);
-        },
-        show: function(options, transitionOptions) {
-            /// <summary>
-            ///     Shows the view using iUI in order to transition to the new element.
-            /// </summary>
-
-            if (this.onShow(this) === false) return;
-
+        activate: function(options) {
             if (this.refreshRequiredFor(options))
             {
                 this.refreshRequired = true;
@@ -150,16 +114,13 @@ define('Sage/Platform/Mobile/View', [
 
             (this.options.title) ? this.set('title', this.options.title) : this.set('title', this.titleText);
 
-            ReUI.show(this.domNode, lang.mixin(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
+            this.onActivate(this);
         },
+        /**
+         * @param expression
+         * @return {*}
+         */
         expandExpression: function(expression) {
-            /// <summary>
-            ///     Expands the passed expression if it is a function.
-            /// </summary>
-            /// <param name="expression" type="String">
-            ///     1: function - Called on this object and must return a string.
-            ///     2: string - Returned directly.
-            /// </param>
             if (typeof expression === 'function')
                 return expression.apply(this, Array.prototype.slice.call(arguments, 1));
             else
@@ -198,12 +159,15 @@ define('Sage/Platform/Mobile/View', [
 
             this.onTransitionAway(this);
         },
+        /**
+         * @deprecated
+         * @return {*}
+         */
         getService: function() {
-            /// <summary>
-            ///     Returns the primary SDataService instance for the view.
-            /// </summary>
-            /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>
-            return App.getService(this.serviceName); /* if false is passed, the default service will be returned */
+            return this.getConnection();
+        },
+        getConnection: function() {
+            return application().getConnection(this.connectionName || this.serviceName);
         },
         getTag: function() {
         },
