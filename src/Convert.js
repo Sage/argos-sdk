@@ -75,14 +75,14 @@ define('Sage/Platform/Mobile/Convert', [
             }
             else if ((match = isoDate.exec(value)))
             {
-                utc = new Date(Date.UTC(
+                utc = moment(new Date(Date.UTC(
                     parseInt(match[1], 10),
                     parseInt(match[2], 10) - 1, // zero based
                     parseInt(match[3], 10),
                     parseInt(match[4] || 0, 10),
                     parseInt(match[5] || 0, 10),
                     parseInt(match[6] || 0, 10)
-                ));
+                )));
 
                 if (match[8] && match[8] !== 'Z')
                 {
@@ -90,12 +90,12 @@ define('Sage/Platform/Mobile/Convert', [
                     m = parseInt(match[11], 10);
                     
                     if (match[9] === '-')
-                        utc.addMinutes((h * 60) + m);
+                        utc.add({minutes:((h * 60) + m)});
                     else
-                        utc.addMinutes(-1 * ((h * 60) + m));
+                        utc.add({minutes:(-1 * ((h * 60) + m))});
                 }
 
-                value = utc;
+                value = utc.toDate();
             }
 
             return value;

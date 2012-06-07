@@ -31,7 +31,7 @@ define('Sage/Platform/Mobile/Fields/DateField', [
     return declare('Sage.Platform.Mobile.Fields.DateField', [EditorField], {
         // Localization
         emptyText: '',
-        dateFormatText: 'MM/dd/yyyy',
+        dateFormatText: 'MM/DD/YYYY',
         invalidDateFormatErrorText: "Field '${0}' has Invalid date format.",
 
         widgetTemplate: new Simplate([
