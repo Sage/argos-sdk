@@ -49,6 +49,8 @@ define('Sage/Platform/Mobile/GroupedList', [
         },
         toggleGroup: function(evt, node) {
             if (node) domClass.toggle(node, 'collapsed');
+
+            this.onContentChange();
         },
         _onFetchComplete: function(items, request) {
             var count = items.length;

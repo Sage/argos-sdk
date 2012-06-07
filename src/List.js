@@ -564,9 +564,9 @@ define('Sage/Platform/Mobile/List', [
                 if (output.length > 0) domConstruct.place(output.join(''), this.contentNode, 'last');
             }
 
-            this.onContentChange();
-
             domClass.remove(this.domNode, 'is-loading');
+
+            this.onContentChange();
         },
         _onFetchError: function(error, keywordArgs) {
             alert(string.substitute(this.requestErrorText, [error]));

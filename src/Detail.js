@@ -192,6 +192,8 @@ define('Sage/Platform/Mobile/Detail', [
         },
         toggleSection: function(evt, node) {
             if (node) domClass.toggle(node, 'collapsed');
+
+            this.onContentChange();
         },
         activateRelatedEntry: function(params) {
             if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context, 10), params.descriptor);
@@ -236,9 +238,10 @@ define('Sage/Platform/Mobile/Detail', [
                 this.set('detailContent', '');
             }
 
-            this.onContentChange();
-
             domClass.remove(this.domNode, 'is-loading');
+
+            /* this must take place when the content is visible */
+            this.onContentChange();
         },
         _onFetchError: function(error, keywordArgs) {
             if (error.status == 404)

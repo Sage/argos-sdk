@@ -162,6 +162,7 @@ img
 /* view */
 .view
 {
+    display: none;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -171,6 +172,11 @@ img
     -moz-box-sizing: border-box;
 
     width: 100%;
+}
+
+.is-visible
+{
+    display: block;
 }
 
 /* list */

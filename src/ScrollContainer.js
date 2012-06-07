@@ -39,12 +39,15 @@ define('Sage/Platform/Mobile/ScrollContainer', [
             if (hasTouch)
             {
                 this._scroll = new iScroll(this.domNode, {
-                    checkDOMChanges: false
+                    useTransition: true,
+                    checkDOMChanges: false,
+                    hScrollbar: false,
+                    vScrollbar: false
                 });
             }
         },
         onContentChange: function() {
-            console.log('content changed!');
+            console.log('content changed: %s', this.getComponentOwner().id);
             if (this._scroll)
                 this._scroll.refresh();
         },

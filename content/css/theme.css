@@ -149,9 +149,11 @@ h5
         color-stop(1, #cccccc)
     );
     background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+    /*
     box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    */
     color: #000;
     text-shadow: #fff 0px 1px 0px;
     font-weight: bold;
@@ -269,9 +271,11 @@ h5
         color-stop(1, #cccccc)
     );
     background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+    /*
     box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    */
     color: #000;
     text-shadow: #fff 0px 1px 0px;
     font-weight: bold;
