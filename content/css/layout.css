@@ -237,7 +237,7 @@ img
     list-style: none;
     margin: 0;
     padding: 8px 32px 8px 36px;
-    position: relative;
+    /* position: relative; */
     border-bottom: solid 1px #ddd;
     cursor: pointer;
 }
