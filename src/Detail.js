@@ -229,14 +229,7 @@ define('Sage/Platform/Mobile/Detail', [
 
             this.entry = this.processItem(item);
 
-            if (this.entry)
-            {
-                this.processLayout(layout, this.entry);
-            }
-            else
-            {
-                this.set('detailContent', '');
-            }
+            this.processLayout(layout, this.entry);
 
             domClass.remove(this.domNode, 'is-loading');
 
@@ -246,7 +239,7 @@ define('Sage/Platform/Mobile/Detail', [
         _onFetchError: function(error, keywordArgs) {
             if (error.status == 404)
             {
-                query(this.contentNode).append(this.notAvailableTemplate.apply(this));
+                domConstruct.place(this.notAvailableTemplate.apply(this), this.contentNode, 'only');
             }
             else
             {
@@ -254,8 +247,6 @@ define('Sage/Platform/Mobile/Detail', [
 
                 ErrorManager.addError(error, keywordArgs, this.options, 'failure');
             }
-
-            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'failure');
 
             domClass.remove(this.domNode, 'is-loading');
         },
@@ -489,7 +480,7 @@ define('Sage/Platform/Mobile/Detail', [
             this.inherited(arguments);
         },
         clear: function() {
-            this.set('detailContent', this.loadingTemplate.apply(this));
+            domConstruct.place(this.loadingTemplate.apply(this), this.contentNode, 'only');
 
             this._navigationOptions = [];
         }

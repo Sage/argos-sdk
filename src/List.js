@@ -524,7 +524,7 @@ define('Sage/Platform/Mobile/List', [
         _onFetchBegin: function(size, request) {
             if (size === 0)
             {
-                this.set('listContent', this.noDataTemplate.apply(this));
+                domConstruct.place(this.noDataTemplate.apply(this), this.contentNode, 'only');
             }
             else
             {
@@ -565,6 +565,9 @@ define('Sage/Platform/Mobile/List', [
             }
 
             domClass.remove(this.domNode, 'is-loading');
+
+            /* remove the loading indicator so that it does not get re-shown while requesting more data */
+            if (request['start'] === 0) domConstruct.destroy(this.loadingIndicatorNode);
 
             this.onContentChange();
         },
@@ -720,7 +723,7 @@ define('Sage/Platform/Mobile/List', [
 
             domClass.remove(this.domNode, 'has-more');
 
-            this.set('listContent', this.loadingTemplate.apply(this));
+            this.loadingIndicatorNode = domConstruct.place(this.loadingTemplate.apply(this), this.contentNode, 'only');
         }
     });
 

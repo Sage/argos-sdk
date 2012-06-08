@@ -223,7 +223,7 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             if (result)
             {
                 var items = lang.getObject(this.itemsAttribute, false, result) || [result],
-                    size = result['$totalResults'] || -1;
+                    size = typeof result['$totalResults'] === 'number' ? result['$totalResults'] : -1;
 
                 if (keywordArgs.onBegin)
                     keywordArgs.onBegin.call(keywordArgs.scope || this, size, requestObject);
