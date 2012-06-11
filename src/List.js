@@ -557,6 +557,13 @@ define('Sage/Platform/Mobile/List', [
             if (coords.y + coords.h + 48 > win.getBox().h)
                 this.actionsNode.scrollIntoView(false);
         },
+        setSource: function(source) {
+            lang.mixin(source, {
+                resourceKind: this.resourceKind
+            });
+
+            this.options.source = source;
+        },
         hideActionPanel: function(rowNode) {
             domClass.remove(rowNode, 'list-action-selected');
         },
