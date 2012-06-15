@@ -227,14 +227,10 @@ define('Sage/Platform/Mobile/List', [
          */
         rowTemplate: new Simplate([
             '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
-            '{% if ($$.enableActions) { %}',
-                '<div data-action="selectEntry" class="list-item-selector button nonGlossExtraWhiteButton actions-enabled">',
-                '<img src="{%= $$.icon %}" class="icon" /></div>',
-                '{% } else { %}',
-                '<div data-action="selectEntry" class="list-item-selector">',
-                '<img src="{%= $$.selectIcon %}" class="icon" /></div>',
-            '{% } %}',
-            '<div class="list-item-content">{%! $$.itemTemplate %}</div>',
+                '<button data-action="selectEntry" class="list-item-selector button">',
+                    '<img src="{%= $$.icon || $$.selectIcon %}" class="icon" />',
+                '</button>',
+                '<div class="list-item-content">{%! $$.itemTemplate %}</div>',
             '</li>'
         ]),
         /**
@@ -261,13 +257,13 @@ define('Sage/Platform/Mobile/List', [
             '</li>'
         ]),
         listActionTemplate: new Simplate([
-            '<li data-dojo-attach-point="actionsNode" class="list-item-actions"></li>'
+            '<li data-dojo-attach-point="actionsNode" class="actions-row"></li>'
         ]),
         listActionItemTemplate: new Simplate([
-            '<div class="action-button" data-action="invokeActionItem" data-id="{%= $.actionIndex %}" aria-label="{%: $.title || $.id %}"">',
-                '<img src="{%= $.icon %}" alt="{%= $.id %}" class="action-icon" />',
-                '<div class="action-label">{%: $.label %}</div>',
-            '</div>'
+            '<button data-action="invokeActionItem" data-id="{%= $.actionIndex %}" aria-label="{%: $.title || $.id %}">',
+                '<img src="{%= $.icon %}" alt="{%= $.id %}" />',
+                '<label>{%: $.label %}</label>',
+            '</button>'
         ]),
             
         contentNode:null,
@@ -329,10 +325,14 @@ define('Sage/Platform/Mobile/List', [
          */
         enableSearch: true,
         /**
-         * True to hide the search bar (defaults to false).
+         * True to enable action based panel (defaults to false).
          * @type {Boolean}
          */
         enableActions: false,
+        /**
+         * True to hide the search bar (defaults to false).
+         * @type {Boolean}
+         */
         hideSearch: false,
         /**
          * True to allow selection in the view (defaults to false).
@@ -934,8 +934,11 @@ define('Sage/Platform/Mobile/List', [
             if (typeof this.options.enableActions !== 'undefined')
                 this.enableActions = this.options.enableActions;
 
+            domClass.toggle(this.domNode, 'list-show-actions', this.enableActions);
             if (this.enableActions)
+            {
                 this._selectionModel.useSingleSelection(true);
+            }
 
 
             if (this.refreshRequired)
