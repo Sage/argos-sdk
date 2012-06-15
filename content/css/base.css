@@ -328,7 +328,7 @@
 .actions-row > button > label
 {
     padding: 0 3px 3px 3px;
-    font-size: 70%;
+    font-size: 10px;
     white-space: nowrap;
     display: block;
     text-overflow: ellipsis;

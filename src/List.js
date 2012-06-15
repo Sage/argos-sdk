@@ -513,13 +513,9 @@ define('Sage/Platform/Mobile/List', [
                 var action = actions[i],
                     options = {
                         actionIndex: i,
-                        enabled: typeof action.enabled !== 'undefined' ? this.expandExpression(action.enabled) : true
+                        hasAccess: (action.security && App.hasAccessTo(this.expandExpression(action.security))) || true
                     },
                     actionTemplate = action.template || this.listActionItemTemplate;
-
-                // if action is enabled, check security
-                if (options.enabled && action.security)
-                    options.enabled = App.hasAccessTo(this.expandExpression(action.security));
 
                 lang.mixin(action, options);
 
@@ -534,7 +530,7 @@ define('Sage/Platform/Mobile/List', [
                 selectedItems = this.get('selectionModel').getSelections(),
                 selection = null;
 
-            if (!action.enabled) return;
+            if (!action.isEnabled) return;
 
             for (var key in selectedItems)
             {
@@ -549,7 +545,37 @@ define('Sage/Platform/Mobile/List', [
                     if (this.hasAction(action['action']))
                         this.invokeAction(action['action'], action, selection);
         },
+        checkActionState: function() {
+            var selectedItems = this.get('selectionModel').getSelections(),
+                selection = null;
+
+            for (var key in selectedItems)
+            {
+                selection = selectedItems[key];
+                break;
+            }
+
+            for (var i = 0; i < this.actions.length; i++)
+            {
+                var action = this.actions[i];
+
+                action.isEnabled = (typeof action['enabled'] === 'undefined')
+                    ? true
+                    : this.expandExpression(action['enabled'], action, selection);
+
+                if (!action.hasAccess)
+                    action.isEnabled = false;
+
+                if (action.isEnabled)
+                    domClass.remove(this.actionsNode.childNodes[i], 'toolButton-disabled');
+                else
+                    domClass.add(this.actionsNode.childNodes[i], 'toolButton-disabled');
+            }
+
+        },
         showActionPanel: function(rowNode) {
+            this.checkActionState();
+
             domClass.add(rowNode, 'list-action-selected');
             domConstruct.place(this.actionsNode, rowNode, 'after');
 
