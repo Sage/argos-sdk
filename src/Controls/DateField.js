@@ -31,9 +31,11 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
         emptyText: '',
         dateFormatText: 'MM/dd/yyyy',
         showTimePicker: false,
+        timeless: false,
+        
         invalidDateFormatErrorText: "Field '{0}' has Invalid date format.",
         formatValue: function(value) {
-            return Sage.Platform.Mobile.Format.date(value, this.dateFormatText);
+            return Sage.Platform.Mobile.Format.date(value, this.dateFormatText, this.timeless);
         },
         init: function() {
             Sage.Platform.Mobile.Controls.EditorField.superclass.init.apply(this, arguments);
@@ -67,6 +69,7 @@ Ext.namespace('Sage.Platform.Mobile.Controls');
 
             options.date = this.currentValue;
             options.showTimePicker = this.showTimePicker;
+            options.timeless = this.timeless;
 
             return options;
         },
