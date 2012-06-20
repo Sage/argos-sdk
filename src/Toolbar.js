@@ -16,6 +16,7 @@
 define('Sage/Platform/Mobile/Toolbar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/query',
     'dojo/dom-style',
     'dojo/dom-class',
     'dijit/_WidgetBase',
@@ -25,11 +26,13 @@ define('Sage/Platform/Mobile/Toolbar', [
 ], function(
     declare,
     lang,
+    query,
     domStyle,
     domClass,
     _WidgetBase,
     _EventMapMixin,
-    _UiComponent
+    _UiComponent,
+    utility
 ) {
     return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _UiComponent], {
         baseClass: 'toolbar',
@@ -38,6 +41,10 @@ define('Sage/Platform/Mobile/Toolbar', [
             {tag: 'h1', attrs: {'class':'toolbar-title'}, attachPoint: 'titleNode'}
         ],
         _setTitleAttr: {node: 'titleNode', type: 'innerHTML'},
+        _size: 0,
+        _items: null,
+        _itemsByName: null,
+
         _getPositionAttr: function() {
             return this.position;
         },
@@ -56,6 +63,36 @@ define('Sage/Platform/Mobile/Toolbar', [
         onCreate: function() {
             this.inherited(arguments);
             this.onPositionChange(this.position, null);
+        },
+        clear: function() {
+            query("> .tool-button", this.domNode).remove();
+
+            this._items = {};
+        },
+        _setItemsAttr: function(values) {
+            var items = {};
+
+            if (typeof values == 'undefined') return;
+
+            this.clear();
+
+            for (var i = 0; i < values.length; i++) {
+                var value = values[i],
+                    item = {
+                        name: value.name || value.id,
+                        busy: false,
+                        visible: true,
+                        enabled: true,
+                        source: value
+                    };
+
+                items[item.name] = item;
+            }
+
+            this._items = items;
+        },
+        _getItemsAttr: function() {
+            return this._items;
         }
     });
 
