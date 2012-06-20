@@ -755,6 +755,7 @@ body.landscape > #generic_calendar > #datetime-picker {
 body.landscape > #generic_calendar > #datetime-picker > .calendar-content,
 body.landscape > #generic_calendar > #datetime-picker > .time-content
 {
+    vertical-align: top;
     display:inline-block;
     padding: 0px !important;
 }
