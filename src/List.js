@@ -273,6 +273,7 @@ define('Sage/Platform/Mobile/List', [
         remainingNode: null,
         moreNode: null,
         actionsNode: null,
+
         /**
          * @cfg {String} id
          * The id for the view, and it's main DOM element.
@@ -566,10 +567,7 @@ define('Sage/Platform/Mobile/List', [
                 if (!action.hasAccess)
                     action.isEnabled = false;
 
-                if (action.isEnabled)
-                    domClass.remove(this.actionsNode.childNodes[i], 'toolButton-disabled');
-                else
-                    domClass.add(this.actionsNode.childNodes[i], 'toolButton-disabled');
+                domClass.toggle(this.actionsNode.childNodes[i], 'toolButton-disabled', !action.isEnabled);
             }
 
         },
@@ -579,8 +577,7 @@ define('Sage/Platform/Mobile/List', [
             domClass.add(rowNode, 'list-action-selected');
             domConstruct.place(this.actionsNode, rowNode, 'after');
 
-            var coords = domGeom.position(this.actionsNode);
-            if (coords.y + coords.h + 48 > win.getBox().h)
+            if (this.actionsNode.offsetTop + this.actionsNode.clientHeight + 48 > document.documentElement.clientHeight)
                 this.actionsNode.scrollIntoView(false);
         },
         setSource: function(source) {
@@ -634,7 +631,11 @@ define('Sage/Platform/Mobile/List', [
                     var row = query((string.substitute('[data-key="${0}"], [data-descriptor="${0}"]', [previousSelections[i]])), this.contentNode)[0];
 
                     if (row)
-                        this.selectEntry({$source: row});
+                        this.activateEntry({
+                            key: previousSelections[i],
+                            descriptor: previousSelections[i],
+                            $source: row
+                        });
                 }
             }
         },
@@ -644,17 +645,14 @@ define('Sage/Platform/Mobile/List', [
                 this.refreshRequired = true;
             }
         },
-        selectEntry: function(params) {
-            var row = query(params.$source).closest('[data-key]')[0],
+        selectEntry: function(params, evt, node) {
+            var row = query(node).closest('[data-key]')[0],
                 key = row ? row.getAttribute('data-key') : false;
 
             if (this._selectionModel && key)
                 this._selectionModel.toggle(key, this.entries[key], row);
 
-            if (this.enableActions)
-                return;
-
-            if (this.options.singleSelect && this.options.singleSelectAction)
+            if (this.options.singleSelect && this.options.singleSelectAction && !this.enableActions)
                 this.invokeSingleSelectAction();
         },
         activateEntry: function(params) {
