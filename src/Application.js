@@ -272,8 +272,10 @@ define('Sage/Platform/Mobile/Application', [
             return null;
         },
         getViewSecurity: function(key, access) {
-            var view = this.getView(key);
-            return (view && view.getSecurity(access));
+            return null;
+            // todo: implement
+            //var view = this.getView(key);
+            //return (view && view.getSecurity(access));
         },
         onResize: function() {
             if (this.resizeTimer) clearTimeout(this.resizeTimer);

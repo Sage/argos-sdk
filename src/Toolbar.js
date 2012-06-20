@@ -17,8 +17,10 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/query',
+    'dojo/dom-construct',
     'dojo/dom-style',
     'dojo/dom-class',
+    'dojo/dom-attr',
     'dijit/_WidgetBase',
     './_EventMapMixin',
     './_UiComponent',
@@ -27,8 +29,10 @@ define('Sage/Platform/Mobile/Toolbar', [
     declare,
     lang,
     query,
+    domConstruct,
     domStyle,
     domClass,
+    domAttr,
     _WidgetBase,
     _EventMapMixin,
     _UiComponent,
@@ -40,8 +44,19 @@ define('Sage/Platform/Mobile/Toolbar', [
         components: [
             {tag: 'h1', attrs: {'class':'toolbar-title'}, attachPoint: 'titleNode'}
         ],
+        itemTemplate: new Simplate([
+            '<button class="button tool-button {%= $$.cls %}"',
+                    'data-tool="{%= $.name %}" aria-label="{%: $$.title || $.name %}">',
+                '{% if ($$.icon) { %}',
+                '<img src="{%= $$.icon %}" alt="{%= $.name %}" />',
+                '{% } else { %}',
+                '<span></span>',
+                '{% } %}',
+            '</button>'
+        ]),
+        items: null,
         _setTitleAttr: {node: 'titleNode', type: 'innerHTML'},
-        _size: 0,
+        _size: null,
         _items: null,
         _itemsByName: null,
 
@@ -65,29 +80,87 @@ define('Sage/Platform/Mobile/Toolbar', [
             this.onPositionChange(this.position, null);
         },
         clear: function() {
-            query("> .tool-button", this.domNode).remove();
+            this._remove();
 
             this._items = {};
         },
+        update: function() {
+            var count = {left: 0, right: 0};
+
+            for (var name in this._items)
+            {
+                var item = this._items[name];
+
+                this._update(item);
+
+                if (item.visible) count[item.side] += 1;
+
+                this._sync(item);
+            }
+
+            domAttr.set(this.domNode, 'data-item-count', Math.max(count['left'], count['right']));
+        },
+        _render: function(item) {
+            var node = domConstruct.toDom(this.itemTemplate.apply(item, item.source));
+
+            item.domNode = node;
+
+            domClass.add(node, 'on-' + item.side);
+
+            this._sync(item);
+
+            domConstruct.place(node, this.domNode);
+
+            return node;
+        },
+        _update: function(item) {
+            var value = item.source,
+                visible = utility.expand(this, value.visible),
+                enabled = utility.expand(this, value.enabled);
+
+            item.visible = typeof visible !== 'undefined' ? visible : true;
+            item.enabled = typeof enabled !== 'undefined' ? enabled : true;
+        },
+        _sync: function(item) {
+            var node = item.domNode;
+
+            domClass.toggle(node, 'is-disabled', !item.enabled);
+            domClass.toggle(node, 'is-hidden', !item.visible);
+        },
+        _remove: function() {
+            query("> .tool", this.domNode).remove();
+        },
         _setItemsAttr: function(values) {
-            var items = {};
+            var items = {},
+                count = {left: 0, right: 0};
 
             if (typeof values == 'undefined') return;
 
-            this.clear();
+            this._remove();
 
             for (var i = 0; i < values.length; i++) {
                 var value = values[i],
                     item = {
+                        domNode: null,
                         name: value.name || value.id,
+                        side: value.side || 'right',
                         busy: false,
                         visible: true,
                         enabled: true,
                         source: value
                     };
 
+                this._update(item);
+
+                if (item.visible) count[item.side] += 1;
+
+                this._render(item);
+
                 items[item.name] = item;
             }
+
+            /* todo: track each side seprately? */
+            domAttr.set(this.domNode, 'data-tool-count', Math.max(count['left'], count['right']));
 
             this._items = items;
         },

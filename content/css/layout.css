@@ -43,6 +43,14 @@ img
 	border: none 0 black;
 }
 
+/* button */
+.button
+{
+	height: 30px;
+	line-height: 30px;
+	padding: 0 2px 0 2px;
+}
+
 /* dojo mobile: themes/common/FixedSplitter.css */
 .mblFixedSpliter {
 	width: 100%;
@@ -147,16 +155,47 @@ img
     z-index: 0;
 }
 
-.toolbar-size-1 > h1
+.toolbar[data-tool-count="1"] > h1
 {
     left: 50px;
     right: 50px;
 }
 
-.toolbar-size-2 > h1
+.toolbar[data-tool-count="2"] > h1
 {
     left: 100px;
     right: 100px;
+}
+
+.tool-button
+{
+    position: relative;
+    width: 34px;
+    height: 34px;
+    padding: 0px;
+    z-index: 100;
+}
+
+.tool-button > span
+{
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: center center;
+    margin: 4px;
+    width: 24px;
+    height: 24px;
+}
+
+.toolbar > .on-left
+{
+    float: left;
+    margin-right: 10px;
+}
+
+.toolbar > .on-right
+{
+    float: right;
+    margin-left: 10px;
 }
 
 /* view */
@@ -655,12 +694,4 @@ h2 > .collapsed-indicator
 {
 	display: inline-block;
     text-align: center;
-}
-
-/* button */
-.button
-{
-	height: 30px;
-	line-height: 30px;
-	padding: 0 2px 0 2px;
 }

@@ -90,9 +90,9 @@ define('Sage/Platform/Mobile/Utility', [
                 return fn.apply(scope || this, called.concat(optional));
             };
         },
-        expand: function(expression) {
+        expand: function(scope, expression) {
             if (typeof expression === 'function')
-                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
+                return expression.apply(scope, Array.prototype.slice.call(arguments, 2));
             else
                 return expression;
         }
