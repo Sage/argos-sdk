@@ -588,8 +588,8 @@ img
     display: block;    
 }
 
-.row > div > input[type|=radio], .row > div >x input[type|=checkbox],
-.row > input[type|=radio], .row > div >x input[type|=checkbox]
+.row > div > input[type|=radio], .row > div > input[type|=checkbox],
+.row > input[type|=radio], .row > div > input[type|=checkbox]
 {
   margin: 7px 7px 0 0;
   height: 25px;
