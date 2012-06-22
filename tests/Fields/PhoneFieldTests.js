@@ -94,9 +94,85 @@ return describe('Sage.Platform.Mobile.Fields.PhoneField', function() {
         expect(field.previousValue).toEqual(false);
     });
 
+    it('Can skip formatting when number starts with +', function() {
+        var field = new PhoneField();
 
+        var testNumber = '+100-100-1000';
+        var cleaned = field.formatNumberForDisplay(testNumber);
 
+        expect(cleaned).toEqual(testNumber);
+    });
+    it('Can format (6) nnnnnn to nnn-nnn', function() {
+        var field = new PhoneField();
 
+        var testNumber = '123456';
+        var cleaned = field.formatNumberForDisplay(testNumber);
 
+        expect(cleaned).toEqual('123-456');
+    });
+    it('Can format (7) nnnnnnn to nnn-nnnn', function() {
+        var field = new PhoneField();
+
+        var testNumber = '1234567';
+        var cleaned = field.formatNumberForDisplay(testNumber);
+
+        expect(cleaned).toEqual('123-4567');
+    });
+    it('Can format (8) nnnnnnnn to (nnn)-nnn-nn', function() {
+        var field = new PhoneField();
+
+        var testNumber = '12345678';
+        var cleaned = field.formatNumberForDisplay(testNumber);
+
+        expect(cleaned).toEqual('(123)-456-78');
+    });
+    it('Can format (9) nnnnnnnnn to (nnn)-nnn-nnn', function() {
+        var field = new PhoneField();
+
+        var testNumber = '123456789';
+        var cleaned = field.formatNumberForDisplay(testNumber);
+
+        expect(cleaned).toEqual('(123)-456-789');
+    });
+    it('Can format (10) nnnnnnnnnn to (nnn)-nnn-nnnn', function() {
+        var field = new PhoneField();
+
+        var testNumber = '1234567890';
+        var cleaned = field.formatNumberForDisplay(testNumber);
+
+        expect(cleaned).toEqual('(123)-456-7890');
+    });
+    it('Can return 11+ digits unformated', function() {
+        var field = new PhoneField();
+
+        var testNumber = '123456789011';
+        var cleaned = field.formatNumberForDisplay(testNumber);
+
+        expect(cleaned).toEqual('123456789011');
+    });
+    it('Can format (8x) nnnnnnnnxxx to (nnn)-nnn-nnxxx', function() {
+        var field = new PhoneField();
+
+        var testNumber = '12345678xxx';
+        var cleaned = field.formatNumberForDisplay(testNumber);
+
+        expect(cleaned).toEqual('(123)-456-78xxx');
+    });
+    it('Can format (9x) nnnnnnnnnxxxx to (nnn)-nnn-nnnxxxx', function() {
+        var field = new PhoneField();
+
+        var testNumber = '123456789xxx';
+        var cleaned = field.formatNumberForDisplay(testNumber);
+
+        expect(cleaned).toEqual('(123)-456-789xxx');
+    });
+    it('Can format (10x) nnnnnnnnnnxxx to (nnn)-nnn-nnnnxxx', function() {
+        var field = new PhoneField();
+
+        var testNumber = '1234567890xxx';
+        var cleaned = field.formatNumberForDisplay(testNumber);
+
+        expect(cleaned).toEqual('(123)-456-7890xxx');
+    });
 });
 });
