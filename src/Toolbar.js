@@ -17,6 +17,8 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/query',
+    'dojo/NodeList-manipulate',
+    'dojo/topic',
     'dojo/dom-construct',
     'dojo/dom-style',
     'dojo/dom-class',
@@ -29,6 +31,8 @@ define('Sage/Platform/Mobile/Toolbar', [
     declare,
     lang,
     query,
+    nodeListManipulate,
+    topic,
     domConstruct,
     domStyle,
     domClass,
@@ -39,6 +43,9 @@ define('Sage/Platform/Mobile/Toolbar', [
     utility
 ) {
     return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _UiComponent], {
+        events: {
+            '.tool-button:click': '_onToolClick'
+        },
         baseClass: 'toolbar',
         position: 'top',
         components: [
@@ -59,7 +66,32 @@ define('Sage/Platform/Mobile/Toolbar', [
         _size: null,
         _items: null,
         _itemsByName: null,
+        _onToolClick: function(evt, node) {
+            var name = domAttr.get(node, 'data-tool');
+            if (name) this._invokeTool(name);
+        },
+        _invokeTool: function(name) {
+            var item = this._items[name],
+                source = item && item.source;
+            if (source)
+            {
+                if (source.fn)
+                {
+                    source.fn.call(source.scope || this, source);
+                }
+                else if (source.action)
+                {
+                    var root = this.getComponentRoot(),
+                        method = root[source.action];
 
+                    if (typeof method === 'function') method.call(root, source);
+                }
+                else if (source.publish)
+                {
+                    topic.publish(source.publish, [source]);
+                }
+            }
+        },
         _getPositionAttr: function() {
             return this.position;
         },
@@ -114,9 +146,9 @@ define('Sage/Platform/Mobile/Toolbar', [
             return node;
         },
         _update: function(item) {
-            var value = item.source,
-                visible = utility.expand(this, value.visible),
-                enabled = utility.expand(this, value.enabled);
+            var source = item.source,
+                visible = utility.expand(this, source.visible),
+                enabled = utility.expand(this, source.enabled);
 
             item.visible = typeof visible !== 'undefined' ? visible : true;
             item.enabled = typeof enabled !== 'undefined' ? enabled : true;
@@ -139,15 +171,15 @@ define('Sage/Platform/Mobile/Toolbar', [
             this._remove();
 
             for (var i = 0; i < values.length; i++) {
-                var value = values[i],
+                var source = values[i],
                     item = {
                         domNode: null,
-                        name: value.name || value.id,
-                        side: value.side || 'right',
+                        name: source.name || source.id,
+                        side: source.side || 'right',
                         busy: false,
                         visible: true,
                         enabled: true,
-                        source: value
+                        source: source
                     };
 
                 this._update(item);

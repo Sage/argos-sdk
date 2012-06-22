@@ -17,16 +17,18 @@ define('Sage/Platform/Mobile/Fields/DateField', [
     'dojo/_base/declare',
     'dojo/string',
     'dojo/dom-class',
-    'Sage/Platform/Mobile/Format',
-    'Sage/Platform/Mobile/Fields/EditorField',
-    'Sage/Platform/Mobile/Calendar'
+    '../_TemplatedWidgetMixin',
+    '../Calendar',
+    '../Format',
+    './EditorField'
 ], function(
     declare,
     string,
     domClass,
+    _TemplatedWidgetMixin,
+    Calendar,
     format,
-    EditorField,
-    Calendar
+    EditorField
 ) {
     return declare('Sage.Platform.Mobile.Fields.DateField', [EditorField], {
         // Localization

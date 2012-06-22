@@ -64,6 +64,9 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
                 ? props
                 : props['type'];
             return this.fromType[name] || ((fallback !== false) && TextField);
+        },
+        register: function(type, ctor) {
+            fromType[type] = ctor;
         }
     });
 });

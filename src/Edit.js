@@ -24,25 +24,16 @@ define('Sage/Platform/Mobile/Edit', [
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/query',
-    'Sage/Platform/Mobile/Convert',
-    'Sage/Platform/Mobile/Utility',
-    'Sage/Platform/Mobile/ErrorManager',
-    'Sage/Platform/Mobile/FieldManager',
-    'Sage/Platform/Mobile/View',
-
     'dojo/NodeList-manipulate',
-    'Sage/Platform/Mobile/Fields/BooleanField',
-    'Sage/Platform/Mobile/Fields/DateField',
-    'Sage/Platform/Mobile/Fields/DecimalField',
-    'Sage/Platform/Mobile/Fields/DurationField',
-    'Sage/Platform/Mobile/Fields/HiddenField',
-    'Sage/Platform/Mobile/Fields/LookupField',
-    'Sage/Platform/Mobile/Fields/NoteField',
-    'Sage/Platform/Mobile/Fields/PhoneField',
-    'Sage/Platform/Mobile/Fields/SelectField',
-    'Sage/Platform/Mobile/Fields/SignatureField',
-    'Sage/Platform/Mobile/Fields/TextAreaField',
-    'Sage/Platform/Mobile/Fields/TextField'
+    './View',
+    './ScrollContainer',
+    './Toolbar',
+    './Data/SDataStore',
+    './ErrorManager',
+    './Fields/FieldRegistry',
+    './Convert',
+    './Utility',
+    'argos!customizations'
 ], function(
     declare,
     lang,
@@ -54,39 +45,41 @@ define('Sage/Platform/Mobile/Edit', [
     domClass,
     domConstruct,
     query,
+    nodeListManipulate,
+    View,
+    ScrollContainer,
+    Toolbar,
+    SDataStore,
+    ErrorManager,
+    FieldRegistry,
     convert,
     utility,
-    ErrorManager,
-    FieldManager,
-    View
+    customizations
 ) {
 
     return declare('Sage.Platform.Mobile.Edit', [View], {
-        attributeMap: {
-            validationContent: {
-                node: 'validationContentNode',
-                type: 'innerHTML'
-            }
+        events: {
+            'click': true
         },
-        widgetTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="edit panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',            
-            '{%! $.loadingTemplate %}',
-            '{%! $.validationSummaryTemplate %}',
-            '<div class="panel-content" data-dojo-attach-point="contentNode"></div>',
-            '</div>'
-        ]),
-        loadingTemplate: new Simplate([
-            '<fieldset class="panel-loading-indicator">',
-            '<div class="row"><div>{%: $.loadingText %}</div></div>',
-            '</fieldset>'        
-        ]),
-        validationSummaryTemplate: new Simplate([
-            '<div class="panel-validation-summary">',
-            '<h2>{%: $.validationSummaryText %}</h2>',
-            '<ul data-dojo-attach-point="validationContentNode">',
-            '</ul>',
-            '</div>'
-        ]),
+        components: [
+            {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
+            {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
+            {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
+                {name: 'scroll', tag: 'div', components: [
+                    {name: 'loading', content: Simplate.make('<fieldset class="loading-indicator"><div class="row"><div>{%: $.loadingText %}</div></div></fieldset>')},
+                    {name: 'validation', tag: 'div', attrs: {'class': 'validation-summary'}, components: [
+                        {name: 'validationTitle', content: Simplate.make('<h2>{%: $.validationSummaryText %}</h2>')},
+                        {name: 'validationContent', tag: 'ul', attachPoint: 'validationContentNode'}
+                    ]},
+                    {name: 'content', tag: 'div', attrs: {'class': 'edit-content'}, attachPoint: 'contentNode'}
+                ]}
+            ]}
+        ],
+        baseClass: 'view edit',
+        _setEditContentAttr: {node: 'contentNode', type: 'innerHTML'},
+        _setValidationContentAttr: {node: 'validationContentNode', type: 'innerHTML'},
+        _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
+
         validationSummaryItemTemplate: new Simplate([
             '<li>',
             '<a href="#{%= $.name %}">',
@@ -112,26 +105,28 @@ define('Sage/Platform/Mobile/Edit', [
         ]),
         transitionEffect: 'slide',
         id: 'generic_edit',
+        tier: 1,
         layout: null,
-        enableCustomizations: true,
         customizationSet: 'edit',
-        expose: false,
         saveText: 'Save',
         titleText: 'Edit',
         toggleCollapseText: 'toggle collapse',
         validationSummaryText: 'Validation Summary',
         detailsText: 'Details',
         loadingText: 'loading...',
-        requestErrorText: 'A server error occured while requesting data.',
+        requestErrorText: 'A server error occurred while requesting data.',
         insertSecurity: false,
         updateSecurity: false,
         constructor: function(o) {
             this.fields = {};
         },
-        startup: function() {
+        onCreate: function() {
             this.inherited(arguments);
+
+            var customizationSet = customizations(),
+                layout = customizationSet.apply(customizationSet.toPath(this.customizationSet, null, this.id), this.createLayout());
             
-            this.processLayout(this._createCustomizedLayout(this.createLayout()));
+            this.processLayout(layout);
 
             query('div[data-field]', this.contentNode).forEach(function(node) {
                 var name = domAttr.get(node, 'data-field'),
@@ -156,9 +151,9 @@ define('Sage/Platform/Mobile/Edit', [
                         : this.updateSecurity
                 },{
                     id: 'cancel',
-                    side: 'left',
-                    fn: ReUI.back,
-                    scope: ReUI
+                    side: 'left'
+                    //fn: ReUI.back,
+                    //scope: ReUI
                 }]
             });
         },
@@ -174,6 +169,7 @@ define('Sage/Platform/Mobile/Edit', [
         _onDisableField: function(field) {
             domClass.add(field.containerNode, 'row-disabled');
         },
+        /*
         invokeAction: function(name, parameters, evt, node) {
             var fieldNode = node && query(node, this.contentNode).parents('[data-field]'),
                 field = this.fields[fieldNode.length > 0 && domAttr.get(fieldNode[0], 'data-field')];
@@ -192,6 +188,7 @@ define('Sage/Platform/Mobile/Edit', [
 
             return this.inherited(arguments);
         },
+        */
         toggleSection: function(params) {
             var node = dom.byId(params.$source);
             if (node)
@@ -268,7 +265,7 @@ define('Sage/Platform/Mobile/Edit', [
                     content.push(this.sectionBeginTemplate.apply(layout, this));
                 }                    
 
-                var ctor = FieldManager.get(current['type']),
+                var ctor = FieldRegistry.getFieldFor(current['type'], false),
                     field = this.fields[current['name'] || current['property']] = new ctor(lang.mixin({
                         owner: this
                     }, current)),
@@ -715,10 +712,12 @@ define('Sage/Platform/Mobile/Edit', [
 
             this.inherited(arguments);
         },
+        /*
         activate: function() {
             // external navigation (browser back/forward) never refreshes the edit view as it's always a terminal loop.
             // i.e. you never move "forward" from an edit view; you navigate to child editors, from which you always return.
-        },       
+        },
+        */
         refreshRequiredFor: function(options) {
             if (this.options)
             {

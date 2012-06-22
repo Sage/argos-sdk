@@ -16,7 +16,7 @@
 define('Sage/Platform/Mobile/Fields/DecimalField', [
     'dojo/_base/declare',
     'dojo/string',
-    'Sage/Platform/Mobile/Fields/TextField'
+    './TextField'
 ], function(
     declare,
     string,

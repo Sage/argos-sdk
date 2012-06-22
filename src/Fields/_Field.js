@@ -17,30 +17,19 @@ define('Sage/Platform/Mobile/Fields/_Field', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/string',
-    'dijit/_Widget',
-    'Sage/Platform/Mobile/_ActionMixin',
-    'Sage/Platform/Mobile/_Templated'
+    'dijit/_WidgetBase'
 ], function(
     declare,
     lang,
     string,
-    _Widget,
-    _ActionMixin,
-    _Templated
+    _WidgetBase
 ) {
-    
-    return declare('Sage.Platform.Mobile.Fields._Field', [_Widget, _ActionMixin, _Templated], {
+    return declare('Sage.Platform.Mobile.Fields._Field', [_WidgetBase], {
         owner: false,
         applyTo: false,
         alwaysUseValue: false,
         disabled: false,
         hidden: false,
-        widgetTemplate: new Simplate([
-            '<input data-dojo-attach-point="inputNode">'
-        ]),
-        constructor: function(o) {
-            lang.mixin(this, o);
-        },
         renderTo: function(node) {
             this.containerNode = node; // todo: should node actually be containerNode instead of last rendered node?
             this.placeAt(node);

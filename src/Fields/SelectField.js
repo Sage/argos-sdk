@@ -15,7 +15,7 @@
 
 define('Sage/Platform/Mobile/Fields/SelectField', [
     'dojo/_base/declare',
-    'Sage/Platform/Mobile/Fields/LookupField'
+    './LookupField'
 ], function(
     declare,
     LookupField

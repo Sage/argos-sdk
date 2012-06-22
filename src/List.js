@@ -370,7 +370,7 @@ define('Sage/Platform/Mobile/List', [
         _getSelectionModelAttr: function() {
             return this._selectionModel;
         },
-        startup: function() {
+        onCreate: function() {
             this.inherited(arguments);
 
             if (this._selectionModel == null)

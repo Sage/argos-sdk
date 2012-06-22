@@ -15,8 +15,7 @@
 
 define('Sage/Platform/Mobile/Fields/HiddenField', [
     'dojo/_base/declare',
-    'Sage/Platform/Mobile/Fields/TextField',
-    'Sage/Platform/Mobile/FieldManager'
+    './TextField'
 ], function(
     declare,
     TextField

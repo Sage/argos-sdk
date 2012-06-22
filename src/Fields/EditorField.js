@@ -17,15 +17,17 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
     'dojo/_base/declare',
     'dojo/_base/event',
     'dojo/_base/lang',
-    'Sage/Platform/Mobile/Fields/_Field'
+    '../_TemplatedWidgetMixin',
+    './_Field'
 ], function(
     declare,
     event,
     lang,
+    _TemplatedWidgetMixin,
     _Field
 ) {
 
-    return declare('Sage.Platform.Mobile.Fields.EditorField', [_Field], {
+    return declare('Sage.Platform.Mobile.Fields.EditorField', [_Field, _TemplatedWidgetMixin], {
         attributeMap: {
             inputValue: {
                 node: 'inputNode',

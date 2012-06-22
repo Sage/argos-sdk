@@ -26,6 +26,29 @@ h5
     font-weight: normal;
 }
 
+input:not([type|=radio]):not([type|=checkbox]) {
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+    -webkit-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 100%;
+    margin: 0 0 8px 0;
+    padding: 6px 6px 6px 44px;
+    font-size: 16px;
+    font-weight: normal;
+    border: 1px solid #000;
+}
+
+input:focus,
+textarea:focus
+{
+	outline: none;
+	background-color: #fff; /* #FDFFDD */;
+}
+
 /* layout */
 .layout-left
 {
@@ -342,6 +365,135 @@ h5
 {
     background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
     padding: 0 0 0 20px;
+}
+
+/* edit */
+.edit
+{
+    background: #fbfdf0;
+}
+
+.edit-content
+{
+    background-color: #fff;
+    border: none 0px black;
+    border-bottom: solid 1px #ddd;
+}
+
+.edit-content > h2
+{
+    border-bottom: 1px solid #000;
+    border-top: 1px solid #000;
+    background-color: #e6e6e6;
+    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(1, #cccccc)
+    );
+    background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+    /*
+    box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    */
+    color: #000;
+    text-shadow: #fff 0px 1px 0px;
+    font-weight: bold;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#cccccc)";
+}
+
+.edit-content > h2:first-of-type
+{
+    border-top: solid 1px #e6e6e6;
+}
+
+.edit-content > fieldset,
+.edit-content > div
+{
+    border: none 0px black;
+}
+
+.edit-content > ul
+{
+    border: none 0px black;
+    background-color: #fff;
+}
+
+.edit-content > ul > li
+{
+    border-top: solid 1px #ddd;
+    cursor: pointer;
+}
+
+.edit-content > ul > li:first-child
+{
+    border-top: none 0 black;
+}
+
+.edit-content > ul a
+{
+    color: inherit;
+    text-decoration: none;
+}
+
+.edit-content > fieldset > .row,
+.edit-content > div > .row
+{
+    padding: .25em;
+    min-height: 1.5em;
+    border-top: solid 1px #ddd;
+}
+
+.edit-content > fieldset > .row:first-child,
+.edit-content > div > .row:first-child
+{
+    border-top: none 0px black;
+}
+
+.edit-content > fieldset > .row > div > label,
+.edit-content > fieldset > .row > label,
+.edit-content > div > .row > div > label,
+.edit-content > div > .row > label
+{
+    font-weight: bold;
+    color: #0079A7;
+}
+
+.edit-content > fieldset > .row-edit > div > textarea,
+.edit-content > fieldset > .row-edit > textarea,
+
+{
+    font-family: Helvetica, Arial;
+    font-size: 16px;
+}
+
+.edit-content > fieldset > .row-edit > div > input:focus,
+.edit-content > fieldset > .row-edit > div > textarea:focus,
+.edit-content > fieldset > .row-edit > input:focus,
+.edit-content > fieldset > .row-edit > textarea:focus
+{
+    box-shadow: 0 0 5px #f0ac55 !important;
+    -webkit-box-shadow: 0 0 5px #f0ac55 !important;
+    -moz-box-shadow: 0 0 5px #f0ac55 !important;
+}
+
+.edit-content > fieldset > .row-edit
+{
+    border-top: solid 1px #ddd;
+}
+
+.edit-content > fieldset > .row-edit:first-of-type
+{
+    border-top: none 0 black;
+}
+
+.text-field-active > .clear-button
+{
+    background: url('../images/delete.png') no-repeat 50% 50%;
 }
 
 /* button */

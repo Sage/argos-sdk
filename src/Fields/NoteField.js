@@ -17,7 +17,7 @@
 
 define('Sage/Platform/Mobile/Fields/NoteField', [
     'dojo/_base/declare',
-    'Sage/Platform/Mobile/Fields/EditorField'
+    './EditorField'
 ], function(
     declare,
     EditorField

@@ -28,7 +28,8 @@ define('Sage/Platform/Mobile/Detail', [
     './ScrollContainer',
     './Toolbar',
     './Data/SDataStore',
-    'argos!customizations'
+    'argos!customizations',
+    'argos!scene'
 ], function(
     dojo,
     declare,
@@ -44,7 +45,8 @@ define('Sage/Platform/Mobile/Detail', [
     ScrollContainer,
     Toolbar,
     SDataStore,
-    customizations
+    customizations,
+    scene
 ) {
 
     var Detail = declare('Sage.Platform.Mobile.Detail', [View], {
@@ -151,7 +153,7 @@ define('Sage/Platform/Mobile/Detail', [
         editView: false,
         _navigationOptions: null,
 
-        startup: function() {
+        onCreate: function() {
             this.inherited(arguments);
             this.subscribe('/app/refresh', this._onRefresh);
             this.clear();
@@ -202,9 +204,9 @@ define('Sage/Platform/Mobile/Detail', [
             if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context, 10), params.descriptor);
         },
         navigateToEditView: function(el) {
-            var view = App.getView(this.editView);
-            if (view)
-                view.show({entry: this.entry});
+            scene().showView(this.editView, {
+                entry: this.entry
+            });
         },
         navigateToRelatedView: function(id, slot, descriptor) {
             var options = this._navigationOptions[slot],

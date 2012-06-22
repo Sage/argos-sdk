@@ -17,7 +17,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', [
     'dojo/_base/declare',
     'dojo/has',
     'dojo/string',
-    'Sage/Platform/Mobile/Fields/TextField',
+    './TextField',
     'dojo/_base/sniff'
 ], function(
     declare,

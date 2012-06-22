@@ -17,8 +17,8 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
     'dojo/_base/declare',
     'dojo/_base/json',
     'dojo/dom-attr',
-    'Sage/Platform/Mobile/Format',
-    'Sage/Platform/Mobile/Fields/EditorField'
+    '../Format',
+    './EditorField'
 ], function(
     declare,
     json,

@@ -15,7 +15,7 @@
 
 define('Sage/Platform/Mobile/Fields/TextAreaField', [
     'dojo/_base/declare',
-    'Sage/Platform/Mobile/Fields/TextField'
+    './TextField'
 ], function(
     declare,
     TextField

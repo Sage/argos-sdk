@@ -16,13 +16,15 @@
 define('Sage/Platform/Mobile/Fields/BooleanField', [
     'dojo/_base/declare',
     'dojo/dom-attr',
-    'Sage/Platform/Mobile/Fields/_Field'
+    '../_TemplatedWidgetMixin',
+    './_Field'
 ], function(
     declare,
     domAttr,
-    Field
+    _TemplatedWidgetMixin,
+    _Field
 ) {
-    return declare('Sage.Platform.Mobile.Fields.BooleanField', [Field], {
+    return declare('Sage.Platform.Mobile.Fields.BooleanField', [_Field, _TemplatedWidgetMixin], {
         attributeMap: {
             toggled:{
                 node: 'toggleNode',

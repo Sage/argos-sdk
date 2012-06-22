@@ -17,8 +17,8 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
     'dojo/_base/declare',
     'dojo/string',
     'dojo/dom-class',
-    'Sage/Platform/Mobile/Format',
-    'Sage/Platform/Mobile/Fields/LookupField'
+    '../Format',
+    './LookupField'
 ], function(
     declare,
     string,
