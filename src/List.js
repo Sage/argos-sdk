@@ -730,7 +730,7 @@ define('Sage/Platform/Mobile/List', [
 
             var resourceKindExpr = this.expandExpression((options && options.resourceKind) || this.resourceKind);
             if (resourceKindExpr)
-                request.setResourceKind(this.resourceKind);
+                request.setResourceKind(resourceKindExpr);
 
             var resourcePropertyExpr = this.expandExpression((options && options.resourceProperty) || this.resourceProperty);
             if (resourcePropertyExpr)
