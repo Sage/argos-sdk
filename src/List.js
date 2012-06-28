@@ -23,7 +23,6 @@ define('Sage/Platform/Mobile/List', [
     'dojo/dom-construct',
     'dojo/dom',
     'dojo/string',
-    './Data/SDataStore',
     './View',
     './ErrorManager',
     './ScrollContainer',
@@ -41,7 +40,6 @@ define('Sage/Platform/Mobile/List', [
     domConstruct,
     dom,
     string,
-    SDataStore,
     View,
     ErrorManager,
     ScrollContainer,
@@ -173,7 +171,7 @@ define('Sage/Platform/Mobile/List', [
         },
         components: [
             {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
-            {name: 'search', type: SearchWidget, attachEvent: 'onSearchExpression:_onSearchExpression'},
+            {name: 'search', type: SearchWidget, attachEvent: 'onQuery:_onSearchQuery,onClear:_onSearchClear'},
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
                 {name: 'scroll', tag: 'div', components: [
@@ -183,7 +181,7 @@ define('Sage/Platform/Mobile/List', [
                     {name: 'content', tag: 'ul', attrs: {'class': 'list-content'}, attachPoint: 'contentNode'},
                     {name: 'more', tag: 'div', attrs: {'class': 'list-more'}, components: [
                         {name: 'moreRemaining', tag: 'span', attrs: {'class': 'list-remaining'}, attachPoint: 'remainingContentNode'},
-                        {name: 'moreButton', content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
+                        {name: 'moreButton', content: Simplate.make('<button class="button" data-action="requestData"><span>{%: $.moreText %}</span></button>')}
                     ]}
                 ]}
             ]}
@@ -296,11 +294,26 @@ define('Sage/Platform/Mobile/List', [
          */
         contextView: false,
         /**
+         * The built hash tag layout.
+         */
+        hashTags: null,
+        /**
          * A dictionary of hash tag search queries.  The key is the hash tag, without the symbol, and the value is
          * either a query string, or a function that returns a query string.
          * @type {?Object}
          */
         hashTagQueries: null,
+        /**
+         * The regular expression used to determine if a search query is a custom search expression.  A custom search
+         * expression is not processed, and directly passed to SData.
+         * @type {Object}
+         */
+        customSearchRE: /^#!/,
+        /**
+         * The regular expression used to determine if a search query is a hash tag search.
+         * @type {Object}
+         */
+        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
         /**
          * The text displayed in the more button.
          * @type {String}
@@ -381,15 +394,6 @@ define('Sage/Platform/Mobile/List', [
             domClass.toggle(this.domNode, 'has-search', this.hideSearch);
 
             this.clear(true);
-
-            if (this.$.search)
-                this.$.search.configure({
-                    'formatSearchQuery': lang.hitch(this, this.formatSearchQuery),
-                    'hashTagQueries': customizations().apply(
-                        customizations().toPath(this.customizationSet, 'hashTagQueries', this.id),
-                        this.createHashTagQueryLayout()
-                    )
-                });
         },
         createToolLayout: function() {
             return this.tools || (this.tools = {
@@ -471,34 +475,57 @@ define('Sage/Platform/Mobile/List', [
             if (this.autoClearSelection)
                 this._selectionModel.clear();
         },
-        formatRelatedQuery: function(entry, fmt, property) {
-            return string.substitute(fmt, [lang.getObject(property || '$key', false, entry)]);
+        _getHashTagsAttr: function() {
+            var customizationSet = customizations();
+            return customizationSet.apply(customizationSet.toPath(this.customizationSet, 'hashTagQueries', this.id), this.createHashTagQueryLayout());
         },
-        formatSearchQuery: function(searchQuery) {
-            /// <summary>
-            ///     Called to transform a textual query into an SData query compatible search expression.
-            /// </summary>
-            /// <returns type="String">An SData query compatible search expression.</returns>
+        _setHashTagsAttr: function(value) {
+            this.hashTags = value;
+        },
+        createHashTagQueryLayout: function() {
+            if (this.hashTags) return this.hashTags;
+
+            var layout = [];
+
+            for (var name in this.hashTagQueries)
+            {
+                layout.push({
+                    'key': name,
+                    'tag': (this.hashTagQueriesText && this.hashTagQueriesText[name]) || name,
+                    'query': this.hashTagQueries[name]
+                });
+            }
+
+            return (this.hashTags = layout);
+        },
+        formatSearchQuery: function(query) {
             return false;
         },
-        escapeSearchQuery: function(searchQuery) {
-            return (searchQuery || '').replace(/"/g, '""');
+        formatHashTagQuery: function(query) {
+            return false;
         },
-        _onSearchExpression: function(expression) {
+        _onSearchQuery: function(query) {
+            if (query)
+            {
+                if (this.hashTagSearchRE.test(query))
+                {
+                    this.query = this.formatHashTagQuery(query);
+                }
+                else
+                {
+                    this.query = this.formatSearchQuery(query);
+                }
+            }
+            else
+            {
+                this.query = false;
+            }
 
             this.clear(false);
-            this.queryText = '';
-            this.query = expression;
-
             this.requestData();
         },
-        _configureSearch: function() {
-            this.query = this.options && this.options.query || null;
+        _onSearchClear: function() {
 
-            if (this.$.search)
-                this.$.search.configure({
-                    'context': this.getContext()
-                });
         },
         createStore: function() {
             return null;
@@ -509,15 +536,11 @@ define('Sage/Platform/Mobile/List', [
                 key: key
             });
         },
-        navigateToInsertView: function(el) {
-            var view = App.getView(this.insertView || this.editView);
-            if (view)
-            {
-                view.show({
-                    returnTo: this.id,
-                    insert: true
-                });
-            }
+        navigateToInsertView: function() {
+            scene().showView(this.detailView, {
+                returnTo: this.id,
+                insert: true
+            });
         },
         onContentChange: function() {
         },
@@ -589,8 +612,6 @@ define('Sage/Platform/Mobile/List', [
             domClass.add(this.domNode, 'is-loading');
 
             var store = this.store || (this.store = this.createStore()),
-                options = this.options,
-                conditions = [],
                 keywordArgs = {
                     scope: this,
                     onBegin: this._onFetchBegin,
@@ -601,33 +622,16 @@ define('Sage/Platform/Mobile/List', [
                     start: this.position
                 };
 
-            if (options && options.where)
-                conditions.push(this.expandExpression(options.where));
-
-            if (this.query)
-                conditions.push(this.query);
-
-            if (conditions.length > 0)
-                keywordArgs.query = ('(' + conditions.join(') and (') + ')');
-
-            if (options)
-            {
-                if (options.select) keywordArgs.select = this.expandExpression(options.select);
-                if (options.include) keywordArgs.include = this.expandExpression(options.include);
-                if (options.orderBy) keywordArgs.sort = parseOrderBy(this.expandExpression(options.orderBy));
-                if (options.contractName) keywordArgs.contractName = this.expandExpression(options.contractName);
-                if (options.resourceKind) keywordArgs.resourceKind = this.expandExpression(options.resourceKind);
-                if (options.resourceProperty) keywordArgs.resourceProperty = this.expandExpression(options.resourceProperty);
-                if (options.resourcePredicate) keywordArgs.resourcePredicate = this.expandExpression(options.resourcePredicate);
-            }
+            this.applyQueryToKeywordArgs(keywordArgs);
+            this.applyOptionsToKeywordArgs(keywordArgs);
 
             return store.fetch(keywordArgs);
         },
-        more: function() {
-            /// <summary>
-            ///     Called when the more button is clicked.
-            /// </summary>
-            this.requestData();
+        applyQueryToKeywordArgs: function(keywordArgs) {
+            if (this.query) keywordArgs.query = this.query;
+        },
+        applyOptionsToKeywordArgs: function(keywordArgs) {
+
         },
         emptySelection: function() {
             /// <summary>
@@ -679,25 +683,10 @@ define('Sage/Platform/Mobile/List', [
                     this._selectionModel.clear();
             }
         },
-        transitionTo: function()
-        {
-            this._configureSearch();
-
+        transitionTo: function() {
             if (this._selectionModel) this._loadPreviousSelections();
 
             this.inherited(arguments);
-        },
-        createHashTagQueryLayout: function() {
-            // todo: always regenerate this layout? always regenerating allows for all existing customizations
-            // to still work, at expense of potential (rare) performance issues if many customizations are registered.
-            var layout = [];
-            for (var name in this.hashTagQueries)
-                layout.push({
-                    'key': name,
-                    'tag': (this.hashTagQueriesText && this.hashTagQueriesText[name]) || name,
-                    'query': this.hashTagQueries[name]
-                });
-            return layout;
         },
         refresh: function() {
             this.requestData();
@@ -716,74 +705,17 @@ define('Sage/Platform/Mobile/List', [
 
             this.items = {};
             this.position = 0;
-            this.query = false; // todo: rename to searchQuery
 
-            if (this.$.search && all !== false)
+            if (all !== false)
+            {
+                this.query = false;
+
                 this.$.search.clear();
+            }
 
             domClass.remove(this.domNode, 'has-more');
 
             this.loadingIndicatorNode = domConstruct.place(this.loadingTemplate.apply(this), this.contentNode, 'only');
-        }
-    });
-
-    /**
-     * SData enablement for the List view.
-     */
-    lang.extend(List, {
-        /**
-         * @cfg {String} resourceKind
-         * The SData resource kind the view is responsible for.  This will be used as the default resource kind
-         * for all SData requests.
-         * @type {String}
-         */
-        resourceKind: '',
-        /**
-         * A list of fields to be selected in an SData request.
-         * @type {Array.<String>}
-         */
-        querySelect: null,
-        /**
-         * A list of child properties to be included in an SData request.
-         * @type {Array.<String>}
-         */
-        queryInclude: null,
-        /**
-         * The default order by expression for an SData request.
-         * @type {String}
-         */
-        queryOrderBy: null,
-        /**
-         * The default where expression for an SData request.
-         * @type {String|Function}
-         */
-        queryWhere: null,
-        /**
-         * The default resource property for an SData request.
-         * @type {String|Function}
-         */
-        resourceProperty: null,
-        /**
-         * The default resource predicate for an SData request.
-         * @type {String|Function}
-         */
-        resourcePredicate: null,
-        keyProperty: '$key',
-        descriptorProperty: '$descriptor',
-        createStore: function() {
-            return new SDataStore({
-                service: this.getConnection(),
-                contractName: this.expandExpression(this.contractName),
-                resourceKind: this.expandExpression(this.resourceKind),
-                resourceProperty: this.expandExpression(this.resourceProperty),
-                resourcePredicate: this.expandExpression(this.resourcePredicate),
-                include: this.expandExpression(this.queryInclude),
-                select: this.expandExpression(this.querySelect),
-                where: this.expandExpression(this.queryWhere),
-                orderBy: this.expandExpression(this.queryOrderBy),
-                labelAttribute: this.descriptorProperty,
-                identityAttribute: this.keyProperty
-            });
         }
     });
 

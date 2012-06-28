@@ -169,30 +169,8 @@ define('Sage/Platform/Mobile/Edit', [
         _onDisableField: function(field) {
             domClass.add(field.containerNode, 'row-disabled');
         },
-        /*
-        invokeAction: function(name, parameters, evt, node) {
-            var fieldNode = node && query(node, this.contentNode).parents('[data-field]'),
-                field = this.fields[fieldNode.length > 0 && domAttr.get(fieldNode[0], 'data-field')];
-
-            if (field && typeof field[name] === 'function')
-                return field[name].apply(field, [parameters, evt, node]);
-
-            return this.inherited(arguments);
-        },
-        hasAction: function(name, evt, node) {
-            var fieldNode = node && query(node, this.contentNode).parents('[data-field]'),
-                field = fieldNode && this.fields[fieldNode.length > 0 && domAttr.get(fieldNode[0], 'data-field')];
-
-            if (field && typeof field[name] === 'function')
-                return true;
-
-            return this.inherited(arguments);
-        },
-        */
-        toggleSection: function(params) {
-            var node = dom.byId(params.$source);
-            if (node)
-                domClass.toggle(node, 'collapsed');
+        toggleSection: function(evt, node) {
+            if (node) domClass.toggle(node, 'collapsed');
         },
         createRequest: function() {
             var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());

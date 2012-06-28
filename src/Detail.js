@@ -27,7 +27,6 @@ define('Sage/Platform/Mobile/Detail', [
     './View',
     './ScrollContainer',
     './Toolbar',
-    './Data/SDataStore',
     'argos!customizations',
     'argos!scene'
 ], function(
@@ -44,7 +43,6 @@ define('Sage/Platform/Mobile/Detail', [
     View,
     ScrollContainer,
     Toolbar,
-    SDataStore,
     customizations,
     scene
 ) {
@@ -263,7 +261,6 @@ define('Sage/Platform/Mobile/Detail', [
             domClass.add(this.domNode, 'is-loading');
 
             var store = this.store || (this.store = this.createStore()),
-                options = this.options,
                 keywordArgs = {
                     scope: this,
                     onError: this._onFetchError,
@@ -271,21 +268,17 @@ define('Sage/Platform/Mobile/Detail', [
                     onItem: this._onFetchItem
                 };
 
-            if (options)
-            {
-                /* todo: how to extract the remaining SData options */
-                if (options.key) keywordArgs.identity = options.key;
-                if (options.select) keywordArgs.select = this.expandExpression(options.select);
-                if (options.include) keywordArgs.include = this.expandExpression(options.include);
-                if (options.contractName) keywordArgs.contractName = this.expandExpression(options.contractName);
-                if (options.resourceKind) keywordArgs.resourceKind = this.expandExpression(options.resourceKind);
-                if (options.resourceProperty) keywordArgs.resourceProperty = this.expandExpression(options.resourceProperty);
-                if (options.resourcePredicate) keywordArgs.resourcePredicate = this.expandExpression(options.resourcePredicate);
-
-                if (options.identity) keywordArgs.identity = options.identity;
-            }
+            this.applyOptionsToKeywordArgs(keywordArgs);
 
             return store.fetchItemByIdentity(keywordArgs);
+        },
+        applyOptionsToKeywordArgs: function(keywordArgs) {
+            var options = this.options;
+
+            if (options)
+            {
+                if (options.identity) keywordArgs.identity = options.identity;
+            }
         },
         createLayout: function() {
             return this.layout || [];
@@ -485,54 +478,6 @@ define('Sage/Platform/Mobile/Detail', [
             domConstruct.place(this.loadingTemplate.apply(this), this.contentNode, 'only');
 
             this._navigationOptions = [];
-        }
-    });
-
-    /**
-     * SData enablement for the Detail view.
-     */
-    lang.extend(Detail, {
-        /**
-         * @cfg {String} resourceKind
-         * The SData resource kind the view is responsible for.  This will be used as the default resource kind
-         * for all SData requests.
-         * @type {String}
-         */
-        resourceKind: '',
-        /**
-         * A list of fields to be selected in an SData request.
-         * @type {Array.<String>}
-         */
-        querySelect: null,
-        /**
-         * A list of child properties to be included in an SData request.
-         * @type {Array.<String>}
-         */
-        queryInclude: null,
-        /**
-         * The default resource property for an SData request.
-         * @type {String|Function}
-         */
-        resourceProperty: null,
-        /**
-         * The default resource predicate for an SData request.
-         * @type {String|Function}
-         */
-        resourcePredicate: null,
-        keyProperty: '$key',
-        descriptorProperty: '$descriptor',
-        createStore: function() {
-            return new SDataStore({
-                service: this.getConnection(),
-                contractName: this.expandExpression(this.contractName),
-                resourceKind: this.expandExpression(this.resourceKind),
-                resourceProperty: this.expandExpression(this.resourceProperty),
-                resourcePredicate: this.expandExpression(this.resourcePredicate),
-                include: this.expandExpression(this.queryInclude),
-                select: this.expandExpression(this.querySelect),
-                labelAttribute: this.descriptorProperty,
-                identityAttribute: this.keyProperty
-            });
         }
     });
 

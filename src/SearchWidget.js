@@ -44,108 +44,24 @@ define('Sage/Platform/Mobile/SearchWidget', [
         ]),
         
         searchText: 'Search',
-        
-        /**
-         * The regular expression used to determine if a search query is a custom search expression.  A custom search
-         * expression is not processed, and directly passed to SData.
-         * @type {Object}
-         */
-        customSearchRE: /^#!/,
-        /**
-         * The regular expression used to determine if a search query is a hash tag search.
-         * @type {Object}
-         */
-        hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
-        hashTagQueries: null,
+
         queryNode: null,
 
         clear: function() {
             domClass.remove(this.domNode, 'search-active');
+
             this.set('queryValue', '');
+
+            this.onClear();
         },
         search: function() {
-            var searchQuery = this.queryNode.value,
-                formattedQuery,
-                isCustomMatch = searchQuery && this.customSearchRE.test(searchQuery),
-                isHashTagMatch = searchQuery && this.hashTagSearchRE.test(searchQuery);
+            var query = this.queryNode.value;
 
-            switch(true) {
-                case isCustomMatch: formattedQuery = this.customSearch(searchQuery);
-                    break;
-                case isHashTagMatch: formattedQuery = this.hashTagSearch(searchQuery);
-                    break;
-                default: formattedQuery = this.formatSearchQuery(searchQuery);
-            }
-
-            if (lang.trim(searchQuery) === '')
-                formattedQuery = null;
-
-            this.onSearchExpression(formattedQuery, this);
+            this.onQuery(query);
         },
-        /**
-         * Returns an unmodified search query which allows a user
-         * to type in their own where clause
-         * @param {String} query Value of search box
-         * @returns {String} query Unformatted query
-         */
-        customSearch: function(query) {
-            this.customSearchRE.lastIndex = 0;
-            query = query.replace(this.customSearchRE, '');
-            return query;
+        onQuery: function(query) {
         },
-        /**
-         * Returns the search query based on a hash selector
-         * Any hash tags in the search are replaced by predefined search statements
-         * Remaining text not preceded by a hash will receive
-         * that views normal search formatting
-         * @param {String} query Value of search box
-         * @returns {String} query Hash resolved query
-         */
-        hashTagSearch: function(query) {
-            var hashLayout = this.hashTagQueries || [],
-                hashQueries = [],
-                additionalSearch = query;
-
-            this.hashTagSearchRE.lastIndex = 0;
-
-            var match;
-            while (match = this.hashTagSearchRE.exec(query))
-            {
-                var hashTag = match[1],
-                    hashQueryExpression = null;
-
-                // todo: can optimize later if necessary
-                for (var i = 0; i < hashLayout.length && !hashQueryExpression; i++)
-                    if (hashLayout[i].tag == hashTag)
-                        hashQueryExpression = hashLayout[i].query;
-
-                if (!hashQueryExpression) continue;
-
-                hashQueries.push(this.expandExpression(hashQueryExpression));
-                additionalSearch = additionalSearch.replace(match[0], '');
-            }
-
-            if (hashQueries.length < 1)
-                return this.formatSearchQuery(query);
-
-            query = string.substitute('(${0})', [hashQueries.join(') and (')]);
-
-            additionalSearch = additionalSearch.replace(/^\s+|\s+$/g, '');
-
-            if (additionalSearch)
-                query += string.substitute(' and (${0})', [this.formatSearchQuery(additionalSearch)]);
-
-            return query;
-        },
-        configure: function(options) {
-            // todo: for now, we simply mixin the options
-            lang.mixin(this, options);
-        },
-        expandExpression: function(expression) {
-            if (typeof expression === 'function')
-                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
-            else
-                return expression;
+        onClear: function() {
         },
         _onClearClick: function(evt){
             event.stop(evt);
@@ -166,14 +82,6 @@ define('Sage/Platform/Mobile/SearchWidget', [
                 this.queryNode.blur();
                 this.search();
             }
-        },
-        /**
-         * The event that fires when the search widget provides an explicit search query
-         * @param expression
-         * @param widget
-         */
-        onSearchExpression: function(expression, widget) {
-
         }
     });
 });

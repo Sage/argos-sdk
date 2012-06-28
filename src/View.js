@@ -50,9 +50,12 @@ define('Sage/Platform/Mobile/View', [
 
             domClass.add(this.domNode, 'has-toolbar-' + position);
         },
-        getTools: function() {
+        _getToolsAttr: function() {
             var customizationSet = customizations();
             return customizationSet.apply(customizationSet.toPath(this.customizationSet, 'tools', this.id), this.createToolLayout());
+        },
+        _setToolsAttr: function(value) {
+            this.tools = value;
         },
         createToolLayout: function() {
             return this.tools || {};
@@ -76,7 +79,7 @@ define('Sage/Platform/Mobile/View', [
             this.inherited(arguments);
 
             var map = {'tbar': 'top', 'bbar': 'bottom'},
-                tools = this.getTools();
+                tools = this.get('tools');
             if (tools)
             {
                 for (var name in tools)
