@@ -300,6 +300,12 @@ define('Sage/Platform/Mobile/Edit', [
         },
         onRequestDataSuccess: function(entry) {
             this.processEntry(entry);
+
+            if (this.options.changes)
+            {
+                this.changes = this.options.changes;
+                this.setValues(this.changes);
+            }
         },
         requestData: function() {
             var request = this.createRequest();
@@ -323,30 +329,6 @@ define('Sage/Platform/Mobile/Edit', [
                 request.read({
                     success: this.onRequestTemplateSuccess,
                     failure: this.onRequestTemplateFailure,
-                    scope: this
-                });
-        },
-        onRequestEntryFailure: function(response, o) {
-            alert(string.substitute(this.requestErrorText, [response, o]));
-            ErrorManager.addError(response, o, this.options, 'failure');
-        },
-        onRequestEntrySuccess: function(entry) {
-            this.processEntry(entry);
-            this.setValues(this.entry, true);
-
-            // Re-apply any passed changes as they may have been overwritten
-            if (this.options.changes)
-            {
-                this.changes = this.options.changes;
-                this.setValues(this.changes);
-            }
-        },
-        requestEntry: function(){
-            var request = this.createRequest();
-            if (request)
-                request.read({
-                    success: this.onRequestEntrySuccess,
-                    failure: this.onRequestEntryFailure,
                     scope: this
                 });
         },
@@ -377,7 +359,8 @@ define('Sage/Platform/Mobile/Edit', [
         },
         processEntry: function(entry) {
             this.entry = this.convertEntry(entry || {});
-            
+            this.setValues(this.entry, true);
+
             domClass.remove(this.domNode, 'panel-loading');
         },
         applyContext: function(templateEntry) {
@@ -754,21 +737,19 @@ define('Sage/Platform/Mobile/Edit', [
                 if (this.options.entry)
                 {
                     this.processEntry(this.options.entry);
-                    this.setValues(this.entry, true);
+
+                    // apply changes as modified data, since we want this to feed-back through
+                    if (this.options.changes)
+                    {
+                        this.changes = this.options.changes;
+                        this.setValues(this.changes);
+                    }
                 }
                 else
                 {
                     // if key is passed request that keys entity and process
                     if (this.options.key)
-                        this.requestEntry();
-                }
-
-                // apply changes as modified data, since we want this to feed-back through
-                // the changes option is primarily used by editor fields
-                if (this.options.changes)
-                {
-                    this.changes = this.options.changes;
-                    this.setValues(this.changes);
+                        this.requestData();
                 }
             }
         }
