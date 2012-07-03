@@ -66,7 +66,7 @@ define('Sage/Platform/Mobile/Edit', [
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
                 {name: 'scroll', tag: 'div', components: [
-                    {name: 'loading', content: Simplate.make('<fieldset class="loading-indicator"><div class="row"><div>{%: $.loadingText %}</div></div></fieldset>')},
+                    {name: 'loading', content: Simplate.make('<div class="loading-indicator"><div>{%: $.loadingText %}</div></div>')},
                     {name: 'validation', tag: 'div', attrs: {'class': 'validation-summary'}, components: [
                         {name: 'validationTitle', content: Simplate.make('<h2>{%: $.validationSummaryText %}</h2>')},
                         {name: 'validationContent', tag: 'ul', attachPoint: 'validationContentNode'}
@@ -81,11 +81,9 @@ define('Sage/Platform/Mobile/Edit', [
         _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
 
         validationSummaryItemTemplate: new Simplate([
-            '<li>',
-            '<a href="#{%= $.name %}">',
+            '<li data-field="{%= $.name %}">',
             '<h3>{%: $.message %}</h3>',
             '<h4>{%: $$.label %}</h4>',
-            '</a>',
             '</li>'
         ]),
         sectionBeginTemplate: new Simplate([
@@ -99,13 +97,12 @@ define('Sage/Platform/Mobile/Edit', [
             '</fieldset>'
         ]),
         propertyTemplate: new Simplate([
-            '<a name="{%= $.name || $.property %}"></a>',
             '<div class="row row-edit {%= $.cls %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'
         ]),
-        transitionEffect: 'slide',
         id: 'generic_edit',
         tier: 1,
+        store: null,
         layout: null,
         customizationSet: 'edit',
         saveText: 'Save',
@@ -151,11 +148,13 @@ define('Sage/Platform/Mobile/Edit', [
                         : this.updateSecurity
                 },{
                     id: 'cancel',
-                    side: 'left'
-                    //fn: ReUI.back,
-                    //scope: ReUI
+                    side: 'left',
+                    publish: '/app/scene/back'
                 }]
             });
+        },
+        _getStoreAttr: function() {
+            return this.store || (this.store = this.createStore());
         },
         _onShowField: function(field) {
             domClass.remove(field.containerNode, 'row-hidden');
@@ -172,43 +171,74 @@ define('Sage/Platform/Mobile/Edit', [
         toggleSection: function(evt, node) {
             if (node) domClass.toggle(node, 'collapsed');
         },
-        createRequest: function() {
-            var request = new Sage.SData.Client.SDataSingleResourceRequest(this.getService());
-
-            var key = (this.entry && this.entry['$key']) || this.options.key
-            if (key)
-                request.setResourceSelector(string.substitute("'${0}'", [key]));
-
-            if (this.contractName)
-                request.setContractName(this.contractName);
-
-            if (this.resourceKind)
-                request.setResourceKind(this.resourceKind);
-
-            if (this.querySelect)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, this.querySelect.join(','));
-
-            if (this.queryInclude)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, this.queryInclude.join(','));
-
-            if (this.queryOrderBy)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.OrderBy, this.queryOrderBy);
-
-            return request;
+        createStore: function() {
+            return null;
         },
-        createTemplateRequest: function() {
-            var request = new Sage.SData.Client.SDataTemplateResourceRequest(this.getService());
+        processItem: function(item) {
+            return item;
+        },
+        onContentChange: function() {
+        },
+        _onFetchItem: function(item) {
+            this.item = this.processItem(item);
 
-            if (this.resourceKind)
-                request.setResourceKind(this.resourceKind);
+            this.applyItem(item);
 
-            if (this.querySelect)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Select, this.querySelect.join(','));
+            // Re-apply any passed changes as they may have been overwritten
+            if (this.options.changes)
+            {
+                this.changes = this.options.changes;
+                this.setValues(this.changes);
+            }
 
-            if (this.queryInclude)
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, this.queryInclude.join(','));
+            domClass.remove(this.domNode, 'is-loading');
 
-            return request;
+            /* this must take place when the content is visible */
+            this.onContentChange();
+        },
+        _onFetchError: function(error, keywordArgs) {
+            if (error.status == 404)
+            {
+                // todo: add error message
+            }
+            else
+            {
+                alert(string.substitute(this.requestErrorText, [error]));
+
+                ErrorManager.addError(error, keywordArgs, this.options, 'failure');
+            }
+
+            domClass.remove(this.domNode, 'is-loading');
+        },
+        _onFetchAbort: function(error, keywordArgs) {
+            this.options = false; // force a refresh
+
+            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'aborted');
+
+            domClass.remove(this.domNode, 'is-loading');
+        },
+        requestData: function() {
+            domClass.add(this.domNode, 'is-loading');
+
+            var store = this.get('store'),
+                keywordArgs = {
+                    scope: this,
+                    onError: this._onFetchError,
+                    onAbort: this._onFetchAbort,
+                    onItem: this._onFetchItem
+                };
+
+            this.applyOptionsToFetchItem(keywordArgs);
+
+            return store.fetchItemByIdentity(keywordArgs);
+        },
+        applyOptionsToFetchItem: function(keywordArgs) {
+            var options = this.options;
+
+            if (options)
+            {
+                if (options.key) keywordArgs.identity = options.key;
+            }
         },
         createLayout: function() {
             return this.layout || [];
@@ -269,45 +299,18 @@ define('Sage/Platform/Mobile/Edit', [
                 this.processLayout(current);
             }
         },
-        onRequestDataFailure: function(response, o) {
-            alert(string.substitute(this.requestErrorText, [response, o]));
-            ErrorManager.addError(response, o, this.options, 'failure');
-        },
-        onRequestDataSuccess: function(entry) {
-            this.processEntry(entry);
-        },
-        requestData: function() {
-            var request = this.createRequest();
-            if (request)
-                request.read({
-                    success: this.onRequestDataSuccess,
-                    failure: this.onRequestDataFailure,
-                    scope: this
-                });
-        },
-        onRequestTemplateFailure: function(response, o) {
-            alert(string.substitute(this.requestErrorText, [response, o]));
-            ErrorManager.addError(response, o, this.options, 'failure');
-        },
-        onRequestTemplateSuccess: function(entry) {
-            this.processTemplateEntry(entry);
-        },
-        requestTemplate: function() {
-            var request = this.createTemplateRequest();
-            if (request)
-                request.read({
-                    success: this.onRequestTemplateSuccess,
-                    failure: this.onRequestTemplateFailure,
-                    scope: this
-                });
-        },
-        onRequestEntryFailure: function(response, o) {
-            alert(string.substitute(this.requestErrorText, [response, o]));
-            ErrorManager.addError(response, o, this.options, 'failure');
-        },
-        onRequestEntrySuccess: function(entry) {
-            this.processEntry(entry);
-            this.setValues(this.entry, true);
+        _onFetchItemTemplate: function(template) {
+            this.itemTemplate = this.processItem(template);
+
+            var store = this.get('store'),
+                basis = {};
+
+            this.item = store.newItem(this.applyItemTemplateToNewItem(basis));
+
+            this.setValues(this.itemTemplate, true);
+
+            this.applyDefaultValues();
+            this.applyContext(template);
 
             // Re-apply any passed changes as they may have been overwritten
             if (this.options.changes)
@@ -315,49 +318,49 @@ define('Sage/Platform/Mobile/Edit', [
                 this.changes = this.options.changes;
                 this.setValues(this.changes);
             }
-        },
-        requestEntry: function(){
-            var request = this.createRequest();
-            if (request)
-                request.read({
-                    success: this.onRequestEntrySuccess,
-                    failure: this.onRequestEntryFailure,
-                    scope: this
-                });
-        },
-        convertEntry: function(entry) {
-            // todo: should we create a deep copy?
-            // todo: do a deep conversion?
 
-            for (var n in entry)
-            {
-                if (convert.isDateString(entry[n]))
-                    entry[n] = convert.toDateFromString(entry[n]);
-            }
+            domClass.remove(this.domNode, 'is-loading');
 
-            return entry;
+            /* this must take place when the content is visible */
+            this.onContentChange();
         },
-        convertValues: function(values) {
-            // todo: do a deep conversion?
-
-            for (var n in values)
-            {
-                if (values[n] instanceof Date)
-                    values[n] = this.getService().isJsonEnabled()
-                        ? convert.toJsonStringFromDate(values[n])
-                        : convert.toIsoStringFromDate(values[n]);
-            }
-
-            return values;
+        applyItemTemplateToNewItem: function(item) {
+            return item;
         },
-        processEntry: function(entry) {
-            this.entry = this.convertEntry(entry || {});
-            
-            domClass.remove(this.domNode, 'panel-loading');
+        requestItemTemplate: function() {
+            domClass.add(this.domNode, 'is-loading');
+
+            this._onFetchItemTemplate(this.createItemTemplate());
         },
         applyContext: function(templateEntry) {
         },
-        applyFieldDefaults: function(){
+        applyItem: function(item) {
+            var noValue = {},
+                store = this.get('store'),
+                field,
+                value;
+
+            for (var name in this.fields)
+            {
+                field = this.fields[name];
+
+                // for now, explicitly hidden fields (via. the field.hide() method) are not included
+                if (field.isHidden()) continue;
+
+                if (field.applyTo !== false)
+                {
+                    value = store.getValue(item, field.applyTo, noValue); // utility.getValue(values, field.applyTo, noValue);
+                }
+                else
+                {
+                    value = store.getValue(item, field.property || name, noValue); //utility.getValue(values, field.property || name, noValue);
+                }
+
+                // fyi: uses the fact that ({} !== {})
+                if (value !== noValue) field.setValue(value, true);
+            }
+        },
+        applyDefaultValues: function(){
             for (var name in this.fields)
             {
                 var field = this.fields[name],
@@ -368,22 +371,55 @@ define('Sage/Platform/Mobile/Edit', [
                 field.setValue(this.expandExpression(defaultValue, field));
             }
         },
-        processTemplateEntry: function(templateEntry) {
-            this.templateEntry = this.convertEntry(templateEntry || {});
+        persistItem: function(item) {
+            var o = {},
+                store = this.get('store'),
+                empty = true,
+                field,
+                value,
+                target,
+                include,
+                exclude;
 
-            this.setValues(this.templateEntry, true);
-            this.applyFieldDefaults();
-            this.applyContext(this.templateEntry);
-
-            // if an entry has been passed through options, apply it here, now that the template has been applied.
-            // in this case, since we are doing an insert (only time template is used), the entry is applied as modified data.
-            if (this.options.entry)
+            for (var name in this.fields)
             {
-                this.processEntry(this.options.entry);
-                this.setValues(this.entry);
-            }
+                field = this.fields[name];
+                value = field.getValue();
 
-            domClass.remove(this.domNode, 'panel-loading');
+                include = this.expandExpression(field.include, value, field, this);
+                exclude = this.expandExpression(field.exclude, value, field, this);
+
+                /**
+                 * include:
+                 *   true: always include value
+                 *   false: always exclude value
+                 * exclude:
+                 *   true: always exclude value
+                 *   false: default handling
+                 */
+                if (include !== undefined && !include) continue;
+                if (exclude !== undefined && exclude) continue;
+
+                // for now, explicitly hidden fields (via. the field.hide() method) are not included
+                if ((field.alwaysUseValue || field.isDirty() || include) && !field.isHidden())
+                {
+                    if (field.applyTo !== false)
+                    {
+                        var root = (field.applyTo !== '.' && field.applyTo !== '') && field.applyTo;
+
+                        for (var property in value)
+                        {
+                            store.setValue(item, root ? root + '.' + property : property, value[property]);
+                        }
+                    }
+                    else
+                    {
+                        store.setValue(item, field.property || name, value);
+                    }
+
+                    empty = false;
+                }
+            }
         },
         clearValues: function() {
             for (var name in this.fields)
@@ -642,10 +678,10 @@ define('Sage/Platform/Mobile/Edit', [
                 content.push(this.validationSummaryItemTemplate.apply(this.errors[i], this.fields[this.errors[i].name]));
 
             this.set('validationContent', content.join(''));
-            domClass.add(this.domNode, 'panel-form-error');
+            domClass.add(this.domNode, 'has-error');
         },
         hideValidationSummary: function() {
-            domClass.remove(this.domNode, 'panel-form-error');
+            domClass.remove(this.domNode, 'has-error');
             this.set('validationContent', '');
         },
         save: function() {
@@ -659,10 +695,11 @@ define('Sage/Platform/Mobile/Edit', [
                 return;
             }
 
-            if (this.inserting)
-                this.insert();
-            else
-                this.update();
+            this.persistItem(this.item);
+
+            var store = this.get('store');
+
+            console.log(store);
         },
         getContext: function() {
             return lang.mixin(this.inherited(arguments), {
@@ -683,19 +720,13 @@ define('Sage/Platform/Mobile/Edit', [
             if (this.refreshRequired)
             {
                 if (this.options.insert === true || this.options.key)
-                    domClass.add(this.domNode, 'panel-loading');
+                    domClass.add(this.domNode, 'is-loading');
                 else
-                    domClass.remove(this.domNode, 'panel-loading');
+                    domClass.remove(this.domNode, 'is-loading');
             }
 
             this.inherited(arguments);
         },
-        /*
-        activate: function() {
-            // external navigation (browser back/forward) never refreshes the edit view as it's always a terminal loop.
-            // i.e. you never move "forward" from an edit view; you navigate to child editors, from which you always return.
-        },
-        */
         refreshRequiredFor: function(options) {
             if (this.options)
             {
@@ -710,42 +741,53 @@ define('Sage/Platform/Mobile/Edit', [
                 return this.inherited(arguments);
         },
         refresh: function() {
-            this.entry = false;
             this.changes = false;
             this.inserting = (this.options.insert === true);
+            this.itemTemplate = false;
+            this.item = false;
 
-            domClass.remove(this.domNode, 'panel-form-error');
+            domClass.remove(this.domNode, 'has-error');
 
             this.clearValues();
+
+            var store = this.get('store');
+            store.revert();
 
             if (this.inserting)
             {
                 if (this.options.template)
-                    this.processTemplateEntry(this.options.template);
+                {
+                    this.itemTemplate = this.processItem(this.options.template);
+
+                    // todo: should the template be applied to the store, fully? or just to the form?
+                    this.applyItem(this.itemTemplate);
+                }
                 else
-                    this.requestTemplate();
+                {
+                    this.requestItemTemplate();
+                }
             }
             else
             {
                 // apply entry as non-modified data
-                if (this.options.entry)
+                if (this.options.item || this.options.entry)
                 {
-                    this.processEntry(this.options.entry);
-                    this.setValues(this.entry, true);
+                    this.item = this.processItem(this.options.item || this.options.entry);
+
+                    this.applyItem(this.item);
+
+                    // apply changes as modified data, since we want this to feed-back through
+                    // the changes option is primarily used by editor fields
+                    if (this.options.changes)
+                    {
+                        this.changes = this.options.changes;
+                        this.setValues(this.changes);
+                    }
                 }
                 else
                 {
                     // if key is passed request that keys entity and process
-                    if (this.options.key)
-                        this.requestEntry();
-                }
-
-                // apply changes as modified data, since we want this to feed-back through
-                // the changes option is primarily used by editor fields
-                if (this.options.changes)
-                {
-                    this.changes = this.options.changes;
-                    this.setValues(this.changes);
+                    if (this.options.identity || this.options.key) this.requestData();
                 }
             }
         }

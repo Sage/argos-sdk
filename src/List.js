@@ -248,6 +248,7 @@ define('Sage/Platform/Mobile/List', [
          * The property containing the key for the items in the data store.
          */
         tier: 0,
+        store: null,
         /**
          * The page size (defaults to 20).
          * @type {Number}
@@ -395,6 +396,9 @@ define('Sage/Platform/Mobile/List', [
 
             this.clear(true);
         },
+        _getStoreAttr: function() {
+            return this.store || (this.store = this.createStore());
+        },
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'tbar': [{
@@ -446,7 +450,7 @@ define('Sage/Platform/Mobile/List', [
                 key = row ? row.getAttribute('data-key') : false;
 
             if (this._selectionModel && key)
-                this._selectionModel.toggle(key, this.entries[key], row);
+                this._selectionModel.toggle(key, this.items[key], row);
 
             if (this.options.singleSelect && this.options.singleSelectAction)
                 this.invokeSingleSelectAction();
@@ -458,7 +462,7 @@ define('Sage/Platform/Mobile/List', [
             {
                 if (this._selectionModel && this.isNavigationDisabled())
                 {
-                    this._selectionModel.toggle(key, this.entries[key] || descriptor, node);
+                    this._selectionModel.toggle(key, this.items[key] || descriptor, node);
                     if (this.options.singleSelect && this.options.singleSelectAction)
                         this.invokeSingleSelectAction();
                 }
@@ -570,7 +574,8 @@ define('Sage/Platform/Mobile/List', [
             return item;
         },
         _onFetchComplete: function(items, request) {
-            var count = items.length;
+            var store = this.get('store'),
+                count = items.length;
             if (count > 0)
             {
                 var output = [];
@@ -579,7 +584,7 @@ define('Sage/Platform/Mobile/List', [
                 {
                     var item = this.processItem(items[i]);
 
-                    this.items[this.store.getIdentity(item)] = item;
+                    this.items[store.getIdentity(item)] = item;
 
                     output.push(this.rowTemplate.apply(item, this));
                 }
@@ -611,7 +616,7 @@ define('Sage/Platform/Mobile/List', [
         requestData: function() {
             domClass.add(this.domNode, 'is-loading');
 
-            var store = this.store || (this.store = this.createStore()),
+            var store = this.get('store'),
                 keywordArgs = {
                     scope: this,
                     onBegin: this._onFetchBegin,
@@ -622,15 +627,15 @@ define('Sage/Platform/Mobile/List', [
                     start: this.position
                 };
 
-            this.applyQueryToKeywordArgs(keywordArgs);
-            this.applyOptionsToKeywordArgs(keywordArgs);
+            this.applyQueryToFetch(keywordArgs);
+            this.applyOptionsToFetch(keywordArgs);
 
             return store.fetch(keywordArgs);
         },
-        applyQueryToKeywordArgs: function(keywordArgs) {
+        applyQueryToFetch: function(keywordArgs) {
             if (this.query) keywordArgs.query = this.query;
         },
-        applyOptionsToKeywordArgs: function(keywordArgs) {
+        applyOptionsToFetch: function(keywordArgs) {
 
         },
         emptySelection: function() {

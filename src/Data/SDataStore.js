@@ -3,61 +3,84 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/string',
-    'dojo/json'
+    'dojo/json',
+    '../Convert',
+    '../Utility'
 ], function (
     declare,
     lang,
     array,
     string,
-    json
+    json,
+    convert,
+    utility
 ) {
+    var transformQuery = function(query) {
+        if (typeof query === 'object')
+        {
+            // todo: add support for transforming a recommended object query
+            return query;
+        }
+
+        return query;
+    };
+
     return declare('Sage.Data.SDataStore', null, {
+        _create: null,
+        _update: null,
+        _delete: null,
+        clearOnClose: true,
+        doDateConversion: true,
+
         where: null,
         select: null,
         include: null,
         orderBy: null,
+        service: null,
         request: null,
         queryName: null,
+        entityName: null,
         contractName: null,
         resourceKind: null,
         resourceProperty: null,
         resourcePredicate: null,
+        itemsAttribute: '$resources',
         labelAttribute: '$descriptor',
         identityAttribute: '$key',
-        itemsAttribute: '$resources',
+        versionAttribute: '$etag',
         executeFetchAs: null,
         executeFetchItemAs: null,
+
         constructor: function(options) {
             lang.mixin(this, options);
 
+            this._create = [];
+            this._update = {};
+            this._delete = {};
+
             this._features = {
                 'dojo.data.api.Read': true,
+                'dojo.data.api.Write': true,
                 'dojo.data.api.Identity': true
             };
         },
         getFeatures: function() {
             return this._features;
         },
-        expandExpression: function(expression) {
-            if (typeof expression === 'function')
-                return expression.apply(this, Array.prototype.slice.call(arguments, 1));
-            else
-                return expression;
-        },
         _createEntryRequest: function(keywordArgs) {
-            var request = this.expandExpression(keywordArgs.request || this.request);
+            var request = utility.expand(this, keywordArgs.request || this.request);
             if (request)
             {
                 request = request.clone();
             }
             else
             {
-                var contractName = this.expandExpression(keywordArgs.contractName || this.contractName),
-                    resourceKind = this.expandExpression(keywordArgs.resourceKind || this.resourceKind),
-                    resourceProperty = this.expandExpression(keywordArgs.resourceProperty || this.resourceProperty),
+                var contractName = utility.expand(this, keywordArgs.contractName || this.contractName),
+                    resourceKind = utility.expand(this, keywordArgs.resourceKind || this.resourceKind),
+                    resourceProperty = utility.expand(this, keywordArgs.resourceProperty || this.resourceProperty),
                     resourcePredicate = keywordArgs.identity
                         ? json.stringify(keywordArgs.identity) /* string keys are quoted, numeric keys are left alone */
-                        : this.expandExpression(keywordArgs.resourcePredicate || this.resourcePredicate);
+                        : utility.expand(this, keywordArgs.resourcePredicate || this.resourcePredicate);
 
                 if (resourceProperty)
                 {
@@ -75,8 +98,8 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
                 if (resourceKind) request.setResourceKind(resourceKind);
             }
 
-            var select = this.expandExpression(keywordArgs.select || this.select),
-                include = this.expandExpression(keywordArgs.include || this.include);
+            var select = utility.expand(this, keywordArgs.select || this.select),
+                include = utility.expand(this, keywordArgs.include || this.include);
 
             if (select && select.length > 0)
                 request.setQueryArg('select', select.join(','));
@@ -87,18 +110,18 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             return request;
         },
         _createFeedRequest: function(keywordArgs) {
-            var request = this.expandExpression(keywordArgs.request || this.request);
+            var request = utility.expand(this, keywordArgs.request || this.request);
             if (request)
             {
                 request = request.clone();
             }
             else
             {
-                var queryName = this.expandExpression(keywordArgs.queryName || this.queryName),
-                    contractName = this.expandExpression(keywordArgs.contractName || this.contractName),
-                    resourceKind = this.expandExpression(keywordArgs.resourceKind || this.resourceKind),
-                    resourceProperty = this.expandExpression(keywordArgs.resourceProperty || this.resourceProperty),
-                    resourcePredicate = this.expandExpression(keywordArgs.resourcePredicate || this.resourcePredicate);
+                var queryName = utility.expand(this, keywordArgs.queryName || this.queryName),
+                    contractName = utility.expand(this, keywordArgs.contractName || this.contractName),
+                    resourceKind = utility.expand(this, keywordArgs.resourceKind || this.resourceKind),
+                    resourceProperty = utility.expand(this, keywordArgs.resourceProperty || this.resourceProperty),
+                    resourcePredicate = utility.expand(this, keywordArgs.resourcePredicate || this.resourcePredicate);
 
                 if (queryName)
                 {
@@ -122,10 +145,9 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
                 if (resourceKind) request.setResourceKind(resourceKind);
             }
 
-            var select = this.expandExpression(keywordArgs.select || this.select),
-                orderBy = this.expandExpression(keywordArgs.sort || this.orderBy),
-                include = this.expandExpression(keywordArgs.include || this.include),
-                conditions = [];
+            var select = utility.expand(this, keywordArgs.select || this.select),
+                include = utility.expand(this, keywordArgs.include || this.include),
+                orderBy = utility.expand(this, keywordArgs.sort || this.orderBy);
 
             if (select && select.length > 0)
                 request.setQueryArg('select', select.join(','));
@@ -153,11 +175,15 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
                 }
             }
 
-            if (this.where)
-                conditions.push(this.where);
+            var where = utility.expand(this, this.where),
+                query = utility.expand(this, keywordArgs.query),
+                conditions = [];
 
-            if (keywordArgs.query)
-                conditions.push(keywordArgs.query);
+            if (where)
+                conditions.push(where);
+
+            if (query)
+                conditions.push(transformQuery(query));
 
             if (conditions.length > 0)
                 request.setQueryArg('where', '(' + conditions.join(') and (') + ')');
@@ -214,7 +240,14 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             return requestObject;
         },
         close: function(request) {
-            request.abort();
+            if (request)
+            {
+                request.abort();
+            }
+            else
+            {
+                this.revert();
+            }
         },
         _abortRequest: function(handle) {
             this.service.abortRequest(handle);
@@ -281,6 +314,14 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
                 this._onRequestFailure(keywordArgs, requestObject, xhr, xhrOptions);
             }
         },
+        isItem: function(something) {
+            return something;
+        },
+        isItemLoaded: function(something) {
+            return something;
+        },
+        loadItem: function(keywordArgs) {
+        },
         getLabel: function(item) {
             return this.getValue(item, this.labelAttribute, '');
         },
@@ -294,7 +335,113 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             return [this.labelAttribute];
         },
         getValue: function(item, attribute, defaultValue) {
-            return lang.getObject(attribute, false, item) || defaultValue;
+            var value = lang.getObject(attribute, false, item);
+
+            if (typeof value === 'undefined') return defaultValue;
+
+            if (this.doDateConversion && convert.isDateString(value)) return convert.toDateFromString(value);
+
+            return value;
+        },
+        newItem: function(keywordArgs, parentInfo) {
+            var value = lang.mixin({}, keywordArgs);
+
+            this._create.push(value);
+
+            return value;
+        },
+        deleteItem: function(item) {
+            var identity = this.getIdentity(item);
+            if (!identity) return;
+
+            this._delete[identity] = item;
+        },
+        setValue: function(item, attribute, value) {
+            var identity = this.getIdentity(item),
+                dirty;
+
+            if (!identity)
+            {
+                // todo: not the fastest way, but ensures that the item is of this store, and keeps items free of store properties
+                // todo: is this check necessary?
+                if (this._create.indexOf(item) <= -1) return;
+
+                dirty = item;
+            }
+            else
+            {
+                dirty = this._update[identity];
+
+                if (!dirty)
+                {
+                    dirty = {};
+
+                    lang.setObject(this.identityAttribute, identity, dirty);
+
+                    var version = lang.getObject(this.versionAttribute, false, item);
+                    if (version) lang.setObject(this.versionAttribute, version, dirty);
+
+                    this._update[identity] = dirty;
+                }
+            }
+
+            if (this.doDateConversion && convert.isDate(value))
+                value = this.service.isJsonEnabled()
+                    ? convert.toJsonStringFromDate(value)
+                    : convert.toIsoStringFromDate(value);
+
+            lang.setObject(attribute, value, dirty);
+        },
+        setValues: function(item, attribute, values) {
+            this.setValue(item, attribute, values);
+        },
+        unsetAttribute: function(item, attribute) {
+            var identity = this.getIdentity(item);
+
+            if (!identity) return;
+
+            var dirty = this._update[identity];
+
+            if (!dirty) return;
+
+            var parts = attribute.split('.'),
+                property = parts.pop(),
+                path = parts.join('.');
+
+            var container = lang.getObject(path, false, dirty);
+            if (container) delete container[property];
+        },
+        save: function(keywordArgs) {
+        },
+        revert: function() {
+            this._create = [];
+            this._update = {};
+            this._delete = {};
+        },
+        isDirty: function(item) {
+            if (item)
+            {
+                var identity = this.getIdentity(item);
+
+                if (!identity) return;
+
+                if (this._update[identity]) return true;
+                if (this._delete[identity]) return true;
+                if (this._create.indexOf(item) > -1) return true;
+
+                return false;
+            }
+            else
+            {
+                if (this._create.length > 0) return true;
+
+                var dirty = false;
+
+                for (var key in this._update) { dirty = true; break; }
+                for (var key in this._delete) { dirty = true; break; }
+
+                return dirty;
+            }
         }
     });
 });

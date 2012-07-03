@@ -67,7 +67,7 @@ define('Sage/Platform/Mobile/Detail', [
         ]),
         loadingTemplate: new Simplate([
             '<div class="loading-indicator">',
-            '<div class="row"><div>{%: $.loadingText %}</div></div>',
+            '<div>{%: $.loadingText %}</div>',
             '</div>'
         ]),
         sectionBeginTemplate: new Simplate([
@@ -138,6 +138,7 @@ define('Sage/Platform/Mobile/Detail', [
             '<div class="not-available">{%: $.notAvailableText %}</div>'
         ]),
         tier: 1,
+        store: null,
         layout: null,
         security: false,
         customizationSet: 'detail',
@@ -156,6 +157,9 @@ define('Sage/Platform/Mobile/Detail', [
             this.subscribe('/app/refresh', this._onRefresh);
             this.clear();
         },
+        _getStoreAttr: function() {
+            return this.store || (this.store = this.createStore());
+        },
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'tbar': [{
@@ -164,12 +168,6 @@ define('Sage/Platform/Mobile/Detail', [
                     security: App.getViewSecurity(this.editView, 'update')
                 }]
             });
-        },
-        invokeAction: function(name, parameters, evt, el) {
-            if (parameters && /true/i.test(parameters['disableAction']))
-                return;
-
-            return this.inherited(arguments);
         },
         _onRefresh: function(o) {
             /* todo: change to be something non-sdata specific */
@@ -260,7 +258,7 @@ define('Sage/Platform/Mobile/Detail', [
         requestData: function() {
             domClass.add(this.domNode, 'is-loading');
 
-            var store = this.store || (this.store = this.createStore()),
+            var store = this.get('store'),
                 keywordArgs = {
                     scope: this,
                     onError: this._onFetchError,
@@ -268,16 +266,16 @@ define('Sage/Platform/Mobile/Detail', [
                     onItem: this._onFetchItem
                 };
 
-            this.applyOptionsToKeywordArgs(keywordArgs);
+            this.applyOptionsToFetchItem(keywordArgs);
 
             return store.fetchItemByIdentity(keywordArgs);
         },
-        applyOptionsToKeywordArgs: function(keywordArgs) {
+        applyOptionsToFetchItem: function(keywordArgs) {
             var options = this.options;
 
             if (options)
             {
-                if (options.identity) keywordArgs.identity = options.identity;
+                if (options.key) keywordArgs.identity = options.key;
             }
         },
         createLayout: function() {

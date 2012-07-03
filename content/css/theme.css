@@ -148,6 +148,18 @@ textarea:focus
 }
 
 /* list */
+.list
+{
+    background: #fbfdf0;
+}
+
+.list > .scroll-container > .scroll-content
+{
+    background-color: #fff;
+    border: none 0px black;
+    border-bottom: solid 1px #ddd;
+}
+
 .is-loading .list-more > .button > span
 {
     background: url('../images/loading-indicator-gray.gif') no-repeat scroll 0 50%;
@@ -276,7 +288,7 @@ textarea:focus
     background: #fbfdf0;
 }
 
-.detail-content
+.detail > .scroll-container > .scroll-content
 {
     background-color: #fff;
     border: none 0px black;
@@ -373,7 +385,7 @@ textarea:focus
     background: #fbfdf0;
 }
 
-.edit-content
+.edit > .scroll-container > .scroll-content
 {
     background-color: #fff;
     border: none 0px black;
@@ -417,19 +429,22 @@ textarea:focus
     border: none 0px black;
 }
 
-.edit-content > ul
+.edit-content > ul,
+.edit .validation-summary > ul
 {
     border: none 0px black;
     background-color: #fff;
 }
 
-.edit-content > ul > li
+.edit-content > ul > li,
+.edit .validation-summary > ul > li
 {
     border-top: solid 1px #ddd;
     cursor: pointer;
 }
 
-.edit-content > ul > li:first-child
+.edit-content > ul > li:first-child,
+.edit .validation-summary > ul > li:first-child
 {
     border-top: none 0 black;
 }
@@ -489,6 +504,55 @@ textarea:focus
 .edit-content > fieldset > .row-edit:first-of-type
 {
     border-top: none 0 black;
+}
+
+.edit .validation-summary > h2
+{
+    border-bottom: 1px solid #000;
+    border-top: 1px solid #000;
+    background-color: #de6464;
+    background-image: linear-gradient(top, #de6464, #b33737);
+    background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0, #de6464),
+		color-stop(1, #b33737)
+	);
+	background-image: -moz-linear-gradient(top, #de6464, #b33737);
+    color: #fff;
+    text-shadow: #000 0px 1px 0px;
+    font-weight: bold;
+
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#de6464, endColorstr=#b33737)";
+}
+
+.edit .validation-summary > h2:first-child
+{
+    border-top: solid 1px #de6464;
+}
+
+.edit .validation-summary > fieldset,
+.edit .validation-summary > div
+{
+    border: none 0px black;
+}
+
+.edit.has-error .edit-content > h2:first-child
+{
+    border-top: 1px solid #000;
+}
+
+.edit .loading-indicator
+{
+    background: #fff;
+    border: none 0px black;
+}
+
+.edit .loading-indicator > div
+{
+    background: url('../images/loading-indicator-white.gif') no-repeat scroll 0 50%;
+    padding: 0 0 0 20px;
 }
 
 .text-field-active > .clear-button

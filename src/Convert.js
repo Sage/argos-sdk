@@ -27,6 +27,9 @@ define('Sage/Platform/Mobile/Convert', [
         toBoolean: function(value) {
             return trueRE.test(value);
         },
+        isDate: function(value) {
+            return value instanceof Date;
+        },
         isDateString: function(value) {
             if (typeof value !== 'string')
                 return false;

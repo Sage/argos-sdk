@@ -678,6 +678,16 @@ h2 > .collapsed-indicator
 .detail-content > .loading-indicator
 {
     display: none;
+    text-align: center;
+    font-size: 1em;
+    font-weight: normal;
+    line-height: 1.5em;
+    padding: 1em !important;
+}
+
+.detail-content > .loading-indicator > div
+{
+    display: inline-block;
 }
 
 .is-loading .detail-content > *
@@ -688,21 +698,11 @@ h2 > .collapsed-indicator
 .is-loading .detail-content > .loading-indicator
 {
     display: block;
-    text-align: center;
-    font-size: 1em;
-    font-weight: normal;
-    line-height: 1.5em;
-    padding: 1em;
-}
-
-.is-loading .detail-content > .loading-indicator > div
-{
-	display: inline-block;
-    text-align: center;
 }
 
 /* edit */
-.edit-content > h2
+.edit-content > h2,
+.edit .validation-summary > h2
 {
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -726,7 +726,7 @@ h2 > .collapsed-indicator
     clear: both;
 }
 
-.edit-validation-summary > ul > li
+.edit .validation-summary > ul > li
 {
     list-style: none;
     clear: both;
@@ -745,14 +745,15 @@ h2 > .collapsed-indicator
 .edit-content > fieldset
 .edit-content > div,
 .edit-content > ul,
+.edit .validation-summary > ul
 {
     margin: 0;
     padding: 0 0 1.5em 0;
 }
 
 .edit-content > fieldset:last-child,
-.edit-content > ul:last-child,
-.edit-content > div:last-child
+.edit-content > div:last-child,
+.edit-content > ul:last-child
 {
     margin: 0;
     padding: 0 0 0 0;
@@ -773,6 +774,11 @@ h2 > .collapsed-indicator
     padding: 8px;
     margin: 0px;
     display: block;
+}
+
+.edit .validation-summary > ul > li
+{
+    padding: 8px;
 }
 
 .row > div > input:not([type|=radio]):not([type|=checkbox]),
@@ -903,6 +909,19 @@ h2 > .collapsed-indicator
 .edit .loading-indicator
 {
     display: none;
+    text-align: center;
+    font-size: 1em;
+    font-weight: normal;
+    line-height: 1.5em;
+    padding: 1em;
+    margin: 0;
+
+}
+
+.edit .loading-indicator > div
+{
+	display: inline-block;
+    text-align: center;
 }
 
 .is-loading .edit-content
@@ -913,17 +932,11 @@ h2 > .collapsed-indicator
 .edit.is-loading .loading-indicator
 {
     display: block;
-    text-align: center;
-    font-size: 1em;
-    font-weight: normal;
-    line-height: 1.5em;
-    padding: 1em;
 }
 
-.edit.is-loading > .loading-indicator > div
+.edit.has-error .validation-summary
 {
-	display: inline-block;
-    text-align: center;
+    display: block;
 }
 
 /* fields */
