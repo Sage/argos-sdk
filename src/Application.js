@@ -76,16 +76,6 @@ define('Sage/Platform/Mobile/Application', [
         'mergeConfiguration': mergeConfiguration
     });
 
-    var ViewShim = declare('Sage.Platform.Mobile.ViewShim', null, {
-        id: null,
-        constructor: function(options) {
-            lang.mixin(this, options);
-        },
-        show: function(options) {
-            win.global.App.viewManager.showView(this.id, options);
-        }
-    });
-    
     return declare('Sage.Platform.Mobile.Application', [_Component], {
         _started: false,
         _signals: null,

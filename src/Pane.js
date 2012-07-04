@@ -93,6 +93,8 @@ define('Sage/Platform/Mobile/Pane', [
 
                 this.active = view;
 
+                if (view.resize) view.resize();
+
                 deferred.resolve(true);
             }));
 
@@ -108,6 +110,11 @@ define('Sage/Platform/Mobile/Pane', [
             deferred.resolve(true);
 
             return deferred;
+        },
+        resize: function() {
+            // skip default implementation, only resize active child
+            if (this.active && this.active.resize)
+                this.active.resize();
         }
     });
 });

@@ -41,6 +41,7 @@ define('Sage/Platform/Mobile/View', [
         serviceName: false,
         connectionName: false,
         customizationSet: 'view',
+        _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
         _getProtoComponentDeclarations: function() {
             var customizationSet = customizations();
             return customizationSet.apply(customizationSet.toPath(this.customizationSet, 'components', this.id), this.inherited(arguments));
@@ -78,16 +79,13 @@ define('Sage/Platform/Mobile/View', [
         onCreate: function() {
             this.inherited(arguments);
 
-            var map = {'tbar': 'top', 'bbar': 'bottom'},
-                tools = this.get('tools');
+            var tools = this.get('tools');
             if (tools)
             {
                 for (var name in tools)
                 {
-                    var mapped = map[name] || name;
-
-                    if (this.$[mapped])
-                        this.$[mapped].set('items', tools[name]);
+                    if (this.$[name])
+                        this.$[name].set('items', tools[name]);
                 }
             }
         },

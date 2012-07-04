@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/Detail', [
     './ErrorManager',
     './View',
     './ScrollContainer',
-    './Toolbar',
+    './TitleBar',
     'argos!customizations',
     'argos!scene'
 ], function(
@@ -42,7 +42,7 @@ define('Sage/Platform/Mobile/Detail', [
     ErrorManager,
     View,
     ScrollContainer,
-    Toolbar,
+    TitleBar,
     customizations,
     scene
 ) {
@@ -52,7 +52,7 @@ define('Sage/Platform/Mobile/Detail', [
             'click': true
         },
         components: [
-            {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
+            {name: 'top', type: TitleBar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
                 {name: 'scroll', tag: 'div', components: [
@@ -62,7 +62,6 @@ define('Sage/Platform/Mobile/Detail', [
         ],
         baseClass: 'view detail',
         _setDetailContentAttr: {node: 'contentNode', type: 'innerHTML'},
-        _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
         emptyTemplate: new Simplate([
         ]),
         loadingTemplate: new Simplate([
@@ -162,7 +161,7 @@ define('Sage/Platform/Mobile/Detail', [
         },
         createToolLayout: function() {
             return this.tools || (this.tools = {
-                'tbar': [{
+                'top': [{
                     id: 'edit',
                     action: 'navigateToEditView',
                     security: App.getViewSecurity(this.editView, 'update')

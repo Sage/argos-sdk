@@ -27,7 +27,7 @@ define('Sage/Platform/Mobile/List', [
     './ErrorManager',
     './ScrollContainer',
     './SearchWidget',
-    './Toolbar',
+    './TitleBar',
     'argos!scene',
     'argos!customizations'
 ], function(
@@ -44,7 +44,7 @@ define('Sage/Platform/Mobile/List', [
     ErrorManager,
     ScrollContainer,
     SearchWidget,
-    Toolbar,
+    TitleBar,
     scene,
     customizations
 ) {
@@ -170,7 +170,7 @@ define('Sage/Platform/Mobile/List', [
             'click': true
         },
         components: [
-            {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
+            {name: 'top', type: TitleBar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
             {name: 'search', type: SearchWidget, attachEvent: 'onQuery:_onSearchQuery,onClear:_onSearchClear'},
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
@@ -194,7 +194,6 @@ define('Sage/Platform/Mobile/List', [
         moreNode: null,
         _setListContentAttr: {node: 'contentNode', type: 'innerHTML'},
         _setRemainingContentAttr: {node: 'remainingContentNode', type: 'innerHTML'},
-        _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
         /**
          * The template used to render the loading message when the view is requesting more data.
          *
@@ -401,7 +400,7 @@ define('Sage/Platform/Mobile/List', [
         },
         createToolLayout: function() {
             return this.tools || (this.tools = {
-                'tbar': [{
+                'top': [{
                     id: 'new',
                     action: 'navigateToInsertView',
                     security: App.getViewSecurity(this.insertView, 'insert')

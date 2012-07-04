@@ -48,9 +48,7 @@ define('Sage/Platform/Mobile/Toolbar', [
         },
         baseClass: 'toolbar',
         position: 'top',
-        components: [
-            {tag: 'h1', attrs: {'class':'toolbar-title'}, attachPoint: 'titleNode'}
-        ],
+        components: [],
         itemTemplate: new Simplate([
             '<button class="button tool-button {%= $$.cls %}"',
                     'data-tool="{%= $.name %}" aria-label="{%: $$.title || $.name %}">',
@@ -62,8 +60,7 @@ define('Sage/Platform/Mobile/Toolbar', [
             '</button>'
         ]),
         items: null,
-        _setTitleAttr: {node: 'titleNode', type: 'innerHTML'},
-        _size: null,
+        _size: 0,
         _items: null,
         _itemsByName: null,
         _onToolClick: function(evt, node) {
@@ -71,7 +68,7 @@ define('Sage/Platform/Mobile/Toolbar', [
             if (name) this._invokeTool(name);
         },
         _invokeTool: function(name) {
-            var item = this._items[name],
+            var item = this._itemsByName[name],
                 source = item && item.source;
             if (source)
             {
@@ -117,35 +114,42 @@ define('Sage/Platform/Mobile/Toolbar', [
             this._items = {};
         },
         update: function() {
-            var count = {left: 0, right: 0};
+            var count = {left: 0, right: 0},
+                items = this._items;
 
-            for (var name in this._items)
+            for (var i = 0; i < items.length; i++)
             {
-                var item = this._items[name];
+                var item = items[i];
 
-                this._update(item);
+                this._updateItemState(item);
 
                 if (item.visible) count[item.side] += 1;
 
-                this._sync(item);
+                this._applyItemStateToDom(item);
             }
 
-            domAttr.set(this.domNode, 'data-item-count', Math.max(count['left'], count['right']));
+            var size = Math.max(count['left'], count['right']);
+
+            domAttr.set(this.domNode, 'data-item-count', size);
+
+            this._size = size;
+
+            this.onContentChange();
         },
-        _render: function(item) {
+        _renderItem: function(item) {
             var node = domConstruct.toDom(this.itemTemplate.apply(item, item.source));
 
             item.domNode = node;
 
             domClass.add(node, 'on-' + item.side);
 
-            this._sync(item);
+            this._applyItemStateToDom(item);
 
-            domConstruct.place(node, this.domNode);
+            domConstruct.place(node, this.containerNode || this.domNode);
 
             return node;
         },
-        _update: function(item) {
+        _updateItemState: function(item) {
             var source = item.source,
                 visible = utility.expand(this, source.visible),
                 enabled = utility.expand(this, source.enabled);
@@ -153,7 +157,7 @@ define('Sage/Platform/Mobile/Toolbar', [
             item.visible = typeof visible !== 'undefined' ? visible : true;
             item.enabled = typeof enabled !== 'undefined' ? enabled : true;
         },
-        _sync: function(item) {
+        _applyItemStateToDom: function(item) {
             var node = item.domNode;
 
             domClass.toggle(node, 'is-disabled', !item.enabled);
@@ -161,9 +165,12 @@ define('Sage/Platform/Mobile/Toolbar', [
         },
         _remove: function() {
             query("> .tool", this.domNode).remove();
+
+            this.onContentChange();
         },
         _setItemsAttr: function(values) {
-            var items = {},
+            var items = [],
+                itemsByName = {},
                 count = {left: 0, right: 0};
 
             if (typeof values == 'undefined') return;
@@ -182,22 +189,32 @@ define('Sage/Platform/Mobile/Toolbar', [
                         source: source
                     };
 
-                this._update(item);
+                this._updateItemState(item);
 
                 if (item.visible) count[item.side] += 1;
 
-                this._render(item);
+                this._renderItem(item);
+
+                items.push(item);
 
                 items[item.name] = item;
             }
 
-            /* todo: track each side seprately? */
-            domAttr.set(this.domNode, 'data-tool-count', Math.max(count['left'], count['right']));
+            var size = Math.max(count['left'], count['right']);
 
+            /* todo: track each side seprately? */
+            domAttr.set(this.domNode, 'data-tool-count', size);
+
+            this._size = size;
             this._items = items;
+            this._itemsByName = itemsByName;
+
+            this.onContentChange();
         },
         _getItemsAttr: function() {
             return this._items;
+        },
+        onContentChange: function() {
         }
     });
 });

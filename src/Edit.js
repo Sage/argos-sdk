@@ -27,7 +27,7 @@ define('Sage/Platform/Mobile/Edit', [
     'dojo/NodeList-manipulate',
     './View',
     './ScrollContainer',
-    './Toolbar',
+    './TitleBar',
     './Data/SDataStore',
     './ErrorManager',
     './Fields/FieldRegistry',
@@ -48,7 +48,7 @@ define('Sage/Platform/Mobile/Edit', [
     nodeListManipulate,
     View,
     ScrollContainer,
-    Toolbar,
+    TitleBar,
     SDataStore,
     ErrorManager,
     FieldRegistry,
@@ -62,7 +62,7 @@ define('Sage/Platform/Mobile/Edit', [
             'click': true
         },
         components: [
-            {name: 'top', type: Toolbar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
+            {name: 'top', type: TitleBar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
                 {name: 'scroll', tag: 'div', components: [
@@ -78,7 +78,6 @@ define('Sage/Platform/Mobile/Edit', [
         baseClass: 'view edit',
         _setEditContentAttr: {node: 'contentNode', type: 'innerHTML'},
         _setValidationContentAttr: {node: 'validationContentNode', type: 'innerHTML'},
-        _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
 
         validationSummaryItemTemplate: new Simplate([
             '<li data-field="{%= $.name %}">',
@@ -140,7 +139,7 @@ define('Sage/Platform/Mobile/Edit', [
         },
         createToolLayout: function() {
             return this.tools || (this.tools = {
-                'tbar': [{
+                'top': [{
                     id: 'save',
                     action: 'save',
                     security: this.options && this.options.insert
