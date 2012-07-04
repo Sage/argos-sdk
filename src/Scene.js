@@ -32,13 +32,46 @@ define('Sage/Platform/Mobile/Scene', [
     Layout,
     View
 ) {
+    /*
+     in order to expand or contract the number of tiers, state must be re-linearized, and browser history must be re-written.
+
+     to re-write browser history: browser back # of state sets in the old state
+     to re-linearize state down:
+        - beginning with the lowest-priority tier (N), trace tier N-1 back until change
+            - (A, B) => (A, C) => (A, D) ==> (A, D) : N-1 is A, so N-1 can be traced back until (A, B)
+            - (A, 0) => (B, 0) => (B, C) => (B, D) ===> (B, 0) : N-1 is B, so N-1 can be traced back until (B, 0)
+        - linearize to start with N-1 value, then build back N
+            - (A, 0) => (B, 0) => (B, C) => (B, D)
+                        (B, 0) => (B, C) => (B, D)
+                     => (B) => (0) => (C) => (D)
+                     => (B) => (C) => (D)
+        - a shortcut may be to trace back to where N is 0.
+
+     to re-linearize state up:
+        - track the original tier each item in the state set was shown with
+        - simply play-forward the standard algorithm, with the correct tier
+     */
     return declare('Sage.Platform.Mobile.Scene', [_Component], {
         _registeredViews: null,
         _instancedViews: null,
         _state: null,
+        /**
+         * A queue of view instances waiting to be shown (after async operations).
+         */
         _queue: null,
+        /**
+         * True if the scene is currently idle.  False if a view is in the process of being shown.
+         */
         _idle: true,
+        /**
+         * A hash containing information about which views are waiting for other views to be shown.
+         *
+         * key (the view waiting) => value (the view being waited for)
+         */
         _wait: null,
+        /**
+         * If truthy, the last view that was required.
+         */
         _last: null,
         components: [
             {type: Layout, attachPoint: 'layout'}
@@ -104,6 +137,8 @@ define('Sage/Platform/Mobile/Scene', [
             var instance = this._instancedViews[name];
             if (instance)
             {
+                /* since the view has already been required and instantiated, if the scene is idle, it can be shown immediately. */
+                /* otherwise, it needs to be placed on the queue */
                 if (this._idle)
                 {
                     this._showViewInstance(name, instance, options, at);
@@ -119,6 +154,9 @@ define('Sage/Platform/Mobile/Scene', [
             var definition = this._registeredViews[name];
             if (definition)
             {
+
+                /* if _last has been set, another view is in the process of being shown, this view needs to wait for that one. */
+                /* the view can be required, and instantiated, while that is happening. */
                 if (this._last)
                 {
                     console.log('%s is waiting for %s', name, this._last);
@@ -180,7 +218,7 @@ define('Sage/Platform/Mobile/Scene', [
                 stateSet[tier] = this._state[stateMark] && tier < location.tier ? this._state[stateMark][tier] : null;
             }
 
-            stateSet[location.tier] = { hash: hash, context: context };
+            stateSet[location.tier] = { hash: hash, context: context, location: location };
 
             return stateSet;
         },
@@ -318,6 +356,8 @@ define('Sage/Platform/Mobile/Scene', [
             while (next = this._queue.shift())
             {
                 var name = next[0];
+
+                /* if the view is waiting for another view to finish being shown, put it back in the queue. */
                 if (this._wait[name])
                 {
                     console.log('%s is still waiting for %s', name, this._wait[name]);
