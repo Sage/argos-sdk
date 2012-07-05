@@ -208,17 +208,19 @@ define('Sage/Platform/Mobile/Scene', [
                 tag = view.getTag(),
                 hash = [view.id].concat(tag ? tag : []).join(';'),
                 stateSet = [],
-                stateMark = this._state.length - 1;
+                stateMark = this._state.length - 1,
+                tiers = this.layout.tiers,
+                target = Math.min(tiers - 1, location.tier);
 
             /* todo: add position adjustment */
             /* todo: add pane maximization */
-            for (var tier = 0; tier < this.layout.tiers; tier++)
+            for (var tier = 0; tier < tiers; tier++)
             {
                 /* inherit the state of the higher priority tiers */
                 stateSet[tier] = this._state[stateMark] && tier < location.tier ? this._state[stateMark][tier] : null;
             }
 
-            stateSet[location.tier] = { hash: hash, context: context, location: location };
+            stateSet[target] = { hash: hash, context: context, location: location };
 
             return stateSet;
         },
