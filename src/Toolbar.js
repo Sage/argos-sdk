@@ -26,7 +26,8 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dijit/_WidgetBase',
     './_EventMapMixin',
     './_UiComponent',
-    './Utility'
+    './Utility',
+    'argos!scene'
 ], function(
     declare,
     lang,
@@ -40,7 +41,8 @@ define('Sage/Platform/Mobile/Toolbar', [
     _WidgetBase,
     _EventMapMixin,
     _UiComponent,
-    utility
+    utility,
+    scene
 ) {
     return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _UiComponent], {
         events: {
@@ -75,18 +77,30 @@ define('Sage/Platform/Mobile/Toolbar', [
             {
                 if (source.fn)
                 {
-                    source.fn.call(source.scope || this, source);
+                    var args = source.args ? source.args.concat(source) : [source];
+
+                    source.fn.apply(source.scope || this, args);
+                }
+                else if (source.show)
+                {
+                    scene().showView(source.show, source.args);
                 }
                 else if (source.action)
                 {
                     var root = this.getComponentRoot(),
-                        method = root[source.action];
+                        active = root && root.active,
+                        method = active && active[source.action],
+                        args = source.args ? source.args.concat(source) : [source];
 
-                    if (typeof method === 'function') method.call(root, source);
+                    if (typeof method === 'function') method.apply(root, args);
                 }
                 else if (source.publish)
                 {
-                    topic.publish(source.publish, [source]);
+                    var args = source.args
+                        ? [source.publish].concat(source.args, source)
+                        : [source.publish, source];
+
+                    topic.publish.apply(topic, args);
                 }
             }
         },

@@ -33,6 +33,7 @@ define('Sage/Platform/Mobile/_Component', [
         constructor: function(props) {
             this._components = [];
             this._componentContext = [];
+            this._componentSource = {};
 
             this.$ = {};
             this.components = [];
@@ -85,13 +86,16 @@ define('Sage/Platform/Mobile/_Component', [
         _destroyChildComponent: function(instance) {
             if (typeof instance.destroy === 'function') instance.destroy();
         },
-        addComponent: function(instance) {
+        addComponent: function(name, instance) {
             if (instance._componentOwner) return;
 
             var slot = (this._components.push(instance) - 1),
                 context = {
                     remote: true
-                };
+                },
+                source = instance._componentSource;
+
+            source.name = name;
 
             this._componentContext[slot] = context;
 
@@ -306,6 +310,9 @@ define('Sage/Platform/Mobile/_Component', [
         getComponents: function() {
             return this._components;
         },
+        _modifyComponentDeclarations: function(components) {
+            return components;
+        },
         _getProtoComponentDeclarations: function() {
             return this.constructor.prototype.components;
         },
@@ -313,14 +320,32 @@ define('Sage/Platform/Mobile/_Component', [
             return this.hasOwnProperty('components') && this.components;
         },
         initComponents: function() {
-            var root = this._componentRoot || this,
+            var source = this._componentSource,
+                root = this._componentRoot || this,
                 owner = this;
 
-            /* components defined on the prototype are always rooted locally */
-            this._createComponents(this._getProtoComponentDeclarations(), owner, owner);
+            if (source.root)
+            {
+                /* create instance components as if they were proto-components */
+                this._createComponents(
+                    this._modifyComponentDeclarations(this.hasOwnProperty('components') && this.components),
+                    owner, owner
+                );
+            }
+            else
+            {
+                /* components defined on the prototype are always rooted locally */
+                this._createComponents(
+                    this._modifyComponentDeclarations(this.constructor.prototype.components),
+                    owner, owner
+                );
 
-            /* components defined on the instance always inherit the root */
-            this._createComponents(this._getInstanceComponentDeclarations(), root, owner);
+                /* components defined on the instance always inherit the root */
+                this._createComponents(
+                    this._modifyComponentDeclarations(this.hasOwnProperty('components') && this.components),
+                    root, owner
+                );
+            }
         }
     });
 

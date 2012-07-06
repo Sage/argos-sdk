@@ -39,7 +39,9 @@ define('Sage/Platform/Mobile/TitleBar', [
     return declare('Sage.Platform.Mobile.TitleBar', [Toolbar], {
         position: 'top',
         components: [
-            {tag: 'h1', attrs: {'class':'toolbar-title'}, attachPoint: 'titleNode'}
+            {tag: 'h1', attrs: {'class':'toolbar-title'}, components: [
+                {tag: 'span', attachPoint: 'titleNode'}
+            ]}
         ],
         _setTitleAttr: {node: 'titleNode', type: 'innerHTML'}
     });

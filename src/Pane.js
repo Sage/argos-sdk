@@ -21,6 +21,7 @@ define('Sage/Platform/Mobile/Pane', [
     'dojo/topic',
     'dojo/dom-style',
     'dojo/dom-class',
+    'dojo/dom-attr',
     'dojox/mobile/FixedSplitterPane',
     './_UiComponent',
     './Toolbar',
@@ -34,6 +35,7 @@ define('Sage/Platform/Mobile/Pane', [
     topic,
     domStyle,
     domClass,
+    domAttr,
     FixedSplitterPane,
     _UiComponent,
     Toolbar,
@@ -151,14 +153,16 @@ define('Sage/Platform/Mobile/Pane', [
 
             view.transitionTo();
 
-            this._afterTransition(view, options, previous);
-
             this.active = view;
+
+            domAttr.set(this.domNode, 'data-active-view', view.id);
 
             if (view.resize)
             {
                 view.resize();
             }
+
+            this._afterTransition(view, options, previous);
 
             deferred.resolve(true);
         },
@@ -180,6 +184,8 @@ define('Sage/Platform/Mobile/Pane', [
             }
 
             this.active = null;
+
+            domAttr.set(this.domNode, 'data-active-view', '');
 
             deferred.resolve(true);
 
