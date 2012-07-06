@@ -170,7 +170,6 @@ define('Sage/Platform/Mobile/List', [
             'click': true
         },
         components: [
-            {name: 'top', type: TitleBar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
             {name: 'search', type: SearchWidget, attachEvent: 'onQuery:_onSearchQuery,onClear:_onSearchClear'},
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [

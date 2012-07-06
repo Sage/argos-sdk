@@ -300,6 +300,12 @@ define('Sage/Platform/Mobile/_Component', [
         getComponentValue: function() {
             return this;
         },
+        getComponentName: function() {
+            return this._componentSource.name;
+        },
+        getComponents: function() {
+            return this._components;
+        },
         _getProtoComponentDeclarations: function() {
             return this.constructor.prototype.components;
         },

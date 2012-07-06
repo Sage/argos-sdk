@@ -50,7 +50,7 @@ define('Sage/Platform/Mobile/Toolbar', [
         position: 'top',
         components: [],
         itemTemplate: new Simplate([
-            '<button class="button tool-button {%= $$.cls %}"',
+            '<button class="tool button tool-button {%= $$.cls %}"',
                     'data-tool="{%= $.name %}" aria-label="{%: $$.title || $.name %}">',
                 '{% if ($$.icon) { %}',
                 '<img src="{%= $$.icon %}" alt="{%= $.name %}" />',
@@ -60,6 +60,7 @@ define('Sage/Platform/Mobile/Toolbar', [
             '</button>'
         ]),
         items: null,
+        visible: true,
         _size: 0,
         _items: null,
         _itemsByName: null,
@@ -102,6 +103,14 @@ define('Sage/Platform/Mobile/Toolbar', [
 
             this.onPositionChange(value, previous);
         },
+        _setVisibleAttr: function(value) {
+            this.visible = value;
+
+            domClass.toggle(this.domNode, 'is-hidden', !value);
+        },
+        _getVisibleAttr: function() {
+            return this.visible;
+        },
         onPositionChange: function(position, previous) {
         },
         onCreate: function() {
@@ -109,9 +118,16 @@ define('Sage/Platform/Mobile/Toolbar', [
             this.onPositionChange(this.position, null);
         },
         clear: function() {
-            this._remove();
+            this._empty();
 
-            this._items = {};
+            this._items = [];
+            this._itemsByName = {};
+        },
+        hide: function() {
+            this.set('visible', false);
+        },
+        show: function() {
+            this.set('visible', true);
         },
         update: function() {
             var count = {left: 0, right: 0},
@@ -163,10 +179,18 @@ define('Sage/Platform/Mobile/Toolbar', [
             domClass.toggle(node, 'is-disabled', !item.enabled);
             domClass.toggle(node, 'is-hidden', !item.visible);
         },
-        _remove: function() {
-            query("> .tool", this.domNode).remove();
+        _empty: function() {
+            if (this._items)
+            {
+                for (var i = 0; i < this._items.length; i++)
+                {
+                    var item = this._items[i];
+                    if (item.domNode && item.domNode.parentNode)
+                        item.domNode.parentNode.removeChild(item.domNode);
+                }
 
-            this.onContentChange();
+                this.onContentChange();
+            }
         },
         _setItemsAttr: function(values) {
             var items = [],
@@ -175,7 +199,7 @@ define('Sage/Platform/Mobile/Toolbar', [
 
             if (typeof values == 'undefined') return;
 
-            this._remove();
+            this._empty();
 
             for (var i = 0; i < values.length; i++) {
                 var source = values[i],
@@ -197,7 +221,7 @@ define('Sage/Platform/Mobile/Toolbar', [
 
                 items.push(item);
 
-                items[item.name] = item;
+                itemsByName[item.name] = item;
             }
 
             var size = Math.max(count['left'], count['right']);

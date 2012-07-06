@@ -34,14 +34,14 @@ define('Sage/Platform/Mobile/View', [
 ) {
     return declare('Sage.Platform.Mobile.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
         baseClass: 'view',
-        titleText: 'Generic View',
+        title: null,
         tools: null,
         layout: null,
         security: null,
         serviceName: false,
         connectionName: false,
         customizationSet: 'view',
-        _setTitleAttr: function(value) { this.$.top && this.$.top.set('title', value); },
+        titleText: 'Generic View',
         _getProtoComponentDeclarations: function() {
             var customizationSet = customizations();
             return customizationSet.apply(customizationSet.toPath(this.customizationSet, 'components', this.id), this.inherited(arguments));

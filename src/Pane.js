@@ -16,29 +16,54 @@
 define('Sage/Platform/Mobile/Pane', [
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/_base/array',
     'dojo/_base/Deferred',
+    'dojo/topic',
     'dojo/dom-style',
     'dojo/dom-class',
     'dojox/mobile/FixedSplitterPane',
     './_UiComponent',
     './Toolbar',
+    './TitleBar',
     './View'
 ], function(
     declare,
     lang,
+    array,
     Deferred,
+    topic,
     domStyle,
     domClass,
     FixedSplitterPane,
     _UiComponent,
     Toolbar,
-    View
+    TitleBar
 ) {
     return declare('Sage.Platform.Mobile.Pane', [FixedSplitterPane, _UiComponent], {
         components: [
-            /* todo: let a view own its toolbar? */
+            {name: 'top', type: TitleBar, attachEvent: 'onPositionChange:_onToolbarPositionChange', props: {managed: true, visible: false}},
+            {name: 'container', tag: 'div', attrs: {'class': 'view-container'}, attachPoint: 'viewContainerNode'}
         ],
+        viewContainerNode: null,
         active: null,
+        toolbars: null,
+
+        constructor: function() {
+            this.toolbars = {};
+        },
+        _onToolbarPositionChange: function(position, previous) {
+            if (previous) domClass.remove(this.domNode, 'has-toolbar-' + previous);
+
+            domClass.add(this.domNode, 'has-toolbar-' + position);
+        },
+        onCreate: function() {
+            this.inherited(arguments);
+
+            array.forEach(this.getComponents(), function(component) {
+                if (component.isInstanceOf(Toolbar) && component.managed)
+                    this.toolbars[component.getComponentName()] = component;
+            }, this);
+        },
         show: function(view, options) {
             var deferred = new Deferred();
 
@@ -57,53 +82,102 @@ define('Sage/Platform/Mobile/Pane', [
              * - rotating the tablet causes it to paint correctly.
              * - even happens with OpenGL rendering disabled.
              */
-            setTimeout(lang.hitch(this, function() {
-                if (this.active === view)
-                {
-                    /* todo: is `reload` an appropriate name for this? */
-                    view.reload();
-
-                    deferred.resolve(true);
-
-                    return deferred;
-                }
-
-                // domStyle.set(view.domNode, 'display', 'none');
-
-                domClass.remove(view.domNode, 'is-visible');
-
-                view.placeAt(this.domNode);
-
-                var previous = this.active;
-                if (previous) previous.beforeTransitionAway();
-
-                view.beforeTransitionTo();
-
-                //if (previous) domStyle.set(previous.domNode, 'display', 'none');
-
-                if (previous) domClass.remove(previous.domNode, 'is-visible');
-
-                // domStyle.set(view.domNode, 'display', 'block');
-
-                domClass.add(view.domNode, 'is-visible');
-
-                view.transitionTo();
-
-                if (previous) previous.transitionAway();
-
-                this.active = view;
-
-                if (view.resize) view.resize();
-
-                deferred.resolve(true);
-            }));
+            setTimeout(lang.hitch(this, this._transitionTo, view, options, deferred));
 
             return deferred;
+        },
+        _beforeTransition: function(view, options, previous) {
+            if (previous)
+            {
+                previous.beforeTransitionAway();
+            }
+
+            view.beforeTransitionTo();
+
+            for (var name in this.toolbars)
+            {
+                var toolbar = this.toolbars[name];
+
+                toolbar.clear();
+                toolbar.show();
+            }
+
+            topic.publish('/app/transition/before', view, previous, this);
+        },
+        _afterTransition: function(view, options, previous) {
+            var tools = (options && options.tools) || view.get('tools') || {};
+
+            for (var name in this.toolbars)
+            {
+                var toolbar = this.toolbars[name];
+
+                toolbar.set('title', view.get('title'));
+
+                if (tools[name]) toolbar.set('items', tools[name]);
+            }
+
+            topic.publish('/app/transition/after', view, previous, this);
+        },
+        _transitionTo: function(view, options, deferred) {
+            if (this.active === view)
+            {
+                /* todo: is `reload` an appropriate name for this? */
+                view.reload();
+
+                deferred.resolve(true);
+
+                return deferred;
+            }
+
+            var previous = this.active;
+
+            domClass.remove(view.domNode, 'is-visible');
+
+            view.placeAt(this.viewContainerNode || this.domNode);
+
+            this._beforeTransition(view, options, previous);
+
+            if (previous)
+            {
+                domClass.remove(previous.domNode, 'is-visible');
+            }
+
+            domClass.add(view.domNode, 'is-visible');
+
+            if (previous)
+            {
+                previous.transitionAway();
+            }
+
+            view.transitionTo();
+
+            this._afterTransition(view, options, previous);
+
+            this.active = view;
+
+            if (view.resize)
+            {
+                view.resize();
+            }
+
+            deferred.resolve(true);
         },
         empty: function() {
             var deferred = new Deferred(),
                 previous = this.active;
-            if (previous) previous.domNode.parentNode.removeChild(previous.domNode);
+
+            if (previous)
+            {
+                if (previous.domNode && previous.domNode.parentNode)
+                    previous.domNode.parentNode.removeChild(previous.domNode);
+            }
+
+            for (var name in this.toolbars)
+            {
+                var toolbar = this.toolbars[name];
+
+                toolbar.hide();
+            }
 
             this.active = null;
 
@@ -112,7 +186,8 @@ define('Sage/Platform/Mobile/Pane', [
             return deferred;
         },
         resize: function() {
-            // skip default implementation, only resize active child
+            // do not call base implementation (FixedSplitterPane)
+            // only resize active child (for performance)
             if (this.active && this.active.resize)
                 this.active.resize();
         }

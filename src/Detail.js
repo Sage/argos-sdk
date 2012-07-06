@@ -52,7 +52,6 @@ define('Sage/Platform/Mobile/Detail', [
             'click': true
         },
         components: [
-            {name: 'top', type: TitleBar, attachEvent: 'onPositionChange:_onToolbarPositionChange'},
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
                 {name: 'scroll', tag: 'div', components: [

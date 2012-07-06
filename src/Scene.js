@@ -19,6 +19,7 @@ define('Sage/Platform/Mobile/Scene', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/window',
+    'dojo/topic',
     './_Component',
     './Layout',
     './View'
@@ -28,6 +29,7 @@ define('Sage/Platform/Mobile/Scene', [
     declare,
     lang,
     win,
+    topic,
     _Component,
     Layout,
     View
@@ -54,6 +56,7 @@ define('Sage/Platform/Mobile/Scene', [
     return declare('Sage.Platform.Mobile.Scene', [_Component], {
         _registeredViews: null,
         _instancedViews: null,
+        _signals: null,
         _state: null,
         /**
          * A queue of view instances waiting to be shown (after async operations).
@@ -82,6 +85,7 @@ define('Sage/Platform/Mobile/Scene', [
             this._registeredViews = {};
             this._instancedViews = {};
 
+            this._signals = [];
             this._state = [];
             this._queue = [];
             this._wait = {};
@@ -89,13 +93,19 @@ define('Sage/Platform/Mobile/Scene', [
 
             lang.mixin(this, options);
         },
-        startup: function() {
-            this.layout.placeAt(win.body());
+        onCreate: function() {
+            this.inherited(arguments);
 
-            this.inherited(arguments);
+            this._signals.push(topic.subscribe('/app/scene/back', lang.hitch(this, this.back)));
+
+            this.layout.placeAt(win.body());
         },
-        destroy: function() {
+        onDestroy: function() {
             this.inherited(arguments);
+
+            array.forEach(this._signals, function(signal) {
+                signal.remove();
+            });
 
             for (var name in this._instancedViews)
             {

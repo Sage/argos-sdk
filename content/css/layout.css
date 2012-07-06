@@ -91,6 +91,31 @@ img
     z-index: 50;
 }
 
+/* pane */
+.view-container
+{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.has-toolbar-top > .view-container
+{
+    top: 45px !important;
+}
+
+.has-toolbar-bottom > .view-container
+{
+    bottom: 45px !important;
+}
+
+.has-search-header > .view-container
+{
+    top: 45px !important;
+}
+
 /* toolbar */
 .toolbar
 {
@@ -218,15 +243,20 @@ img
     display: block;
 }
 
+.is-hidden
+{
+    display: none;
+}
+
 /* list */
 .scroll-container
 {
     z-index: 1;
     position: absolute;
-    top: 45px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 
     /*
     box-sizing: border-box;
@@ -484,7 +514,7 @@ img
 {
     display: block;
     position: absolute;
-    top: 45px;
+    top: 0;
     width: 100%;
 }
 
