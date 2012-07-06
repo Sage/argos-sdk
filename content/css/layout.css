@@ -536,6 +536,11 @@ img
     user-select: none;
 }
 
+.detail-content > h2.hidden-section
+{
+    display: none;
+}
+
 .detail-content > ul > li
 {
     list-style: none;
@@ -748,6 +753,12 @@ h2 > .collapsed-indicator
     -moz-user-select: none;
     user-select: none;
 }
+
+.edit-content > h2.hidden-section
+{
+    display: none;
+}
+
 
 .edit-content > ul > li
 {
