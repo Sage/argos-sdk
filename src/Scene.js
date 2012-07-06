@@ -144,6 +144,8 @@ define('Sage/Platform/Mobile/Scene', [
             return this._registeredViews[name];
         },
         showView: function(name, options, at) {
+            /* todo: add a fix for when the same view is shown multiple times before completion, i.e. multiple click on initial show, due to lag */
+
             var instance = this._instancedViews[name];
             if (instance)
             {
