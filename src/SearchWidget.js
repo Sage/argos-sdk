@@ -36,6 +36,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
         attributeMap: {
             queryValue: { node: 'queryNode', type: 'attribute', attribute: 'value' }
         },
+        _setLabelAttr: {node: 'labelNode', type: 'innerHTML'},
         widgetTemplate: new Simplate([
             '<div class="search-header">',
                 '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="queryNode" data-dojo-attach-event="onfocus:_onFocus,onblur:_onBlur,onkeypress:_onKeyPress" />',
@@ -61,8 +62,8 @@ define('Sage/Platform/Mobile/SearchWidget', [
 
             this.onQuery(query);
         },
-        setWatermark: function(text) {
-            html.set(this.labelNode, text);
+        setLabel: function(text) {
+            this.set('label', text);
         },
         onQuery: function(query) {
         },

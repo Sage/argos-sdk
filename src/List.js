@@ -394,7 +394,7 @@ define('Sage/Platform/Mobile/List', [
             domClass.toggle(this.domNode, 'has-search', this.hideSearch);
 
             if (this.searchText)
-                this.$.search.setWatermark(this.searchText);
+                this.$.search.setLabel(this.searchText);
 
             this.clear(true);
         },
