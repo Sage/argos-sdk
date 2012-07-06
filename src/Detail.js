@@ -69,9 +69,11 @@ define('Sage/Platform/Mobile/Detail', [
             '</div>'
         ]),
         sectionBeginTemplate: new Simplate([
+            '{% if (!($.title === false || $.options.title === false)) { %}',
             '<h2 data-action="toggleSection" class="{% if ($.collapsed || $.options.collapsed) { %}collapsed{% } %}">',
             '{%: ($.title || $.options.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
+            '{% } %}',
             '{% if ($.list || $.options.list) { %}',
             '<ul class="{%= ($.cls || $.options.cls) %}">',
             '{% } else { %}',
@@ -314,7 +316,7 @@ define('Sage/Platform/Mobile/Detail', [
                 {
                     sectionStarted = true;
                     section = domConstruct.toDom(this.sectionBeginTemplate.apply(layout, this) + this.sectionEndTemplate.apply(layout, this));
-                    sectionNode = section.childNodes[1];
+                    sectionNode = section.childNodes[1] || section;
                     domConstruct.place(section, this.contentNode);
                 }
 
