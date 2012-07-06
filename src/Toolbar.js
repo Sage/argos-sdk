@@ -92,7 +92,7 @@ define('Sage/Platform/Mobile/Toolbar', [
                         method = active && active[source.action],
                         args = source.args ? source.args.concat(source) : [source];
 
-                    if (typeof method === 'function') method.apply(root, args);
+                    if (typeof method === 'function') method.apply(active, args);
                 }
                 else if (source.publish)
                 {
