@@ -18,6 +18,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
     'dojo/_base/lang',
     'dojo/_base/event',
     'dojo/string',
+    'dojo/html',
     'dojo/dom-class',
     'dijit/_WidgetBase',
     './_TemplatedWidgetMixin'
@@ -26,6 +27,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
     lang,
     event,
     string,
+    html,
     domClass,
     _WidgetBase,
     _TemplatedWidgetMixin
@@ -58,6 +60,9 @@ define('Sage/Platform/Mobile/SearchWidget', [
             var query = this.queryNode.value;
 
             this.onQuery(query);
+        },
+        setWatermark: function(text) {
+            html.set(this.labelNode, text);
         },
         onQuery: function(query) {
         },

@@ -354,7 +354,8 @@ define('Sage/Platform/Mobile/List', [
          * The text displayed when data is being requested.
          * @type {String}
          */
-        loadingText: 'loading...',
+        loadingText: null,
+        searchText: 'Search',
         /**
          * The text displayed when a data request fails.
          * @type {String}
@@ -391,6 +392,9 @@ define('Sage/Platform/Mobile/List', [
             this.subscribe('/app/refresh', this._onRefresh);
 
             domClass.toggle(this.domNode, 'has-search', this.hideSearch);
+
+            if (this.searchText)
+                this.$.search.setWatermark(this.searchText);
 
             this.clear(true);
         },
