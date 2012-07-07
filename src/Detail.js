@@ -20,6 +20,7 @@ define('Sage/Platform/Mobile/Detail', [
     'dojo/string',
     'dojo/dom',
     'dojo/dom-class',
+    'dojo/dom-attr',
     'dojo/dom-construct',
     './Format',
     './Utility',
@@ -36,6 +37,7 @@ define('Sage/Platform/Mobile/Detail', [
     string,
     dom,
     domClass,
+    domAttr,
     domConstruct,
     format,
     utility,
@@ -46,6 +48,7 @@ define('Sage/Platform/Mobile/Detail', [
     customizations,
     scene
 ) {
+    /* todo: make release note that `raw` has been changed to `value` and `value` to `formatted` */
 
     var defaultPropertyProvider = function(item, property, info) {
         return utility.getValue(item, property, item);
@@ -82,59 +85,42 @@ define('Sage/Platform/Mobile/Detail', [
             '<div class="{%= $.cls %}"></div>',
             '{% } %}'
         ]),
-
-        valueTemplate: new Simplate([
-            '<div class="row {%= $.cls %}" data-property="{%= $.property || $.name %}">',
+        propertyItemTemplate: new Simplate([
             '<label>{%: $.label %}</label>',
-            '<span>{%= $.value %}</span>', // todo: create a way to allow the value to not be surrounded with a span tag
-            '</div>'
+            '<span>{%= $.formatted %}</span>'
         ]),
-
-        propertyTemplate: new Simplate([
-            '<div class="row {%= $.cls %}" data-property="{%= $.property || $.name %}">',
-            '<label>{%: $.label %}</label>',
-            '<span>{%= $.value %}</span>', // todo: create a way to allow the value to not be surrounded with a span tag
-            '</div>'
-        ]),
-        relatedPropertyTemplate: new Simplate([
-            '<div class="row {%= $.cls %}">',
+        relatedItemTemplate: new Simplate([
+            '{% if ($.key) { %}',
             '<label>{%: $.label %}</label>',
             '<span>',
-            '<a data-action="activateRelatedEntry" data-view="{%= $.view %}" data-context="{%: $.context %}" data-descriptor="{%: $.descriptor %}">',
-            '{%= $.value %}',
+            '<a data-action="navigateToRelatedView" data-view="{%= $.view %}" data-context="{%: $.context %}" data-descriptor="{%: $.descriptor %}">',
+            '{%= $.formatted %}',
             '</a>',
             '</span>',
-            '</div>'
-        ]),
-        relatedTemplate: new Simplate([
-            '<li class="{%= $.cls %}">',
-            '<a data-action="activateRelatedList" data-view="{%= $.view %}" data-context="{%: $.context %}">',
-            '{% if ($.icon) { %}',
-            '<img src="{%= $.icon %}" alt="icon" class="icon" />',
-            '{% } %}',
+            '{% } else { %}',
+            '<a data-action="navigateToRelatedView" data-view="{%= $.view %}" data-context="{%: $.context %}" data-descriptor="{%: $.descriptor %}">',
+            '{% if ($.icon) { %}<img src="{%= $.icon %}" alt="icon" class="icon" />{% } %}',
             '<span>{%: $.label %}</span>',
             '</a>',
-            '</li>'
+            '{% } %}'
         ]),
-        actionPropertyTemplate: new Simplate([
-            '<div class="row {%= $.cls %}">',
-            '<label>{%: $.label %}</label>',
-            '<span>',
-            '<a data-action="{%= $.action %}" {% if ($.disabled) { %}data-disable-action="true"{% } %} class="{% if ($.disabled) { %}disabled{% } %}">',
-            '{%= $.value %}',
-            '</a>',
-            '</span>',
-            '</div>'
-        ]),
-        actionTemplate: new Simplate([
-            '<li class="{%= $.cls %}">',
+        actionItemTemplate: new Simplate([
             '<a data-action="{%= $.action %}" {% if ($.disabled) { %}data-disable-action="true"{% } %} class="{% if ($.disabled) { %}disabled{% } %}">',
             '{% if ($.icon) { %}',
             '<img src="{%= $.icon %}" alt="icon" class="icon" />',
             '{% } %}',
             '<label>{%: $.label %}</label>',
-            '<span>{%= $.value %}</span>',
-            '</a>',
+            '<span>{%= $.formatted %}</span>',
+            '</a>'
+        ]),
+        standardRowTemplate: new Simplate([
+            '<div class="row {%= $.cls %}" data-property="{%= $.property || $.name %}">',
+            '{%! $.itemTemplate %}',
+            '</div>'
+        ]),
+        listRowTemplate: new Simplate([
+            '<li class="row {%= $.cls %}" data-property="{%= $.property || $.name %}">',
+            '{%! $.itemTemplate %}',
             '</li>'
         ]),
         notAvailableTemplate: new Simplate([
@@ -198,25 +184,20 @@ define('Sage/Platform/Mobile/Detail', [
 
             this.onContentChange();
         },
-        activateRelatedEntry: function(params) {
-            if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context, 10), params.descriptor);
-        },
-        activateRelatedList: function(params) {
-            if (params.context) this.navigateToRelatedView(params.view, parseInt(params.context, 10), params.descriptor);
-        },
-        navigateToEditView: function(el) {
+        navigateToEditView: function() {
             scene().showView(this.editView, {
                 item: this.item
             });
         },
-        navigateToRelatedView: function(id, slot, descriptor) {
-            var options = this._navigationOptions[slot],
-                view = App.getView(id);
+        navigateToRelatedView: function(evt, node) {
+            var view = domAttr.get(node, 'data-view'),
+                slot = domAttr.get(node, 'data-context'),
+                descriptor = domAttr.get(node, 'data-descriptor'),
+                options = this._navigationOptions[slot];
+            if (options && descriptor)
+                options['descriptor'] = descriptor;
 
-            if (descriptor && options) options['descriptor'] = descriptor;
-
-            if (view && options)
-                view.show(options);
+            scene().showView(view, options);
         },
         createStore: function() {
             return null;
@@ -318,9 +299,9 @@ define('Sage/Platform/Mobile/Detail', [
                     rendered,
                     formatted;
 
-                if (row['template'] || row['tpl'])
+                if (row['template'])
                 {
-                    rendered = (row['template'] || row['tpl']).apply(value, this);
+                    rendered = (row['template']).apply(value, this);
                     formatted = row['encode'] === true
                         ? format.encode(rendered)
                         : rendered;
@@ -334,15 +315,15 @@ define('Sage/Platform/Mobile/Detail', [
                 }
                 else
                 {
-                    formatted = row['encode'] !== false
-                        ? format.encode(value)
-                        : value;
+                    formatted = typeof value !== 'object'
+                        ? row['encode'] !== false ? format.encode(value) : value
+                        : '';
                 }
 
                 var data = lang.mixin({}, row, {
                     entry: item,
-                    value: formatted,
-                    raw: value
+                    value: value,
+                    formatted: formatted
                 });
 
                 if (row['descriptor'])
@@ -380,21 +361,24 @@ define('Sage/Platform/Mobile/Detail', [
                     data['context'] = (this._navigationOptions.push(context) - 1);
                 }
 
-                // priority: use > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
                 var useListTemplate = layout['list'],
-                    template = row['use']
-                        ? row['use']
-                        : row['view']
-                            ? useListTemplate
-                                ? this.relatedTemplate
-                                : this.relatedPropertyTemplate
-                            : row['action']
-                                ? useListTemplate
-                                    ? this.actionTemplate
-                                    : this.actionPropertyTemplate
-                                : this.propertyTemplate;
+                    rowTemplate = (row['rowTemplate'] || row['use'])
+                        ? (row['rowTemplate'] || row['use'])
+                        : useListTemplate
+                            ? this.listRowTemplate
+                            : this.standardRowTemplate;
 
-                var node = domConstruct.place(template.apply(data, this), sectionNode);
+                var itemTemplate = row['itemTemplate']
+                    ? row['itemTemplate']
+                    : row['view']
+                        ? this.relatedItemTemplate
+                        : row['action']
+                            ? this.actionItemTemplate
+                            : this.propertyItemTemplate;
+
+                data['itemTemplate'] = itemTemplate;
+
+                var node = domConstruct.place(rowTemplate.apply(data, this), sectionNode);
 
                 if (row['onCreate'])
                     row['onCreate'].call(this, row, node, value, item);
@@ -406,7 +390,6 @@ define('Sage/Platform/Mobile/Detail', [
                     : layout['children']
                         ? layout['children']
                         : layout,
-                // rows = (layout['children'] || layout),
                 sectionQueue = [],
                 sectionStarted = false,
                 i, current;
