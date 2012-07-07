@@ -156,11 +156,9 @@ define('Sage/Platform/Mobile/Pane', [
             this.active = view;
 
             domAttr.set(this.domNode, 'data-active-view', view.id);
+            domAttr.set(this.domNode, 'data-active-view-kind', view.customizationSet);
 
-            if (view.resize)
-            {
-                view.resize();
-            }
+            this.resize();
 
             this._afterTransition(view, options, previous);
 
@@ -186,6 +184,9 @@ define('Sage/Platform/Mobile/Pane', [
             this.active = null;
 
             domAttr.set(this.domNode, 'data-active-view', '');
+            domAttr.set(this.domNode, 'data-active-view-kind', '');
+
+            this.resize();
 
             deferred.resolve(true);
 

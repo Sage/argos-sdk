@@ -47,6 +47,10 @@ define('Sage/Platform/Mobile/Detail', [
     scene
 ) {
 
+    var defaultPropertyProvider = function(item, property, info) {
+        return utility.getValue(item, property, item);
+    };
+
     var Detail = declare('Sage.Platform.Mobile.Detail', [View], {
         events: {
             'click': true
@@ -161,7 +165,8 @@ define('Sage/Platform/Mobile/Detail', [
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'top': [{
-                    id: 'edit',
+                    name: 'edit',
+                    label: this.editText,
                     action: 'navigateToEditView',
                     security: App.getViewSecurity(this.editView, 'update')
                 }]
@@ -319,12 +324,12 @@ define('Sage/Platform/Mobile/Detail', [
                     domConstruct.place(section, this.contentNode);
                 }
 
-                var provider = current['provider'] || utility.getValue,
+                var provider = current['provider'] || defaultPropertyProvider,
                     property = typeof current['property'] == 'string'
                         ? current['property']
                         : current['name'],
                     value = typeof current['value'] === 'undefined'
-                        ? provider(entry, property, entry)
+                        ? provider(entry, property)
                         : this.expandExpression(current['value'], entry),
                     rendered,
                     formatted;

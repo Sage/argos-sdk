@@ -203,7 +203,7 @@ define('Sage/Platform/Mobile/List', [
          *      loadingText         The text to display while loading.
          */
         loadingTemplate: new Simplate([
-            '<li class="loading-indicator"><div>{%= $.loadingText %}</div></li>'
+            '<li class="loading-indicator"><div>{%: $.loadingText %}</div></li>'
         ]),
         /**
          * The template used to render a row in the view.  This template includes {@link #itemTemplate}.
@@ -354,7 +354,7 @@ define('Sage/Platform/Mobile/List', [
          * The text displayed when data is being requested.
          * @type {String}
          */
-        loadingText: null,
+        loadingText: 'Loading...',
         searchText: 'Search',
         /**
          * The text displayed when a data request fails.

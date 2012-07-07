@@ -201,14 +201,19 @@ img
     z-index: 100;
 }
 
-.tool-button > span
+.tool-button > div
 {
     display: inline-block;
     background-repeat: no-repeat;
     background-position: center center;
+    width: 34px;
+    height: 34px;
+}
+
+.tool-button > div > span
+{
     margin: 4px;
-    width: 24px;
-    height: 24px;
+    display: none;
 }
 
 .toolbar > .on-left
@@ -307,12 +312,18 @@ img
     margin: 0;
     padding: 8px 32px 8px 36px;
     /* position: relative; */
-    border-bottom: solid 1px #ddd;
+    border-width: 1px 0 0 0;
     cursor: pointer;
 }
+
 .list-content > li:last-child
 {
-    border-bottom: none;
+    border-bottom-width: 1px;
+}
+
+.list-content > li:first-child
+{
+    border-top-width: 0px;
 }
 
 .list-content > li > img.icon,
@@ -353,6 +364,7 @@ img
 .list-empty > .button
 {
     height: 40px;
+    width: 100%;
     line-height: 40px;
     cursor: pointer;
     font-size: .9em;
@@ -432,6 +444,16 @@ img
 {
     margin: 0;
     padding: 0 0 0 0;
+}
+
+.list-grouped .list-content > ul > li:last-child
+{
+    border-bottom-width: 0px;
+}
+
+.list-grouped .list-content > ul:last-child > li:last-child
+{
+    border-bottom-width: 1px;
 }
 
 /* search */

@@ -155,9 +155,22 @@ textarea:focus
 
 .list > .scroll-container > .scroll-content
 {
-    background-color: #fff;
+    /* background-color: #fff; */
     border: none 0px black;
-    border-bottom: solid 1px #ddd;
+    /* border-bottom: solid 1px #ddd; */
+}
+
+.list-content,
+.list-empty,
+.list-more
+{
+    background-color: #fff;
+}
+
+.list-content > li
+{
+    border-color: #ddd;
+    border-style: solid;
 }
 
 .is-loading .list-more > .button > span
@@ -210,7 +223,7 @@ textarea:focus
 
 .list-grouped .list-content > ul > li:last-child
 {
-    border-bottom: none 0 black;
+    /* border-bottom: none 0 black; */
 }
 
 /* search */

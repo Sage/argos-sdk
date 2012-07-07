@@ -53,12 +53,15 @@ define('Sage/Platform/Mobile/Toolbar', [
         components: [],
         itemTemplate: new Simplate([
             '<button class="tool button tool-button {%= $$.cls %}"',
-                    'data-tool="{%= $.name %}" aria-label="{%: $$.title || $.name %}">',
+                    'data-tool="{%= $.name %}" aria-label="{%: $$.label || $.name %}">',
+                '<div>',
                 '{% if ($$.icon) { %}',
                 '<img src="{%= $$.icon %}" alt="{%= $.name %}" />',
-                '{% } else { %}',
-                '<span></span>',
                 '{% } %}',
+                '{% if ($$.label) { %}',
+                '<span>{%: $$.label %}</span>',
+                '{% } %}',
+                '</div>',
             '</button>'
         ]),
         items: null,
