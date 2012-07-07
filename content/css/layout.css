@@ -668,7 +668,7 @@ img
 	text-align: center;
 }
 
-.collapsed
+.is-collapsed
 {
     margin-bottom: -1px !important;
 }
@@ -681,13 +681,13 @@ h2 > .collapsed-indicator
     margin: 0 4px 0 0;
 }
 
-.collapsed > .collapsed-indicator
+.is-collapsed > .collapsed-indicator
 {
 
 }
 
-.collapsed + ul,
-.collapsed + div
+.is-collapsed + ul,
+.is-collapsed + div
 {
     display: none !important;
 }

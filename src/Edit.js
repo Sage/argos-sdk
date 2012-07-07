@@ -84,14 +84,12 @@ define('Sage/Platform/Mobile/Edit', [
             '<h4>{%: $$.label %}</h4>',
             '</li>'
         ]),
-        sectionBeginTemplate: new Simplate([
-            '<h2 data-action="toggleSection" class="{% if ($.collapsed || $.options.collapsed) { %}collapsed{% } %}">',
-            '{%: ($.title || $.options.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
+        sectionTemplate: new Simplate([
+            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}is-collapsed{% } %} {% if ($.title === false) { %}is-hidden{% } %}">',
+            '{%: ($.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
-            '<fieldset class="{%= ($.cls || $.options.cls) %}">',
-            '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'
-        ]),
-        sectionEndTemplate: new Simplate([
+            '<fieldset class="{%= $.cls %}">',
+            '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',
             '</fieldset>'
         ]),
         propertyTemplate: new Simplate([
@@ -121,7 +119,7 @@ define('Sage/Platform/Mobile/Edit', [
             var customizationSet = customizations(),
                 layout = customizationSet.apply(customizationSet.toPath(this.customizationSet, null, this.id), this.createLayout());
             
-            this.processLayout(layout);
+            this._processLayout(layout);
 
             query('div[data-field]', this.contentNode).forEach(function(node) {
                 var name = domAttr.get(node, 'data-field'),
@@ -241,7 +239,21 @@ define('Sage/Platform/Mobile/Edit', [
         createLayout: function() {
             return this.layout || [];
         },
-        processLayout: function(layout)
+        _processLayoutRow: function(layout, row, sectionNode) {
+            var ctor = FieldRegistry.getFieldFor(row['type'], false),
+                field = this.fields[row['name'] || row['property']] = new ctor(lang.mixin({
+                    owner: this
+                }, row)),
+                template = field.propertyTemplate || this.propertyTemplate;
+
+            this.connect(field, 'onShow', this._onShowField);
+            this.connect(field, 'onHide', this._onHideField);
+            this.connect(field, 'onEnable', this._onEnableField);
+            this.connect(field, 'onDisable', this._onDisableField);
+
+            domConstruct.place(template.apply(field, this), sectionNode, 'last');
+        },
+        _processLayout: function(layout)
         {
             var rows = (layout['children'] || layout['as'] || layout),
                 options = layout['options'] || (layout['options'] = {
@@ -249,18 +261,21 @@ define('Sage/Platform/Mobile/Edit', [
                 }),
                 sectionQueue = [],
                 sectionStarted = false,
-                content = [];
+                i, current;
             
-            for (var i = 0; i < rows.length; i++)
+            for (i = 0; i < rows.length; i++)
             {
-                var current = rows[i];
+                current = rows[i];
+
+                var section,
+                    sectionNode;
 
                 if (current['children'] || current['as'])
                 {
                     if (sectionStarted)
                         sectionQueue.push(current);
                     else
-                        this.processLayout(current);
+                        this._processLayout(current);
 
                     continue;
                 }
@@ -268,33 +283,19 @@ define('Sage/Platform/Mobile/Edit', [
                 if (!sectionStarted)
                 {
                     sectionStarted = true;
-                    content.push(this.sectionBeginTemplate.apply(layout, this));
-                }                    
+                    section = domConstruct.toDom(this.sectionTemplate.apply(layout, this));
+                    sectionNode = section.lastChild;
+                    domConstruct.place(section, this.contentNode);
+                }
 
-                var ctor = FieldRegistry.getFieldFor(current['type'], false),
-                    field = this.fields[current['name'] || current['property']] = new ctor(lang.mixin({
-                        owner: this
-                    }, current)),
-                    template = field.propertyTemplate || this.propertyTemplate;
-
-
-                this.connect(field, 'onShow', this._onShowField);
-                this.connect(field, 'onHide', this._onHideField);
-                this.connect(field, 'onEnable', this._onEnableField);
-                this.connect(field, 'onDisable', this._onDisableField);
-
-                content.push(template.apply(field, this));
+                this._processLayoutRow(layout, current, sectionNode);
             }
-
-            content.push(this.sectionEndTemplate.apply(layout, this));
-
-            domConstruct.place(content.join(''), this.contentNode, 'last');
 
             for (var i = 0; i < sectionQueue.length; i++)
             {
                 var current = sectionQueue[i];
 
-                this.processLayout(current);
+                this._processLayout(current);
             }
         },
         _onFetchItemTemplate: function(template) {

@@ -72,23 +72,24 @@ define('Sage/Platform/Mobile/Detail', [
             '<div>{%: $.loadingText %}</div>',
             '</div>'
         ]),
-        sectionBeginTemplate: new Simplate([
-            '<h2 data-action="toggleSection" class="{% if ($.collapsed || $.options.collapsed) { %}collapsed{% } %} {% if ($.title === false || $.options.title == false) { %}hidden-section{% } %}">',
-            '{%: ($.title || $.options.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
+        sectionTemplate: new Simplate([
+            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}is-collapsed{% } %} {% if ($.title === false) { %}is-hidden{% } %}">',
+            '{%: ($.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
-            '{% if ($.list || $.options.list) { %}',
-            '<ul class="{%= ($.cls || $.options.cls) %}">',
+            '{% if ($.list) { %}',
+            '<ul class="{%= $.cls %}"></ul>',
             '{% } else { %}',
-            '<div class="{%= ($.cls || $.options.cls) %}">',
+            '<div class="{%= $.cls %}"></div>',
             '{% } %}'
         ]),
-        sectionEndTemplate: new Simplate([
-            '{% if ($.list || $.options.list) { %}',
-            '</ul>',
-            '{% } else { %}',
-            '</div>',
-            '{% } %}'
+
+        valueTemplate: new Simplate([
+            '<div class="row {%= $.cls %}" data-property="{%= $.property || $.name %}">',
+            '<label>{%: $.label %}</label>',
+            '<span>{%= $.value %}</span>', // todo: create a way to allow the value to not be surrounded with a span tag
+            '</div>'
         ]),
+
         propertyTemplate: new Simplate([
             '<div class="row {%= $.cls %}" data-property="{%= $.property || $.name %}">',
             '<label>{%: $.label %}</label>',
@@ -205,7 +206,7 @@ define('Sage/Platform/Mobile/Detail', [
         },
         navigateToEditView: function(el) {
             scene().showView(this.editView, {
-                entry: this.entry
+                item: this.item
             });
         },
         navigateToRelatedView: function(id, slot, descriptor) {
@@ -229,9 +230,9 @@ define('Sage/Platform/Mobile/Detail', [
             var customizationSet = customizations(),
                 layout = customizationSet.apply(customizationSet.toPath(this.customizationSet, null, this.id), this.createLayout());
 
-            this.entry = this.processItem(item);
+            this.item = this.processItem(item);
 
-            this.processLayout(layout, this.entry);
+            this._processLayout(layout, this.item);
 
             domClass.remove(this.domNode, 'is-loading');
 
@@ -285,14 +286,129 @@ define('Sage/Platform/Mobile/Detail', [
         createLayout: function() {
             return this.layout || [];
         },
-        processLayout: function(layout, entry) {
-            var rows = (layout['children'] || layout['as'] || layout),
-                options = layout['options'] || (layout['options'] = {
-                    title: this.detailsText
-                }),
+        _processLayoutRowValue: function(row, item) {
+            var provider = row['provider'] || defaultPropertyProvider,
+                property = typeof row['property'] == 'string'
+                    ? row['property']
+                    : row['name'],
+                value = typeof row['value'] === 'undefined'
+                    ? provider(item, property)
+                    : this.expandExpression(row['value'], item);
+
+            return value;
+        },
+        _processLayoutRow: function(layout, row, item, sectionNode) {
+            var value = this._processLayoutRowValue(row, item);
+
+            /* a generator creates markup */
+            if (typeof row['generator'] === 'function')
+            {
+                var dynamicNode = row['generator'].call(this, row, value, item);
+                if (dynamicNode) domConstruct.place(dynamicNode, sectionNode);
+            }
+            /* a creator generates layout */
+            else if (typeof row['creator'] === 'function')
+            {
+                var dynamicLayout = row['creator'].call(this, row, value, item);
+                if (dynamicLayout) this._processLayout(dynamicLayout, item);
+            }
+            else
+            {
+                var provider = row['provider'] || defaultPropertyProvider,
+                    rendered,
+                    formatted;
+
+                if (row['template'] || row['tpl'])
+                {
+                    rendered = (row['template'] || row['tpl']).apply(value, this);
+                    formatted = row['encode'] === true
+                        ? format.encode(rendered)
+                        : rendered;
+                }
+                else if (row['renderer'] && typeof row['renderer'] === 'function')
+                {
+                    rendered = row['renderer'].call(this, value);
+                    formatted = row['encode'] === true
+                        ? format.encode(rendered)
+                        : rendered;
+                }
+                else
+                {
+                    formatted = row['encode'] !== false
+                        ? format.encode(value)
+                        : value;
+                }
+
+                var data = lang.mixin({}, row, {
+                    entry: item,
+                    value: formatted,
+                    raw: value
+                });
+
+                if (row['descriptor'])
+                    data['descriptor'] = typeof row['descriptor'] === 'function'
+                        ? this.expandExpression(row['descriptor'], item, value)
+                        : provider(item, row['descriptor']);
+
+                if (row['action'])
+                    data['action'] = this.expandExpression(row['action'], item, value);
+
+                var hasAccess = App.hasAccessTo(row['security']);
+                if (row['security'])
+                    data['disabled'] = !hasAccess;
+
+                if (row['disabled'] && hasAccess)
+                    data['disabled'] = this.expandExpression(row['disabled'], item, value);
+
+                if (row['view'])
+                {
+                    var context = lang.mixin({}, row['options']);
+                    if (row['key'])
+                        context['key'] = typeof row['key'] === 'function'
+                            ? this.expandExpression(row['key'], item)
+                            : provider(item, row['key']);
+                    if (row['where'])
+                        context['where'] = this.expandExpression(row['where'], item);
+                    if (row['resourceKind'])
+                        context['resourceKind'] = this.expandExpression(row['resourceKind'], item);
+                    if (row['resourceProperty'])
+                        context['resourceProperty'] = this.expandExpression(row['resourceProperty'], item);
+                    if (row['resourcePredicate'])
+                        context['resourcePredicate'] = this.expandExpression(row['resourcePredicate'], item);
+
+                    data['view'] = row['view'];
+                    data['context'] = (this._navigationOptions.push(context) - 1);
+                }
+
+                // priority: use > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
+                var useListTemplate = layout['list'],
+                    template = row['use']
+                        ? row['use']
+                        : row['view']
+                            ? useListTemplate
+                                ? this.relatedTemplate
+                                : this.relatedPropertyTemplate
+                            : row['action']
+                                ? useListTemplate
+                                    ? this.actionTemplate
+                                    : this.actionPropertyTemplate
+                                : this.propertyTemplate;
+
+                var node = domConstruct.place(template.apply(data, this), sectionNode);
+
+                if (row['onCreate'])
+                    row['onCreate'].call(this, row, node, value, item);
+            }
+        },
+        _processLayout: function(layout, item) {
+            var rows = typeof layout['generator'] === 'function'
+                    ? layout['generator'].call(this, layout, this._processLayoutRowValue(layout, item), item)
+                    : layout['children']
+                        ? layout['children']
+                        : layout,
+                // rows = (layout['children'] || layout),
                 sectionQueue = [],
                 sectionStarted = false,
-                callbacks = [],
                 i, current;
 
             for (i = 0; i < rows.length; i++) {
@@ -300,18 +416,19 @@ define('Sage/Platform/Mobile/Detail', [
 
                 var section,
                     sectionNode,
-                    include = this.expandExpression(current['include'], entry),
-                    exclude = this.expandExpression(current['exclude'], entry);
+                    include = this.expandExpression(current['include'], item),
+                    exclude = this.expandExpression(current['exclude'], item);
 
                 if (include !== undefined && !include) continue;
                 if (exclude !== undefined && exclude) continue;
 
-                if (current['children'] || current['as'])
+                if (current['children'] || current['generator'])
                 {
+                    /* todo: do we need to defer anymore? */
                     if (sectionStarted)
                         sectionQueue.push(current);
                     else
-                        this.processLayout(current, entry);
+                        this._processLayout(current, item);
 
                     continue;
                 }
@@ -319,115 +436,19 @@ define('Sage/Platform/Mobile/Detail', [
                 if (!sectionStarted)
                 {
                     sectionStarted = true;
-                    section = domConstruct.toDom(this.sectionBeginTemplate.apply(layout, this) + this.sectionEndTemplate.apply(layout, this));
-                    sectionNode = section.childNodes[1];
+                    section = domConstruct.toDom(this.sectionTemplate.apply(layout, this));
+                    sectionNode = section.lastChild;
                     domConstruct.place(section, this.contentNode);
                 }
 
-                var provider = current['provider'] || defaultPropertyProvider,
-                    property = typeof current['property'] == 'string'
-                        ? current['property']
-                        : current['name'],
-                    value = typeof current['value'] === 'undefined'
-                        ? provider(entry, property)
-                        : this.expandExpression(current['value'], entry),
-                    rendered,
-                    formatted;
-
-                if (current['template'] || current['tpl'])
-                {
-                    rendered = (current['template'] || current['tpl']).apply(value, this);
-                    formatted = current['encode'] === true
-                        ? format.encode(rendered)
-                        : rendered;
-                }
-                else if (current['renderer'] && typeof current['renderer'] === 'function')
-                {
-                    rendered = current['renderer'].call(this, value);
-                    formatted = current['encode'] === true
-                        ? format.encode(rendered)
-                        : rendered;
-                }
-                else
-                {
-                    formatted = current['encode'] !== false
-                        ? format.encode(value)
-                        : value;
-                }
-
-                var data = lang.mixin({}, current, {
-                    entry: entry,
-                    value: formatted,
-                    raw: value
-                });
-
-                if (current['descriptor'])
-                    data['descriptor'] = typeof current['descriptor'] === 'function'
-                        ? this.expandExpression(current['descriptor'], entry, value)
-                        : provider(entry, current['descriptor']);
-
-                if (current['action'])
-                    data['action'] = this.expandExpression(current['action'], entry, value);
-
-                var hasAccess = App.hasAccessTo(current['security']);
-                if (current['security'])
-                    data['disabled'] = !hasAccess;
-
-                if (current['disabled'] && hasAccess)
-                    data['disabled'] = this.expandExpression(current['disabled'], entry, value);
-
-                if (current['view'])
-                {
-                    var context = lang.mixin({}, current['options']);
-                    if (current['key'])
-                        context['key'] = typeof current['key'] === 'function'
-                            ? this.expandExpression(current['key'], entry)
-                            : provider(entry, current['key']);
-                    if (current['where'])
-                        context['where'] = this.expandExpression(current['where'], entry);
-                    if (current['resourceKind'])
-                        context['resourceKind'] = this.expandExpression(current['resourceKind'], entry);
-                    if (current['resourceProperty'])
-                        context['resourceProperty'] = this.expandExpression(current['resourceProperty'], entry);
-                    if (current['resourcePredicate'])
-                        context['resourcePredicate'] = this.expandExpression(current['resourcePredicate'], entry);
-
-                    data['view'] = current['view'];
-                    data['context'] = (this._navigationOptions.push(context) - 1);
-                }
-
-                // priority: use > (relatedPropertyTemplate | relatedTemplate) > (actionPropertyTemplate | actionTemplate) > propertyTemplate
-                var useListTemplate = (layout['list'] || options['list']),
-                    template = current['use']
-                        ? current['use']
-                        : current['view']
-                            ? useListTemplate
-                                ? this.relatedTemplate
-                                : this.relatedPropertyTemplate
-                            : current['action']
-                                ? useListTemplate
-                                    ? this.actionTemplate
-                                    : this.actionPropertyTemplate
-                                : this.propertyTemplate;
-
-                console.log(data);
-                var rowNode = domConstruct.place(template.apply(data, this), sectionNode);
-
-                if(current['onCreate'])
-                    callbacks.push({row: current, node: rowNode, value: value, entry: entry});
-            }
-
-            for (i = 0; i < callbacks.length; i++)
-            {
-                current = callbacks[i];
-                current.row['onCreate'].apply(this, [current.row, current.node, current.value, current.entry]);
+                this._processLayoutRow(layout, current, item, sectionNode);
             }
 
             for (i = 0; i < sectionQueue.length; i++)
             {
                 current = sectionQueue[i];
 
-                this.processLayout(current, entry);
+                this._processLayout(current, item);
             }
         },
         refreshRequiredFor: function(options) {
