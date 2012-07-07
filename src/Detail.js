@@ -184,6 +184,7 @@ define('Sage/Platform/Mobile/Detail', [
         },
         formatRelatedQuery: function(entry, fmt, property) {
             property = property || '$key';
+            console.log(fmt, entry, property);
             return string.substitute(fmt, [utility.getValue(entry, property)]);
         },
         toggleSection: function(evt, node) {
@@ -324,7 +325,7 @@ define('Sage/Platform/Mobile/Detail', [
                         : current['name'],
                     value = typeof current['value'] === 'undefined'
                         ? provider(entry, property, entry)
-                        : current['value'],
+                        : this.expandExpression(current['value'], entry),
                     rendered,
                     formatted;
 
@@ -349,11 +350,11 @@ define('Sage/Platform/Mobile/Detail', [
                         : value;
                 }
 
-                var data = lang.mixin({}, {
+                var data = lang.mixin({}, current, {
                     entry: entry,
                     value: formatted,
                     raw: value
-                }, current);
+                });
 
                 if (current['descriptor'])
                     data['descriptor'] = typeof current['descriptor'] === 'function'
@@ -404,6 +405,7 @@ define('Sage/Platform/Mobile/Detail', [
                                     : this.actionPropertyTemplate
                                 : this.propertyTemplate;
 
+                console.log(data);
                 var rowNode = domConstruct.place(template.apply(data, this), sectionNode);
 
                 if(current['onCreate'])
