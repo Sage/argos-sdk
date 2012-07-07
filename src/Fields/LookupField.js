@@ -22,7 +22,8 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     'dojo/query',
     '../_TemplatedWidgetMixin',
     '../Utility',
-    './_Field'
+    './_Field',
+    'argos!scene'
 ], function(
     array,
     declare,
@@ -32,7 +33,8 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     query,
     _TemplatedWidgetMixin,
     utility,
-    _Field
+    _Field,
+    scene
 ) {
     return declare('Sage.Platform.Mobile.Fields.LookupField', [_Field, _TemplatedWidgetMixin], {
         attributeMap: {
@@ -143,8 +145,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                     },{
                         id: 'cancel',
                         side: 'left',
-                        fn: ReUI.back,
-                        scope: ReUI
+                        publish: '/app/scene/back'
                     }]
                     }
                 },
@@ -182,10 +183,11 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             return options;
         },
         navigateToListView: function() {
-            var view = App.getView(this.view),
-                options = this.createNavigationOptions();
-            if (view && options && !this.disabled)
-                view.show(options);
+            if (this.disabled) return;
+
+            var options = this.createNavigationOptions();
+
+            scene().showView(this.view, options);
         },
         _onClick: function(evt) {
             var buttonNode = query(evt.target).closest('.button')[0];

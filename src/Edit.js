@@ -127,6 +127,8 @@ define('Sage/Platform/Mobile/Edit', [
                 if (field)
                     field.renderTo(node);
             }, this);
+
+            this.init();
         },
         init: function() {
             this.inherited(arguments);
