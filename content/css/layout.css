@@ -558,7 +558,9 @@ img
     user-select: none;
 }
 
-.detail-content > h2.hidden-section
+.list-content > h2.hidden-section,
+.detail-content > h2.hidden-section,
+.edit-content > h2.hidden-section
 {
     display: none;
 }

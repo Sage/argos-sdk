@@ -32,7 +32,7 @@ define('Sage/Platform/Mobile/GroupedList', [
     return declare('Sage.Platform.Mobile.GroupedList', [List], {
         baseClass: 'view list list-grouped has-search-header',
         groupTemplate: new Simplate([
-            '<h2 data-action="toggleGroup" class="{% if ($.collapsed) { %}collapsed{% } %}">',
+            '<h2 data-action="toggleGroup" class="{% if ($.collapsed) { %}collapsed{% } %} {% if ($.title === false) { %}hidden-section{% } %}">',
             '{%: $.title %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
             '<ul data-group="{%= $.tag %}" class="list-content"></ul>'
