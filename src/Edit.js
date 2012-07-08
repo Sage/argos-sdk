@@ -125,16 +125,11 @@ define('Sage/Platform/Mobile/Edit', [
                 var name = domAttr.get(node, 'data-field'),
                     field = this.fields[name];
                 if (field)
+                {
                     field.renderTo(node);
+                    field.startup();
+                }
             }, this);
-
-            this.init();
-        },
-        init: function() {
-            this.inherited(arguments);
-
-            for (var name in this.fields)
-                this.fields[name].init();
         },
         createToolLayout: function() {
             return this.tools || (this.tools = {

@@ -294,12 +294,6 @@ define('Sage/Platform/Mobile/Detail', [
                 var dynamicNode = row['generator'].call(this, row, value, item);
                 if (dynamicNode) domConstruct.place(dynamicNode, sectionNode);
             }
-            /* a creator generates layout */
-            else if (typeof row['creator'] === 'function')
-            {
-                var dynamicLayout = row['creator'].call(this, row, value, item);
-                if (dynamicLayout) this._processLayout(dynamicLayout, item);
-            }
             else
             {
                 var provider = row['provider'] || defaultPropertyProvider,
@@ -392,8 +386,9 @@ define('Sage/Platform/Mobile/Detail', [
             }
         },
         _processLayout: function(layout, item) {
-            var rows = typeof layout['generator'] === 'function'
-                    ? layout['generator'].call(this, layout, this._processLayoutRowValue(layout, item), item)
+            /* todo: rename to `creator` */
+            var rows = typeof layout['creator'] === 'function'
+                    ? layout['creator'].call(this, layout, this._processLayoutRowValue(layout, item), item)
                     : layout['children']
                         ? layout['children']
                         : layout,
@@ -412,7 +407,7 @@ define('Sage/Platform/Mobile/Detail', [
                 if (include !== undefined && !include) continue;
                 if (exclude !== undefined && exclude) continue;
 
-                if (current['children'] || current['generator'])
+                if (current['children'] || current['creator'])
                 {
                     /* todo: do we need to defer anymore? */
                     if (sectionStarted)
