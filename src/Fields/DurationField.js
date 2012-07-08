@@ -78,9 +78,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
          */
         autoCompleteValueRE: /^((?:\d+(?:\.\d*)?|\.\d+))/,
         
-        init: function() {
-            // do not use lookups connects
-
+        startup: function() {
             var numberDecimalSeparator = Mobile.CultureInfo.numberFormat.numberDecimalSeparator;
 
             this.autoCompletePhraseRE = new RegExp(

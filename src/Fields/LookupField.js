@@ -76,8 +76,9 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         valueTextProperty: null,
         requireSelection: true,
         singleSelect: true,
+        dependsOn: null,
 
-        init: function() {
+        startup: function() {
             this.inherited(arguments);
 
             this.connect(this.containerNode, 'onclick', this._onClick);

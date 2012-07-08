@@ -52,7 +52,7 @@ define('Sage/Platform/Mobile/Fields/TextField', [
         enableClearButton: true,
         validInputOnly: false,
 
-        init: function() {
+        startup: function() {
             this.inherited(arguments);
             
             if (this.validInputOnly)

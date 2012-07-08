@@ -50,7 +50,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
         formatValue: function(val) {
             return '';
         },
-        init: function() {
+        startup: function() {
             this.inherited(arguments);
 
             this.connect(this.containerNode, "onclick", this._onClick);

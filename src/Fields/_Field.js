@@ -34,8 +34,6 @@ define('Sage/Platform/Mobile/Fields/_Field', [
             this.containerNode = node; // todo: should node actually be containerNode instead of last rendered node?
             this.placeAt(node);
         },
-        init: function() {
-        },
         isDirty: function() {
             return true;
         },
