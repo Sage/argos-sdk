@@ -387,8 +387,8 @@ define('Sage/Platform/Mobile/Detail', [
         },
         _processLayout: function(layout, item) {
             /* todo: rename to `creator` */
-            var rows = typeof layout['creator'] === 'function'
-                    ? layout['creator'].call(this, layout, this._processLayoutRowValue(layout, item), item)
+            var rows = typeof layout['children'] === 'function'
+                    ? layout['children'].call(this, layout, this._processLayoutRowValue(layout, item), item)
                     : layout['children']
                         ? layout['children']
                         : layout,
@@ -407,7 +407,7 @@ define('Sage/Platform/Mobile/Detail', [
                 if (include !== undefined && !include) continue;
                 if (exclude !== undefined && exclude) continue;
 
-                if (current['children'] || current['creator'])
+                if (current['children'])
                 {
                     /* todo: do we need to defer anymore? */
                     if (sectionStarted)
