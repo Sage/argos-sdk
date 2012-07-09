@@ -51,8 +51,11 @@ define('Sage/Platform/Mobile/Detail', [
     /* todo: make release note that `raw` has been changed to `value` and `value` to `formatted` */
 
     var defaultPropertyProvider = function(item, property, info) {
-        return utility.getValue(item, property, item);
-    };
+            return utility.getValue(item, property, item);
+        },
+        applyValueTemplate = function(data, container) {
+            return data['valueTemplate'].apply(data.value, container);
+        };
 
     var Detail = declare('Sage.Platform.Mobile.Detail', [View], {
         events: {
@@ -369,15 +372,24 @@ define('Sage/Platform/Mobile/Detail', [
                             ? this.listRowTemplate
                             : this.standardRowTemplate;
 
-                var itemTemplate = row['itemTemplate']
+                data['valueTemplate'] = row['valueTemplate'];
+                data['itemTemplate'] = row['valueTemplate']
+                    ? {apply: applyValueTemplate}
+                    : row['itemTemplate']
+                        ? row['itemTemplate']
+                        : row['view']
+                            ? this.relatedItemTemplate
+                            : row['action']
+                                ? this.actionItemTemplate
+                                : this.propertyItemTemplate;
+
+                data['itemTemplate'] = row['itemTemplate']
                     ? row['itemTemplate']
                     : row['view']
                         ? this.relatedItemTemplate
                         : row['action']
                             ? this.actionItemTemplate
                             : this.propertyItemTemplate;
-
-                data['itemTemplate'] = itemTemplate;
 
                 var node = domConstruct.place(rowTemplate.apply(data, this), sectionNode);
 
