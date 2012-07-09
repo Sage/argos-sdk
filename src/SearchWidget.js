@@ -33,10 +33,8 @@ define('Sage/Platform/Mobile/SearchWidget', [
     _TemplatedWidgetMixin
 ) {
     return declare('Sage.Platform.Mobile.SearchWidget', [_WidgetBase, _TemplatedWidgetMixin], {
-        attributeMap: {
-            queryValue: { node: 'queryNode', type: 'attribute', attribute: 'value' }
-        },
         _setLabelAttr: {node: 'labelNode', type: 'innerHTML'},
+        _setQueryValueAttr: { node: 'queryNode', type: 'attribute', attribute: 'value' },
         widgetTemplate: new Simplate([
             '<div class="search-header">',
                 '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="queryNode" data-dojo-attach-event="onfocus:_onFocus,onblur:_onBlur,onkeypress:_onKeyPress" />',
