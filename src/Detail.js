@@ -176,7 +176,6 @@ define('Sage/Platform/Mobile/Detail', [
         },
         formatRelatedQuery: function(entry, fmt, property) {
             property = property || '$key';
-            console.log(fmt, entry, property);
             return string.substitute(fmt, [utility.getValue(entry, property)]);
         },
         toggleSection: function(evt, node) {
