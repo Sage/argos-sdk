@@ -113,7 +113,7 @@ define('Sage/Platform/Mobile/Edit', [
         constructor: function(o) {
             this.fields = {};
         },
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
 
             var customizationSet = customizations(),

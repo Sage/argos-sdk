@@ -51,12 +51,13 @@ define('Sage/Platform/Mobile/_Component', [
         },
         postscript: function() {
             this.inherited(arguments);
+            this.onCreate();
             this.initComponents();
         },
         startup: function() {
             this.inherited(arguments);
 
-            this.onCreate();
+            this.onStartup();
 
             array.forEach(this._components, function(instance, slot) {
                 this._startupChildComponent(instance);
@@ -292,6 +293,8 @@ define('Sage/Platform/Mobile/_Component', [
             }
         },
         onCreate: function() {
+        },
+        onStartup: function() {
         },
         onDestroy: function() {
         },

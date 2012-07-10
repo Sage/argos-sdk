@@ -144,7 +144,7 @@ define('Sage/Platform/Mobile/Detail', [
         editView: false,
         _navigationOptions: null,
 
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
             this.subscribe('/app/refresh', this._onRefresh);
             this.clear();

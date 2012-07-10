@@ -93,7 +93,7 @@ define('Sage/Platform/Mobile/Scene', [
 
             lang.mixin(this, options);
         },
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
 
             this._signals.push(topic.subscribe('/app/scene/back', lang.hitch(this, this.back)));

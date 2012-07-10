@@ -58,7 +58,7 @@ define('Sage/Platform/Mobile/Pane', [
 
             domClass.add(this.domNode, 'has-toolbar-' + position);
         },
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
 
             array.forEach(this.getComponents(), function(component) {

@@ -76,7 +76,7 @@ define('Sage/Platform/Mobile/View', [
             this.beforeTransitionTo();
             this.transitionTo();
         },
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
 
             var tools = this.get('tools');

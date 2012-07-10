@@ -31,26 +31,21 @@ define('Sage/Platform/Mobile/_UiComponent', [
             instance.destroy();
         },
         _instantiateComponent: function(component, root, owner) {
-            var content = component.content,
-                tag = component.tag;
+            if (component.type) return this.inherited(arguments);
 
-            if (content || tag)
-            {
-                var node = content
-                        ? domConstruct.toDom(lang.isFunction(content) ? content.call(root, root, owner, this) : content)
-                        : domConstruct.create(component.tag, component.attrs),
-                    props = lang.mixin({
-                        components: component.components,
-                        _componentRoot: root,
-                        _componentOwner: owner
-                    }, component.props);
+            var node = component.content
+                    ? domConstruct.toDom(lang.isFunction(component.content) ? component.content.call(root, root, owner, this) : component.content)
+                    : domConstruct.create(component.tag, component.attrs),
+                props = lang.mixin({
+                    components: component.components,
+                    _componentRoot: root,
+                    _componentOwner: owner,
+                    _componentSource: component
+                }, component.props);
 
-                return component.domOnly !== false
-                    ? new DomContentComponent(props, node)
-                    : new ContentComponent(props, node);
-            }
-
-            return this.inherited(arguments);
+            return component.domOnly !== false
+                ? new DomContentComponent(props, node)
+                : new ContentComponent(props, node);
         },
         _attachRemoteComponent: function(instance, context, owner) {
             this.inherited(arguments);
