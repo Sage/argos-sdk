@@ -35,7 +35,7 @@ define('Sage/Platform/Mobile/ScrollContainer', [
             var child = this.domNode.children[0];
             if (child) domClass.add(child, 'scroll-content');
 
-            var hasTouch = true; 'ontouchstart' in window;
+            var hasTouch = 'ontouchstart' in window;
             if (hasTouch)
             {
                 this._scroll = new iScroll(this.domNode, {
