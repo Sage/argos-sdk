@@ -372,6 +372,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         _onFetchComplete: function(items, request) {
             domClass.remove(this.chartNode, 'is-loading');
             this.processFeed(items);
+            alert('b');
             this.setSize();
             this.setAxisLabelSizes();
             this.render();
@@ -414,8 +415,9 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         },
 
         setMinorTickStep: function(div) {
-            console.log('max, div, minor tick step:',this.stats.max, div, this.stats.max/div);
-            this.chart.axes[this.valueAxis].opt.minorTickStep = this.stats.max / div;
+            var majTickStep = Math.pow(10, Math.floor(Math.log(this.stats.max - this.stats.min) / Math.LN10));
+
+            this.chart.axes[this.valueAxis].opt.minorTickStep = majTickStep / div;
         },
 
         /**
