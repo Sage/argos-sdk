@@ -5,6 +5,8 @@ define('Sage/Platform/Mobile/_UiComponent', [
     'dojo/_base/lang',
     'dojo/_base/connect',
     'dojo/dom-construct',
+    'dojo/dom-class',
+    'dojo/Stateful',
     'dijit/_WidgetBase',
     'dijit/_Container',
     './_Component'
@@ -15,6 +17,8 @@ define('Sage/Platform/Mobile/_UiComponent', [
     lang,
     connect,
     domConstruct,
+    domClass,
+    Stateful,
     _WidgetBase,
     _Container,
     _Component
@@ -30,22 +34,37 @@ define('Sage/Platform/Mobile/_UiComponent', [
 
             instance.destroy();
         },
-        _instantiateComponent: function(component, root, owner) {
-            if (component.type) return this.inherited(arguments);
+        _instantiateComponent: function(definition, root, owner) {
+            if (definition.type) return this.inherited(arguments);
+            if (definition.domOnly !== false)
+            {
+                var node = definition.content
+                    ? domConstruct.toDom(
+                        lang.isFunction(definition.content)
+                            ? definition.content.call(this, root, owner, this)
+                            : definition.content
+                    )
+                    : domConstruct.create(definition.tag, definition.attrs);
 
-            var node = component.content
-                    ? domConstruct.toDom(lang.isFunction(component.content) ? component.content.call(root, root, owner, this) : component.content)
-                    : domConstruct.create(component.tag, component.attrs),
-                props = lang.mixin({
-                    components: component.components,
+                return new DomContentComponent(lang.mixin({
+                    components: definition.components,
                     _componentRoot: root,
                     _componentOwner: owner,
-                    _componentSource: component
-                }, component.props);
-
-            return component.domOnly !== false
-                ? new DomContentComponent(props, node)
-                : new ContentComponent(props, node);
+                    _componentSource: definition
+                }, definition.props), node);
+            }
+            else
+            {
+                return new Control(lang.mixin({
+                    components: definition.components,
+                    content: definition.content,
+                    attrs: definition.attrs,
+                    tag: definition.tag,
+                    _componentRoot: root,
+                    _componentOwner: owner,
+                    _componentSource: definition
+                }, definition.props));
+            }
         },
         _attachComponent: function(definition, instance, context, root, owner) {
             this.inherited(arguments);
@@ -87,7 +106,6 @@ define('Sage/Platform/Mobile/_UiComponent', [
         }
     });
 
-    var ContentComponent = declare('Sage.Platform.Mobile.ContentComponent', [_WidgetBase, _UiComponent], {});
     var DomContentComponent = declare('Sage.Platform.Mobile.DomContentComponent', [_UiComponent], {
         domNode: null,
         constructor: function(props, node) {
@@ -111,8 +129,75 @@ define('Sage/Platform/Mobile/_UiComponent', [
         }
     });
 
-    _UiComponent.ContentComponent = ContentComponent;
+    /**
+     * A lightweight widget-like component.
+     */
+    var Control = declare('Sage.Platform.Mobile.Control', [Stateful, _UiComponent], {
+        attributeMap: {},
+        tag: null,
+        attrs: null,
+        content: null,
+        baseClass: null,
+
+        constructor: function(props) {
+            this.params = props;
+        },
+
+        onCreate: function() {
+            this.inherited(arguments);
+            this.render();
+
+            if (this.domNode) this._applyAttributes();
+        },
+
+        render: function() {
+            if (this.domNode) return;
+
+            if (this.content)
+            {
+                this.domNode = domConstruct.toDom(
+                    lang.isFunction(this.content)
+                        ? this.content.call(this, this._componentRoot, this._componentOwner, this)
+                        : this.content
+                );
+            }
+            else
+            {
+                this.domNode = domConstruct.create(this.tag || 'div', this.attrs);
+            }
+
+            this.containerNode = this.domNode;
+
+            if (this.baseClass) domClass.add(this.domNode, this.baseClass);
+        },
+
+        remove: function() {
+            if (this.domNode && this.domNode.parentNode)
+                this.domNode.parentNode.removeChild(this.domNode);
+        },
+
+        destroy: function() {
+            this.inherited(arguments);
+
+            if (this.domNode && this.domNode.parentNode)
+                this.domNode.parentNode.removeChild(this.domNode);
+
+            this.domNode = this.containerNode = null;
+        },
+
+        /* selective mixin from _WidgetBase */
+        placeAt: _WidgetBase.prototype.placeAt,
+        set: _WidgetBase.prototype.set,
+        get: _WidgetBase.prototype.get,
+        _set: _WidgetBase.prototype._set,
+        _attrToDom: _WidgetBase.prototype._attrToDom,
+        _getAttrNames: _WidgetBase.prototype._getAttrNames,
+        _attrPairNames: _WidgetBase.prototype._attrPairNames,
+        _applyAttributes: _WidgetBase.prototype._applyAttributes
+    });
+
     _UiComponent.DomContentComponent = DomContentComponent;
+    _UiComponent.Control = Control;
 
     return _UiComponent;
 });

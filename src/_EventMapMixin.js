@@ -95,7 +95,7 @@ define('Sage/Platform/Mobile/_EventMapMixin', [
                 signal.remove();
             });
 
-            this._eventSignals = null;
+            delete this._eventSignals;
         }
     });
 });

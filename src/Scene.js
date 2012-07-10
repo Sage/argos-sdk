@@ -107,6 +107,8 @@ define('Sage/Platform/Mobile/Scene', [
                 signal.remove();
             });
 
+            delete this._signals;
+
             for (var name in this._instancedViews)
             {
                 this._instancedViews[name].destroy();

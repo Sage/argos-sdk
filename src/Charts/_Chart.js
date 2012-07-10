@@ -162,14 +162,14 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         },
         postCreate: function() {
             this.inherited(arguments);
-            this.subscribe('/app/resize', this._onResize);
+            this.subscribe('/app/resize', this.resize);
         },
         startup: function() {
             this.inherited(arguments);
         },
-        _onResize: function() {
-            this.setSize();
-            this.setAxisLabelSizes();
+        resize: function() {
+            this._resizeChart();
+            this._resizeAxisLabels();
 
             if (this.chart)
                 this.chart.resize();
@@ -183,7 +183,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         /**
          * Called to resize any labels for proper clipping
          */
-        setAxisLabelSizes: function() {
+        _resizeAxisLabels: function() {
             if (!this.chart || !this.feed) return;
 
             for (var i=0; i < this.chart.axes.length; i++)
@@ -212,7 +212,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         /**
          * Called to resize the chartNode to correct proportions
          */
-        setSize: function() {
+        _resizeChart: function() {
             var box = domGeom.getMarginBox(this.domNode),
                 ratio = this.ratio,
                 height = box.h,
@@ -372,8 +372,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         _onFetchComplete: function(items, request) {
             domClass.remove(this.chartNode, 'is-loading');
             this.processFeed(items);
-            this.setSize();
-            this.setAxisLabelSizes();
+            this.resize();
             this.render();
         },
         _onFetchError: function() {
@@ -437,7 +436,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
                 this.addAxis(axis['axis'], axis['options'] || {});
             }, chart);
 
-            this.setAxisLabelSizes();
+            this._resizeAxisLabels();
 
             var data = this.getSeries(this.feed);
             if (!lang.isArray(data))

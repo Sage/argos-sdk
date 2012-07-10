@@ -38,7 +38,8 @@ define('Sage/Platform/Mobile/ApplicationModule', [
             array.forEach(this._signals, function(signal) {
                 signal.remove();
             });
-            this._signals = null;
+
+            delete this._signals;
 
             this.uninitialize();
         },

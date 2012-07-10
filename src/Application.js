@@ -105,6 +105,8 @@ define('Sage/Platform/Mobile/Application', [
                 signal.remove();
             });
 
+            delete this._signals;
+
             for (var name in this._connections)
             {
                 var connection = this._connections[name];

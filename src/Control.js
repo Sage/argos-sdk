@@ -14,78 +14,9 @@
  */
 
 define('Sage/Platform/Mobile/Control', [
-    'dojo/_base/declare',
-    'dojo/_base/lang',
-    'dojo/dom-construct',
-    'dojo/dom-class',
-    'dojo/Stateful',
-    'dijit/_WidgetBase',
     './_UiComponent'
 ], function(
-    declare,
-    lang,
-    domConstruct,
-    domClass,
-    Stateful,
-    _WidgetBase,
     _UiComponent
 ) {
-    /**
-     * A lightweight replacement for _WidgetBase.
-     */
-    return declare('Sage.Platform.Mobile.Control', [Stateful, _UiComponent], {
-        attributeMap: {},
-        content: null,
-        tag: null,
-        attrs: null,
-        baseClass: null,
-
-        onCreate: function() {
-            this.inherited(arguments);
-            this.render();
-
-            if (this.domNode) this._applyAttributes();
-        },
-
-        render: function() {
-            if (this.domNode) return;
-
-            if (this.content)
-            {
-                this.domNode = domConstruct.toDom(lang.isFunction(this.content) ? this.content.call(this, this) : this.content)
-            }
-            else
-            {
-                this.domNode = domConstruct.create(this.tag || 'div', this.attrs);
-            }
-
-            this.containerNode = this.domNode;
-
-            if (this.baseClass) domClass.add(this.domNode, this.baseClass);
-        },
-
-        remove: function() {
-            if (this.domNode && this.domNode.parentNode)
-                this.domNode.parentNode.removeChild(this.domNode);
-        },
-
-        destroy: function() {
-            this.inherited(arguments);
-
-            if (this.domNode && this.domNode.parentNode)
-                this.domNode.parentNode.removeChild(this.domNode);
-
-            this.domNode = this.containerNode = null;
-        },
-
-        /* selective mixin from _WidgetBase */
-        placeAt: _WidgetBase.prototype.placeAt,
-        set: _WidgetBase.prototype.set,
-        get: _WidgetBase.prototype.get,
-        _set: _WidgetBase.prototype._set,
-        _attrToDom: _WidgetBase.prototype._attrToDom,
-        _getAttrNames: _WidgetBase.prototype._getAttrNames,
-        _attrPairNames: _WidgetBase.prototype._attrPairNames,
-        _applyAttributes: _WidgetBase.prototype._applyAttributes
-    });
+    return _UiComponent.Control;
 });
