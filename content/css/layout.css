@@ -734,7 +734,8 @@ h2 > .collapsed-indicator
     white-space: nowrap;
 }
 
-.detail-content > .loading-indicator
+.detail-content > .loading-indicator,
+.chart-content > .loading-indicator
 {
     display: none;
     text-align: center;
@@ -744,17 +745,20 @@ h2 > .collapsed-indicator
     padding: 1em !important;
 }
 
-.detail-content > .loading-indicator > div
+.detail-content > .loading-indicator > div,
+.chart-content > .loading-indicator > div
 {
     display: inline-block;
 }
 
-.is-loading .detail-content > *
+.is-loading .detail-content > *,
+.is-loading .chart-content > *
 {
     display: none;
 }
 
-.is-loading .detail-content > .loading-indicator
+.is-loading .detail-content > .loading-indicator,
+.is-loading .chart-content > .loading-indicator
 {
     display: block;
 }
@@ -1088,28 +1092,28 @@ h2 > .collapsed-indicator
     padding: 4px 34px 4px 110px !important;
 }
 
-.chart-panel
+.chart-content
 {
     width: 100%;
 }
-.chart-panel > .chart
+.chart-content > .chart
 {
     width: 100%;
     height: 100%;
     display: inline-block;
 }
-.chart-panel > .dojoxLegendNode
+.chart-content > .dojoxLegendNode
 {
     width: 20%;
     display: inline-block;
     vertical-align: top;
     margin: 16px 0 0 6px;
 }
-.chart-panel > .dojoxLegendNode td
+.chart-content > .dojoxLegendNode td
 {
     white-space: nowrap;
 }
-.chart-panel > .dojoxLegendNode .dojoxLegendText
+.chart-content > .dojoxLegendNode .dojoxLegendText
 {
     padding-left: 6px;
 }

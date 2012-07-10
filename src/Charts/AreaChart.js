@@ -17,8 +17,7 @@ define('Sage/Platform/Mobile/Charts/AreaChart', [
     'dojo/_base/declare',
     'dojo/dom-attr',
     'dojo/dom-class',
-    'Sage/Platform/Mobile/Charts/_Chart',
-    'Sage/Platform/Mobile/ChartManager',
+    './_Chart',
     'dojox/charting/plot2d/Areas',
     'dojox/charting/plot2d/Markers',
     'dojox/charting/axis2d/Default'
@@ -27,10 +26,9 @@ define('Sage/Platform/Mobile/Charts/AreaChart', [
     domAttr,
     domClass,
     _Chart,
-    ChartManager,
     Areas
 ) {
-    var chart = declare('Sage.Platform.Mobile.Charts.AreaChart', [_Chart], {
+    return declare('Sage.Platform.Mobile.Charts.AreaChart', [_Chart], {
         xAxis: {
             fixLower: 'major',
             fixUpper: 'major',
@@ -48,8 +46,4 @@ define('Sage/Platform/Mobile/Charts/AreaChart', [
             tension: 'X'
         }
     });
-
-    ChartManager.register('area', chart);
-
-    return chart;
 });

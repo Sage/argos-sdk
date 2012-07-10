@@ -17,8 +17,7 @@ define('Sage/Platform/Mobile/Charts/LineChart', [
     'dojo/_base/declare',
     'dojo/window',
     'dojo/dom-geometry',
-    'Sage/Platform/Mobile/Charts/_Chart',
-    'Sage/Platform/Mobile/ChartManager',
+    './_Chart',
     'dojox/charting/plot2d/Lines',
     'dojox/charting/plot2d/Markers',
     'dojox/charting/axis2d/Default'
@@ -30,7 +29,7 @@ define('Sage/Platform/Mobile/Charts/LineChart', [
     ChartManager,
     LinesPlot
 ) {
-    var chart = declare('Sage.Platform.Mobile.Charts.LineChart', [_Chart], {
+    return declare('Sage.Platform.Mobile.Charts.LineChart', [_Chart], {
         legend: true,
         xAxis: {
             minorTicks: false
@@ -65,8 +64,4 @@ define('Sage/Platform/Mobile/Charts/LineChart', [
             }
         }
     });
-
-    ChartManager.register('line', chart);
-
-    return chart;
 });
