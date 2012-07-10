@@ -16,8 +16,7 @@
 define('Sage/Platform/Mobile/Charts/ColumnChart', [
     'dojo/_base/declare',
     'dojo/dom-geometry',
-    'Sage/Platform/Mobile/Charts/_Chart',
-    'Sage/Platform/Mobile/ChartManager',
+    './_Chart',
     'dojox/charting/plot2d/Columns',
     'dojox/charting/plot2d/Markers',
     'dojox/charting/axis2d/Default'
@@ -25,10 +24,9 @@ define('Sage/Platform/Mobile/Charts/ColumnChart', [
     declare,
     domGeom,
     _Chart,
-    ChartManager,
     Columns
 ) {
-    var chart = declare('Sage.Platform.Mobile.Charts.ColumnChart', [_Chart], {
+    return declare('Sage.Platform.Mobile.Charts.ColumnChart', [_Chart], {
         plotType: Columns,
 
         plotOptions: {
@@ -48,8 +46,4 @@ define('Sage/Platform/Mobile/Charts/ColumnChart', [
             minorTicks: false
         }
     });
-
-    ChartManager.register('column', chart);
-
-    return chart;
 });

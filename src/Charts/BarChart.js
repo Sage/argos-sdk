@@ -17,8 +17,7 @@ define('Sage/Platform/Mobile/Charts/BarChart', [
     'dojo/_base/declare',
     'dojo/window',
     'dojo/dom-geometry',
-    'Sage/Platform/Mobile/Charts/_Chart',
-    'Sage/Platform/Mobile/ChartManager',
+    './_Chart',
     'dojox/charting/plot2d/Bars',
     'dojox/charting/axis2d/Default'
 ], function(
@@ -26,10 +25,9 @@ define('Sage/Platform/Mobile/Charts/BarChart', [
     win,
     domGeom,
     _Chart,
-    ChartManager,
     Bars
 ) {
-    var chart = declare('Sage.Platform.Mobile.Charts.BarChart', [_Chart], {
+    return declare('Sage.Platform.Mobile.Charts.BarChart', [_Chart], {
         xAxis: {
             fixLower: 'major',
             fixUpper: 'major',
@@ -64,8 +62,4 @@ define('Sage/Platform/Mobile/Charts/BarChart', [
             }
         }
     });
-
-    ChartManager.register('bar', chart);
-
-    return chart;
 });

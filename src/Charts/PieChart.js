@@ -16,20 +16,16 @@
 define('Sage/Platform/Mobile/Charts/PieChart', [
     'dojo/_base/declare',
     'dojo/dom-geometry',
-    'dojo/window',
-    'Sage/Platform/Mobile/Charts/_Chart',
-    'Sage/Platform/Mobile/ChartManager',
+    './_Chart',
     'dojox/charting/plot2d/Pie',
     'dojox/charting/axis2d/Default'
 ], function(
     declare,
     domGeom,
-    win,
     _Chart,
-    ChartManager,
     PiePlot
 ) {
-    var chart = declare('Sage.Platform.Mobile.Charts.PieChart', [_Chart], {
+    return declare('Sage.Platform.Mobile.Charts.PieChart', [_Chart], {
         plotType: PiePlot,
         plotOptions: {
             labelStyle: 'columns',
@@ -60,7 +56,7 @@ define('Sage/Platform/Mobile/Charts/PieChart', [
             return type;
         },
         getRadius: function() {
-            var box = win.getBox(),
+            var box = domGeom.getMarginBox(this.domNode),
                 width = box.w,
                 height = (box.h > this.maxHeight) ? this.maxHeight : box.h;
 
@@ -70,8 +66,4 @@ define('Sage/Platform/Mobile/Charts/PieChart', [
             return [];
         }
     });
-
-    ChartManager.register('pie', chart);
-
-    return chart;
 });

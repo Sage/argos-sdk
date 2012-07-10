@@ -25,7 +25,6 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     'dojox/charting/Chart',
     'dojox/charting/widget/Legend',
     'dojox/charting/plot2d/Grid',
-    'Sage/Platform/Mobile/Charts/SageTheme',
     'dijit/_WidgetBase',
     '../_TemplatedWidgetMixin'
 ], function(
@@ -40,14 +39,13 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     Chart,
     Legend,
     Grid,
-    theme,
     _WidgetBase,
     _TemplatedWidgetMixin
 ) {
 
     return declare('Sage.Platform.Mobile.Charts._Chart', [_WidgetBase, _TemplatedWidgetMixin], {
         widgetTemplate: new Simplate([
-            '<div class="detail-content chart-panel {%: $.cls %}">',
+            '<div class="chart-content {%: $.cls %}">',
                 '<div class="chart" data-dojo-attach-point="chartNode"></div>',
                 '<div class="legend" data-dojo-attach-point="legendNode"></div>',
                 '{%! $.loadingTemplate %}',
@@ -87,7 +85,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         /**
          * Default charting theme used for all charts
          */
-        defaultTheme: theme,
+        defaultTheme: null,
 
         /**
          * Default dimension ratio for clamping width/height
@@ -157,6 +155,8 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
 
         cls: null,
 
+        stats: {},
+
         constructor: function(o) {
             lang.mixin(this, o);
         },
@@ -225,7 +225,6 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
 
             if (!this.ratio)
             {
-                console.log(height, width);
                 domStyle.set(this.chartNode, {
                     height: height+'px',
                     width: width+'px'
@@ -318,6 +317,11 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
                     description = (this.seriesLabelFormatter) ? this.seriesLabelFormatter(o[this.descriptionProperty]) : o[this.descriptionProperty],
                     value = o[this.valueProperty];
 
+                if ((value[0] || value) > this.stats.max)
+                    this.stats.max = value[0] || value;
+                if ((value[0] || value) < this.stats.min)
+                    this.stats.min = value[0] || value;
+
                 if (description)
                     values.push({
                         x: this.valueAxis === 'x' ? (value[0] || value) : i+1,
@@ -409,12 +413,18 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
             this.feed = feed;
         },
 
+        setMinorTickStep: function(div) {
+            console.log('max, div, minor tick step:',this.stats.max, div, this.stats.max/div);
+            this.chart.axes[this.valueAxis].opt.minorTickStep = this.stats.max / div;
+        },
+
         /**
          * Renders the dojo Chart to the chartNode
          */
         render: function() {
             var chart = new Chart(this.chartNode, this.chartOptions);
             this.chart = chart;
+            this.stats = {max: 0, min: 0};
 
             chart.setTheme(this.getTheme());
             chart.addPlot('default', this.getType());
@@ -435,13 +445,17 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
                 this.addSeries(series['name'], series['data'], series['options'] || {});
             }, chart);
 
-            if (this.grid)
-                chart.addPlot("Grid", lang.mixin(this.grid, {type: "Grid"}));
+            if (this.minorTickDivisions)
+                this.setMinorTickStep(this.minorTickDivisions);
 
-          //  if (this.click || this.mouseover || this.mouseout)
-            chart.connectToPlot('default', this, this.onChartEvent);
+            if (this.grid)
+                chart.addPlot('Grid', lang.mixin(this.grid, {type: 'Grid'}));
+
+            if (this.click || this.mouseover || this.mouseout)
+                chart.connectToPlot('default', this, this.onChartEvent);
 
             chart.render();
+            console.log('chart:',chart);
 
             if (this.legend)
                 new Legend(lang.mixin({},{chart: chart}, this.legendOptions), this.legendNode);
