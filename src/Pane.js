@@ -58,7 +58,7 @@ define('Sage/Platform/Mobile/Pane', [
 
             domClass.add(this.domNode, 'has-toolbar-' + position);
         },
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
 
             array.forEach(this.getComponents(), function(component) {
@@ -104,27 +104,33 @@ define('Sage/Platform/Mobile/Pane', [
                 toolbar.show();
             }
 
-            topic.publish('/app/transition/before', view, previous, this);
+            topic.publish('/app/view/transition/before', view, previous, this);
         },
         _afterTransition: function(view, options, previous) {
             var tools = (options && options.tools) || view.get('tools') || {};
 
             for (var name in this.toolbars)
             {
-                var toolbar = this.toolbars[name];
+                var toolbar = this.toolbars[name],
+                    items = tools[name];
 
                 toolbar.set('title', view.get('title'));
 
-                if (tools[name]) toolbar.set('items', tools[name]);
+                if (items) toolbar.set('items', items, { key: view.id });
             }
 
-            topic.publish('/app/transition/after', view, previous, this);
+            topic.publish('/app/view/transition/after', view, previous, this);
         },
         _transitionTo: function(view, options, deferred) {
             if (this.active === view)
             {
+                /* todo: fully reset tools here? could update? only issue would be if new tools were passed for same active view. */
+                this._beforeTransition(view, options, view);
+
                 /* todo: is `reload` an appropriate name for this? */
                 view.reload();
+
+                this._afterTransition(view, options, view);
 
                 deferred.resolve(true);
 

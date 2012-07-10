@@ -365,8 +365,7 @@ define('Sage/Platform/Mobile/List', [
         _selectionModel: null,
         _selectionConnects: null,
         _setSelectionModelAttr: function(selectionModel) {
-            if (this._selectionConnects)
-                array.forEach(this._selectionConnects, this.disconnect, this);
+            if (this._selectionConnects) array.forEach(this._selectionConnects, this.disconnect, this);
 
             this._selectionModel = selectionModel;
             this._selectionConnects = [];
@@ -383,7 +382,7 @@ define('Sage/Platform/Mobile/List', [
         _getSelectionModelAttr: function() {
             return this._selectionModel;
         },
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
 
             if (this._selectionModel == null)
@@ -397,6 +396,24 @@ define('Sage/Platform/Mobile/List', [
                 this.$.search.setLabel(this.searchText);
 
             this.clear(true);
+        },
+        onDestroy: function() {
+            this.inherited(arguments);
+
+            if (this.store)
+            {
+                this.store.close();
+
+                delete this.store;
+            }
+
+            if (this._selectionConnects)
+            {
+                array.forEach(this._selectionConnects, this.disconnect, this);
+
+                delete this._selectionConnects;
+                delete this._selectionModel;
+            }
         },
         _getStoreAttr: function() {
             return this.store || (this.store = this.createStore());
@@ -599,7 +616,8 @@ define('Sage/Platform/Mobile/List', [
             /* remove the loading indicator so that it does not get re-shown while requesting more data */
             if (request['start'] === 0) domConstruct.destroy(this.loadingIndicatorNode);
 
-            this.onContentChange();
+            var self = this;
+            setTimeout(function() { self.onContentChange(); }, 100);
         },
         _onFetchError: function(error, keywordArgs) {
             alert(string.substitute(this.requestErrorText, [error]));

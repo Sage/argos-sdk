@@ -93,7 +93,7 @@ define('Sage/Platform/Mobile/Scene', [
 
             lang.mixin(this, options);
         },
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
 
             this._signals.push(topic.subscribe('/app/scene/back', lang.hitch(this, this.back)));
@@ -315,7 +315,7 @@ define('Sage/Platform/Mobile/Scene', [
             /* todo: trim state to item before match of `stateSet` */
             this._trimStateTo(stateSet);
 
-            console.log('view set to apply: %o', viewSet);
+            // console.log('view set to apply: %o', viewSet);
 
             /*
               A scene tells the layout to apply a view set.  This causes the layout to invoke
@@ -354,7 +354,7 @@ define('Sage/Platform/Mobile/Scene', [
         _onLayoutApplyComplete: function(stateSet) {
             this._state.push(stateSet);
 
-            console.log('current state: %o', this._state);
+            // console.log('current state: %o', this._state);
 
             this._processQueue();
         },

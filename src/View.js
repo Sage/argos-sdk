@@ -42,7 +42,7 @@ define('Sage/Platform/Mobile/View', [
         connectionName: false,
         customizationSet: 'view',
         titleText: 'Generic View',
-        _getProtoComponentDeclarations: function() {
+        _preCreateComponents: function(components) {
             var customizationSet = customizations();
             return customizationSet.apply(customizationSet.toPath(this.customizationSet, 'components', this.id), this.inherited(arguments));
         },
@@ -76,7 +76,7 @@ define('Sage/Platform/Mobile/View', [
             this.beforeTransitionTo();
             this.transitionTo();
         },
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
 
             var tools = this.get('tools');

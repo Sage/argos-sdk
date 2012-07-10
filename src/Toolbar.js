@@ -16,92 +16,70 @@
 define('Sage/Platform/Mobile/Toolbar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
-    'dojo/query',
-    'dojo/NodeList-manipulate',
+    'dojo/_base/array',
     'dojo/topic',
-    'dojo/dom-construct',
-    'dojo/dom-style',
-    'dojo/dom-class',
     'dojo/dom-attr',
+    'dojo/dom-class',
     'dijit/_WidgetBase',
     './_EventMapMixin',
     './_UiComponent',
+    './ToolbarButton',
     './Utility',
     'argos!scene'
 ], function(
     declare,
     lang,
-    query,
-    nodeListManipulate,
+    array,
     topic,
-    domConstruct,
-    domStyle,
-    domClass,
     domAttr,
+    domClass,
     _WidgetBase,
     _EventMapMixin,
     _UiComponent,
+    ToolbarButton,
     utility,
     scene
 ) {
     return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _UiComponent], {
         events: {
-            '.tool-button:click': '_onToolClick'
+            'click': true
         },
         baseClass: 'toolbar',
         position: 'top',
-        components: [],
-        itemTemplate: new Simplate([
-            '<button class="tool button tool-button {%= $$.cls %}"',
-                    'data-tool="{%= $.name %}" aria-label="{%: $$.label || $.name %}">',
-                '<div>',
-                '{% if ($$.icon) { %}',
-                '<img src="{%= $$.icon %}" alt="{%= $.name %}" />',
-                '{% } %}',
-                '{% if ($$.label) { %}',
-                '<span>{%: $$.label %}</span>',
-                '{% } %}',
-                '</div>',
-            '</button>'
-        ]),
         items: null,
         visible: true,
         _size: 0,
         _items: null,
         _itemsByName: null,
-        _onToolClick: function(evt, node) {
-            var name = domAttr.get(node, 'data-tool');
-            if (name) this._invokeTool(name);
-        },
-        _invokeTool: function(name) {
-            var item = this._itemsByName[name],
-                source = item && item.source;
-            if (source)
+        invoke: function(evt, node) {
+            var name = node && domAttr.get(node, 'data-tool'),
+                item = name && this._itemsByName[name];
+            if (item)
             {
-                if (source.fn)
+                if (item.fn)
                 {
-                    var args = source.args ? source.args.concat(source) : [source];
+                    var args = item.args ? item.args.concat(item) : [item];
 
-                    source.fn.apply(source.scope || this, args);
+                    item.fn.apply(item.scope || this, args);
                 }
-                else if (source.show)
+                else if (item.show)
                 {
-                    scene().showView(source.show, source.args);
+                    scene().showView(item.show, item.args);
                 }
-                else if (source.action)
+                else if (item.action)
                 {
                     var root = this.getComponentRoot(),
                         active = root && root.active,
-                        method = active && active[source.action],
-                        args = source.args ? source.args.concat(source) : [source];
+                        method = active && active[item.action],
+                        args = item.args ? item.args.concat(item) : [item];
 
                     if (typeof method === 'function') method.apply(active, args);
                 }
-                else if (source.publish)
+                else if (item.publish)
                 {
-                    var args = source.args
-                        ? [source.publish].concat(source.args, source)
-                        : [source.publish, source];
+                    var args = item.args
+                        ? [item.publish].concat(item.args, item)
+                        : [item.publish, item];
 
                     topic.publish.apply(topic, args);
                 }
@@ -130,7 +108,7 @@ define('Sage/Platform/Mobile/Toolbar', [
         },
         onPositionChange: function(position, previous) {
         },
-        onCreate: function() {
+        onStartup: function() {
             this.inherited(arguments);
             this.onPositionChange(this.position, null);
         },
@@ -147,19 +125,13 @@ define('Sage/Platform/Mobile/Toolbar', [
             this.set('visible', true);
         },
         update: function() {
-            var count = {left: 0, right: 0},
-                items = this._items;
+            var count = {left: 0, right: 0};
 
-            for (var i = 0; i < items.length; i++)
-            {
-                var item = items[i];
+            array.forEach(this._items, function(item) {
+                item.update(this.context);
 
-                this._updateItemState(item);
-
-                if (item.visible) count[item.side] += 1;
-
-                this._applyItemStateToDom(item);
-            }
+                if (item.get('visible')) count[item.get('side')] += 1;
+            }, this);
 
             var size = Math.max(count['left'], count['right']);
 
@@ -169,81 +141,46 @@ define('Sage/Platform/Mobile/Toolbar', [
 
             this.onContentChange();
         },
-        _renderItem: function(item) {
-            var node = domConstruct.toDom(this.itemTemplate.apply(item, item.source));
-
-            item.domNode = node;
-
-            domClass.add(node, 'on-' + item.side);
-
-            this._applyItemStateToDom(item);
-
-            domConstruct.place(node, this.containerNode || this.domNode);
-
-            return node;
-        },
-        _updateItemState: function(item) {
-            var source = item.source,
-                visible = utility.expand(this, source.visible),
-                enabled = utility.expand(this, source.enabled);
-
-            item.visible = typeof visible !== 'undefined' ? visible : true;
-            item.enabled = typeof enabled !== 'undefined' ? enabled : true;
-        },
-        _applyItemStateToDom: function(item) {
-            var node = item.domNode;
-
-            domClass.toggle(node, 'is-disabled', !item.enabled);
-            domClass.toggle(node, 'is-hidden', !item.visible);
-        },
         _empty: function() {
             if (this._items)
             {
-                for (var i = 0; i < this._items.length; i++)
-                {
-                    var item = this._items[i];
-                    if (item.domNode && item.domNode.parentNode)
-                        item.domNode.parentNode.removeChild(item.domNode);
-                }
+                array.forEach(this._items, function(item) {
+                    item.remove();
+                });
 
                 this.onContentChange();
             }
         },
-        _setItemsAttr: function(values) {
-            var items = [],
-                itemsByName = {},
-                count = {left: 0, right: 0};
+        _setItemsAttr: function(values, options) {
+            /* todo: use options for animation, caching */
+            /* cache per key and exact object */
 
             if (typeof values == 'undefined') return;
 
-            this._empty();
+            var count = {left: 0, right: 0},
+                itemsByName = {},
+                items = array.map(values, function(value) {
 
-            for (var i = 0; i < values.length; i++) {
-                var source = values[i],
-                    item = {
-                        domNode: null,
-                        name: source.name || source.id,
-                        side: source.side || 'right',
-                        busy: false,
-                        visible: true,
-                        enabled: true,
-                        source: source
-                    };
+                    /* support old tool definitions */
+                    value.name = value.name || value.id;
 
-                this._updateItemState(item);
+                    /* right now we only support button items */
+                    var item = new ToolbarButton(value);
 
-                if (item.visible) count[item.side] += 1;
+                    item.update(this.context);
 
-                this._renderItem(item);
+                    if (item.get('visible')) count[item.get('side')] += 1;
 
-                items.push(item);
+                    item.placeAt(this.containerNode || this.domNode);
 
-                itemsByName[item.name] = item;
-            }
+                    itemsByName[item.get('name')] = item;
+
+                    return item;
+                }, this);
 
             var size = Math.max(count['left'], count['right']);
 
-            /* todo: track each side seprately? */
+            /* todo: track each side separately? */
             domAttr.set(this.domNode, 'data-tool-count', size);
 
             this._size = size;

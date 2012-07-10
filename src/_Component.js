@@ -25,15 +25,24 @@ define('Sage/Platform/Mobile/_Component', [
 
     var _Component = declare('Sage.Platform.Mobile._Component', null, {
         _components: null,
+        /**
+         * Contains information about `this` component.
+         */
+        _componentInfo: null,
         _componentRoot: null,
         _componentOwner: null,
+        /**
+         * Contains information about how, and where, all child components were attached.
+         */
         _componentContext: null,
+
         $: null,
         components: null,
+
         constructor: function(props) {
             this._components = [];
+            this._componentInfo = {};
             this._componentContext = [];
-            this._componentSource = {};
 
             this.$ = {};
             this.components = [];
@@ -44,19 +53,20 @@ define('Sage/Platform/Mobile/_Component', [
 
                 /* todo: is there a better way to pass this around and still have creation in postscript? */
                 /* in case props aren't mixed in by default */
+                if (props._componentInfo) this._componentInfo = props._componentInfo;
                 if (props._componentRoot) this._componentRoot = props._componentRoot;
                 if (props._componentOwner) this._componentOwner = props._componentOwner;
-                if (props._componentSource) this._componentSource = props._componentSource;
             }
         },
         postscript: function() {
             this.inherited(arguments);
+            this.onCreate();
             this.initComponents();
         },
         startup: function() {
             this.inherited(arguments);
 
-            this.onCreate();
+            this.onStartup();
 
             array.forEach(this._components, function(instance, slot) {
                 this._startupChildComponent(instance);
@@ -72,7 +82,7 @@ define('Sage/Platform/Mobile/_Component', [
 
             array.forEach(this._components, function(instance, slot) {
                 var context = this._componentContext[slot];
-                this._handleComponentRemoval(instance, context);
+                this._detachComponent(instance, context, context.root, context.owner);
                 this._destroyChildComponent(instance);
             }, this);
 
@@ -91,15 +101,19 @@ define('Sage/Platform/Mobile/_Component', [
 
             var slot = (this._components.push(instance) - 1),
                 context = {
-                    remote: true
-                },
-                source = instance._componentSource;
+                    name: name,
+                    root: this,
+                    owner: this,
+                    signals: null
+                };
 
-            source.name = name;
+            instance._componentInfo = {name: name};
+            instance._componentRoot = this;
+            instance._componentOwner = this;
 
             this._componentContext[slot] = context;
 
-            this._attachRemoteComponent(instance, context, this);
+            this._attachComponent(null, instance, context, this, this);
         },
         removeComponent: function(instance) {
             var slot = this._components.indexOf(instance);
@@ -107,49 +121,10 @@ define('Sage/Platform/Mobile/_Component', [
             {
                 var context = this._componentContext[slot];
 
-                this._handleComponentRemoval(instance, context);
+                this._detachComponent(instance, context, context.root, context.owner);
 
                 this._componentContext.splice(slot, 1);
                 this._components.splice(slot, 1);
-            }
-        },
-        _handleComponentRemoval: function(instance, context) {
-            if (context)
-            {
-                /* todo: should _componentOwner and _componentRoot be tracked by the context? */
-                if (context.remote)
-                    this._detachRemoteComponent(instance, context, instance._componentOwner);
-                else
-                    this._detachLocalComponent(instance, context, instance._componentRoot, instance._componentOwner);
-
-                instance._componentRemoved = true;
-            }
-        },
-        _attachRemoteComponent: function(instance, context, owner) {
-            var component = instance._componentSource,
-                componentName = context.componentName = component && component.name;
-
-            instance._componentRoot = owner;
-            instance._componentOwner = owner;
-
-            if (componentName)
-            {
-                if (owner.$[componentName]) throw new Error('A component with the same name already exists.');
-
-                owner.$[componentName] = instance;
-            }
-        },
-        _detachRemoteComponent: function(instance, context, owner) {
-            var componentName = context.componentName;
-
-            instance._componentRoot = null;
-            instance._componentOwner = null;
-
-            if (componentName)
-            {
-                if (owner.$[componentName]) throw new Error('A component with the same name already exists.');
-
-                delete owner.$[componentName];
             }
         },
         /**
@@ -157,17 +132,17 @@ define('Sage/Platform/Mobile/_Component', [
          * a component attaching itself to the heirarchy, is due to the need to support "components" that
          * are not true components, in that they do not inherit from `_Component`.  The primary use case for this is
          * for widgets, so that they may be used as child components, without extra code.
-         * @param component
+         * @param definition
          * @param instance
          * @param root
          * @param owner
          * @private
          */
-        _attachLocalComponent: function(component, instance, context, root, owner) {
-            var componentName = context.componentName = component.name,
-                attachPoint = component.attachPoint,
-                attachEvent = component.attachEvent,
-                subscribeEvent = component.subscribeEvent;
+        _attachComponent: function(definition, instance, context, root, owner) {
+            var componentName = context.name,
+                attachPoint = definition && definition.attachPoint,
+                attachEvent = definition && definition.attachEvent,
+                subscribeEvent = definition && definition.subscribeEvent;
 
             if (componentName)
             {
@@ -221,8 +196,8 @@ define('Sage/Platform/Mobile/_Component', [
                 }
             }
         },
-        _detachLocalComponent: function(instance, context, root, owner) {
-            var componentName = context.componentName,
+        _detachComponent: function(instance, context, root, owner) {
+            var componentName = context.name,
                 points = context.points,
                 signals = context.signals;
 
@@ -243,6 +218,8 @@ define('Sage/Platform/Mobile/_Component', [
 
                     lang.setObject(point, null, root);
                 }
+
+                delete context.points;
             }
 
             if (signals)
@@ -250,48 +227,57 @@ define('Sage/Platform/Mobile/_Component', [
                 array.forEach(signals, function(signal) {
                     signal.remove();
                 });
+
+                delete context.signals;
             }
         },
-        _instantiateComponent: function(component, root, owner) {
-            var type = component.type,
+        _instantiateComponent: function(definition, root, owner) {
+            var type = definition.type,
                 ctor = lang.isFunction(type) ? type : lang.getObject(type, false);
 
             if (!ctor) throw new Error('Invalid component type.');
 
             var props = lang.mixin({
-                components: component.components,
+                components: definition.components,
+                _componentInfo: {
+                    name: definition.name,
+                    root: definition.root
+                },
                 _componentRoot: root,
-                _componentOwner: owner,
-                _componentSource: component
-            }, component.props);
+                _componentOwner: owner
+            }, definition.props);
 
             return new ctor(props);
         },
-        _createComponent: function(component, root, owner) {
-            var instance = this._instantiateComponent(component, root, owner);
+        _createComponent: function(definition, root, owner) {
+            var instance = this._instantiateComponent(definition, root, owner);
 
             var slot = (this._components.push(instance) - 1),
                 context = {
-                    remote: false,
+                    name: definition.name,
+                    root: root,
+                    owner: owner,
                     signals: null
                 };
 
             this._componentContext[slot] = context;
 
-            this._attachLocalComponent(component, instance, context, root, owner);
+            this._attachComponent(definition, instance, context, root, owner);
 
             return instance;
         },
-        _createComponents: function(components, root, owner) {
-            if (components)
+        _createComponents: function(definitions, root, owner) {
+            if (definitions)
             {
-                for (var i = 0; i < components.length; i++)
+                for (var i = 0; i < definitions.length; i++)
                 {
-                    this._createComponent(components[i], root, owner);
+                    this._createComponent(definitions[i], root, owner);
                 }
             }
         },
         onCreate: function() {
+        },
+        onStartup: function() {
         },
         onDestroy: function() {
         },
@@ -301,34 +287,32 @@ define('Sage/Platform/Mobile/_Component', [
         getComponentOwner: function() {
             return this._componentOwner || this;
         },
+        /**
+         * The value used when a component is being attached to an instance.
+         * @return {*}
+         */
         getComponentValue: function() {
             return this;
         },
         getComponentName: function() {
-            return this._componentSource.name;
+            return this._componentInfo.name;
         },
         getComponents: function() {
             return this._components;
         },
-        _modifyComponentDeclarations: function(components) {
-            return components;
-        },
-        _getProtoComponentDeclarations: function() {
-            return this.constructor.prototype.components;
-        },
-        _getInstanceComponentDeclarations: function() {
-            return this.hasOwnProperty('components') && this.components;
+        _preCreateComponents: function(definitions) {
+            return definitions;
         },
         initComponents: function() {
-            var source = this._componentSource,
+            var info = this._componentInfo,
                 root = this._componentRoot || this,
                 owner = this;
 
-            if (source.root)
+            if (info.root)
             {
                 /* create instance components as if they were proto-components */
                 this._createComponents(
-                    this._modifyComponentDeclarations(this.hasOwnProperty('components') && this.components),
+                    this._preCreateComponents(this.hasOwnProperty('components') && this.components),
                     owner, owner
                 );
             }
@@ -336,13 +320,13 @@ define('Sage/Platform/Mobile/_Component', [
             {
                 /* components defined on the prototype are always rooted locally */
                 this._createComponents(
-                    this._modifyComponentDeclarations(this.constructor.prototype.components),
+                    this._preCreateComponents(this.constructor.prototype.components),
                     owner, owner
                 );
 
                 /* components defined on the instance always inherit the root */
                 this._createComponents(
-                    this._modifyComponentDeclarations(this.hasOwnProperty('components') && this.components),
+                    this._preCreateComponents(this.hasOwnProperty('components') && this.components),
                     root, owner
                 );
             }
