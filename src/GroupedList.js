@@ -82,9 +82,12 @@ define('Sage/Platform/Mobile/GroupedList', [
                 if (output.length > 0 && this._currentGroupNode) domConstruct.place(output.join(''), this._currentGroupNode, 'last');
             }
 
-            this.onContentChange();
-
             domClass.remove(this.domNode, 'is-loading');
+
+            /* remove the loading indicator so that it does not get re-shown while requesting more data */
+            if (request['start'] === 0) domConstruct.destroy(this.loadingIndicatorNode);
+
+            this.onContentChange();
         },
         clear: function() {
             this.inherited(arguments);

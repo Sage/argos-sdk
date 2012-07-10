@@ -616,8 +616,7 @@ define('Sage/Platform/Mobile/List', [
             /* remove the loading indicator so that it does not get re-shown while requesting more data */
             if (request['start'] === 0) domConstruct.destroy(this.loadingIndicatorNode);
 
-            var self = this;
-            setTimeout(function() { self.onContentChange(); }, 100);
+            this.onContentChange();
         },
         _onFetchError: function(error, keywordArgs) {
             alert(string.substitute(this.requestErrorText, [error]));
