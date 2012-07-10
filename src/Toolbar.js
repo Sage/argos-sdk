@@ -160,6 +160,10 @@ define('Sage/Platform/Mobile/Toolbar', [
             var count = {left: 0, right: 0},
                 itemsByName = {},
                 items = array.map(values, function(value) {
+
+                    /* support old tool definitions */
+                    value.name = value.name || value.id;
+
                     /* right now we only support button items */
                     var item = new ToolbarButton(value);
 

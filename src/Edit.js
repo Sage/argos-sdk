@@ -131,6 +131,28 @@ define('Sage/Platform/Mobile/Edit', [
                 }
             }, this);
         },
+        onDestroy: function() {
+            this.inherited(arguments);
+
+            if (this.store)
+            {
+                this.store.close();
+
+                delete this.store;
+            }
+
+            if (this.fields)
+            {
+                for (var name in this.fields)
+                {
+                    var field = this.fields[name];
+                    if (field)
+                        field.destroy();
+                }
+
+                delete this.fields;
+            }
+        },
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'top': [{

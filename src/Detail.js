@@ -146,8 +146,19 @@ define('Sage/Platform/Mobile/Detail', [
 
         onStartup: function() {
             this.inherited(arguments);
+
             this.subscribe('/app/refresh', this._onRefresh);
             this.clear();
+        },
+        onDestroy: function() {
+            this.inherited(arguments);
+
+            if (this.store)
+            {
+                this.store.close();
+
+                delete this.store();
+            }
         },
         _getStoreAttr: function() {
             return this.store || (this.store = this.createStore());

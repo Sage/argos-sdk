@@ -47,49 +47,32 @@ define('Sage/Platform/Mobile/_UiComponent', [
                 ? new DomContentComponent(props, node)
                 : new ContentComponent(props, node);
         },
-        _attachRemoteComponent: function(instance, context, owner) {
+        _attachComponent: function(definition, instance, context, root, owner) {
             this.inherited(arguments);
 
-            this._attachUiComponent(instance, context);
+            this._attachUiComponent(instance, context, definition && definition.position);
         },
-        _detachRemoteComponent: function(instance, context, owner) {
-            this.inherited(arguments);
-
-            this._detachUiComponent(instance, context);
-        },
-        _attachLocalComponent: function(component, instance, context, root, owner) {
-            this.inherited(arguments);
-
-            this._attachUiComponent(instance, context, component.position);
-        },
-        _detachLocalComponent: function(instance, context, root, owner) {
+        _detachComponent: function(instance, context, root, owner) {
             this.inherited(arguments);
 
             this._detachUiComponent(instance, context);
         },
         _attachUiComponent: function(instance, context, position) {
+            var referenceNode = this.containerNode || this.domNode;
+
             if (instance.isInstanceOf(_WidgetBase))
             {
-                /* place the component (widget) locally, instead of on the owner like other attachments, since
-                 * it is expected that ui components (widgets) exist inside of their defined container.
-                 */
                 if (this.isInstanceOf(_Container))
                     this.addChild(instance, position);
-                else if (this.isInstanceOf(_WidgetBase))
-                    instance.placeAt(this.containerNode || this.domNode, position);
-                else if (this.isInstanceOf(DomContentComponent))
-                    instance.placeAt(this.containerNode || this.domNode, position);
+                else if (referenceNode)
+                    instance.placeAt(referenceNode, position);
             }
-            else if (instance.isInstanceOf(DomContentComponent))
+            else if (instance.domNode)
             {
-                if (this.isInstanceOf(_WidgetBase))
-                    domConstruct.place(instance.domNode, this.containerNode || this.domNode, position);
-                else if (this.isInstanceOf(DomContentComponent))
-                    domConstruct.place(instance.domNode, this.containerNode || this.domNode, position);
+                domConstruct.place(instance.domNode, referenceNode, position);
             }
         },
         _detachUiComponent: function(instance, context) {
-            //node.parentNode.removeChild(node);
             if (instance.isInstanceOf(_WidgetBase))
             {
                 if (this.isInstanceOf(_Container))
@@ -97,10 +80,9 @@ define('Sage/Platform/Mobile/_UiComponent', [
                 else if (instance.domNode && instance.domNode.parentNode)
                     instance.domNode.parentNode.removeChild(instance.domNode);
             }
-            else if (instance.isInstanceOf(DomContentComponent))
+            else if (instance.domNode && instance.domNode.parentNode)
             {
-                if (instance.domNode && instance.domNode.parentNode)
-                    instance.domNode.parentNode.removeChild(instance.domNode);
+                instance.domNode.parentNode.removeChild(instance.domNode);
             }
         }
     });
