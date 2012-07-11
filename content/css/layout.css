@@ -259,12 +259,12 @@ img
 
 .is-visible
 {
-    display: block;
+    display: block !important;
 }
 
 .is-hidden
 {
-    display: none;
+    display: none !important;
 }
 
 /* list */

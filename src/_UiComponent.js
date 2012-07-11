@@ -84,11 +84,11 @@ define('Sage/Platform/Mobile/_UiComponent', [
                 if (this.isInstanceOf(_Container))
                     this.addChild(instance, position);
                 else if (referenceNode)
-                    instance.placeAt(referenceNode, position);
+                    instance.placeAt(instance.domNode == referenceNode ? this.domNode : referenceNode, position);
             }
             else if (instance.domNode)
             {
-                domConstruct.place(instance.domNode, referenceNode, position);
+                domConstruct.place(instance.domNode, instance.domNode == referenceNode ? this.domNode : referenceNode, position);
             }
         },
         _detachUiComponent: function(instance, context) {
