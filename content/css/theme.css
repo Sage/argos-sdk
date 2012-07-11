@@ -573,6 +573,14 @@ textarea:focus
     background: url('../images/delete.png') no-repeat 50% 50%;
 }
 
+.row-edit[data-field-type="camera"] > div > .button
+{
+    margin: 0;
+    padding: 0 8px;
+    position: absolute;
+    right: 4px;
+}
+
 /* button */
 .button
 {

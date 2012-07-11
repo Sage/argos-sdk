@@ -1106,6 +1106,16 @@ h2 > .collapsed-indicator
     padding: 4px 34px 4px 110px !important;
 }
 
+.row-edit[data-field-type="camera"] > div > .button span
+{
+visibility: hidden;
+}
+
+.row-edit[data-field-type="camera"] > div > img
+{
+    padding-left: 110px;
+}
+
 .chart-content
 {
     width: 100%;

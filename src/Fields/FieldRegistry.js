@@ -16,6 +16,7 @@
 define('Sage/Platform/Mobile/Fields/FieldRegistry', [
     'dojo/_base/lang',
     './BooleanField',
+    './CameraField',
     './DateField',
     './DecimalField',
     './DurationField',
@@ -30,6 +31,7 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
 ], function(
     lang,
     BooleanField,
+    CameraField,
     DateField,
     DecimalField,
     DurationField,
@@ -44,6 +46,7 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
 ) {
     var fromType = {
         'boolean': BooleanField,
+        'camera': CameraField,
         'date': DateField,
         'decimal': DecimalField,
         'duration': DurationField,
