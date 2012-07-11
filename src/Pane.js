@@ -62,8 +62,7 @@ define('Sage/Platform/Mobile/Pane', [
             this.inherited(arguments);
 
             array.forEach(this.getComponents(), function(component) {
-                if (component.isInstanceOf(Toolbar) && component.managed)
-                    this.toolbars[component.getComponentName()] = component;
+                if (component.isInstanceOf(Toolbar)) this.toolbars[component.getComponentName()] = component;
             }, this);
         },
         show: function(view, options) {
@@ -99,9 +98,11 @@ define('Sage/Platform/Mobile/Pane', [
             for (var name in this.toolbars)
             {
                 var toolbar = this.toolbars[name];
-
-                toolbar.clear();
-                toolbar.show();
+                if (toolbar.managed)
+                {
+                    toolbar.clear();
+                    toolbar.show();
+                }
             }
 
             topic.publish('/app/view/transition/before', view, previous, this);
@@ -111,12 +112,16 @@ define('Sage/Platform/Mobile/Pane', [
 
             for (var name in this.toolbars)
             {
-                var toolbar = this.toolbars[name],
-                    items = tools[name];
-
-                toolbar.set('title', view.get('title'));
-
-                if (items) toolbar.set('items', items, { key: view.id });
+                var toolbar = this.toolbars[name];
+                if (toolbar.managed)
+                {
+                    toolbar.set('title', view.get('title'));
+                    toolbar.set('items', tools[name]);
+                }
+                else
+                {
+                    toolbar.update();
+                }
             }
 
             topic.publish('/app/view/transition/after', view, previous, this);

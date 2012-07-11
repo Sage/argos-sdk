@@ -47,43 +47,50 @@ define('Sage/Platform/Mobile/Toolbar', [
         baseClass: 'toolbar',
         position: 'top',
         items: null,
+        context: null,
         visible: true,
         _size: 0,
         _items: null,
         _itemsByName: null,
+
         invoke: function(evt, node) {
             var name = node && domAttr.get(node, 'data-tool'),
                 item = name && this._itemsByName[name];
             if (item)
             {
+                var context = this.get('context'),
+                    scope = item.scope || context || this,
+                    args = utility.expand(item, item.args, context, item);
+
                 if (item.fn)
                 {
-                    var args = item.args ? item.args.concat(item) : [item];
-
-                    item.fn.apply(item.scope || this, args);
+                    item.fn.apply(scope, args.concat(item));
                 }
                 else if (item.show)
                 {
-                    scene().showView(item.show, item.args);
+                    scene().showView(item.show, args);
                 }
                 else if (item.action)
                 {
-                    var root = this.getComponentRoot(),
-                        active = root && root.active,
-                        method = active && active[item.action],
-                        args = item.args ? item.args.concat(item) : [item];
+                    var method = scope && scope[item.action];
 
-                    if (typeof method === 'function') method.apply(active, args);
+                    if (typeof method === 'function') method.apply(scope, args.concat(item));
                 }
                 else if (item.publish)
                 {
-                    var args = item.args
-                        ? [item.publish].concat(item.args, item)
-                        : [item.publish, item];
-
-                    topic.publish.apply(topic, args);
+                    topic.publish.apply(topic, [item.publish].concat(args, item));
                 }
             }
+        },
+        _getContextAttr: function() {
+            if (this.context) return this.context;
+
+            var parent = this.getParent();
+
+            return parent && parent.active;
+        },
+        _setContextAttr: function(value) {
+            this.context = value;
         },
         _getPositionAttr: function() {
             return this.position;
@@ -125,10 +132,11 @@ define('Sage/Platform/Mobile/Toolbar', [
             this.set('visible', true);
         },
         update: function() {
-            var count = {left: 0, right: 0};
+            var context = this.get('context'),
+                count = {left: 0, right: 0};
 
             array.forEach(this._items, function(item) {
-                item.update(this.context);
+                item.update(context);
 
                 if (item.get('visible')) count[item.get('side')] += 1;
             }, this);
@@ -157,7 +165,9 @@ define('Sage/Platform/Mobile/Toolbar', [
 
             if (typeof values == 'undefined') return;
 
-            var count = {left: 0, right: 0},
+            var context = this.get('context'),
+                count = {left: 0, right: 0},
+                key = options && options.key,
                 itemsByName = {},
                 items = array.map(values, function(value) {
 
@@ -167,7 +177,7 @@ define('Sage/Platform/Mobile/Toolbar', [
                     /* right now we only support button items */
                     var item = new ToolbarButton(value);
 
-                    item.update(this.context);
+                    item.update(context);
 
                     if (item.get('visible')) count[item.get('side')] += 1;
 
