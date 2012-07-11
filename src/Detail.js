@@ -218,6 +218,11 @@ define('Sage/Platform/Mobile/Detail', [
         processItem: function(item) {
             return item;
         },
+        resize: function() {
+            this.inherited(arguments);
+
+            this.onContentChange();
+        },
         onContentChange: function() {
         },
         _onFetchItem: function(item) {

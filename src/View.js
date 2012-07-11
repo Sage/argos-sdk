@@ -69,6 +69,8 @@ define('Sage/Platform/Mobile/View', [
         },
         refresh: function() {
         },
+        resize: function() {
+        },
         reload: function() {
             /* todo: is this the right implementation? even though no transition is actually happening? */
             /* most of the full refresh logic is split between these two functions; that which needs to happen behind the scenes and that

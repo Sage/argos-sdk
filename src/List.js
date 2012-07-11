@@ -565,6 +565,11 @@ define('Sage/Platform/Mobile/List', [
                 insert: true
             });
         },
+        resize: function() {
+            this.inherited(arguments);
+
+            this.onContentChange();
+        },
         onContentChange: function() {
         },
         _onFetchBegin: function(size, request) {

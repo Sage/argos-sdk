@@ -192,6 +192,11 @@ define('Sage/Platform/Mobile/Edit', [
         processItem: function(item) {
             return item;
         },
+        resize: function() {
+            this.inherited(arguments);
+
+            this.onContentChange();
+        },
         onContentChange: function() {
         },
         _onFetchItem: function(item) {

@@ -43,6 +43,14 @@ define('Sage/Platform/Mobile/TitleBar', [
                 {tag: 'span', attachPoint: 'titleNode'}
             ]}
         ],
-        _setTitleAttr: {node: 'titleNode', type: 'innerHTML'}
+        _setTitleAttr: {node: 'titleNode', type: 'innerHTML'},
+
+        onCreate: function() {
+            domAttr.set(this.domNode, 'data-action', 'scroll');
+        },
+
+        scroll: function() {
+            console.log('scroll!');
+        }
     });
 });
