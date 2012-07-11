@@ -482,18 +482,15 @@ textarea:focus
     border-top: none 0px black;
 }
 
-.edit-content > fieldset > .row > div > label,
-.edit-content > fieldset > .row > label,
-.edit-content > div > .row > div > label,
-.edit-content > div > .row > label
+.edit-content > fieldset .row label,
+.edit-content > div .row label
 {
     font-weight: bold;
     color: #0079A7;
 }
 
 .edit-content > fieldset > .row-edit > div > textarea,
-.edit-content > fieldset > .row-edit > textarea,
-
+.edit-content > fieldset > .row-edit > textarea
 {
     font-family: Helvetica, Arial;
     font-size: 16px;
@@ -509,14 +506,14 @@ textarea:focus
     -moz-box-shadow: 0 0 5px #f0ac55 !important;
 }
 
-.edit-content > fieldset > .row-edit
+.edit-content > fieldset .row-edit
 {
-    border-top: solid 1px #ddd;
+    border-bottom: solid 1px #ddd;
 }
 
 .edit-content > fieldset > .row-edit:first-of-type
 {
-    border-top: none 0 black;
+    border-bottom: none 0 black;
 }
 
 .edit .validation-summary > h2

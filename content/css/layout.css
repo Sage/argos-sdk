@@ -1106,6 +1106,16 @@ h2 > .collapsed-indicator
     padding: 4px 34px 4px 110px !important;
 }
 
+.generator-container
+{
+    background: white;
+    margin: 12px;
+    padding: 0;
+    -webkit-border-radius: 13px;
+    border-radius: 13px;
+    border: 1px solid #DDD;
+}
+
 .chart-content
 {
     width: 100%;
