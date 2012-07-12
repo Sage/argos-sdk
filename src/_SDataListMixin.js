@@ -1,10 +1,31 @@
 define('Sage/Platform/Mobile/_SDataListMixin', [
     'dojo/_base/declare',
-    './Data/SDataStore'
+    './Store/SData',
+    './Utility'
 ], function(
     declare,
-    SDataStore
+    SData,
+    utility
 ) {
+    var parseOrderByRE = /((?:\w+)(?:\.\w+)?)(?:\s+(asc|desc))?/g,
+        parseOrderBy = function(expression) {
+            if (typeof expression !== 'string') return expression;
+
+            var match,
+                result = [];
+
+            while (match = parseOrderByRE.exec(expression))
+            {
+                result.push({
+                    attribute: match[1],
+                    descending: match[2] && match[2].toLowerCase() == 'desc'
+                });
+            }
+
+            return result;
+        };
+
+
     /**
      * SData enablement for the List view.
      */
@@ -49,34 +70,40 @@ define('Sage/Platform/Mobile/_SDataListMixin', [
         keyProperty: '$key',
         descriptorProperty: '$descriptor',
         createStore: function() {
-            return new SDataStore({
+            return new SData({
                 service: this.getConnection(),
-                contractName: this.expandExpression(this.contractName),
-                resourceKind: this.expandExpression(this.resourceKind),
-                resourceProperty: this.expandExpression(this.resourceProperty),
-                resourcePredicate: this.expandExpression(this.resourcePredicate),
-                include: this.expandExpression(this.queryInclude),
-                select: this.expandExpression(this.querySelect),
-                where: this.expandExpression(this.queryWhere),
-                orderBy: this.expandExpression(this.queryOrderBy),
-                labelAttribute: this.descriptorProperty,
-                identityAttribute: this.keyProperty
+                contractName: utility.expand(this, this.contractName),
+                resourceKind: utility.expand(this, this.resourceKind),
+                resourceProperty: utility.expand(this, this.resourceProperty),
+                resourcePredicate: utility.expand(this, this.resourcePredicate),
+                include: utility.expand(this, this.queryInclude),
+                select: utility.expand(this, this.querySelect),
+                where: utility.expand(this, this.queryWhere),
+                orderBy: utility.expand(this, this.queryOrderBy),
+                idProperty: this.keyProperty
             });
         },
-        applyOptionsToFetch: function(keywordArgs) {
+        _buildQueryExpression: function() {
+            var options = this.options,
+                passed = options && (options.query || options.where);
+
+            return passed
+                ? this.query
+                    ? '(' + utility.expand(this, passed) + ') and (' + this.query + ')'
+                    : '(' + utility.expand(this, passed) + ')'
+                : this.query;
+        },
+        _applyStateToQueryOptions: function(queryOptions) {
             var options = this.options;
             if (options)
             {
-                if (options.where) keywordArgs.query = keywordArgs.query
-                    ? '(' + this.expandExpression(options.where) + ') and (' + keywordArgs.query + ')'
-                    : '(' + this.expandExpression(options.where) + ')';
-                if (options.select) keywordArgs.select = this.expandExpression(options.select);
-                if (options.include) keywordArgs.include = this.expandExpression(options.include);
-                if (options.orderBy) keywordArgs.sort = parseOrderBy(this.expandExpression(options.orderBy));
-                if (options.contractName) keywordArgs.contractName = this.expandExpression(options.contractName);
-                if (options.resourceKind) keywordArgs.resourceKind = this.expandExpression(options.resourceKind);
-                if (options.resourceProperty) keywordArgs.resourceProperty = this.expandExpression(options.resourceProperty);
-                if (options.resourcePredicate) keywordArgs.resourcePredicate = this.expandExpression(options.resourcePredicate);
+                if (options.select) queryOptions.select = utility.expand(this, options.select);
+                if (options.include) queryOptions.include = utility.expand(this, options.include);
+                if (options.orderBy) queryOptions.sort = parseOrderBy(utility.expand(this, options.orderBy));
+                if (options.contractName) queryOptions.contractName = utility.expand(this, options.contractName);
+                if (options.resourceKind) queryOptions.resourceKind = utility.expand(this, options.resourceKind);
+                if (options.resourceProperty) queryOptions.resourceProperty = utility.expand(this, options.resourceProperty);
+                if (options.resourcePredicate) queryOptions.resourcePredicate = utility.expand(this, options.resourcePredicate);
             }
         },
         formatSearchQuery: function(query) {

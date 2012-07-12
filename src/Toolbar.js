@@ -60,7 +60,7 @@ define('Sage/Platform/Mobile/Toolbar', [
             {
                 var context = this.get('context'),
                     scope = item.scope || context || this,
-                    args = utility.expand(item, item.args, context, item);
+                    args = utility.expand(item, item.args, context, item) || [];
 
                 if (item.fn)
                 {

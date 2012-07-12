@@ -17,6 +17,7 @@ define('Sage/Platform/Mobile/Detail', [
     'dojo',
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/_base/Deferred',
     'dojo/string',
     'dojo/dom',
     'dojo/dom-class',
@@ -34,6 +35,7 @@ define('Sage/Platform/Mobile/Detail', [
     dojo,
     declare,
     lang,
+    Deferred,
     string,
     dom,
     domClass,
@@ -153,12 +155,7 @@ define('Sage/Platform/Mobile/Detail', [
         onDestroy: function() {
             this.inherited(arguments);
 
-            if (this.store)
-            {
-                this.store.close();
-
-                delete this.store();
-            }
+            delete this.store();
         },
         _getStoreAttr: function() {
             return this.store || (this.store = this.createStore());
@@ -193,7 +190,7 @@ define('Sage/Platform/Mobile/Detail', [
             return string.substitute(fmt, [utility.getValue(entry, property)]);
         },
         toggleSection: function(evt, node) {
-            if (node) domClass.toggle(node, 'collapsed');
+            if (node) domClass.toggle(node, 'is-collapsed');
 
             this.onContentChange();
         },
@@ -215,9 +212,6 @@ define('Sage/Platform/Mobile/Detail', [
         createStore: function() {
             return null;
         },
-        processItem: function(item) {
-            return item;
-        },
         resize: function() {
             this.inherited(arguments);
 
@@ -225,15 +219,21 @@ define('Sage/Platform/Mobile/Detail', [
         },
         onContentChange: function() {
         },
-        _onFetchItem: function(item) {
+        _processItem: function(item) {
+            return item;
+        },
+        _processData: function(item) {
+            var customizationSet = customizations(),
+                layout = customizationSet.apply(customizationSet.toPath(this.customizationSet, null, this.id), this.createLayout());
+
+            this.item = this._processItem(item);
+
+            this._processLayout(layout, this.item);
+        },
+        _onGetComplete: function(item) {
             if (item)
             {
-                var customizationSet = customizations(),
-                    layout = customizationSet.apply(customizationSet.toPath(this.customizationSet, null, this.id), this.createLayout());
-
-                this.item = this.processItem(item);
-
-                this._processLayout(layout, this.item);
+                this._processData(item);
             }
             else
             {
@@ -245,49 +245,50 @@ define('Sage/Platform/Mobile/Detail', [
             /* this must take place when the content is visible */
             this.onContentChange();
         },
-        _onFetchError: function(error, keywordArgs) {
-            if (error.status == 404)
+        _onGetError: function(getOptions, error) {
+            if (error.aborted)
+            {
+                this.options = false; // force a refresh
+            }
+            else if (error.status == 404)
             {
                 domConstruct.place(this.notAvailableTemplate.apply(this), this.contentNode, 'only');
             }
             else
             {
                 alert(string.substitute(this.requestErrorText, [error]));
-
-                ErrorManager.addError(error, keywordArgs, this.options, 'failure');
             }
 
-            domClass.remove(this.domNode, 'is-loading');
-        },
-        _onFetchAbort: function(error, keywordArgs) {
-            this.options = false; // force a refresh
-
-            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'aborted');
+            ErrorManager.addError(error.xhr, getOptions, this.options, error.aborted ? 'aborted' : 'failure');
 
             domClass.remove(this.domNode, 'is-loading');
         },
-        requestData: function() {
+        _requestData: function() {
             domClass.add(this.domNode, 'is-loading');
 
             var store = this.get('store'),
-                keywordArgs = {
-                    scope: this,
-                    onError: this._onFetchError,
-                    onAbort: this._onFetchAbort,
-                    onItem: this._onFetchItem
+                getOptions = {
                 };
 
-            this.applyOptionsToFetchItem(keywordArgs);
+            this._applyStateToGetOptions(getOptions);
 
-            return store.fetchItemByIdentity(keywordArgs);
+            var getExpression = this._buildGetExpression() || null,
+                getResults = store.get(getExpression, getOptions);
+
+            Deferred.when(getResults,
+                lang.hitch(this, this._onGetComplete),
+                lang.hitch(this, this._onGetError, getOptions)
+            );
+
+            return getResults;
         },
-        applyOptionsToFetchItem: function(keywordArgs) {
+        _buildGetExpression: function() {
             var options = this.options;
 
-            if (options)
-            {
-                if (options.key) keywordArgs.identity = options.key;
-            }
+            return options && (options.id || options.key);
+        },
+        _applyStateToGetOptions: function(getOptions) {
+
         },
         createLayout: function() {
             return this.layout || [];
@@ -505,7 +506,7 @@ define('Sage/Platform/Mobile/Detail', [
                 return;
             }
 
-            this.requestData();
+            this._requestData();
         },
         transitionTo: function() {
             this.inherited(arguments);

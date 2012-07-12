@@ -1,9 +1,9 @@
 define('Sage/Platform/Mobile/_SDataDetailMixin', [
     'dojo/_base/declare',
-    './Data/SDataStore'
+    './Store/SData'
 ], function(
     declare,
-    SDataStore
+    SData
 ) {
     /**
      * SData enablement for the Detail view.
@@ -39,7 +39,7 @@ define('Sage/Platform/Mobile/_SDataDetailMixin', [
         keyProperty: '$key',
         descriptorProperty: '$descriptor',
         createStore: function() {
-            return new SDataStore({
+            return new SData({
                 service: this.getConnection(),
                 contractName: this.expandExpression(this.contractName),
                 resourceKind: this.expandExpression(this.resourceKind),
@@ -47,22 +47,24 @@ define('Sage/Platform/Mobile/_SDataDetailMixin', [
                 resourcePredicate: this.expandExpression(this.resourcePredicate),
                 include: this.expandExpression(this.queryInclude),
                 select: this.expandExpression(this.querySelect),
-                labelAttribute: this.descriptorProperty,
-                identityAttribute: this.keyProperty
+                identityProperty: this.keyProperty
             });
         },
-        applyOptionsToFetchItem: function(keywordArgs) {
+        _buildGetExpression: function() {
             var options = this.options;
 
+            return options && (options.id || options.key);
+        },
+        _applyStateToGetOptions: function(getOptions) {
+            var options = this.options;
             if (options)
             {
-                if (options.key) keywordArgs.identity = options.key;
-                if (options.select) keywordArgs.select = this.expandExpression(options.select);
-                if (options.include) keywordArgs.include = this.expandExpression(options.include);
-                if (options.contractName) keywordArgs.contractName = this.expandExpression(options.contractName);
-                if (options.resourceKind) keywordArgs.resourceKind = this.expandExpression(options.resourceKind);
-                if (options.resourceProperty) keywordArgs.resourceProperty = this.expandExpression(options.resourceProperty);
-                if (options.resourcePredicate) keywordArgs.resourcePredicate = this.expandExpression(options.resourcePredicate);
+                if (options.select) getOptions.select = this.expandExpression(options.select);
+                if (options.include) getOptions.include = this.expandExpression(options.include);
+                if (options.contractName) getOptions.contractName = this.expandExpression(options.contractName);
+                if (options.resourceKind) getOptions.resourceKind = this.expandExpression(options.resourceKind);
+                if (options.resourceProperty) getOptions.resourceProperty = this.expandExpression(options.resourceProperty);
+                if (options.resourcePredicate) getOptions.resourcePredicate = this.expandExpression(options.resourcePredicate);
             }
         }
     });

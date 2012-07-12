@@ -48,22 +48,23 @@ define('Sage/Platform/Mobile/GroupedList', [
             };
         },
         toggleGroup: function(evt, node) {
-            if (node) domClass.toggle(node, 'collapsed');
+            if (node) domClass.toggle(node, 'is-collapsed');
 
             this.onContentChange();
         },
-        _onFetchComplete: function(items, request) {
-            var count = items.length;
+        _processData: function(items) {
+            var store = this.get('store'),
+                count = items.length;
             if (count > 0)
             {
                 var output = [];
 
                 for (var i = 0; i < count; i++)
                 {
-                    var item = this.processItem(items[i]),
+                    var item = this._processItem(items[i]),
                         itemGroup = this.getGroupForItem(item);
 
-                    this.items[this.store.getIdentity(item)] = item;
+                    this.items[store.getIdentity(item)] = item;
 
                     if (itemGroup.tag != this._currentGroup)
                     {
@@ -81,13 +82,6 @@ define('Sage/Platform/Mobile/GroupedList', [
 
                 if (output.length > 0 && this._currentGroupNode) domConstruct.place(output.join(''), this._currentGroupNode, 'last');
             }
-
-            domClass.remove(this.domNode, 'is-loading');
-
-            /* remove the loading indicator so that it does not get re-shown while requesting more data */
-            if (request['start'] === 0) domConstruct.destroy(this.loadingIndicatorNode);
-
-            this.onContentChange();
         },
         clear: function() {
             this.inherited(arguments);
