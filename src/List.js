@@ -17,6 +17,7 @@ define('Sage/Platform/Mobile/List', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
+    'dojo/_base/Deferred', /* todo: use `dojo/when` in 1.8 */
     'dojo/query',
     'dojo/NodeList-manipulate',
     'dojo/dom-class',
@@ -34,6 +35,7 @@ define('Sage/Platform/Mobile/List', [
     declare,
     lang,
     array,
+    Deferred,
     query,
     queryManipulate,
     domClass,
@@ -147,24 +149,6 @@ define('Sage/Platform/Mobile/List', [
         }
     });
 
-    var parseOrderByRE = /((?:\w+)(?:\.\w+)?)(?:\s+(asc|desc))?/g,
-        parseOrderBy = function(expression) {
-            if (typeof expression !== 'string') return expression;
-
-            var match,
-                result = [];
-
-            while (match = parseOrderByRE.exec(expression))
-            {
-                result.push({
-                    attribute: match[1],
-                    descending: match[2] && match[2].toLowerCase() == 'desc'
-                });
-            }
-
-            return result;
-        };
-
     var List = declare('Sage.Platform.Mobile.List', [View], {
         events: {
             'click': true
@@ -180,7 +164,7 @@ define('Sage/Platform/Mobile/List', [
                     {name: 'content', tag: 'ul', attrs: {'class': 'list-content'}, attachPoint: 'contentNode'},
                     {name: 'more', tag: 'div', attrs: {'class': 'list-more'}, components: [
                         {name: 'moreRemaining', tag: 'span', attrs: {'class': 'list-remaining'}, attachPoint: 'remainingContentNode'},
-                        {name: 'moreButton', content: Simplate.make('<button class="button" data-action="requestData"><span>{%: $.moreText %}</span></button>')}
+                        {name: 'moreButton', content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
                     ]}
                 ]}
             ]}
@@ -400,12 +384,7 @@ define('Sage/Platform/Mobile/List', [
         onDestroy: function() {
             this.inherited(arguments);
 
-            if (this.store)
-            {
-                this.store.close();
-
-                delete this.store;
-            }
+            delete this.store;
 
             if (this._selectionConnects)
             {
@@ -572,32 +551,10 @@ define('Sage/Platform/Mobile/List', [
         },
         onContentChange: function() {
         },
-        _onFetchBegin: function(size, request) {
-            if (size === 0)
-            {
-                domConstruct.place(this.noDataTemplate.apply(this), this.contentNode, 'only');
-            }
-            else
-            {
-                var remaining = size > -1
-                    ? size - (request['start'] + request['count'])
-                    : -1;
-
-                if (remaining !== -1)
-                    this.set('remainingContent', string.substitute(this.remainingText, [remaining]));
-
-                domClass.toggle(this.domNode, 'has-more', (remaining === -1 || remaining > 0));
-
-                this.position = this.position + request['count'];
-            }
-
-            /* todo: move to a more appropriate location */
-            if (this.options && this.options.allowEmptySelection) domClass.add(this.domNode, 'has-empty');
-        },
-        processItem: function(item) {
+        _processItem: function(item) {
             return item;
         },
-        _onFetchComplete: function(items, request) {
+        _processData: function(items) {
             var store = this.get('store'),
                 count = items.length;
             if (count > 0)
@@ -606,7 +563,7 @@ define('Sage/Platform/Mobile/List', [
 
                 for (var i = 0; i < count; i++)
                 {
-                    var item = this.processItem(items[i]);
+                    var item = this._processItem(items[i]);
 
                     this.items[store.getIdentity(item)] = item;
 
@@ -615,51 +572,79 @@ define('Sage/Platform/Mobile/List', [
 
                 if (output.length > 0) domConstruct.place(output.join(''), this.contentNode, 'last');
             }
+        },
+        _onQueryComplete: function(queryResults, items) {
+            var start = this.position,
+                size = queryResults.total;
+            if (size === 0)
+            {
+                domConstruct.place(this.noDataTemplate.apply(this), this.contentNode, 'only');
+            }
+            else
+            {
+                var remaining = size > -1
+                    ? size - (this.position + this.pageSize)
+                    : -1;
+
+                if (remaining !== -1)
+                    this.set('remainingContent', string.substitute(this.remainingText, [remaining]));
+
+                domClass.toggle(this.domNode, 'has-more', (remaining === -1 || remaining > 0));
+
+                this.position = this.position + this.pageSize;
+            }
+
+            /* todo: move to a more appropriate location */
+            if (this.options && this.options.allowEmptySelection) domClass.add(this.domNode, 'has-empty');
+
+            this._processData(items);
 
             domClass.remove(this.domNode, 'is-loading');
 
             /* remove the loading indicator so that it does not get re-shown while requesting more data */
-            if (request['start'] === 0) domConstruct.destroy(this.loadingIndicatorNode);
+            if (start === 0) domConstruct.destroy(this.loadingIndicatorNode);
 
             this.onContentChange();
         },
-        _onFetchError: function(error, keywordArgs) {
-            alert(string.substitute(this.requestErrorText, [error]));
+        _onQueryError: function(queryOptions, error) {
+            if (error.aborted)
+            {
+                this.options = false; // force a refresh
+            }
+            else
+            {
+                alert(string.substitute(this.requestErrorText, [error]));
+            }
 
-            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'failure');
+            ErrorManager.addError(error.xhr, queryOptions, this.options, error.aborted ? 'aborted' : 'failure');
 
             domClass.remove(this.domNode, 'is-loading');
         },
-        _onFetchAbort: function(error, keywordArgs) {
-            this.options = false; // force a refresh
-
-            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'aborted');
-
-            domClass.remove(this.domNode, 'is-loading');
-        },
-        requestData: function() {
+        _requestData: function() {
             domClass.add(this.domNode, 'is-loading');
 
             var store = this.get('store'),
-                keywordArgs = {
-                    scope: this,
-                    onBegin: this._onFetchBegin,
-                    onError: this._onFetchError,
-                    onAbort: this._onFetchAbort,
-                    onComplete: this._onFetchComplete,
+                queryOptions = {
                     count: this.pageSize,
                     start: this.position
                 };
 
-            this.applyQueryToFetch(keywordArgs);
-            this.applyOptionsToFetch(keywordArgs);
+            this._applyStateToQueryOptions(queryOptions);
 
-            return store.fetch(keywordArgs);
+            var queryExpression = this._buildQueryExpression() || null,
+                queryResults = store.query(queryExpression, queryOptions);
+
+            Deferred.when(queryResults,
+                lang.hitch(this, this._onQueryComplete, queryResults),
+                lang.hitch(this, this._onQueryError, queryOptions)
+            );
+
+            return queryResults;
         },
-        applyQueryToFetch: function(keywordArgs) {
-            if (this.query) keywordArgs.query = this.query;
+        _buildQueryExpression: function() {
+            return this.query && lang.mixin(this.query || {}, this.options.query || this.options.where);
         },
-        applyOptionsToFetch: function(keywordArgs) {
+        _applyStateToQueryOptions: function(queryOptions) {
 
         },
         emptySelection: function() {
@@ -718,7 +703,10 @@ define('Sage/Platform/Mobile/List', [
             this.inherited(arguments);
         },
         refresh: function() {
-            this.requestData();
+            this._requestData();
+        },
+        more: function() {
+            this._requestData();
         },
         /**
          *

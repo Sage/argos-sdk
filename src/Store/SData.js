@@ -1,8 +1,9 @@
-define('Sage/Platform/Mobile/Data/SDataStore', [
+define('Sage/Platform/Mobile/Store/SData', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/_base/Deferred',
+    'dojo/store/util/QueryResults',
     'dojo/string',
     'dojo/json',
     '../Convert',
@@ -12,46 +13,14 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
     lang,
     array,
     Deferred,
+    QueryResults,
     string,
     json,
     convert,
     utility
 ) {
-    var attach = function(options, deferred, map) {
-            return lang.mixin(options, {
-                success: function(result) {
-                    deferred.resolve(map ? map(result) : result);
-                },
-                failure: function(xhr, xhrOptions) {
-                    var error = new Error('An error occurred requesting: ' + xhrOptions.url);
-
-                    error.xhr = xhr;
-                    error.status = xhr.status;
-                    error.responseText = xhr.responseText;
-                    error.aborted = false;
-
-                    deferred.reject(error);
-                },
-                abort: function(xhr, xhrOptions) {
-                    var error = new Error('An error occurred requesting: ' + xhrOptions.url);
-
-                    error.xhr = xhr;
-                    error.status = 0;
-                    error.responseText = null;
-                    error.aborted = true;
-
-                    deferred.reject(error);
-                }
-            });
-        },
-        mapFeedToResultSet = function(itemsProperty) {
-            return function(feed) {
-
-            };
-        };
-
-    return declare('Sage.Data.SDataStore', null, {
-        doDateConversion: true,
+    return declare('Sage.Platform.Mobile.Store.SData', null, {
+        doDateConversion: false,
 
         where: null,
         select: null,
@@ -65,26 +34,29 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
         resourceKind: null,
         resourceProperty: null,
         resourcePredicate: null,
-        executeFetchAs: null,
-        executeFetchItemAs: null,
+        executeQueryAs: null,
+        executeGetAs: null,
 
         idProperty: '$key',
         itemsProperty: '$resources',
 
-        _createEntryRequest: function(options) {
-            var request = utility.expand(this, options.request || this.request);
+        constructor: function(props) {
+            lang.mixin(this, props);
+        },
+        _createEntryRequest: function(id, getOptions) {
+            var request = utility.expand(this, getOptions.request || this.request);
             if (request)
             {
                 request = request.clone();
             }
             else
             {
-                var contractName = utility.expand(this, options.contractName || this.contractName),
-                    resourceKind = utility.expand(this, options.resourceKind || this.resourceKind),
-                    resourceProperty = utility.expand(this, options.resourceProperty || this.resourceProperty),
-                    resourcePredicate = options.identity
-                        ? json.stringify(options.identity) /* string keys are quoted, numeric keys are left alone */
-                        : utility.expand(this, options.resourcePredicate || this.resourcePredicate);
+                var contractName = utility.expand(this, getOptions.contractName || this.contractName),
+                    resourceKind = utility.expand(this, getOptions.resourceKind || this.resourceKind),
+                    resourceProperty = utility.expand(this, getOptions.resourceProperty || this.resourceProperty),
+                    resourcePredicate = id
+                        ? /(\s+)/.test(id) ? id : json.stringify(id) /* string keys are quoted, numeric keys are left alone */
+                        : utility.expand(this, getOptions.resourcePredicate || this.resourcePredicate);
 
                 if (resourceProperty)
                 {
@@ -102,8 +74,8 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
                 if (resourceKind) request.setResourceKind(resourceKind);
             }
 
-            var select = utility.expand(this, options.select || this.select),
-                include = utility.expand(this, options.include || this.include);
+            var select = utility.expand(this, getOptions.select || this.select),
+                include = utility.expand(this, getOptions.include || this.include);
 
             if (select && select.length > 0)
                 request.setQueryArg('select', select.join(','));
@@ -113,19 +85,19 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
 
             return request;
         },
-        _createFeedRequest: function(options) {
-            var request = utility.expand(this, options.request || this.request);
+        _createFeedRequest: function(query, queryOptions) {
+            var request = utility.expand(this, queryOptions.request || this.request);
             if (request)
             {
                 request = request.clone();
             }
             else
             {
-                var queryName = utility.expand(this, options.queryName || this.queryName),
-                    contractName = utility.expand(this, options.contractName || this.contractName),
-                    resourceKind = utility.expand(this, options.resourceKind || this.resourceKind),
-                    resourceProperty = utility.expand(this, options.resourceProperty || this.resourceProperty),
-                    resourcePredicate = utility.expand(this, options.resourcePredicate || this.resourcePredicate);
+                var queryName = utility.expand(this, queryOptions.queryName || this.queryName),
+                    contractName = utility.expand(this, queryOptions.contractName || this.contractName),
+                    resourceKind = utility.expand(this, queryOptions.resourceKind || this.resourceKind),
+                    resourceProperty = utility.expand(this, queryOptions.resourceProperty || this.resourceProperty),
+                    resourcePredicate = utility.expand(this, queryOptions.resourcePredicate || this.resourcePredicate);
 
                 if (queryName)
                 {
@@ -149,9 +121,9 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
                 if (resourceKind) request.setResourceKind(resourceKind);
             }
 
-            var select = utility.expand(this, options.select || this.select),
-                include = utility.expand(this, options.include || this.include),
-                orderBy = utility.expand(this, options.sort || this.orderBy);
+            var select = utility.expand(this, queryOptions.select || this.select),
+                include = utility.expand(this, queryOptions.include || this.include),
+                orderBy = utility.expand(this, queryOptions.sort || this.orderBy);
 
             if (select && select.length > 0)
                 request.setQueryArg('select', select.join(','));
@@ -180,7 +152,7 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             }
 
             var where = utility.expand(this, this.where),
-                query = utility.expand(this, options.query),
+                query = utility.expand(this, query),
                 conditions = [];
 
             if (where)
@@ -192,16 +164,77 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             if (conditions.length > 0)
                 request.setQueryArg('where', '(' + conditions.join(') and (') + ')');
 
-            if (typeof options.start !== 'undefined')
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.StartIndex, options.start + 1);
+            if (typeof queryOptions.start !== 'undefined')
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.StartIndex, queryOptions.start + 1);
 
-            if (typeof options.count !== 'undefined')
-                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Count, options.count);
+            if (typeof queryOptions.count !== 'undefined')
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Count, queryOptions.count);
 
             return request;
         },
+        _onRequestFeedSuccess: function(queryDeferred, feed) {
+            if (feed)
+            {
+                var items = lang.getObject(this.itemsProperty, false, feed),
+                    total = typeof feed['$totalResults'] === 'number' ? feed['$totalResults'] : -1;
 
-        get: function(id, /* sdata only */ options) {
+                queryDeferred.total = total;
+                queryDeferred.resolve(items);
+            }
+            else
+            {
+                var error = new Error('The feed result is invalid.');
+
+                queryDeferred.reject(error);
+            }
+        },
+        _onRequestEntrySuccess: function(deferred, entry) {
+            if (entry)
+            {
+                deferred.resolve(this.doDateConversion ? this._handleDateConversion(entry) : entry);
+            }
+            else
+            {
+                var error = new Error('The entry result is invalid.');
+
+                deferred.reject(error);
+            }
+        },
+        _onRequestFailure: function(deferred, xhr, xhrOptions) {
+            var error = new Error('An error occurred requesting: ' + xhrOptions.url);
+
+            error.xhr = xhr;
+            error.status = xhr.status;
+            error.responseText = xhr.responseText;
+            error.aborted = false;
+
+            deferred.reject(error);
+        },
+        _onRequestAbort: function(deferred, xhr, xhrOptions) {
+            var error = new Error('An error occurred requesting: ' + xhrOptions.url);
+
+            error.xhr = xhr;
+            error.status = 0;
+            error.responseText = null;
+            error.aborted = true;
+
+            deferred.reject(error);
+        },
+        _onCancel: function(handle) {
+            this.store.abort(handle.value);
+        },
+        _handleDateConversion: function(entry) {
+            for (var prop in entry)
+            {
+                if (convert.isDateString(entry[prop]))
+                {
+                    entry[prop] = convert.toDateFromString(entry[prop]);
+                }
+            }
+
+            return entry;
+        },
+        get: function(id, /* sdata only */ getOptions) {
             // summary:
             //		Retrieves an object by its identity
             // id: Number
@@ -209,18 +242,19 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             // returns: Object
             //		The object in the store that matches the given id.
 
-            var self = this,
-                handle,
-                deferred = new Deferred(function(reason) {
-                    self.service.abort(handle);
-                }),
-                request = this._createEntryRequest(options);
+            var handle = {},
+                deferred = new Deferred(lang.hitch(this, this._onCancel, handle)),
+                request = this._createEntryRequest(id, getOptions || {});
 
-            var method = this.executeFetchItemAs
-                ? request[this.executeFetchItemAs]
+            var method = this.executeGetAs
+                ? request[this.executeGetAs]
                 : request.read;
 
-            handle = method.call(request, attach(options, deferred));
+            handle.value = method.call(request, {
+                success: lang.hitch(this, this._onRequestEntrySuccess, deferred),
+                failure: lang.hitch(this, this._onRequestFailure, deferred),
+                abort: lang.hitch(this, this._onRequestAbort, deferred)
+            });
 
             return deferred;
         },
@@ -258,7 +292,7 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             //		The identity to use to delete the object
 
         },
-        query: function(query, options) {
+        query: function(query, queryOptions) {
             // summary:
             //		Queries the store for objects. This does not alter the store, but returns a
             //		set of data from the store.
@@ -278,20 +312,26 @@ define('Sage/Platform/Mobile/Data/SDataStore', [
             //	|		// handle each object
             //	|	});
 
-            var self = this,
-                handle,
-                deferred = new Deferred(function(reason) {
-                    self.service.abort(handle);
-                }),
-                request = this._createEntryRequest(options);
+            var handle = {},
+                queryDeferred = new Deferred(lang.hitch(this, this._onCancel, handle)),
+                request = this._createFeedRequest(query, queryOptions || {});
 
-            var method = this.executeFetchItemAs
-                ? request[this.executeFetchItemAs]
-                : request.read;
+            queryDeferred.total = -1;
 
-            handle = method.call(request, attach(options, deferred));
+            var method = this.executeQueryAs
+                ? request[this.executeQueryAs]
+                : request instanceof Sage.SData.Client.SDataResourcePropertyRequest
+                    ? request.readFeed
+                    : request.read;
 
-            return deferred;
+            handle.value = method.call(request, {
+                success: lang.hitch(this, this._onRequestFeedSuccess, queryDeferred),
+                failure: lang.hitch(this, this._onRequestFailure, queryDeferred),
+                abort: lang.hitch(this, this._onRequestAbort, queryDeferred),
+                httpMethodOverride: queryOptions && queryOptions['httpMethodOverride']
+            });
+
+            return QueryResults(queryDeferred);
         },
         transaction: function() {
             // summary:

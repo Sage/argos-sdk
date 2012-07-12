@@ -18,6 +18,7 @@ define('Sage/Platform/Mobile/Edit', [
     'dojo/_base/lang',
     'dojo/_base/connect',
     'dojo/_base/array',
+    'dojo/_base/Deferred',
     'dojo/string',
     'dojo/dom',
     'dojo/dom-attr',
@@ -39,6 +40,7 @@ define('Sage/Platform/Mobile/Edit', [
     lang,
     connect,
     array,
+    Deferred,
     string,
     dom,
     domAttr,
@@ -134,12 +136,7 @@ define('Sage/Platform/Mobile/Edit', [
         onDestroy: function() {
             this.inherited(arguments);
 
-            if (this.store)
-            {
-                this.store.close();
-
-                delete this.store;
-            }
+            delete this.store;
 
             if (this.fields)
             {
@@ -184,13 +181,12 @@ define('Sage/Platform/Mobile/Edit', [
             domClass.add(field.containerNode, 'row-disabled');
         },
         toggleSection: function(evt, node) {
-            if (node) domClass.toggle(node, 'collapsed');
+            if (node) domClass.toggle(node, 'is-collapsed');
+
+            this.onContentChange();
         },
         createStore: function() {
             return null;
-        },
-        processItem: function(item) {
-            return item;
         },
         resize: function() {
             this.inherited(arguments);
@@ -199,10 +195,13 @@ define('Sage/Platform/Mobile/Edit', [
         },
         onContentChange: function() {
         },
-        _onFetchItem: function(item) {
-            this.item = this.processItem(item);
+        _processItem: function(item) {
+            return item;
+        },
+        _processData: function(item) {
+            this.item = this._processItem(item);
 
-            this.applyItem(item);
+            this.setValues(item, true);
 
             // Re-apply any passed changes as they may have been overwritten
             if (this.options.changes)
@@ -210,55 +209,58 @@ define('Sage/Platform/Mobile/Edit', [
                 this.changes = this.options.changes;
                 this.setValues(this.changes);
             }
+        },
+        _onGetComplete: function(item) {
+            if (item)
+            {
+                this._processData(item);
+            }
+            else
+            {
+                domConstruct.place(this.notAvailableTemplate.apply(this), this.contentNode, 'only');
+            }
 
             domClass.remove(this.domNode, 'is-loading');
 
             /* this must take place when the content is visible */
             this.onContentChange();
         },
-        _onFetchError: function(error, keywordArgs) {
-            if (error.status == 404)
+        _onGetError: function(getOptions, error) {
+            if (error.aborted)
             {
-                // todo: add error message
+                /* todo: show error message? */
+            }
+            else if (error.status == 404)
+            {
+                /* todo: show error message */
             }
             else
             {
                 alert(string.substitute(this.requestErrorText, [error]));
-
-                ErrorManager.addError(error, keywordArgs, this.options, 'failure');
             }
 
-            domClass.remove(this.domNode, 'is-loading');
-        },
-        _onFetchAbort: function(error, keywordArgs) {
-            this.options = false; // force a refresh
-
-            ErrorManager.addError(error.xhr, keywordArgs, this.options, 'aborted');
+            ErrorManager.addError(error.xhr, getOptions, this.options, error.aborted ? 'aborted' : 'failure');
 
             domClass.remove(this.domNode, 'is-loading');
         },
-        requestData: function() {
+        _requestData: function() {
             domClass.add(this.domNode, 'is-loading');
 
             var store = this.get('store'),
-                keywordArgs = {
-                    scope: this,
-                    onError: this._onFetchError,
-                    onAbort: this._onFetchAbort,
-                    onItem: this._onFetchItem
+                getOptions = {
                 };
 
-            this.applyOptionsToFetchItem(keywordArgs);
+            this._applyStateToGetOptions(getOptions);
 
-            return store.fetchItemByIdentity(keywordArgs);
-        },
-        applyOptionsToFetchItem: function(keywordArgs) {
-            var options = this.options;
+            var getExpression = this._buildGetExpression() || null,
+                getResults = store.get(getExpression, getOptions);
 
-            if (options)
-            {
-                if (options.key) keywordArgs.identity = options.key;
-            }
+            Deferred.when(getResults,
+                lang.hitch(this, this._onGetComplete),
+                lang.hitch(this, this._onGetError, getOptions)
+            );
+
+            return getResults;
         },
         createLayout: function() {
             return this.layout || [];
@@ -322,13 +324,8 @@ define('Sage/Platform/Mobile/Edit', [
                 this._processLayout(current);
             }
         },
-        _onFetchItemTemplate: function(template) {
-            this.itemTemplate = this.processItem(template);
-
-            var store = this.get('store'),
-                basis = {};
-
-            this.item = store.newItem(this.applyItemTemplateToNewItem(basis));
+        _processTemplateData: function(template) {
+            this.itemTemplate = this._processItem(template);
 
             this.setValues(this.itemTemplate, true);
 
@@ -347,41 +344,15 @@ define('Sage/Platform/Mobile/Edit', [
             /* this must take place when the content is visible */
             this.onContentChange();
         },
-        applyItemTemplateToNewItem: function(item) {
-            return item;
-        },
-        requestItemTemplate: function() {
+        _requestTemplateData: function() {
             domClass.add(this.domNode, 'is-loading');
 
-            this._onFetchItemTemplate(this.createItemTemplate());
+            this._processTemplateData(this.createItemTemplate());
+        },
+        createItemTemplate: function() {
+            return {};
         },
         applyContext: function(templateEntry) {
-        },
-        applyItem: function(item) {
-            var noValue = {},
-                store = this.get('store'),
-                field,
-                value;
-
-            for (var name in this.fields)
-            {
-                field = this.fields[name];
-
-                // for now, explicitly hidden fields (via. the field.hide() method) are not included
-                if (field.isHidden()) continue;
-
-                if (field.applyTo !== false)
-                {
-                    value = store.getValue(item, field.applyTo, noValue); // utility.getValue(values, field.applyTo, noValue);
-                }
-                else
-                {
-                    value = store.getValue(item, field.property || name, noValue); //utility.getValue(values, field.property || name, noValue);
-                }
-
-                // fyi: uses the fact that ({} !== {})
-                if (value !== noValue) field.setValue(value, true);
-            }
         },
         applyDefaultValues: function(){
             for (var name in this.fields)
@@ -392,56 +363,6 @@ define('Sage/Platform/Mobile/Edit', [
                 if (typeof defaultValue === 'undefined') continue;
 
                 field.setValue(this.expandExpression(defaultValue, field));
-            }
-        },
-        persistItem: function(item) {
-            var o = {},
-                store = this.get('store'),
-                empty = true,
-                field,
-                value,
-                target,
-                include,
-                exclude;
-
-            for (var name in this.fields)
-            {
-                field = this.fields[name];
-                value = field.getValue();
-
-                include = this.expandExpression(field.include, value, field, this);
-                exclude = this.expandExpression(field.exclude, value, field, this);
-
-                /**
-                 * include:
-                 *   true: always include value
-                 *   false: always exclude value
-                 * exclude:
-                 *   true: always exclude value
-                 *   false: default handling
-                 */
-                if (include !== undefined && !include) continue;
-                if (exclude !== undefined && exclude) continue;
-
-                // for now, explicitly hidden fields (via. the field.hide() method) are not included
-                if ((field.alwaysUseValue || field.isDirty() || include) && !field.isHidden())
-                {
-                    if (field.applyTo !== false)
-                    {
-                        var root = (field.applyTo !== '.' && field.applyTo !== '') && field.applyTo;
-
-                        for (var property in value)
-                        {
-                            store.setValue(item, root ? root + '.' + property : property, value[property]);
-                        }
-                    }
-                    else
-                    {
-                        store.setValue(item, field.property || name, value);
-                    }
-
-                    empty = false;
-                }
             }
         },
         clearValues: function() {
@@ -718,11 +639,7 @@ define('Sage/Platform/Mobile/Edit', [
                 return;
             }
 
-            this.persistItem(this.item);
-
-            var store = this.get('store');
-
-            console.log(store);
+            /* todo: finish save */
         },
         getContext: function() {
             return lang.mixin(this.inherited(arguments), {
@@ -773,21 +690,18 @@ define('Sage/Platform/Mobile/Edit', [
 
             this.clearValues();
 
-            var store = this.get('store');
-            store.revert();
-
             if (this.inserting)
             {
                 if (this.options.template)
                 {
-                    this.itemTemplate = this.processItem(this.options.template);
+                    this.itemTemplate = this._processItem(this.options.template);
 
                     // todo: should the template be applied to the store, fully? or just to the form?
-                    this.applyItem(this.itemTemplate);
+                    this.setValues(this.itemTemplate, true);
                 }
                 else
                 {
-                    this.requestItemTemplate();
+                    this._requestTemplateData();
                 }
             }
             else
@@ -795,9 +709,9 @@ define('Sage/Platform/Mobile/Edit', [
                 // apply entry as non-modified data
                 if (this.options.item || this.options.entry)
                 {
-                    this.item = this.processItem(this.options.item || this.options.entry);
+                    this.item = this._processItem(this.options.item || this.options.entry);
 
-                    this.applyItem(this.item);
+                    this.setValues(this.item, true);
 
                     // apply changes as modified data, since we want this to feed-back through
                     // the changes option is primarily used by editor fields
@@ -810,7 +724,7 @@ define('Sage/Platform/Mobile/Edit', [
                 else
                 {
                     // if key is passed request that keys entity and process
-                    if (this.options.identity || this.options.key) this.requestData();
+                    if (this.options.id || this.options.key) this._requestData();
                 }
             }
         }
