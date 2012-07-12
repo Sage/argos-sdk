@@ -46,6 +46,8 @@ define('Sage/Platform/Mobile/TitleBar', [
         _setTitleAttr: {node: 'titleNode', type: 'innerHTML'},
 
         onCreate: function() {
+            this.inherited(arguments);
+
             domAttr.set(this.domNode, 'data-action', 'scroll');
         },
 
