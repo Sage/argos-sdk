@@ -1,0 +1,325 @@
+define('Sage/Platform/Mobile/Data/SDataStore', [
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/_base/array',
+    'dojo/_base/Deferred',
+    'dojo/string',
+    'dojo/json',
+    '../Convert',
+    '../Utility'
+], function (
+    declare,
+    lang,
+    array,
+    Deferred,
+    string,
+    json,
+    convert,
+    utility
+) {
+    var attach = function(options, deferred, map) {
+            return lang.mixin(options, {
+                success: function(result) {
+                    deferred.resolve(map ? map(result) : result);
+                },
+                failure: function(xhr, xhrOptions) {
+                    var error = new Error('An error occurred requesting: ' + xhrOptions.url);
+
+                    error.xhr = xhr;
+                    error.status = xhr.status;
+                    error.responseText = xhr.responseText;
+                    error.aborted = false;
+
+                    deferred.reject(error);
+                },
+                abort: function(xhr, xhrOptions) {
+                    var error = new Error('An error occurred requesting: ' + xhrOptions.url);
+
+                    error.xhr = xhr;
+                    error.status = 0;
+                    error.responseText = null;
+                    error.aborted = true;
+
+                    deferred.reject(error);
+                }
+            });
+        },
+        mapFeedToResultSet = function(itemsProperty) {
+            return function(feed) {
+
+            };
+        };
+
+    return declare('Sage.Data.SDataStore', null, {
+        doDateConversion: true,
+
+        where: null,
+        select: null,
+        include: null,
+        orderBy: null,
+        service: null,
+        request: null,
+        queryName: null,
+        entityName: null,
+        contractName: null,
+        resourceKind: null,
+        resourceProperty: null,
+        resourcePredicate: null,
+        executeFetchAs: null,
+        executeFetchItemAs: null,
+
+        idProperty: '$key',
+        itemsProperty: '$resources',
+
+        _createEntryRequest: function(options) {
+            var request = utility.expand(this, options.request || this.request);
+            if (request)
+            {
+                request = request.clone();
+            }
+            else
+            {
+                var contractName = utility.expand(this, options.contractName || this.contractName),
+                    resourceKind = utility.expand(this, options.resourceKind || this.resourceKind),
+                    resourceProperty = utility.expand(this, options.resourceProperty || this.resourceProperty),
+                    resourcePredicate = options.identity
+                        ? json.stringify(options.identity) /* string keys are quoted, numeric keys are left alone */
+                        : utility.expand(this, options.resourcePredicate || this.resourcePredicate);
+
+                if (resourceProperty)
+                {
+                    request = new Sage.SData.Client.SDataResourcePropertyRequest(this.service)
+                        .setResourceProperty(resourceProperty)
+                        .setResourceSelector(resourcePredicate);
+                }
+                else
+                {
+                    request = new Sage.SData.Client.SDataSingleResourceRequest(this.service)
+                        .setResourceSelector(resourcePredicate);
+                }
+
+                if (contractName) request.setContractName(contractName);
+                if (resourceKind) request.setResourceKind(resourceKind);
+            }
+
+            var select = utility.expand(this, options.select || this.select),
+                include = utility.expand(this, options.include || this.include);
+
+            if (select && select.length > 0)
+                request.setQueryArg('select', select.join(','));
+
+            if (include && include.length > 0)
+                request.setQueryArg('include', include.join(','));
+
+            return request;
+        },
+        _createFeedRequest: function(options) {
+            var request = utility.expand(this, options.request || this.request);
+            if (request)
+            {
+                request = request.clone();
+            }
+            else
+            {
+                var queryName = utility.expand(this, options.queryName || this.queryName),
+                    contractName = utility.expand(this, options.contractName || this.contractName),
+                    resourceKind = utility.expand(this, options.resourceKind || this.resourceKind),
+                    resourceProperty = utility.expand(this, options.resourceProperty || this.resourceProperty),
+                    resourcePredicate = utility.expand(this, options.resourcePredicate || this.resourcePredicate);
+
+                if (queryName)
+                {
+                    request = new Sage.SData.Client.SDataNamedQueryRequest(this.service)
+                        .setQueryName(queryName);
+
+                    if (resourcePredicate) request.getUri().setCollectionPredicate(resourcePredicate);
+                }
+                else if (resourceProperty)
+                {
+                    request = new Sage.SData.Client.SDataResourcePropertyRequest(this.service)
+                        .setResourceProperty(resourceProperty)
+                        .setResourceSelector(resourcePredicate);
+                }
+                else
+                {
+                    request = new Sage.SData.Client.SDataResourceCollectionRequest(this.service);
+                }
+
+                if (contractName) request.setContractName(contractName);
+                if (resourceKind) request.setResourceKind(resourceKind);
+            }
+
+            var select = utility.expand(this, options.select || this.select),
+                include = utility.expand(this, options.include || this.include),
+                orderBy = utility.expand(this, options.sort || this.orderBy);
+
+            if (select && select.length > 0)
+                request.setQueryArg('select', select.join(','));
+
+            if (include && include.length > 0)
+                request.setQueryArg('include', include.join(','));
+
+            if (orderBy)
+            {
+                if (typeof orderBy === 'string')
+                {
+                    request.setQueryArg('orderby', orderBy);
+                }
+                else if (orderBy.length > 0)
+                {
+                    var order = [];
+                    array.forEach(orderBy, function (v) {
+                        if (v.descending)
+                            this.push(v.attribute + ' desc');
+                        else
+                            this.push(v.attribute);
+                    }, order);
+
+                    request.setQueryArg('orderby', order.join(','));
+                }
+            }
+
+            var where = utility.expand(this, this.where),
+                query = utility.expand(this, options.query),
+                conditions = [];
+
+            if (where)
+                conditions.push(where);
+
+            if (query)
+                conditions.push(query);
+
+            if (conditions.length > 0)
+                request.setQueryArg('where', '(' + conditions.join(') and (') + ')');
+
+            if (typeof options.start !== 'undefined')
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.StartIndex, options.start + 1);
+
+            if (typeof options.count !== 'undefined')
+                request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Count, options.count);
+
+            return request;
+        },
+
+        get: function(id, /* sdata only */ options) {
+            // summary:
+            //		Retrieves an object by its identity
+            // id: Number
+            //		The identity to use to lookup the object
+            // returns: Object
+            //		The object in the store that matches the given id.
+
+            var self = this,
+                handle,
+                deferred = new Deferred(function(reason) {
+                    self.service.abort(handle);
+                }),
+                request = this._createEntryRequest(options);
+
+            var method = this.executeFetchItemAs
+                ? request[this.executeFetchItemAs]
+                : request.read;
+
+            handle = method.call(request, attach(options, deferred));
+
+            return deferred;
+        },
+        getIdentity: function(object) {
+            // summary:
+            //		Returns an object's identity
+            // object: Object
+            //		The object to get the identity from
+            // returns: String|Number
+
+            return lang.getObject(this.idProperty, false, object);
+        },
+        put: function(object, directives) {
+            // summary:
+            //		Stores an object
+            // object: Object
+            //		The object to store.
+            // directives: dojo.store.api.Store.PutDirectives?
+            //		Additional directives for storing objects.
+            // returns: Number|String
+        },
+        add: function(object, directives) {
+            // summary:
+            //		Creates an object, throws an error if the object already exists
+            // object: Object
+            //		The object to store.
+            // directives: dojo.store.api.Store.PutDirectives?
+            //		Additional directives for creating objects.
+            // returns: Number|String
+        },
+        remove: function(id) {
+            // summary:
+            //		Deletes an object by its identity
+            // id: Number
+            //		The identity to use to delete the object
+
+        },
+        query: function(query, options) {
+            // summary:
+            //		Queries the store for objects. This does not alter the store, but returns a
+            //		set of data from the store.
+            // query: String|Object|Function
+            //		The query to use for retrieving objects from the store.
+            // options: dojo.store.api.Store.QueryOptions
+            //		The optional arguments to apply to the resultset.
+            // returns: dojo.store.api.Store.QueryResults
+            //		The results of the query, extended with iterative methods.
+            //
+            // example:
+            //		Given the following store:
+            //
+            //	...find all items where "prime" is true:
+            //
+            //	|	store.query({ prime: true }).forEach(function(object){
+            //	|		// handle each object
+            //	|	});
+
+            var self = this,
+                handle,
+                deferred = new Deferred(function(reason) {
+                    self.service.abort(handle);
+                }),
+                request = this._createEntryRequest(options);
+
+            var method = this.executeFetchItemAs
+                ? request[this.executeFetchItemAs]
+                : request.read;
+
+            handle = method.call(request, attach(options, deferred));
+
+            return deferred;
+        },
+        transaction: function() {
+            // summary:
+            //		Starts a new transaction.
+            //		Note that a store user might not call transaction() prior to using put,
+            //		delete, etc. in which case these operations effectively could be thought of
+            //		as "auto-commit" style actions.
+            // returns: dojo.store.api.Store.Transaction
+            //		This represents the new current transaction.
+        },
+        getChildren: function(parent, options){
+            // summary:
+            //		Retrieves the children of an object.
+            // parent: Object
+            //		The object to find the children of.
+            // options: dojo.store.api.Store.QueryOptions?
+            //		Additional options to apply to the retrieval of the children.
+            // returns: dojo.store.api.Store.QueryResults
+            //		A result set of the children of the parent object.
+        },
+        getMetadata: function(object){
+            // summary:
+            //		Returns any metadata about the object. This may include attribution,
+            //		cache directives, history, or version information.
+            // object: Object
+            //		The object to return metadata for.
+            // returns: Object
+            //		An object containing metadata.
+        }
+    });
+});
