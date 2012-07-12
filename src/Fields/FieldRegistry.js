@@ -59,7 +59,6 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
         'textarea': TextAreaField,
         'text': TextField
     };
-
     return lang.setObject('Sage.Platform.Mobile.Fields.FieldRegistry', {
         fromType: fromType,
         getFieldFor: function(props, fallback) {
