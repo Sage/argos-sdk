@@ -26,15 +26,15 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
         precision: 2,
         enableClearButton: false,
         setValue: function(val) {
-            val = parseFloat(val).toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
-            val = isNaN(val)
-                ? string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.'])
-                : string.substitute('${0}${1}${2}',
-                    [
-                        parseInt(val, 10),
-                        Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.',
-                        val.substr(- Mobile.CultureInfo.numberFormat.currencyDecimalDigits)
-                    ]);
+            if (isNaN(parseFloat(val)))
+                val = 0;
+
+            var precision = (isNaN(this.precision) || this.precision < 0)
+                ? Mobile.CultureInfo.numberFormat.currencyDecimalDigits
+                : this.precision;
+            val = parseFloat(val).toFixed(precision);
+
+            val = val.replace('.', Mobile.CultureInfo.numberFormat.currencyDecimalSeparator);
 
             this.inherited(arguments, [val]);
         },

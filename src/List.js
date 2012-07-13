@@ -376,7 +376,7 @@ define('Sage/Platform/Mobile/List', [
 
             this.subscribe('/app/refresh', this._onRefresh);
 
-            domClass.toggle(this.domNode, 'has-search', this.hideSearch);
+            domClass.toggle(this.domNode, 'has-search-header', this.hideSearch);
 
             if (this.searchText)
                 this.$.search.setLabel(this.searchText);
@@ -684,7 +684,7 @@ define('Sage/Platform/Mobile/List', [
         beforeTransitionTo: function() {
             this.inherited(arguments);
 
-            domClass.toggle(this.domNode, 'has-search', this.hideSearch);
+            domClass.toggle(this.domNode, 'has-search-header', !this.hideSearch);
             domClass.toggle(this.domNode, 'has-selectors', !this.isSelectionDisabled());
 
             if (this._selectionModel && !this.isSelectionDisabled())
