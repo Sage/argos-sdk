@@ -646,7 +646,7 @@ define('Sage/Platform/Mobile/List', [
             return queryResults;
         },
         _buildQueryExpression: function() {
-            return this.query && lang.mixin(this.query || {}, this.options.query || this.options.where);
+            return lang.mixin(this.query || {}, this.options.query || this.options.where);
         },
         _applyStateToQueryOptions: function(queryOptions) {
 
