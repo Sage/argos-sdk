@@ -1,5 +1,6 @@
 define('Sage/Platform/Mobile/_SDataEditMixin', [
     'dojo/_base/declare',
+    'dojo/_base/lang',
     'dojo/string',
     'dojo/dom-class',
     './ErrorManager',
@@ -7,6 +8,7 @@ define('Sage/Platform/Mobile/_SDataEditMixin', [
     './_SDataDetailMixin'
 ], function(
     declare,
+    lang,
     string,
     domClass,
     ErrorManager,
@@ -17,6 +19,13 @@ define('Sage/Platform/Mobile/_SDataEditMixin', [
      * SData enablement for the Detail view.
      */
     return declare('Sage.Platform.Mobile._SDataEditMixin', [_SDataDetailMixin], {
+        _buildRefreshMessage: function(item) {
+            var message = this.inherited(arguments);
+
+            return lang.mixin(message, {
+                resourceKind: this.resourceKind
+            });
+        },
         _onRequestTemplateFailure: function(xhr, xhrOptions) {
             var error = new Error('An error occurred requesting: ' + xhrOptions.url);
 
@@ -24,7 +33,7 @@ define('Sage/Platform/Mobile/_SDataEditMixin', [
             error.status = xhr.status;
             error.responseText = xhr.responseText;
 
-            this._onFetchError(error, {});
+            this._onGetError({}, error);
         },
         _onRequestTemplateSuccess: function(template) {
             this._processTemplateData(template);

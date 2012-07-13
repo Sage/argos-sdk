@@ -88,13 +88,6 @@ define('Sage/Platform/Mobile/Pane', [
             return deferred;
         },
         _beforeTransition: function(view, options, previous) {
-            if (previous)
-            {
-                previous.beforeTransitionAway();
-            }
-
-            view.beforeTransitionTo();
-
             for (var name in this.toolbars)
             {
                 var toolbar = this.toolbars[name];
@@ -127,12 +120,16 @@ define('Sage/Platform/Mobile/Pane', [
             topic.publish('/app/view/transition/after', view, previous, this);
         },
         _transitionTo: function(view, options, deferred) {
+            console.log('transition: %s', view.id);
+
             if (this.active === view)
             {
                 /* todo: fully reset tools here? could update? only issue would be if new tools were passed for same active view. */
                 this._beforeTransition(view, options, view);
 
                 /* todo: is `reload` an appropriate name for this? */
+                console.log('reload: %s', view.id);
+
                 view.reload();
 
                 this._afterTransition(view, options, view);
@@ -143,6 +140,13 @@ define('Sage/Platform/Mobile/Pane', [
             }
 
             var previous = this.active;
+
+            if (previous)
+            {
+                previous.beforeTransitionAway();
+            }
+
+            view.beforeTransitionTo();
 
             domClass.remove(view.domNode, 'is-visible');
 
@@ -176,6 +180,8 @@ define('Sage/Platform/Mobile/Pane', [
             deferred.resolve(true);
         },
         empty: function() {
+            console.log('empty: %s', this.id);
+
             var deferred = new Deferred(),
                 previous = this.active;
 

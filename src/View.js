@@ -42,9 +42,16 @@ define('Sage/Platform/Mobile/View', [
         connectionName: false,
         customizationSet: 'view',
         titleText: 'Generic View',
-        _preCreateComponents: function(components) {
-            var customizationSet = customizations();
-            return customizationSet.apply(customizationSet.toPath(this.customizationSet, 'components', this.id), this.inherited(arguments));
+        _preCreateComponents: function(components, proto) {
+            if (proto)
+            {
+                var customizationSet = customizations();
+                return customizationSet.apply(customizationSet.toPath(this.customizationSet, 'components', this.id), this.inherited(arguments));
+            }
+            else
+            {
+                return components;
+            }
         },
         _onToolbarPositionChange: function(position, previous) {
             if (previous) domClass.remove(this.domNode, 'has-toolbar-' + previous);
@@ -68,6 +75,7 @@ define('Sage/Platform/Mobile/View', [
                 return true;
         },
         refresh: function() {
+            console.log('refresh: %s', this.id);
         },
         resize: function() {
         },
@@ -198,7 +206,7 @@ define('Sage/Platform/Mobile/View', [
         },
         getContext: function() {
             // todo: should we track options?
-            return {id: this.id, options: this.getOptionsContext()};
+            return {view: this.id, options: this.getOptionsContext()};
         },
         getSecurity: function(access) {
             return this.security;

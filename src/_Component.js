@@ -312,7 +312,7 @@ define('Sage/Platform/Mobile/_Component', [
             {
                 /* create instance components as if they were proto-components */
                 this._createComponents(
-                    this._preCreateComponents(this.hasOwnProperty('components') && this.components),
+                    this._preCreateComponents(this.hasOwnProperty('components') && this.components, false),
                     owner, owner
                 );
             }
@@ -320,13 +320,13 @@ define('Sage/Platform/Mobile/_Component', [
             {
                 /* components defined on the prototype are always rooted locally */
                 this._createComponents(
-                    this._preCreateComponents(this.constructor.prototype.components),
+                    this._preCreateComponents(this.constructor.prototype.components, true),
                     owner, owner
                 );
 
                 /* components defined on the instance always inherit the root */
                 this._createComponents(
-                    this._preCreateComponents(this.hasOwnProperty('components') && this.components),
+                    this._preCreateComponents(this.hasOwnProperty('components') && this.components, false),
                     root, owner
                 );
             }

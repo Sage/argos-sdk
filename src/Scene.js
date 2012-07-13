@@ -254,7 +254,7 @@ define('Sage/Platform/Mobile/Scene', [
                               list, detail => list (detail panel should pop out) */
                 if (context)
                     viewSet.push({
-                        view: this._instancedViews[context.id]
+                        view: this._instancedViews[context.view]
                     });
                 else
                     viewSet.push({});
@@ -393,6 +393,8 @@ define('Sage/Platform/Mobile/Scene', [
             require([definition.type], lang.hitch(this, this._onRequireComplete, name, options, definition, at));
         },
         _onRequireComplete: function(name, options, definition, at, ctor) {
+            console.log('require complete: %s', name);
+
             /* todo: always replace id with name? */
             var instance = new ctor(lang.mixin({id: name}, definition.props));
 
@@ -437,7 +439,7 @@ define('Sage/Platform/Mobile/Scene', [
             /* todo: trim state to item before match of `stateSet` */
             this._trimStateTo(stateSet);
 
-            console.log('view set to apply: %o', viewSet);
+            // console.log('view set to apply: %o', viewSet);
 
             var deferred = this.layout.apply(viewSet);
             deferred.then(

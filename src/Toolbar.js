@@ -49,6 +49,7 @@ define('Sage/Platform/Mobile/Toolbar', [
         items: null,
         context: null,
         visible: true,
+        enabled: true,
         _size: 0,
         _items: null,
         _itemsByName: null,
@@ -56,19 +57,19 @@ define('Sage/Platform/Mobile/Toolbar', [
         invoke: function(evt, node) {
             var name = node && domAttr.get(node, 'data-tool');
 
-            this._invokeByName(name);
+            this._invokeItemByName(name);
         },
-        _invokeByName: function(name) {
+        _invokeItemByName: function(name) {
             var item = name && this._itemsByName[name];
             if (item)
             {
                 var context = this.get('context'),
-                    scope = item.scope || context || this,
+                    scope = item.scope || context || item,
                     args = utility.expand(item, item.args, context, item) || [];
 
                 if (item.fn)
                 {
-                    item.fn.apply(scope, args.concat(item));
+                    item.fn.apply(scope, args.concat(context, item));
                 }
                 else if (item.show)
                 {
@@ -78,11 +79,11 @@ define('Sage/Platform/Mobile/Toolbar', [
                 {
                     var method = scope && scope[item.action];
 
-                    if (typeof method === 'function') method.apply(scope, args.concat(item));
+                    if (typeof method === 'function') method.apply(scope, args.concat(context, item));
                 }
                 else if (item.publish)
                 {
-                    topic.publish.apply(topic, [item.publish].concat(args, item));
+                    topic.publish.apply(topic, [item.publish].concat(args, context, item));
                 }
             }
         },
@@ -95,6 +96,12 @@ define('Sage/Platform/Mobile/Toolbar', [
         },
         _setContextAttr: function(value) {
             this.context = value;
+        },
+        _setEnabledAttr: function(value) {
+            this.enabled = value;
+        },
+        _getEnabledAttr: function() {
+            return this.enabled;
         },
         _getPositionAttr: function() {
             return this.position;
@@ -122,9 +129,16 @@ define('Sage/Platform/Mobile/Toolbar', [
         onStartup: function() {
             this.inherited(arguments);
 
-            this.subscribe('/app/toolbar/invoke', this._invokeByName);
+            this.subscribe('/app/toolbar/invoke', this._onToolbarInvoke);
+            this.subscribe('/app/toolbar/toggle', this._onToolbarToggle);
 
             this.onPositionChange(this.position, null);
+        },
+        _onToolbarInvoke: function(name) {
+            this._invokeItemByName(name);
+        },
+        _onToolbarToggle: function(name, value) {
+            if (this.position == name) this.set('enabled', value);
         },
         clear: function() {
             this._empty();
@@ -137,6 +151,12 @@ define('Sage/Platform/Mobile/Toolbar', [
         },
         show: function() {
             this.set('visible', true);
+        },
+        disable: function() {
+            this.set('enabled', false);
+        },
+        enable: function() {
+            this.set('enabled', true);
         },
         update: function() {
             var context = this.get('context'),
