@@ -463,11 +463,9 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
                 chart.connectToPlot('default', this, this.onChartEvent);
 
             chart.render();
-            console.log('chart:',chart);
 
             if (this.legend)
                 new Legend(lang.mixin({},{chart: chart}, this.legendOptions), this.legendNode);
-
         }
     });
 });
