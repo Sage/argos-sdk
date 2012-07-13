@@ -267,7 +267,7 @@ define('Sage/Platform/Mobile/Store/SData', [
 
             return lang.getObject(this.idProperty, false, object);
         },
-        put: function(object, directives) {
+        put: function(object, putOptions) {
             // summary:
             //		Stores an object
             // object: Object
@@ -275,8 +275,10 @@ define('Sage/Platform/Mobile/Store/SData', [
             // directives: dojo.store.api.Store.PutDirectives?
             //		Additional directives for storing objects.
             // returns: Number|String
+
+            console.log('put %o, %o', object, putOptions);
         },
-        add: function(object, directives) {
+        add: function(object, addOptions) {
             // summary:
             //		Creates an object, throws an error if the object already exists
             // object: Object
@@ -284,6 +286,10 @@ define('Sage/Platform/Mobile/Store/SData', [
             // directives: dojo.store.api.Store.PutDirectives?
             //		Additional directives for creating objects.
             // returns: Number|String
+            addOptions = addOptions || {};
+            addOptions.overwrite = false;
+
+            return this.put(object, addOptions);
         },
         remove: function(id) {
             // summary:

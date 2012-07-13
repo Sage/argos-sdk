@@ -18,13 +18,15 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
     'dojo/_base/event',
     'dojo/_base/lang',
     '../_TemplatedWidgetMixin',
-    './_Field'
+    './_Field',
+    'argos!scene'
 ], function(
     declare,
     event,
     lang,
     _TemplatedWidgetMixin,
-    _Field
+    _Field,
+    scene
 ) {
 
     return declare('Sage.Platform.Mobile.Fields.EditorField', [_Field, _TemplatedWidgetMixin], {
@@ -108,11 +110,9 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
             
             this.navigateToEditView();
         },
-        getValuesFromView: function() {
-            var view = App.getPrimaryActiveView(),
-                values = view && view.getValues();
-
-            if (view && values)
+        getValuesFromView: function(view) {
+            var values = view && view.getValues();
+            if (values)
             {
                 // todo: is this the appropriate way to handle this?  do not want $key, $name, etc., when applying values.
                 // difference is primarily "as component" vs. "as child".
@@ -120,8 +120,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                 this.validationValue = view.getValues(true); // store all editor values for validation, not only dirty values
             }
         },
-        complete: function() {
-            var view = App.getPrimaryActiveView();
+        complete: function(view, item) {
             var success = true;
 
             if (view instanceof Sage.Platform.Mobile.Edit)
@@ -135,7 +134,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                 }
             }
 
-            this.getValuesFromView();
+            this.getValuesFromView(view);
 
             this.setText(this.formatValue(this.validationValue));
 

@@ -543,7 +543,7 @@ define('Sage/Platform/Mobile/List', [
             });
         },
         navigateToInsertView: function() {
-            scene().showView(this.detailView, {
+            scene().showView(this.insertView || this.editView, {
                 returnTo: this.id,
                 insert: true
             });
@@ -707,6 +707,8 @@ define('Sage/Platform/Mobile/List', [
             this.inherited(arguments);
         },
         refresh: function() {
+            this.inherited(arguments);
+
             this._requestData();
         },
         more: function() {

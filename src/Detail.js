@@ -465,10 +465,13 @@ define('Sage/Platform/Mobile/Detail', [
             }
         },
         refreshRequiredFor: function(options) {
-            if (this.options) {
-                if (options) {
+            if (this.options)
+            {
+                if (options)
+                {
                     if (this.options.key !== options.key) return true;
                 }
+
                 return false;
             }
             else
@@ -499,6 +502,8 @@ define('Sage/Platform/Mobile/Detail', [
             }
         },
         refresh: function() {
+            this.inherited(arguments);
+
             /* todo: why is this here? */
             if (this.security && !App.hasAccessTo(this.expandExpression(this.security)))
             {

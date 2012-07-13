@@ -21,6 +21,7 @@ define('Sage/Platform/Mobile/Edit', [
     'dojo/_base/Deferred',
     'dojo/string',
     'dojo/dom',
+    'dojo/topic',
     'dojo/dom-attr',
     'dojo/dom-class',
     'dojo/dom-construct',
@@ -34,7 +35,8 @@ define('Sage/Platform/Mobile/Edit', [
     './Fields/FieldRegistry',
     './Convert',
     './Utility',
-    'argos!customizations'
+    'argos!customizations',
+    'argos!scene'
 ], function(
     declare,
     lang,
@@ -43,6 +45,7 @@ define('Sage/Platform/Mobile/Edit', [
     Deferred,
     string,
     dom,
+    topic,
     domAttr,
     domClass,
     domConstruct,
@@ -56,7 +59,8 @@ define('Sage/Platform/Mobile/Edit', [
     FieldRegistry,
     convert,
     utility,
-    customizations
+    customizations,
+    scene
 ) {
 
     return declare('Sage.Platform.Mobile.Edit', [View], {
@@ -102,7 +106,10 @@ define('Sage/Platform/Mobile/Edit', [
         tier: 1,
         store: null,
         layout: null,
+        insertSecurity: false,
+        updateSecurity: false,
         customizationSet: 'edit',
+
         saveText: 'Save',
         titleText: 'Edit',
         toggleCollapseText: 'toggle collapse',
@@ -110,8 +117,7 @@ define('Sage/Platform/Mobile/Edit', [
         detailsText: 'Details',
         loadingText: 'loading...',
         requestErrorText: 'A server error occurred while requesting data.',
-        insertSecurity: false,
-        updateSecurity: false,
+
         constructor: function(o) {
             this.fields = {};
         },
@@ -469,25 +475,21 @@ define('Sage/Platform/Mobile/Edit', [
                 ? this.errors
                 : false;
         },
-        createEntry: function() {
+        createItem: function() {
             var values = this.getValues();
 
             return this.inserting
-                ? this.createEntryForInsert(values)
-                : this.createEntryForUpdate(values);
+                ? this.createItemForUpdate(values)
+                : this.createItemForInsert(values);
         },
-        createEntryForUpdate: function(values) {
-            values = this.convertValues(values);
-
+        createItemForUpdate: function(values) {
             return lang.mixin(values, {
                 '$key': this.entry['$key'],
                 '$etag': this.entry['$etag'],
                 '$name': this.entry['$name']
             });
         },
-        createEntryForInsert: function(values) {
-            values = this.convertValues(values);
-            
+        createItemForInsert: function(values) {
             return lang.mixin(values, {
                 '$name': this.entityName
             });
@@ -498,66 +500,68 @@ define('Sage/Platform/Mobile/Edit', [
         disable: function() {
             this.busy = true;
 
-            if (App.bars.tbar)
-                App.bars.tbar.disable();
+            topic.publish('/app/toolbar/toggle', 'top', false);
 
             domClass.add(this.domNode, 'busy');
         },
         enable: function() {
             this.busy = false;
 
-            if (App.bars.tbar)
-                App.bars.tbar.enable();
+            topic.publish('/app/toolbar/toggle', 'top', true);
 
             domClass.remove(this.domNode, 'busy');
         },
         insert: function() {
-            this.disable();
-
             var values = this.getValues();
             if (values)
             {
-                var entry = this.createEntryForInsert(values);
+                this.disable();
 
-                var request = this.createRequest();
-                if (request)
-                    request.create(entry, {
-                        success: this.onInsertSuccess,
-                        failure: this.onInsertFailure,
-                        scope: this
-                    });
+                var store = this.get('store'),
+                    addOptions = {
+                        overwrite: false
+                    },
+                    item = this.createItemForInsert(values);
+
+                this._applyStateToAddOptions(addOptions);
+
+                Deferred.when(store.add(item, addOptions),
+                    lang.hitch(this, this._onAddComplete),
+                    lang.hitch(this, this._onAddError, addOptions)
+                );
             }
             else
             {
-                ReUI.back();
+                scene().back();
             }
         },
-        onInsertSuccess: function(entry) {
+        _applyStateToAddOptions: function(addOptions) {
+        },
+        _onAddComplete: function(result) {
             this.enable();
 
-            connect.publish('/app/refresh', [{
-                resourceKind: this.resourceKind
-            }]);
+            var message = this._buildRefreshMessage();
 
-            this.onInsertCompleted(entry);
+            connect.publish('/app/refresh', [message]);
+
+            this.onInsertComplete(result);
         },
-        onInsertFailure: function(response, o) {
+        _onAddError: function(addOptions, error) {
+            alert(string.substitute(this.requestErrorText, [error]));
+
+            ErrorManager.addError(error.xhr, addOptions, this.options, error.aborted ? 'aborted' : 'failure');
+
             this.enable();
-            this.onRequestFailure(response, o);
         },
-        onInsertCompleted: function(entry) {
-            if (this.options && this.options.returnTo)
+        onInsertComplete: function(result) {
+            var options = this.options;
+            if (options && options.returnTo)
             {
-                var returnTo = this.options.returnTo,
-                    view = App.getView(returnTo);
-                if (view)
-                    view.show();
-                else
-                    window.location.hash = returnTo;
+                scene().showView(options.returnTo);
             }
             else
             {
-                ReUI.back();
+                scene().back();
             }
         },
         onRequestFailure: function(response, o) {
@@ -570,49 +574,64 @@ define('Sage/Platform/Mobile/Edit', [
             {
                 this.disable();
 
-                var entry = this.createEntryForUpdate(values);
+                var store = this.get('store'),
+                    putOptions = {
+                        overwrite: true
+                    },
+                    item = this.createItemForUpdate(values);
 
-                var request = this.createRequest();
-                if (request)
-                    request.update(entry, {
-                        success: this.onUpdateSuccess,
-                        failure: this.onUpdateFailure,
-                        scope: this
-                    });
+                this._applyStateToPutOptions(putOptions);
+
+                Deferred.when(store.put(item, putOptions),
+                    lang.hitch(this, this._onPutComplete, item),
+                    lang.hitch(this, this._onPutError, putOptions)
+                );
             }
             else
             {
                 this.onUpdateCompleted(false);
             }
         },
-        onUpdateSuccess: function(entry) {
-            this.enable();
-
-            connect.publish('/app/refresh', [{
-                resourceKind: this.resourceKind,
-                key: entry['$key'],
-                data: entry
-            }]);
-
-            this.onUpdateCompleted(entry);
+        _applyStateToPutOptions: function(putOptions) {
         },
-        onUpdateFailure: function(response, o) {
-            this.enable();
-            this.onRequestFailure(response, o);
-        },
-        onUpdateCompleted: function(entry) {
-            if (this.options && this.options.returnTo)
+        _buildRefreshMessage: function(item) {
+            if (item)
             {
-                var returnTo = this.options.returnTo,
-                    view = App.getView(returnTo);
-                if (view)
-                    view.show();
-                else
-                    window.location.hash = returnTo;
+                var store = this.get('store'),
+                    id = store.getIdentity(item);
+                return {
+                    id: id,
+                    key: id,
+                    data: item
+                };
+            }
+        },
+        _onPutComplete: function(item, result) {
+            this.enable();
+
+            var message = this._buildRefreshMessage(item);
+
+            connect.publish('/app/refresh', [message]);
+
+            this.onUpdateComplete(item);
+        },
+        _onPutError: function(putOptions, error) {
+
+            alert(string.substitute(this.requestErrorText, [error]));
+
+            ErrorManager.addError(error.xhr, putOptions, this.options, error.aborted ? 'aborted' : 'failure');
+
+            this.enable();
+        },
+        onUpdateComplete: function(item) {
+            var options = this.options;
+            if (options && options.returnTo)
+            {
+                scene().showView(options.returnTo);
             }
             else
             {
-                ReUI.back();
+                scene().back();
             }
         },
         showValidationSummary: function() {
@@ -622,6 +641,7 @@ define('Sage/Platform/Mobile/Edit', [
                 content.push(this.validationSummaryItemTemplate.apply(this.errors[i], this.fields[this.errors[i].name]));
 
             this.set('validationContent', content.join(''));
+
             domClass.add(this.domNode, 'has-error');
         },
         hideValidationSummary: function() {
@@ -639,13 +659,20 @@ define('Sage/Platform/Mobile/Edit', [
                 return;
             }
 
-            /* todo: finish save */
+            if (this.inserting)
+                this.insert();
+            else
+                this.update();
         },
         getContext: function() {
+            var store = this.get('store'),
+                options = this.options;
+
             return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
-                insert: this.options.insert,
-                key: this.options.insert ? false : this.options.entry && this.options.entry['$key']
+                insert: options.insert,
+                key: options.insert ? false : store.getIdentity(options.item || options.entry),
+                id: options.insert ? false : store.getIdentity(options.item || options.entry)
             });
         },
         getSecurity: function(access) {
@@ -672,15 +699,25 @@ define('Sage/Platform/Mobile/Edit', [
             {
                 if (options)
                 {
-                    if (this.options.key && this.options.key === options['key'])
-                        return false;
+                    if (this.options === options) return false;
+
+                    if (this.options.id !== options.id) return true;
+                    if (this.options.key !== options.key) return true;
+                    if (this.options.item !== options.item) return true;
+                    if (this.options.entry !== options.entry) return true;
+                    if (this.options.insert !== options.insert) return true;
+                    if (this.options.changes !== options.changes) return true;
+                    if (this.options.template !== options.template) return true;
                 }
-                return true;
+
+                return false;
             }
             else
                 return this.inherited(arguments);
         },
         refresh: function() {
+            this.inherited(arguments);
+
             this.changes = false;
             this.inserting = (this.options.insert === true);
             this.itemTemplate = false;
