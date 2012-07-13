@@ -25,6 +25,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     'dojox/charting/Chart',
     'dojox/charting/widget/Legend',
     'dojox/charting/plot2d/Grid',
+    'dojo/_base/Deferred',
     'dijit/_WidgetBase',
     '../_TemplatedWidgetMixin'
 ], function(
@@ -39,6 +40,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     Chart,
     Legend,
     Grid,
+    Deferred,
     _WidgetBase,
     _TemplatedWidgetMixin
 ) {
@@ -317,16 +319,16 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
                     description = (this.seriesLabelFormatter) ? this.seriesLabelFormatter(o[this.descriptionProperty]) : o[this.descriptionProperty],
                     value = o[this.valueProperty];
 
-                if ((value[0] || value) > this.stats.max)
-                    this.stats.max = value[0] || value;
-                if ((value[0] || value) < this.stats.min)
-                    this.stats.min = value[0] || value;
+                if (value > this.stats.max)
+                    this.stats.max = value;
+                if (value < this.stats.min)
+                    this.stats.min = value;
 
                 if (description)
                     values.push({
-                        x: this.valueAxis === 'x' ? (value[0] || value) : i+1,
-                        y: this.valueAxis === 'y' ? (value[0] ||value) : i+1,
-                        text: description[0] || description,
+                        x: this.valueAxis === 'x' ? value : i+1,
+                        y: this.valueAxis === 'y' ? value : i+1,
+                        text: description,
                         legend: string.substitute(this.legendLabelTemplate,[description, value])
                     });
             }
@@ -361,21 +363,27 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         requestData:function() {
             domClass.add(this.chartNode, 'is-loading');
             var store = this.get('store'),
-                keywordArgs = {
-                    scope: this,
-                    onError: this._onFetchError,
-                    onAbort: this._onFetchError,
-                    onComplete: this._onFetchComplete
-                };
-            return store.fetch(keywordArgs);
+                queryOptions = { start: 0 },
+                queryExpression = this._buildQueryExpression() || null,
+                queryResults = store.query(queryExpression, queryOptions);
+
+            Deferred.when(queryResults,
+                lang.hitch(this, this._onQueryComplete, queryResults),
+                lang.hitch(this, this._onQueryError, queryOptions)
+            );
+
+            return queryResults;
         },
-        _onFetchComplete: function(items, request) {
+        _buildQueryExpression: function() {
+            return this.where;
+        },
+        _onQueryComplete: function(items, request) {
             domClass.remove(this.chartNode, 'is-loading');
             this.processFeed(items);
             this.resize();
             this.render();
         },
-        _onFetchError: function() {
+        _onQueryError: function() {
             console.log('Chart Request Fail', arguments[0].stack);
         },
 
