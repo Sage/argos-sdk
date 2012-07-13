@@ -54,8 +54,12 @@ define('Sage/Platform/Mobile/Toolbar', [
         _itemsByName: null,
 
         invoke: function(evt, node) {
-            var name = node && domAttr.get(node, 'data-tool'),
-                item = name && this._itemsByName[name];
+            var name = node && domAttr.get(node, 'data-tool');
+
+            this._invokeByName(name);
+        },
+        _invokeByName: function(name) {
+            var item = name && this._itemsByName[name];
             if (item)
             {
                 var context = this.get('context'),
@@ -117,6 +121,9 @@ define('Sage/Platform/Mobile/Toolbar', [
         },
         onStartup: function() {
             this.inherited(arguments);
+
+            this.subscribe('/app/toolbar/invoke', this._invokeByName);
+
             this.onPositionChange(this.position, null);
         },
         clear: function() {

@@ -65,7 +65,7 @@ define('Sage/Platform/Mobile/Pane', [
                 if (component.isInstanceOf(Toolbar)) this.toolbars[component.getComponentName()] = component;
             }, this);
         },
-        show: function(view, options) {
+        show: function(view) {
             var deferred = new Deferred();
 
             /* - add the new view to this domNode
@@ -83,7 +83,7 @@ define('Sage/Platform/Mobile/Pane', [
              * - rotating the tablet causes it to paint correctly.
              * - even happens with OpenGL rendering disabled.
              */
-            setTimeout(lang.hitch(this, this._transitionTo, view, options, deferred));
+            setTimeout(lang.hitch(this, this._transitionTo, view, view.options, deferred));
 
             return deferred;
         },

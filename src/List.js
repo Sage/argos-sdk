@@ -24,6 +24,7 @@ define('Sage/Platform/Mobile/List', [
     'dojo/dom-construct',
     'dojo/dom',
     'dojo/string',
+    'dojo/topic',
     './View',
     './ErrorManager',
     './ScrollContainer',
@@ -42,6 +43,7 @@ define('Sage/Platform/Mobile/List', [
     domConstruct,
     dom,
     string,
+    topic,
     View,
     ErrorManager,
     ScrollContainer,
@@ -461,8 +463,11 @@ define('Sage/Platform/Mobile/List', [
                 if (this._selectionModel && this.isNavigationDisabled())
                 {
                     this._selectionModel.toggle(key, this.items[key] || descriptor, node);
+
                     if (this.options.singleSelect && this.options.singleSelectAction)
+                    {
                         this.invokeSingleSelectAction();
+                    }
                 }
                 else
                 {
@@ -471,8 +476,7 @@ define('Sage/Platform/Mobile/List', [
             }
         },
         invokeSingleSelectAction: function() {
-            if (App.bars['tbar'])
-                App.bars['tbar'].invokeTool({tool: this.options.singleSelectAction});
+            topic.publish('/app/toolbar/invoke', this.options.singleSelectAction);
 
             if (this.autoClearSelection)
                 this._selectionModel.clear();
