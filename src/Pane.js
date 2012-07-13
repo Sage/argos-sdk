@@ -88,6 +88,13 @@ define('Sage/Platform/Mobile/Pane', [
             return deferred;
         },
         _beforeTransition: function(view, options, previous) {
+            if (previous)
+            {
+                previous.beforeTransitionAway();
+            }
+
+            view.beforeTransitionTo();
+
             for (var name in this.toolbars)
             {
                 var toolbar = this.toolbars[name];
@@ -117,6 +124,13 @@ define('Sage/Platform/Mobile/Pane', [
                 }
             }
 
+            if (previous)
+            {
+                previous.transitionAway();
+            }
+
+            view.transitionTo();
+
             topic.publish('/app/view/transition/after', view, previous, this);
         },
         _transitionTo: function(view, options, deferred) {
@@ -141,13 +155,6 @@ define('Sage/Platform/Mobile/Pane', [
 
             var previous = this.active;
 
-            if (previous)
-            {
-                previous.beforeTransitionAway();
-            }
-
-            view.beforeTransitionTo();
-
             domClass.remove(view.domNode, 'is-visible');
 
             view.placeAt(this.viewContainerNode || this.domNode);
@@ -160,13 +167,6 @@ define('Sage/Platform/Mobile/Pane', [
             }
 
             domClass.add(view.domNode, 'is-visible');
-
-            if (previous)
-            {
-                previous.transitionAway();
-            }
-
-            view.transitionTo();
 
             this.active = view;
 
