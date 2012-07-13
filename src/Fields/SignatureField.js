@@ -42,6 +42,7 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
             height: 50
         },
         context: null,
+        view: 'signature_edit',
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.signatureLabelText %}"><span aria-hidden="true">{%: $.signatureText %}</span></button>',

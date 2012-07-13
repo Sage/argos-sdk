@@ -19,8 +19,9 @@ define('Sage/Platform/Mobile/Views/Signature', [
     'dojo/query',
     'dojo/dom-geometry',
     'dojo/window',
-    'Sage/Platform/Mobile/Format',
-    'Sage/Platform/Mobile/View'
+    '../Format',
+    '../_TemplatedWidgetMixin',
+    '../View'
 ], function(
     declare,
     json,
@@ -28,10 +29,11 @@ define('Sage/Platform/Mobile/Views/Signature', [
     domGeom,
     win,
     format,
+    _TemplatedWidgetMixin,
     View
 ) {
 
-    return declare('Sage.Platform.Mobile.Views.Signature', [View], {
+    return declare('Sage.Platform.Mobile.Views.Signature', [View, _TemplatedWidgetMixin], {
         // Localization
         titleText: 'Signature',
         clearCanvasText: 'Erase',
@@ -54,6 +56,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
 
         //View Properties
         id: 'signature_edit',
+        tier: 1,
         expose: false,
         signature: [],
         trace: [],
@@ -70,8 +73,15 @@ define('Sage/Platform/Mobile/Views/Signature', [
         canvasNodeWidth: 360, // starting default size
         canvasNodeHeight: 120, // adjusted on show()
 
-        show: function(options) {
+        startup: function() {
             this.inherited(arguments);
+
+            this.subscribe('/app/resize', this.onResize);
+            this.context = this.signatureNode.getContext('2d');
+        },
+        onBeforeTransitionTo: function() {
+            this.inherited(arguments);
+            var options = this.options;
 
             if (options && options.lineWidth) { this.config.lineWidth = options.lineWidth; }
             if (options && options.penColor)  { this.config.penColor  = options.penColor;  }
@@ -79,10 +89,6 @@ define('Sage/Platform/Mobile/Views/Signature', [
             this.signature = (options && options.signature) ? options.signature : [];
 
             this._sizeCanvas();
-            this.context = this.signatureNode.getContext('2d');
-
-            this.subscribe('/app/resize', this.onResize);
-
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         getValues: function() {
@@ -158,7 +164,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
 
             this.canvasNodeHeight = Math.min(
                 Math.floor(this.canvasNodeWidth * 0.5),
-                win.getBox().h - query('.toolbar')[0].offsetHeight - query('.footer-toolbar')[0].offsetHeight
+                win.getBox().h - query('.toolbar')[0].offsetHeight - query('.toolbar-bottom')[0].offsetHeight
             );
 
             this.signatureNode.width  = this.canvasNodeWidth;

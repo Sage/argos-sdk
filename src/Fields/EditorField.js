@@ -77,14 +77,14 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
             return {
                 tools: {
                     tbar: [{
-                        id: 'complete',
+                        name: 'complete',
+                        cls: 'complete',
                         fn: this.complete,
                         scope: this
                     },{
-                        id: 'cancel',
+                        name: 'cancel',
                         side: 'left',
-                        fn: ReUI.back,
-                        scope: ReUI
+                        publish: '/app/scene/back'
                     }]
                 },
                 entry: this.originalValue,
@@ -96,14 +96,9 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
         navigateToEditView: function() {
             if (this.isDisabled()) return;
 
-            var view = App.getView(this.view),
-                options = this.createNavigationOptions();
+            var options = this.createNavigationOptions();
 
-            if (view && options)
-            {
-                if (options.title) view.set('title', options.title);
-                view.show(options);
-            }
+            scene().showView(this.view, options);
         },
         _onClick: function(evt) {
             event.stop(evt);
