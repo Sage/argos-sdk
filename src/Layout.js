@@ -127,7 +127,7 @@ define('Sage/Platform/Mobile/Layout', [
                 var entry = viewSet[tier];
                 if (entry.view)
                 {
-                    wait.push(this.panesByTier[tier].show(entry.view));
+                    wait.push(this.panesByTier[tier].show(entry.view, entry));
                 }
                 else
                 {
@@ -137,12 +137,12 @@ define('Sage/Platform/Mobile/Layout', [
 
             return new DeferredList(wait, false, true, true);
         },
-        show: function(view, at) {
+        show: function(view, at, options) {
             var pane = this.panes[at];
             if (pane)
             {
                 if (view)
-                    return pane.show(view);
+                    return pane.show(view, options);
                 else
                     return pane.empty();
             }

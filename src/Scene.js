@@ -238,7 +238,7 @@ define('Sage/Platform/Mobile/Scene', [
 
             return stateSet;
         },
-        _createViewSet: function(stateSet) {
+        _createViewSet: function(stateSet, navigation) {
             var viewSet = [];
 
             for (var i = 0; i < stateSet.length; i++)
@@ -254,7 +254,9 @@ define('Sage/Platform/Mobile/Scene', [
                               list, detail => list (detail panel should pop out) */
                 if (context)
                     viewSet.push({
-                        view: this._instancedViews[context.view]
+                        view: this._instancedViews[context.view],
+                        primary: navigation.primary == context.view,
+                        reverse: navigation.reverse
                     });
                 else
                     viewSet.push({});
@@ -312,7 +314,7 @@ define('Sage/Platform/Mobile/Scene', [
             view.activate(options); /* activation required in order to build context (i.e. hash, etc.) */
 
             var stateSet = this._createStateSet(view, location),
-                viewSet = this._createViewSet(stateSet);
+                viewSet = this._createViewSet(stateSet, {primary: view.id});
 
             /* todo: trim state to item before match of `stateSet` */
             this._trimStateTo(stateSet);
@@ -430,7 +432,7 @@ define('Sage/Platform/Mobile/Scene', [
             this._state.pop();
 
             var stateSet = this._state[this._state.length - 1],
-                viewSet = this._createViewSet(stateSet);
+                viewSet = this._createViewSet(stateSet, {reverse: true});
 
             array.forEach(viewSet, function(item, index) {
                 if (item.view) item.view.activate(stateSet[index].context.options);

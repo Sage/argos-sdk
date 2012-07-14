@@ -66,8 +66,8 @@ define('Sage/Platform/Mobile/Pane', [
                 if (component.isInstanceOf(Toolbar)) this.toolbars[component.getComponentName()] = component;
             }, this);
         },
-        show: function(view) {
-            return this._transition(view, view.options);
+        show: function(view, showOptions) {
+            return this._transition(view, view.options, showOptions);
 
             // var deferred = new Deferred();
 
@@ -81,7 +81,7 @@ define('Sage/Platform/Mobile/Pane', [
 
             // return deferred;
         },
-        _before: function(view, options, previous) {
+        _before: function(view, viewOptions, previous) {
             console.log('before: %s', view.id);
 
             if (previous)
@@ -104,12 +104,12 @@ define('Sage/Platform/Mobile/Pane', [
 
             topic.publish('/app/view/transition/before', view, previous, this);
         },
-        _after: function(view, options, previous) {
+        _after: function(view, viewOptions, previous) {
             console.log('after: %s', view.id);
 
             this.active = view;
 
-            var tools = (options && options.tools) || view.get('tools') || {};
+            var tools = (viewOptions && viewOptions.tools) || view.get('tools') || {};
 
             for (var name in this.toolbars)
             {
@@ -142,7 +142,7 @@ define('Sage/Platform/Mobile/Pane', [
             console.error('transition error for %s', view.id);
             console.log(error);
         },
-        _transition: function(view, options) {
+        _transition: function(view, viewOptions, showOptions) {
             console.log('transition: %s', view.id);
 
             var active = this.active;
@@ -153,14 +153,14 @@ define('Sage/Platform/Mobile/Pane', [
                 var deferred = new Deferred();
 
                 /* todo: fully reset tools here? could update? only issue would be if new tools were passed for same active view. */
-                this._before(view, options, view);
+                this._before(view, viewOptions, view);
 
                 /* todo: is `reload` an appropriate name for this? */
                 console.log('reload: %s', view.id);
 
                 view.reload();
 
-                this._after(view, options, view);
+                this._after(view, viewOptions, view);
 
                 deferred.resolve(true);
 
@@ -170,19 +170,19 @@ define('Sage/Platform/Mobile/Pane', [
             var deferred = new Deferred();
 
             deferred.then(
-                lang.hitch(this, this._after, view, options, active),
-                lang.hitch(this, this._error, view, options, active),
-                lang.hitch(this, this._progress, view, options, active)
+                lang.hitch(this, this._after, view, viewOptions, active),
+                lang.hitch(this, this._error, view, viewOptions, active),
+                lang.hitch(this, this._progress, view, viewOptions, active)
             );
 
-            var fx = this._resolve(view, this.active, options);
+            var fx = this._resolve(view, viewOptions, showOptions);
 
             return fx.method(this.viewContainerNode || this.domNode, view, active, fx.options, deferred);
         },
-        _resolve: function(view, previous, options) {
+        _resolve: function(view, viewOptions, showOptions) {
             return {
-                method: transition.slideWithCssAnimation,
-                options: {}
+                method: transition.slide,
+                options: {reverse: showOptions && showOptions.reverse}
             };
         },
         empty: function() {

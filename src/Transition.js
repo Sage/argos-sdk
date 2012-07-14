@@ -62,7 +62,15 @@ define('Sage/Platform/Mobile/Transition', [
     };
 
     var slideWithCssAnimation = function(container, next, current, options, deferred) {
+        options = options || {};
         deferred = deferred || new Deferred();
+
+        var slideInCls = options.reverse
+                ? 'fx-slide-l-in'
+                : 'fx-slide-r-in',
+            slideOutCls = options.reverse
+                ? 'fx-slide-l-out'
+                : 'fx-slide-r-out';
 
         domClass.remove(next.domNode, 'is-visible');
 
@@ -75,10 +83,10 @@ define('Sage/Platform/Mobile/Transition', [
 
             if (current)
             {
-                domClass.remove(current.domNode, 'fx-slide-h-out');
+                domClass.remove(current.domNode, slideOutCls);
             }
 
-            domClass.replace(next.domNode, 'is-visible', 'fx-slide-h-in');
+            domClass.replace(next.domNode, 'is-visible', slideInCls);
 
             deferred.progress(1);
             deferred.resolve(true);
@@ -86,10 +94,10 @@ define('Sage/Platform/Mobile/Transition', [
 
         if (current)
         {
-            domClass.replace(current.domNode, 'fx-slide-h-out', 'is-visible');
+            domClass.replace(current.domNode, slideOutCls, 'is-visible');
         }
 
-        domClass.add(next.domNode, 'fx-slide-h-in');
+        domClass.add(next.domNode, slideInCls);
 
         return deferred;
     };
@@ -98,6 +106,6 @@ define('Sage/Platform/Mobile/Transition', [
         START: 0,
         END: 1,
         basic: basic,
-        slideWithCssAnimation: slideWithCssAnimation
+        slide: slideWithCssAnimation
     });
 });

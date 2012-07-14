@@ -1143,16 +1143,11 @@ visibility: hidden;
 }
 
 /* transitions */
-.fx-reverse
-{
-    -webkit-animation-direction: reverse !important;
-}
-
-.fx-slide-h-in
+.fx-slide-r-in
 {
     display: block !important;
 
-    -webkit-animation-name: slide-h-in;
+    -webkit-animation-name: slide-r-in;
     -webkit-animation-direction: normal;
     -webkit-animation-duration: .3s;
     -webkit-animation-timing-function: ease;
@@ -1161,20 +1156,46 @@ visibility: hidden;
     -webkit-transform: translateX(0%);
 }
 
-.fx-slide-h-out
+.fx-slide-r-out
 {
     display: block !important;
 
-    -webkit-animation-name: slide-h-out;
+    -webkit-animation-name: slide-r-out;
     -webkit-animation-direction: normal;
     -webkit-animation-duration: .3s;
     -webkit-animation-timing-function: ease;
     -webkit-animation-iteration-count: 1;
-    
+
     -webkit-transform: translateX(-100%);
 }
 
-@-webkit-keyframes slide-h-in {
+.fx-slide-l-in
+{
+    display: block !important;
+
+    -webkit-animation-name: slide-l-in;
+    -webkit-animation-direction: normal;
+    -webkit-animation-duration: .3s;
+    -webkit-animation-timing-function: ease;
+    -webkit-animation-iteration-count: 1;
+
+    -webkit-transform: translateX(0%);
+}
+
+.fx-slide-l-out
+{
+    display: block !important;
+
+    -webkit-animation-name: slide-l-out;
+    -webkit-animation-direction: normal;
+    -webkit-animation-duration: .3s;
+    -webkit-animation-timing-function: ease;
+    -webkit-animation-iteration-count: 1;
+
+    -webkit-transform: translateX(100%);
+}
+
+@-webkit-keyframes slide-r-in {
 	0% {
 		-webkit-transform: translateX(100%);
 	}
@@ -1183,11 +1204,29 @@ visibility: hidden;
 	}
 }
 
-@-webkit-keyframes slide-h-out {
+@-webkit-keyframes slide-r-out {
 	0% {
 		-webkit-transform: translateX(0%);
 	}
 	100% {
 		-webkit-transform: translateX(-100%);
+	}
+}
+
+@-webkit-keyframes slide-l-in {
+	0% {
+		-webkit-transform: translateX(-100%);
+	}
+	100% {
+		-webkit-transform: translateX(0%);
+	}
+}
+
+@-webkit-keyframes slide-l-out {
+	0% {
+		-webkit-transform: translateX(0%);
+	}
+	100% {
+		-webkit-transform: translateX(100%);
 	}
 }
