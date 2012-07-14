@@ -528,7 +528,7 @@ define('Sage/Platform/Mobile/List', [
             }
 
             this.clear(false);
-            this.requestData();
+            this._requestData();
         },
         _onSearchClear: function() {
 
