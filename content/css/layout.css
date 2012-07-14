@@ -1145,25 +1145,45 @@ visibility: hidden;
 /* transitions */
 .fx-reverse
 {
-    -webkit-animation-direction: normal !important;
+    -webkit-animation-direction: reverse !important;
 }
 
-.fx-slide-h
+.fx-slide-h-in
 {
     display: block !important;
 
-    -webkit-animation-name: slide-h;
+    -webkit-animation-name: slide-h-in;
     -webkit-animation-direction: normal;
     -webkit-animation-duration: .3s;
     -webkit-animation-timing-function: ease;
     -webkit-animation-iteration-count: 1;
 }
 
-@-webkit-keyframes slide-h {
+.fx-slide-h-out
+{
+    display: block !important;
+
+    -webkit-animation-name: slide-h-out;
+    -webkit-animation-direction: normal;
+    -webkit-animation-duration: .3s;
+    -webkit-animation-timing-function: ease;
+    -webkit-animation-iteration-count: 1;
+}
+
+@-webkit-keyframes slide-h-in {
 	0% {
 		-webkit-transform: translateX(100%);
 	}
 	100% {
 		-webkit-transform: translateX(0%);
+	}
+}
+
+@-webkit-keyframes slide-h-out {
+	0% {
+		-webkit-transform: translateX(0%);
+	}
+	100% {
+		-webkit-transform: translateX(-100%);
 	}
 }
