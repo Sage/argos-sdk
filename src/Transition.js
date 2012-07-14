@@ -61,54 +61,6 @@ define('Sage/Platform/Mobile/Transition', [
         return deferred;
     };
 
-    var slideWithCss = function(container, next, current, options, deferred) {
-        // fx-slide-in-r-start
-        // fx-slide-in-r-stop
-        // fx-slide-out-r-start
-        // fx-slide-out-r-stop
-        // fx-slide-in-l-start
-        // fx-slide-in-l-stop
-
-        deferred = deferred || new Deferred();
-
-        domClass.remove(next.domNode, 'is-visible');
-
-        next.placeAt(container);
-
-        deferred.progress(0);
-
-        domClass.add(next.domNode, 'fx-slide-ready fx-slide-in-r-start');
-
-        if (current)
-        {
-            domClass.add(current.domNode, 'fx-slide-ready fx-slide-out-r-start');
-        }
-
-        var onCompleteSignal = on(next.domNode, transitionEnd, function() {
-            onCompleteSignal.remove();
-
-            if (current)
-            {
-                domClass.remove(current.domNode, 'is-visible fx-slide-ready fx-slide-out-r-start fx-slide-out-r-stop');
-            }
-
-            domClass.add(next.domNode, 'is-visible');
-            domClass.remove(next.domNode, 'fx-slide-ready fx-slide-in-r-start fx-slide-in-r-stop');
-
-            deferred.progress(1);
-            deferred.resolve(true);
-        });
-
-        if (current)
-        {
-            domClass.add(current.domNode, 'fx-slide-out-r-stop');
-        }
-
-        domClass.add(next.domNode, 'fx-slide-in-r-stop');
-
-        return deferred;
-    };
-
     var slideWithCssAnimation = function(container, next, current, options, deferred) {
         deferred = deferred || new Deferred();
 
@@ -118,23 +70,16 @@ define('Sage/Platform/Mobile/Transition', [
 
         deferred.progress(0);
 
-        domClass.add(next.domNode, 'fx-slide-in-r-start');
-
-        if (current)
-        {
-            domClass.add(current.domNode, 'fx-slide-out-r-start');
-        }
-
         var onCompleteSignal = on(next.domNode, animationEnd, function() {
             onCompleteSignal.remove();
 
             if (current)
             {
-                domClass.remove(current.domNode, 'is-visible fx-slide-out-r-start fx-slide-out');
+                domClass.remove(current.domNode, 'is-visible fx-reverse fx-slide-h');
             }
 
             domClass.add(next.domNode, 'is-visible');
-            domClass.remove(next.domNode, 'fx-slide-in-r-start fx-slide-in');
+            domClass.remove(next.domNode, 'fx-slide-h');
 
             deferred.progress(1);
             deferred.resolve(true);
@@ -142,10 +87,10 @@ define('Sage/Platform/Mobile/Transition', [
 
         if (current)
         {
-            domClass.add(current.domNode, 'fx-slide-out');
+            domClass.add(current.domNode, 'fx-reverse fx-slide-h');
         }
 
-        domClass.add(next.domNode, 'fx-slide-in');
+        domClass.add(next.domNode, 'fx-slide-h');
 
         return deferred;
     };
@@ -154,7 +99,6 @@ define('Sage/Platform/Mobile/Transition', [
         START: 0,
         END: 1,
         basic: basic,
-        slideWithCss: slideWithCss,
         slideWithCssAnimation: slideWithCssAnimation
     });
 });
