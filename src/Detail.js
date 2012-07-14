@@ -264,8 +264,6 @@ define('Sage/Platform/Mobile/Detail', [
             domClass.remove(this.domNode, 'is-loading');
         },
         _requestData: function() {
-            domClass.add(this.domNode, 'is-loading');
-
             var store = this.get('store'),
                 getOptions = {
                 };
@@ -517,9 +515,11 @@ define('Sage/Platform/Mobile/Detail', [
             this.inherited(arguments);
         },
         clear: function() {
+            this._navigationOptions = [];
+
             domConstruct.place(this.loadingTemplate.apply(this), this.contentNode, 'only');
 
-            this._navigationOptions = [];
+            domClass.add(this.domNode, 'is-loading');
         }
     });
 

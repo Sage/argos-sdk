@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/Pane', [
     './_UiComponent',
     './Toolbar',
     './TitleBar',
-    './View'
+    './Transition'
 ], function(
     declare,
     lang,
@@ -39,7 +39,8 @@ define('Sage/Platform/Mobile/Pane', [
     FixedSplitterPane,
     _UiComponent,
     Toolbar,
-    TitleBar
+    TitleBar,
+    transition
 ) {
     return declare('Sage.Platform.Mobile.Pane', [FixedSplitterPane, _UiComponent], {
         components: [
@@ -66,16 +67,9 @@ define('Sage/Platform/Mobile/Pane', [
             }, this);
         },
         show: function(view) {
-            var deferred = new Deferred();
+            return this._transition(view, view.options);
 
-            /* - add the new view to this domNode
-             * - do transition, remove old view from domNode ?
-             * - or leave view in the container until it is needed elsewhere?
-             * - save on dom movement and better back button support?
-             *
-             * - or have several configurations of views, one for tablets, and one for mobile?
-             *   where views are assigned directly to containers?
-             */
+            // var deferred = new Deferred();
 
             /* todo: why does this fix display issue on Android 3.0 tablet? */
             /* - the nodes are not painted correctly without the timeout
@@ -83,11 +77,13 @@ define('Sage/Platform/Mobile/Pane', [
              * - rotating the tablet causes it to paint correctly.
              * - even happens with OpenGL rendering disabled.
              */
-            setTimeout(lang.hitch(this, this._transitionTo, view, view.options, deferred));
+            // setTimeout(lang.hitch(this, this._transition, view, view.options, deferred));
 
-            return deferred;
+            // return deferred;
         },
-        _beforeTransition: function(view, options, previous) {
+        _before: function(view, options, previous) {
+            console.log('before: %s', view.id);
+
             if (previous)
             {
                 previous.beforeTransitionAway();
@@ -100,6 +96,7 @@ define('Sage/Platform/Mobile/Pane', [
                 var toolbar = this.toolbars[name];
                 if (toolbar.managed)
                 {
+                    toolbar.set('title', view.get('title'));
                     toolbar.clear();
                     toolbar.show();
                 }
@@ -107,7 +104,11 @@ define('Sage/Platform/Mobile/Pane', [
 
             topic.publish('/app/view/transition/before', view, previous, this);
         },
-        _afterTransition: function(view, options, previous) {
+        _after: function(view, options, previous) {
+            console.log('after: %s', view.id);
+
+            this.active = view;
+
             var tools = (options && options.tools) || view.get('tools') || {};
 
             for (var name in this.toolbars)
@@ -115,7 +116,6 @@ define('Sage/Platform/Mobile/Pane', [
                 var toolbar = this.toolbars[name];
                 if (toolbar.managed)
                 {
-                    toolbar.set('title', view.get('title'));
                     toolbar.set('items', tools[name]);
                 }
                 else
@@ -132,49 +132,58 @@ define('Sage/Platform/Mobile/Pane', [
             view.transitionTo();
 
             topic.publish('/app/view/transition/after', view, previous, this);
+
+            this.resize();
         },
-        _transitionTo: function(view, options, deferred) {
+        _progress: function(view, options, previous, step) {
+            if (step == transition.START) this._before(view, options, previous);
+        },
+        _error: function(view, options, previous, error) {
+            console.error('transition error for %s', view.id);
+            console.log(error);
+        },
+        _transition: function(view, options) {
             console.log('transition: %s', view.id);
 
-            if (this.active === view)
+            var active = this.active;
+
+            if (active === view)
             {
+                /* todo: should we return a deferred? or use `when` on the calling side to handle both? */
+                var deferred = new Deferred();
+
                 /* todo: fully reset tools here? could update? only issue would be if new tools were passed for same active view. */
-                this._beforeTransition(view, options, view);
+                this._before(view, options, view);
 
                 /* todo: is `reload` an appropriate name for this? */
                 console.log('reload: %s', view.id);
 
                 view.reload();
 
-                this._afterTransition(view, options, view);
+                this._after(view, options, view);
 
                 deferred.resolve(true);
 
                 return deferred;
             }
 
-            var previous = this.active;
+            var deferred = new Deferred();
 
-            domClass.remove(view.domNode, 'is-visible');
+            deferred.then(
+                lang.hitch(this, this._after, view, options, active),
+                lang.hitch(this, this._error, view, options, active),
+                lang.hitch(this, this._progress, view, options, active)
+            );
 
-            view.placeAt(this.viewContainerNode || this.domNode);
+            var fx = this._resolve(view, this.active, options);
 
-            this._beforeTransition(view, options, previous);
-
-            if (previous)
-            {
-                domClass.remove(previous.domNode, 'is-visible');
-            }
-
-            domClass.add(view.domNode, 'is-visible');
-
-            this.active = view;
-
-            this._afterTransition(view, options, previous);
-
-            this.resize();
-
-            deferred.resolve(true);
+            return fx.method(this.viewContainerNode || this.domNode, view, active, fx.options, deferred);
+        },
+        _resolve: function(view, previous, options) {
+            return {
+                method: transition.slideWithCssAnimation,
+                options: {}
+            };
         },
         empty: function() {
             console.log('empty: %s', this.id);

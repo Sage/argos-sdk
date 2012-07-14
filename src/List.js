@@ -739,6 +739,8 @@ define('Sage/Platform/Mobile/List', [
             domClass.remove(this.domNode, 'has-more');
 
             this.loadingIndicatorNode = domConstruct.place(this.loadingTemplate.apply(this), this.contentNode, 'only');
+
+            domClass.add(this.domNode, 'is-loading');
         }
     });
 

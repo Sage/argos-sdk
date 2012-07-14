@@ -52,7 +52,9 @@ textarea:focus
 /* layout */
 .layout-left
 {
+    /*
     background: #ff9900;
+    */
 
     background-color: #e6e6e6;
     background-image: linear-gradient(left, #e6e6e6, #cccccc);
@@ -71,9 +73,10 @@ textarea:focus
 
 .layout-center
 {
+    /*
     background: #99ff00;
-
     background: #fff;
+    */
 
     -webkit-box-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
     -moz-shadow: rgba(0, 0, 0, 0.5) 2px 0px 3px;
@@ -82,9 +85,10 @@ textarea:focus
 
 .layout-right
 {
+    /*
     background: #0099ff;
-
     background: #fbfdf0;
+    */
 }
 
 /* toolbar */
