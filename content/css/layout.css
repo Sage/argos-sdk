@@ -1157,6 +1157,8 @@ visibility: hidden;
     -webkit-animation-duration: .3s;
     -webkit-animation-timing-function: ease;
     -webkit-animation-iteration-count: 1;
+
+    -webkit-transform: translateX(0%);
 }
 
 .fx-slide-h-out
@@ -1168,6 +1170,8 @@ visibility: hidden;
     -webkit-animation-duration: .3s;
     -webkit-animation-timing-function: ease;
     -webkit-animation-iteration-count: 1;
+    
+    -webkit-transform: translateX(-100%);
 }
 
 @-webkit-keyframes slide-h-in {

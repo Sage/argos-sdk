@@ -75,11 +75,10 @@ define('Sage/Platform/Mobile/Transition', [
 
             if (current)
             {
-                domClass.remove(current.domNode, 'is-visible fx-slide-h-out');
+                domClass.remove(current.domNode, 'fx-slide-h-out');
             }
 
-            domClass.add(next.domNode, 'is-visible');
-            domClass.remove(next.domNode, 'fx-slide-h-in');
+            domClass.replace(next.domNode, 'is-visible', 'fx-slide-h-in');
 
             deferred.progress(1);
             deferred.resolve(true);
@@ -87,7 +86,7 @@ define('Sage/Platform/Mobile/Transition', [
 
         if (current)
         {
-            domClass.add(current.domNode, 'fx-slide-h-out');
+            domClass.replace(current.domNode, 'fx-slide-h-out', 'is-visible');
         }
 
         domClass.add(next.domNode, 'fx-slide-h-in');
