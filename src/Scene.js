@@ -239,7 +239,8 @@ define('Sage/Platform/Mobile/Scene', [
             return stateSet;
         },
         _createViewSet: function(stateSet, navigation) {
-            var viewSet = [];
+            var viewSet = [],
+                count = this._state.length;
 
             for (var i = 0; i < stateSet.length; i++)
             {
@@ -255,11 +256,12 @@ define('Sage/Platform/Mobile/Scene', [
                 if (context)
                     viewSet.push({
                         view: this._instancedViews[context.view],
+                        initial: count == 0,
                         primary: navigation.primary == context.view,
                         reverse: navigation.reverse
                     });
                 else
-                    viewSet.push({});
+                    viewSet.push({empty: true});
             }
 
             return viewSet;

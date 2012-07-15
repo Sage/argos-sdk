@@ -66,8 +66,8 @@ define('Sage/Platform/Mobile/Pane', [
                 if (component.isInstanceOf(Toolbar)) this.toolbars[component.getComponentName()] = component;
             }, this);
         },
-        show: function(view, showOptions) {
-            return this._transition(view, view.options, showOptions);
+        show: function(view, transitionOptions) {
+            return this._transition(view, view.options, transitionOptions);
 
             // var deferred = new Deferred();
 
@@ -82,45 +82,66 @@ define('Sage/Platform/Mobile/Pane', [
             // return deferred;
         },
         _before: function(view, viewOptions, previous) {
-            console.log('before: %s', view.id);
+            console.log('before: %s', (view && view.id) || 'empty');
 
             if (previous)
             {
                 previous.beforeTransitionAway();
             }
 
-            view.beforeTransitionTo();
+            if (view)
+            {
+                view.beforeTransitionTo();
+            }
 
             for (var name in this.toolbars)
             {
                 var toolbar = this.toolbars[name];
                 if (toolbar.managed)
                 {
-                    toolbar.set('title', view.get('title'));
-                    toolbar.clear();
-                    toolbar.show();
+                    if (view)
+                    {
+                        toolbar.set('title', view.get('title'));
+                        toolbar.clear();
+                        toolbar.show();
+                    }
                 }
             }
 
             topic.publish('/app/view/transition/before', view, previous, this);
         },
         _after: function(view, viewOptions, previous) {
-            console.log('after: %s', view.id);
+            console.log('after: %s', (view && view.id) || 'empty');
 
             this.active = view;
 
-            var tools = (viewOptions && viewOptions.tools) || view.get('tools') || {};
-
-            for (var name in this.toolbars)
+            if (view)
             {
-                var toolbar = this.toolbars[name];
-                if (toolbar.managed)
+                var tools = (viewOptions && viewOptions.tools) || view.get('tools') || {};
+
+                for (var name in this.toolbars)
                 {
-                    toolbar.set('items', tools[name]);
+                    var toolbar = this.toolbars[name];
+                    if (toolbar.managed)
+                    {
+                        toolbar.set('items', tools[name]);
+                    }
+                    else
+                    {
+                        toolbar.update();
+                    }
                 }
-                else
+            }
+            else
+            {
+                for (var name in this.toolbars)
                 {
-                    toolbar.update();
+                    var toolbar = this.toolbars[name];
+                    if (toolbar.managed)
+                    {
+                        toolbar.hide();
+                        toolbar.empty();
+                    }
                 }
             }
 
@@ -129,24 +150,26 @@ define('Sage/Platform/Mobile/Pane', [
                 previous.transitionAway();
             }
 
-            view.transitionTo();
+            if (view)
+            {
+                view.transitionTo();
+            }
 
             topic.publish('/app/view/transition/after', view, previous, this);
 
             this.resize();
         },
-        _progress: function(view, options, previous, step) {
-            if (step == transition.START) this._before(view, options, previous);
+        _progress: function(view, viewOptions, previous, step) {
+            if (step == transition.START) this._before(view, viewOptions, previous);
         },
-        _error: function(view, options, previous, error) {
-            console.error('transition error for %s', view.id);
+        _error: function(view, viewOptions, previous, error) {
+            console.error('transition error for %s', (view && view.id) || 'empty');
             console.log(error);
         },
-        _transition: function(view, viewOptions, showOptions) {
-            console.log('transition: %s', view.id);
+        _transition: function(view, viewOptions, transitionOptions) {
+            console.log('transition: %s', (view && view.id) || 'empty');
 
             var active = this.active;
-
             if (active === view)
             {
                 /* todo: should we return a deferred? or use `when` on the calling side to handle both? */
@@ -156,7 +179,7 @@ define('Sage/Platform/Mobile/Pane', [
                 this._before(view, viewOptions, view);
 
                 /* todo: is `reload` an appropriate name for this? */
-                console.log('reload: %s', view.id);
+                console.log('reload: %s', (view && view.id) || 'empty');
 
                 view.reload();
 
@@ -175,19 +198,27 @@ define('Sage/Platform/Mobile/Pane', [
                 lang.hitch(this, this._progress, view, viewOptions, active)
             );
 
-            var fx = this._resolve(view, viewOptions, showOptions);
+            var fx = transition.findByName(transitionOptions.transition);
 
-            return fx.method(this.viewContainerNode || this.domNode, view, active, fx.options, deferred);
+            return fx(this.viewContainerNode || this.domNode, view, active, transitionOptions, deferred);
         },
-        _resolve: function(view, viewOptions, showOptions) {
-            return {
-                method: transition.slide,
-                options: {reverse: showOptions && showOptions.reverse}
-            };
-        },
-        empty: function() {
+        empty: function(transitionOptions) {
             console.log('empty: %s', this.id);
 
+            if (this.active)
+            {
+                return this._transition(null, null, transitionOptions);
+            }
+            else
+            {
+                var deferred = new Deferred();
+
+                deferred.resolve(true);
+
+                return deferred;
+            }
+
+            /*
             var deferred = new Deferred(),
                 previous = this.active;
 
@@ -211,6 +242,7 @@ define('Sage/Platform/Mobile/Pane', [
             deferred.resolve(true);
 
             return deferred;
+            */
         },
         resize: function() {
             // do not call base implementation (FixedSplitterPane)

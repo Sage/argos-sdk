@@ -119,32 +119,65 @@ define('Sage/Platform/Mobile/Layout', [
 
             delete this._onCheckViewportHeightHandle;
         },
+        _createTransitionOptionsFor: function(view, sceneHint) {
+            if (sceneHint.empty)
+            {
+                return {
+                    transition: 'zoom'
+                };
+            }
+
+            /* no panes are maximized, views slide in L->R, default is L<-R. */
+            if (sceneHint.initial)
+            {
+                return {
+                    transition: 'basic'
+                };
+            }
+
+            if (this.maximized < 0)
+            {
+                return {
+                    transition: 'slide',
+                    reverse: !sceneHint.reverse
+                };
+            }
+            else
+            {
+                return {
+                    transition: 'slide',
+                    reverse: sceneHint.reverse
+                };
+            }
+        },
         apply: function(viewSet) {
             var wait = [];
 
             for (var tier = 0; tier < viewSet.length; tier++)
             {
-                var entry = viewSet[tier];
-                if (entry.view)
+                var item = viewSet[tier],
+                    transitionOptions = this._createTransitionOptionsFor(item.view, item);
+
+                if (item.view)
                 {
-                    wait.push(this.panesByTier[tier].show(entry.view, entry));
+                    wait.push(this.panesByTier[tier].show(item.view, transitionOptions));
                 }
                 else
                 {
-                    wait.push(this.panesByTier[tier].empty());
+                    wait.push(this.panesByTier[tier].empty(transitionOptions));
                 }
             }
 
             return new DeferredList(wait, false, true, true);
         },
-        show: function(view, at, options) {
+        show: function(view, at, transitionOptions) {
             var pane = this.panes[at];
             if (pane)
             {
                 if (view)
-                    return pane.show(view, options);
+                    return pane.show(view, transitionOptions);
                 else
-                    return pane.empty();
+                    return pane.empty(transitionOptions);
             }
 
             /* todo: return empty deferred? */

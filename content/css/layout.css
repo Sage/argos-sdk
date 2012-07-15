@@ -1148,12 +1148,21 @@ visibility: hidden;
     display: block !important;
 
     -webkit-animation-name: slide-r-in;
-    -webkit-animation-direction: normal;
     -webkit-animation-duration: .3s;
-    -webkit-animation-timing-function: ease;
-    -webkit-animation-iteration-count: 1;
+    
+    -moz-animation-name: slide-r-in;
+    -moz-animation-duration: .3s;
+    
+    -ms-animation-name: slide-r-in;
+    -ms-animation-duration: .3s;
+    
+    animation-name: slide-r-in;
+    animation-duration: .3s;
 
     -webkit-transform: translateX(0%);
+    -moz-transform: translateX(0%);
+    -ms-transform: translateX(0%);
+    transform: translateX(0%);
 }
 
 .fx-slide-r-out
@@ -1161,12 +1170,21 @@ visibility: hidden;
     display: block !important;
 
     -webkit-animation-name: slide-r-out;
-    -webkit-animation-direction: normal;
     -webkit-animation-duration: .3s;
-    -webkit-animation-timing-function: ease;
-    -webkit-animation-iteration-count: 1;
+
+    -moz-animation-name: slide-r-out;
+    -moz-animation-duration: .3s;
+
+    -ms-animation-name: slide-r-out;
+    -ms-animation-duration: .3s;
+
+    animation-name: slide-r-out;
+    animation-duration: .3s;
 
     -webkit-transform: translateX(-100%);
+    -moz-transform: translateX(-100%);
+    -ms-transform: translateX(-100%);
+    transform: translateX(-100%);
 }
 
 .fx-slide-l-in
@@ -1174,12 +1192,21 @@ visibility: hidden;
     display: block !important;
 
     -webkit-animation-name: slide-l-in;
-    -webkit-animation-direction: normal;
     -webkit-animation-duration: .3s;
-    -webkit-animation-timing-function: ease;
-    -webkit-animation-iteration-count: 1;
+
+    -moz-animation-name: slide-l-in;
+    -moz-animation-duration: .3s;
+
+    -ms-animation-name: slide-l-in;
+    -ms-animation-duration: .3s;
+
+    animation-name: slide-l-in;
+    animation-duration: .3s;
 
     -webkit-transform: translateX(0%);
+    -moz-transform: translateX(0%);
+    -ms-transform: translateX(0%);
+    transform: translateX(0%);
 }
 
 .fx-slide-l-out
@@ -1187,46 +1214,116 @@ visibility: hidden;
     display: block !important;
 
     -webkit-animation-name: slide-l-out;
-    -webkit-animation-direction: normal;
     -webkit-animation-duration: .3s;
-    -webkit-animation-timing-function: ease;
-    -webkit-animation-iteration-count: 1;
+
+    -moz-animation-name: slide-l-out;
+    -moz-animation-duration: .3s;
+
+    -ms-animation-name: slide-l-out;
+    -ms-animation-duration: .3s;
+
+    animation-name: slide-l-out;
+    animation-duration: .3s;
 
     -webkit-transform: translateX(100%);
+    -moz-transform: translateX(100%);
+    -ms-transform: translateX(100%);
+    transform: translateX(100%);
 }
 
 @-webkit-keyframes slide-r-in {
 	0% {
 		-webkit-transform: translateX(100%);
+		-moz-transform: translateX(100%);
+		-ms-transform: translateX(100%);
+		transform: translateX(100%);
 	}
 	100% {
 		-webkit-transform: translateX(0%);
+		-moz-transform: translateX(0%);
+		-ms-transform: translateX(0%);
+		transform: translateX(0%);
 	}
 }
 
 @-webkit-keyframes slide-r-out {
 	0% {
 		-webkit-transform: translateX(0%);
+		-moz-transform: translateX(0%);
+		-ms-transform: translateX(0%);
+		transform: translateX(0%);
 	}
 	100% {
 		-webkit-transform: translateX(-100%);
+		-moz-transform: translateX(-100%);
+		-ms-transform: translateX(-100%);
+		transform: translateX(-100%);
 	}
 }
 
 @-webkit-keyframes slide-l-in {
 	0% {
 		-webkit-transform: translateX(-100%);
+		-moz-transform: translateX(-100%);
+		-ms-transform: translateX(-100%);
+		transform: translateX(-100%);
 	}
 	100% {
 		-webkit-transform: translateX(0%);
+		-moz-transform: translateX(0%);
+		-ms-transform: translateX(0%);
+		transform: translateX(0%);
 	}
 }
 
 @-webkit-keyframes slide-l-out {
 	0% {
 		-webkit-transform: translateX(0%);
+		-moz-transform: translateX(0%);
+		-ms-transform: translateX(0%);
+		transform: translateX(0%);
 	}
 	100% {
 		-webkit-transform: translateX(100%);
+		-moz-transform: translateX(100%);
+		-ms-transform: translateX(100%);
+		transform: translateX(100%);
+	}
+}
+
+.fx-zoom-out
+{
+    display: block !important;
+
+    -webkit-animation-name: zoom-out;
+    -webkit-animation-duration: .3s;
+
+    -moz-animation-name: zoom-out;
+    -moz-animation-duration: .3s;
+
+    -ms-animation-name: zoom-out;
+    -ms-animation-duration: .3s;
+
+    animation-name: zoom-out;
+    animation-duration: .3s;
+
+    -webkit-transform: scale(0.0, 0.0);
+    -moz-transform: scale(0.0, 0.0);
+    -ms-transform: scale(0.0, 0.0);
+    transform: scale(0.0, 0.0);
+}
+
+@-webkit-keyframes zoom-out {
+	0% {
+		-webkit-transform: scale(1.0, 1.0);
+		-moz-transform: scale(1.0, 1.0);
+		-ms-transform: scale(1.0, 1.0);
+		transform: scale(1.0, 1.0);
+	}
+	100% {
+		-webkit-transform: scale(0.0, 0.0);
+		-moz-transform: scale(0.0, 0.0);
+		-ms-transform: scale(0.0, 0.0);
+		transform: scale(0.0, 0.0);
 	}
 }

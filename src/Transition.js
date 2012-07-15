@@ -61,51 +61,76 @@ define('Sage/Platform/Mobile/Transition', [
         return deferred;
     };
 
-    var slideWithCssAnimation = function(container, next, current, options, deferred) {
-        options = options || {};
-        deferred = deferred || new Deferred();
+    var singleAxisAnimationTransition = function(inCls, outCls, revInCls, revOutCls) {
+        return function(container, next, current, options, deferred) {
+            options = options || {};
+            deferred = deferred || new Deferred();
 
-        var slideInCls = options.reverse
-                ? 'fx-slide-l-in'
-                : 'fx-slide-r-in',
-            slideOutCls = options.reverse
-                ? 'fx-slide-l-out'
-                : 'fx-slide-r-out';
+            var slideInCls = options.reverse
+                    ? revInCls
+                    : inCls,
+                slideOutCls = options.reverse
+                    ? revOutCls
+                    : outCls;
 
-        domClass.remove(next.domNode, 'is-visible');
+            if (next)
+            {
+                domClass.remove(next.domNode, 'is-visible');
 
-        next.placeAt(container);
+                next.placeAt(container);
+            }
 
-        deferred.progress(0);
+            deferred.progress(0);
 
-        var onCompleteSignal = on(next.domNode, animationEnd, function() {
-            onCompleteSignal.remove();
+            var onCompleteSignal = on((next || current).domNode, animationEnd, function() {
+                onCompleteSignal.remove();
+
+                if (current)
+                {
+                    domClass.remove(current.domNode, slideOutCls);
+                }
+
+                if (next)
+                {
+                    domClass.replace(next.domNode, 'is-visible', slideInCls);
+                }
+
+                deferred.progress(1);
+                deferred.resolve(true);
+            });
 
             if (current)
             {
-                domClass.remove(current.domNode, slideOutCls);
+                domClass.replace(current.domNode, slideOutCls, 'is-visible');
             }
 
-            domClass.replace(next.domNode, 'is-visible', slideInCls);
+            if (next)
+            {
+                domClass.add(next.domNode, slideInCls);
+            }
 
-            deferred.progress(1);
-            deferred.resolve(true);
-        });
-
-        if (current)
-        {
-            domClass.replace(current.domNode, slideOutCls, 'is-visible');
-        }
-
-        domClass.add(next.domNode, slideInCls);
-
-        return deferred;
+            return deferred;
+        };
     };
+
+    var slideAnimationTransition = singleAxisAnimationTransition('fx-slide-r-in', 'fx-slide-r-out', 'fx-slide-l-in', 'fx-slide-l-out');
+    var zoomAnimationTransition = singleAxisAnimationTransition('', 'fx-zoom-out', '', '');
 
     return lang.setObject('Sage.Platform.Mobile.Transition', {
         START: 0,
         END: 1,
         basic: basic,
-        slide: slideWithCssAnimation
+        slide: slideAnimationTransition,
+        zoom: zoomAnimationTransition,
+
+        /**
+         *
+         * @param name
+         * @param [fallback]
+         * @return {*}
+         */
+        findByName: function(name, fallback) {
+            return this[name] || ((fallback !== false) && basic);
+        }
     });
 });
