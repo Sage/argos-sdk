@@ -105,6 +105,11 @@ define('Sage/Platform/Mobile/Pane', [
                         toolbar.clear();
                         toolbar.show();
                     }
+                    else
+                    {
+                        toolbar.hide();
+                        toolbar.clear();
+                    }
                 }
             }
 
@@ -134,6 +139,7 @@ define('Sage/Platform/Mobile/Pane', [
             }
             else
             {
+                /*
                 for (var name in this.toolbars)
                 {
                     var toolbar = this.toolbars[name];
@@ -143,6 +149,7 @@ define('Sage/Platform/Mobile/Pane', [
                         toolbar.empty();
                     }
                 }
+                */
             }
 
             if (previous)
