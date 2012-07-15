@@ -67,19 +67,19 @@ define('Sage/Platform/Mobile/Pane', [
             }, this);
         },
         show: function(view, transitionOptions) {
-            return this._transition(view, view.options, transitionOptions);
+            // return this._transition(view, view.options, transitionOptions);
 
-            // var deferred = new Deferred();
+            var deferred = new Deferred();
 
-            /* todo: why does this fix display issue on Android 3.0 tablet? */
+            /* todo: why does this fix display issue on Android 3.0/4.0 tablet? */
             /* - the nodes are not painted correctly without the timeout
              * - some items are not displayed, normally the main view, but can be interacted with
              * - rotating the tablet causes it to paint correctly.
-             * - even happens with OpenGL rendering disabled.
+             * - happens with OpenGL rendering enabled or disabled.
              */
-            // setTimeout(lang.hitch(this, this._transition, view, view.options, deferred));
+            setTimeout(lang.hitch(this, this._transition, view, view.options, setTimeout, deferred), 0);
 
-            // return deferred;
+            return deferred;
         },
         _before: function(view, viewOptions, previous) {
             console.log('before: %s', (view && view.id) || 'empty');
@@ -104,6 +104,11 @@ define('Sage/Platform/Mobile/Pane', [
                         toolbar.set('title', view.get('title'));
                         toolbar.clear();
                         toolbar.show();
+                    }
+                    else
+                    {
+                        toolbar.hide();
+                        toolbar.clear();
                     }
                 }
             }
@@ -134,6 +139,7 @@ define('Sage/Platform/Mobile/Pane', [
             }
             else
             {
+                /*
                 for (var name in this.toolbars)
                 {
                     var toolbar = this.toolbars[name];
@@ -143,6 +149,7 @@ define('Sage/Platform/Mobile/Pane', [
                         toolbar.empty();
                     }
                 }
+                */
             }
 
             if (previous)
@@ -166,14 +173,14 @@ define('Sage/Platform/Mobile/Pane', [
             console.error('transition error for %s', (view && view.id) || 'empty');
             console.log(error);
         },
-        _transition: function(view, viewOptions, transitionOptions) {
+        _transition: function(view, viewOptions, transitionOptions, deferred) {
             console.log('transition: %s', (view && view.id) || 'empty');
 
             var active = this.active;
             if (active === view)
             {
                 /* todo: should we return a deferred? or use `when` on the calling side to handle both? */
-                var deferred = new Deferred();
+                deferred = deferred || new Deferred();
 
                 /* todo: fully reset tools here? could update? only issue would be if new tools were passed for same active view. */
                 this._before(view, viewOptions, view);
@@ -190,7 +197,7 @@ define('Sage/Platform/Mobile/Pane', [
                 return deferred;
             }
 
-            var deferred = new Deferred();
+            deferred = deferred || new Deferred();
 
             deferred.then(
                 lang.hitch(this, this._after, view, viewOptions, active),
