@@ -57,12 +57,11 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
 
             return options;
         },
-        getValuesFromView: function() {
-            var view = App.getPrimaryActiveView();
-            if (view)
+        getValuesFromView: function(view) {
+            var values = view && view.getValues();
+            if (values)
             {
-                var value = view.getValues();
-                this.currentValue = this.validationValue = value;
+                this.currentValue = this.validationValue = values;
                 this.setValue(this.currentValue, false);
             }
         },
