@@ -20,7 +20,8 @@ define('Sage/Platform/Mobile/Calendar', [
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/dom-style',
-    'Sage/Platform/Mobile/View'
+    './_TemplatedWidgetMixin',
+    './View'
 ], function(
     declare,
     string,
@@ -28,18 +29,23 @@ define('Sage/Platform/Mobile/Calendar', [
     domClass,
     domConstruct,
     domStyle,
+    _TemplatedWidgetMixin,
     View
 ) {
-    var pad = function(n) { return n < 10 ? '0' + n : n };
+    var pad = function(n) { return n < 10 ? '0' + n : n; };
     var uCase = function (str) { return str.charAt(0).toUpperCase() + str.substring(1); };
 
-    return declare('Sage.Platform.Mobile.Calendar', [View], {
+    return declare('Sage.Platform.Mobile.Calendar', [View, _TemplatedWidgetMixin], {
         // Localization
         titleText: 'Calendar',
         amText: 'AM',
         pmText: 'PM',
 
         id: 'generic_calendar',
+        events: {
+            'click': true
+        },
+        tier: 0,
         contentNode: null,
         calendarNode: null,
         timeNode: null,
@@ -56,7 +62,7 @@ define('Sage/Platform/Mobile/Calendar', [
         decrementTemplate: '<button data-action="decrement${0}" class="button">-</button>',
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
-                '<div class="panel-content" id="datetime-picker">',
+                '<div class="panel-content datetime-picker">',
                     '<div class="calendar-content">',
                     '<table id="datetime-picker-date" data-dojo-attach-point="datePickControl">',
                         '<caption>&nbsp;</caption>',
@@ -117,7 +123,7 @@ define('Sage/Platform/Mobile/Calendar', [
         daysInMonth: function() {
             return moment(this.year+'-'+this.month).daysInMonth();
         },
-        init: function() {
+        startup: function() {
             this.inherited(arguments);
 
             this.connect(this.dayNode,    'onchange', this.validate);
@@ -189,7 +195,7 @@ define('Sage/Platform/Mobile/Calendar', [
 
             return string.substitute(this[whichTemplate], [whichFormat]);
         },
-        show: function(options) {
+        activate: function(options) {
             this.inherited(arguments);
 
             this.titleText = options.label ? options.label : this.titleText;
@@ -243,9 +249,15 @@ define('Sage/Platform/Mobile/Calendar', [
             }
         },
 
-        decrementYear: function() { this.decrement(this.yearNode); },
-        decrementMonth: function() { this.decrement(this.monthNode); },
-        decrementDay: function() { this.decrement(this.dayNode); },
+        decrementYear: function() {
+            this.decrement(this.yearNode);
+        },
+        decrementMonth: function() {
+            this.decrement(this.monthNode);
+        },
+        decrementDay: function() {
+            this.decrement(this.dayNode);
+        },
         decrementHour: function() {
             this.decrement(this.hourNode);
             if (11 == this.hourNode.value % 12)
@@ -253,7 +265,9 @@ define('Sage/Platform/Mobile/Calendar', [
                 this.toggleMeridiem({$source:this.meridiemNode});
             }
         },
-        decrementMinute: function() { this.decrement(this.minuteNode, 15); },
+        decrementMinute: function() {
+            this.decrement(this.minuteNode, 15);
+        },
         decrement: function(el, inc) { // all fields are <select> elements
             inc = inc || 1;
 
@@ -273,9 +287,15 @@ define('Sage/Platform/Mobile/Calendar', [
             this.validate(null, el);
         },
 
-        incrementYear: function() { this.increment(this.yearNode); },
-        incrementMonth: function() { this.increment(this.monthNode); },
-        incrementDay: function() { this.increment(this.dayNode); },
+        incrementYear: function() {
+            this.increment(this.yearNode);
+        },
+        incrementMonth: function() {
+            this.increment(this.monthNode);
+        },
+        incrementDay: function() {
+            this.increment(this.dayNode);
+        },
         incrementHour: function() {
             this.increment(this.hourNode);
 
@@ -284,7 +304,9 @@ define('Sage/Platform/Mobile/Calendar', [
                 this.toggleMeridiem({$source:this.meridiemNode});
             }
         },
-        incrementMinute: function() { this.increment(this.minuteNode, 15); },
+        incrementMinute: function() {
+            this.increment(this.minuteNode, 15);
+        },
         increment: function(el, inc) {
             inc = inc || 1;
 

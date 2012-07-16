@@ -18,7 +18,6 @@ define('Sage/Platform/Mobile/Fields/DateField', [
     'dojo/string',
     'dojo/dom-class',
     '../_TemplatedWidgetMixin',
-    '../Calendar',
     '../Format',
     './EditorField'
 ], function(
@@ -26,7 +25,6 @@ define('Sage/Platform/Mobile/Fields/DateField', [
     string,
     domClass,
     _TemplatedWidgetMixin,
-    Calendar,
     format,
     EditorField
 ) {
@@ -38,7 +36,7 @@ define('Sage/Platform/Mobile/Fields/DateField', [
 
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
-            '<button data-dojo-attach-point="triggerNode" data-dojo-attach-event="onclick:navigateToEditView" class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
+            '<button data-dojo-attach-point="triggerNode" class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange:_onChange" type="text" />'
         ]),
 
@@ -50,7 +48,7 @@ define('Sage/Platform/Mobile/Fields/DateField', [
             return format.date(value, this.dateFormatText, this.timeless);
         },
         _onChange: function(evt) {
-            var val = Date.parseExact(this.inputNode.value, this.dateFormatText);
+            var val = moment(this.inputNode.value, this.dateFormatText).toDate();
 
             if (val)
             {
@@ -72,8 +70,7 @@ define('Sage/Platform/Mobile/Fields/DateField', [
 
             return options;
         },
-        getValuesFromView: function() {
-            var view = App.getPrimaryActiveView();
+        getValuesFromView: function(view) {
             if (view)
             {
                 this.currentValue = this.validationValue = view.getDateTime();
