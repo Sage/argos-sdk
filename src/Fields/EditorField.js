@@ -47,7 +47,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
         lookupLabelText: 'edit',
         lookupText: '...',
         emptyText: 'empty',
-        completeText: 'Ok',
+        completeText: 'OK',
 
         formatValue: function(val) {
             return '';
@@ -76,9 +76,10 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
         createNavigationOptions: function() {
             return {
                 tools: {
-                    tbar: [{
-                        name: 'complete',
+                    top: [{
+                        name: 'editor-complete',
                         cls: 'complete',
+                        label: this.completeText,
                         fn: this.complete,
                         scope: this
                     },{
@@ -137,7 +138,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
             if (view.isValid && !view.isValid())
                 return;
             else
-                ReUI.back();
+                scene().back();
 
             // if the event is fired before the transition, any XMLHttpRequest created in an event handler and
             // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
@@ -163,7 +164,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                 : this.inherited(arguments);
         },
         setValue: function(val, initial)
-        {            
+        {
             if (val)
             {
                 this.validationValue = this.currentValue = val;

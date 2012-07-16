@@ -160,6 +160,7 @@ define('Sage/Platform/Mobile/Edit', [
             return this.tools || (this.tools = {
                 'top': [{
                     id: 'save',
+                    label: this.saveText,
                     action: 'save',
                     security: this.options && this.options.insert
                         ? this.insertSecurity
