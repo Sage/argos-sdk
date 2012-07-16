@@ -69,8 +69,7 @@ define('Sage/Platform/Mobile/TitleBar', [
             if (item.get('visible')) this._count[item.get('place')] += 1;
         },
         _create: function(props) {
-            props.place = props.place || props.side || 'right';
-            props.side = props.side || props.place;
+            props.place = props.place || 'right';
 
             return this.inherited(arguments);
         },

@@ -44,6 +44,7 @@ define('Sage/Platform/Mobile/Toolbar', [
         events: {
             'click': true
         },
+        itemType: ToolbarButton,
         baseClass: 'toolbar',
         position: 'top',
         items: null,
@@ -53,6 +54,10 @@ define('Sage/Platform/Mobile/Toolbar', [
         _items: null,
         _itemsByName: null,
 
+        constructor: function() {
+            this._items = [];
+            this._itemsByName = {};
+        },
         invoke: function(evt, node) {
             var name = node && domAttr.get(node, 'data-tool');
 
@@ -140,17 +145,17 @@ define('Sage/Platform/Mobile/Toolbar', [
             if (this.position == name) this.set('enabled', value);
         },
         clear: function() {
-            if (this._items)
+            if (this._items.length > 0)
             {
                 array.forEach(this._items, function(item) {
-                    item.remove();
-                });
+                    this._remove(item);
+                }, this);
 
                 this.onContentChange();
-            }
 
-            this._items = [];
-            this._itemsByName = {};
+                this._items = [];
+                this._itemsByName = {};
+            }
         },
         hide: function() {
             this.set('visible', false);
@@ -173,32 +178,38 @@ define('Sage/Platform/Mobile/Toolbar', [
 
             this.onContentChange();
         },
+        _remove: function(item) {
+            item.remove();
+        },
         _update: function(item, context) {
             item.update(context);
         },
-        _create: function(props) {
+        _create: function(props, key) {
             /* support old tool definitions */
             props.name = props.name || props.id;
 
-            /* right now we only support button items */
-            return new ToolbarButton(props);
+            var ctor = props.type || this.itemType;
+
+            delete props.type;
+
+            return new ctor(props);
         },
         _place: function(item) {
             item.placeAt(this.containerNode || this.domNode);
         },
         _setItemsAttr: function(values, options) {
             /* todo: use options for animation, caching */
-            /* cache per key and exact object */
+            /* todo: cache items per key and exact source object */
+
+            this.clear();
 
             if (typeof values == 'undefined') return;
 
             var context = this.get('context'),
-                count = {left: 0, right: 0},
                 key = options && options.key,
                 itemsByName = {},
                 items = array.map(values, function(value) {
-
-                    var item = this._create(value);
+                    var item = this._create(value, key);
 
                     this._update(item, context);
                     this._place(item);

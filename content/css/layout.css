@@ -82,6 +82,11 @@ img
     z-index: 10;
 }
 
+.mblFixedSplitterPane
+{
+    overflow: hidden;
+}
+
 .layout-height-fix
 {
     z-index: 5;

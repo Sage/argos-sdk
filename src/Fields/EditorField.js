@@ -83,7 +83,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                         scope: this
                     },{
                         name: 'cancel',
-                        side: 'left',
+                        place: 'left',
                         publish: '/app/scene/back'
                     }]
                 },

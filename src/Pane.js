@@ -137,20 +137,6 @@ define('Sage/Platform/Mobile/Pane', [
                     }
                 }
             }
-            else
-            {
-                /*
-                for (var name in this.toolbars)
-                {
-                    var toolbar = this.toolbars[name];
-                    if (toolbar.managed)
-                    {
-                        toolbar.hide();
-                        toolbar.empty();
-                    }
-                }
-                */
-            }
 
             if (previous)
             {

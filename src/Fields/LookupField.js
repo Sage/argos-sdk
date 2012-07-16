@@ -146,7 +146,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                             scope: this
                         },{
                             name: 'cancel',
-                            side: 'left',
+                            place: 'left',
                             publish: '/app/scene/back'
                         }]
                     }

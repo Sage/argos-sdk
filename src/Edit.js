@@ -166,7 +166,7 @@ define('Sage/Platform/Mobile/Edit', [
                         : this.updateSecurity
                 },{
                     id: 'cancel',
-                    side: 'left',
+                    place: 'left',
                     publish: '/app/scene/back'
                 }]
             });
