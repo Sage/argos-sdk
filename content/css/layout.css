@@ -194,13 +194,13 @@ img
     z-index: 0;
 }
 
-.toolbar[data-tool-count="1"] > h1
+.toolbar[data-item-count="1"] > h1
 {
     left: 50px;
     right: 50px;
 }
 
-.toolbar[data-tool-count="2"] > h1
+.toolbar[data-item-count="2"] > h1
 {
     left: 100px;
     right: 100px;

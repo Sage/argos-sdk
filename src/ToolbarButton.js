@@ -46,16 +46,11 @@ define('Sage/Platform/Mobile/ToolbarButton', [
         ],
         enabled: true,
         visible: true,
-        side: 'right',
+        place: null,
         icon: null,
         name: null,
         label: null,
 
-        _setSideAttr: function(value) {
-            domClass.replace(this.domNode, 'on-' + value, 'on-' + this.side);
-
-            this.side = value;
-        },
         _setNameAttr: function(value) {
             this.name = value;
 

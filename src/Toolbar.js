@@ -50,7 +50,6 @@ define('Sage/Platform/Mobile/Toolbar', [
         context: null,
         visible: true,
         enabled: true,
-        _size: 0,
         _items: null,
         _itemsByName: null,
 
@@ -141,7 +140,14 @@ define('Sage/Platform/Mobile/Toolbar', [
             if (this.position == name) this.set('enabled', value);
         },
         clear: function() {
-            this._empty();
+            if (this._items)
+            {
+                array.forEach(this._items, function(item) {
+                    item.remove();
+                });
+
+                this.onContentChange();
+            }
 
             this._items = [];
             this._itemsByName = {};
@@ -159,32 +165,26 @@ define('Sage/Platform/Mobile/Toolbar', [
             this.set('enabled', true);
         },
         update: function() {
-            var context = this.get('context'),
-                count = {left: 0, right: 0};
+            var context = this.get('context');
 
             array.forEach(this._items, function(item) {
-                item.update(context);
-
-                if (item.get('visible')) count[item.get('side')] += 1;
+                this._update(item, context);
             }, this);
-
-            var size = Math.max(count['left'], count['right']);
-
-            domAttr.set(this.domNode, 'data-item-count', size);
-
-            this._size = size;
 
             this.onContentChange();
         },
-        _empty: function() {
-            if (this._items)
-            {
-                array.forEach(this._items, function(item) {
-                    item.remove();
-                });
+        _update: function(item, context) {
+            item.update(context);
+        },
+        _create: function(props) {
+            /* support old tool definitions */
+            props.name = props.name || props.id;
 
-                this.onContentChange();
-            }
+            /* right now we only support button items */
+            return new ToolbarButton(props);
+        },
+        _place: function(item) {
+            item.placeAt(this.containerNode || this.domNode);
         },
         _setItemsAttr: function(values, options) {
             /* todo: use options for animation, caching */
@@ -198,29 +198,16 @@ define('Sage/Platform/Mobile/Toolbar', [
                 itemsByName = {},
                 items = array.map(values, function(value) {
 
-                    /* support old tool definitions */
-                    value.name = value.name || value.id;
+                    var item = this._create(value);
 
-                    /* right now we only support button items */
-                    var item = new ToolbarButton(value);
-
-                    item.update(context);
-
-                    if (item.get('visible')) count[item.get('side')] += 1;
-
-                    item.placeAt(this.containerNode || this.domNode);
+                    this._update(item, context);
+                    this._place(item);
 
                     itemsByName[item.get('name')] = item;
 
                     return item;
                 }, this);
 
-            var size = Math.max(count['left'], count['right']);
-
-            /* todo: track each side separately? */
-            domAttr.set(this.domNode, 'data-tool-count', size);
-
-            this._size = size;
             this._items = items;
             this._itemsByName = itemsByName;
 
