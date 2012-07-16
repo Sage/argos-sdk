@@ -45,14 +45,49 @@ define('Sage/Platform/Mobile/TitleBar', [
         ],
         _setTitleAttr: {node: 'titleNode', type: 'innerHTML'},
 
+        _count: null,
+        _size: 0,
+        constructor: function() {
+            this._count = {left: 0, right: 0};
+        },
         onCreate: function() {
             this.inherited(arguments);
 
             domAttr.set(this.domNode, 'data-action', 'scroll');
         },
+        clear: function() {
+            this._count = {left: 0, right: 0};
 
+            this.inherited(arguments);
+        },
         scroll: function() {
             console.log('scroll!');
+        },
+        _update: function(item, context) {
+            this.inherited(arguments);
+
+            if (item.get('visible')) this._count[item.get('place')] += 1;
+        },
+        _create: function(props) {
+            props.place = props.place || props.side || 'right';
+            props.side = props.side || props.place;
+
+            return this.inherited(arguments);
+        },
+        _place: function(item) {
+            domClass.add(item.domNode, 'on-' + item.get('place'));
+
+            this.inherited(arguments);
+        },
+        onContentChange: function() {
+            var count = this._count,
+                size = Math.max(count['left'], count['right']);
+
+            domAttr.set(this.domNode, 'data-item-count', size);
+
+            this._size = size;
+
+            this.inherited(arguments);
         }
     });
 });
