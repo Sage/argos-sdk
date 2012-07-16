@@ -77,7 +77,7 @@ define('Sage/Platform/Mobile/Pane', [
              * - rotating the tablet causes it to paint correctly.
              * - happens with OpenGL rendering enabled or disabled.
              */
-            setTimeout(lang.hitch(this, this._transition, view, view.options, setTimeout, deferred), 0);
+            setTimeout(lang.hitch(this, this._transition, view, view.options, transitionOptions, deferred), 0);
 
             return deferred;
         },
