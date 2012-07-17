@@ -65,30 +65,30 @@ define('Sage/Platform/Mobile/Toolbar', [
         },
         _invokeItemByName: function(name) {
             var item = name && this._itemsByName[name];
-            if (item)
+            if (item) this._invokeItem(item);
+        },
+        _invokeItem: function(item) {
+            var context = this.get('context'),
+                scope = item.scope || context || item,
+                args = utility.expand(item, item.args, context, item) || [];
+
+            if (item.fn)
             {
-                var context = this.get('context'),
-                    scope = item.scope || context || item,
-                    args = utility.expand(item, item.args, context, item) || [];
+                item.fn.apply(scope, args.concat(context, item));
+            }
+            else if (item.show)
+            {
+                scene().showView(item.show, args);
+            }
+            else if (item.action)
+            {
+                var method = scope && scope[item.action];
 
-                if (item.fn)
-                {
-                    item.fn.apply(scope, args.concat(context, item));
-                }
-                else if (item.show)
-                {
-                    scene().showView(item.show, args);
-                }
-                else if (item.action)
-                {
-                    var method = scope && scope[item.action];
-
-                    if (typeof method === 'function') method.apply(scope, args.concat(context, item));
-                }
-                else if (item.publish)
-                {
-                    topic.publish.apply(topic, [item.publish].concat(args, context, item));
-                }
+                if (typeof method === 'function') method.apply(scope, args.concat(context, item));
+            }
+            else if (item.publish)
+            {
+                topic.publish.apply(topic, [item.publish].concat(args, context, item));
             }
         },
         _getContextAttr: function() {
