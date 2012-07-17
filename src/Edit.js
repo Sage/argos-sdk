@@ -387,7 +387,7 @@ define('Sage/Platform/Mobile/Edit', [
             // in this case, since we are doing an insert (only time template is used), the entry is applied as modified data.
             if (this.options.entry)
             {
-                this.processEntry(this.options.entry);
+                this.entry = this.convertEntry(this.options.entry);
                 this.setValues(this.entry);
             }
 
