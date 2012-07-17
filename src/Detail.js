@@ -412,7 +412,6 @@ define('Sage/Platform/Mobile/Detail', [
             }
         },
         _processLayout: function(layout, item) {
-            /* todo: rename to `creator` */
             var rows = typeof layout['children'] === 'function'
                     ? layout['children'].call(this, layout, this._processLayoutRowValue(layout, item), item)
                     : layout['children']

@@ -13,23 +13,47 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/CollectionEditorField', [
+define('Sage/Platform/Mobile/Fields/InlineCollectionEditorField', [
     'dojo/_base/declare',
     'dojo/_base/event',
     'dojo/_base/lang',
-    '../_TemplatedWidgetMixin',
+    'dojo/dom-construct',
+    '../_UiComponent',
     './_Field',
     'argos!scene'
 ], function(
     declare,
     event,
     lang,
-    _TemplatedWidgetMixin,
+    domConstruct,
+    _UiComponent,
     _Field,
     scene
 ) {
 
-    return declare('Sage.Platform.Mobile.Fields.CollectionEditorField', [_Field, _TemplatedWidgetMixin], {
+    return declare('Sage.Platform.Mobile.Fields.InlineCollectionEditorField', [_Field, _UiComponent], {
+        components: [
+            {name: 'content', tag: 'ul', attrs: {'class': 'list-content'}, attachPoint: 'contentNode'},
+            {name: 'editor', tag: 'div', attrs: {'class': 'editor-container'}, attachPoint: 'editorNode'}
+        ],
+        editorNode: null,
+        contentNode: null,
+
+        rowTemplate: new Simplate([
+            '<li data-index="">',
+            '{%! $$.itemTemplate %}',
+            '</li>'
+        ]),
+        itemTemplate: new Simplate([
+            '<h3>{%: $.$descriptor %}</h3>',
+            '<h4>{%: $.$key %}</h4>'
+        ]),
+
+        lookupLabelText: 'edit',
+        lookupText: '...',
+        emptyText: 'empty',
+        completeText: 'OK',
+
         complete: function(view, item) {
             var success = true;
 
@@ -79,6 +103,8 @@ define('Sage/Platform/Mobile/Fields/CollectionEditorField', [
         },
         setValue: function(val, initial)
         {
+            domConstruct.empty(this.contentNode);
+
             if (val)
             {
                 this.validationValue = this.currentValue = val;

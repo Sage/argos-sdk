@@ -288,10 +288,11 @@ define('Sage/Platform/Mobile/Edit', [
         },
         _processLayout: function(layout)
         {
-            var rows = (layout['children'] || layout['as'] || layout),
-                options = layout['options'] || (layout['options'] = {
-                    title: this.detailsText
-                }),
+            var rows = typeof layout['children'] === 'function'
+                ? layout['children'].call(this, layout)
+                : layout['children']
+                    ? layout['children']
+                    : layout,
                 sectionQueue = [],
                 sectionStarted = false,
                 i, current;
@@ -303,7 +304,7 @@ define('Sage/Platform/Mobile/Edit', [
                 var section,
                     sectionNode;
 
-                if (current['children'] || current['as'])
+                if (current['children'])
                 {
                     if (sectionStarted)
                         sectionQueue.push(current);
