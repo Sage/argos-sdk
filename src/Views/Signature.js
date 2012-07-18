@@ -41,22 +41,25 @@ define('Sage/Platform/Mobile/Views/Signature', [
 
         //Templates
         widgetTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel {%= $.cls %}">',
+            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel signature-view {%= $.cls %}">',
                 '{%! $.canvasTemplate %}',
-                '<div class="buttons">',
+                '<div class="signature-buttons">',
                     '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
                     '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
                 '</div>',
             '<div>'
         ]),
         canvasTemplate: new Simplate([
-            '<canvas data-dojo-attach-point="signatureNode" width="{%: $.canvasNodeWidth %}" height="{%: $.canvasNodeHeight %}" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp"></canvas>'
+            '<canvas class="signature-canvas" data-dojo-attach-point="signatureNode" width="{%: $.canvasNodeWidth %}" height="{%: $.canvasNodeHeight %}" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp"></canvas>'
         ]),
         signatureNode: null,
 
         //View Properties
         id: 'signature_edit',
         tier: 1,
+        events: {
+            'click': true
+        },
         expose: false,
         signature: [],
         trace: [],
