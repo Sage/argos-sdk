@@ -691,6 +691,11 @@ body.landscape .datetime-picker > .time-content
     border: none !important;
 }
 
+.signature-view > .signature-canvas
+{
+    border-bottom: 1px black solid;
+}
+
 
 /* button */
 .button

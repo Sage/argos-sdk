@@ -1147,6 +1147,23 @@ visibility: hidden;
     padding-left: 6px;
 }
 
+.signature-view
+{
+    text-align: center;
+}
+.signature-view > .signature-buttons
+{
+    overflow: auto;
+    margin-bottom: 0.5em;
+}
+.signature-view > .signature-buttons > button
+{
+    display: inline-block;
+    width: 40%;
+    margin: 0 1em;
+}
+
+
 /* transitions */
 .fx-slide-r-in
 {
