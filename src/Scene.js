@@ -145,7 +145,7 @@ define('Sage/Platform/Mobile/Scene', [
         getViewRegistration: function(name) {
             return this._registeredViews[name];
         },
-        showView: function(name, options, at) {
+        showView: function(name, options, at, navigation) {
             /* todo: add a fix for when the same view is shown multiple times before completion, i.e. multiple click on initial show, due to lag */
 
             var instance = this._instancedViews[name];
@@ -155,11 +155,11 @@ define('Sage/Platform/Mobile/Scene', [
                 /* otherwise, it needs to be placed on the queue */
                 if (this._idle)
                 {
-                    this._showViewInstance(name, instance, options, at);
+                    this._showViewInstance(name, instance, options, at, navigation);
                 }
                 else
                 {
-                    this._queue.push([name, instance, options, at]);
+                    this._queue.push([name, instance, options, at, navigation]);
                 }
 
                 return;
@@ -185,7 +185,7 @@ define('Sage/Platform/Mobile/Scene', [
                 /* todo: figure out why a `setTimeout` is required here */
                 /* if `require` is called within a `require` as part of `dojo/domReady!`, the
                    page `load` event will not fire. */
-                setTimeout(lang.hitch(this, this._loadView, name, options, definition, at), 0);
+                setTimeout(lang.hitch(this, this._loadView, name, options, definition, at, navigation), 0);
             }
         },
         _isEquivalentStateSet: function(a, b) {
@@ -258,7 +258,8 @@ define('Sage/Platform/Mobile/Scene', [
                         view: this._instancedViews[context.view],
                         initial: count == 0,
                         primary: navigation.primary == context.view,
-                        reverse: navigation.reverse
+                        reverse: navigation.reverse,
+                        always: navigation.always
                     });
                 else
                     viewSet.push({empty: true});
@@ -266,7 +267,7 @@ define('Sage/Platform/Mobile/Scene', [
 
             return viewSet;
         },
-        _showViewInstance: function(name, view, options, at) {
+        _showViewInstance: function(name, view, options, at, navigation) {
             this._idle = false;
 
             /* we are no longer idle and can remove the instance from the require wait list */
@@ -316,7 +317,7 @@ define('Sage/Platform/Mobile/Scene', [
             view.activate(options); /* activation required in order to build context (i.e. hash, etc.) */
 
             var stateSet = this._createStateSet(view, location),
-                viewSet = this._createViewSet(stateSet, {primary: view.id});
+                viewSet = this._createViewSet(stateSet, lang.mixin({primary: view.id}, navigation));
 
             /* todo: trim state to item before match of `stateSet` */
             this._trimStateTo(stateSet);
@@ -393,10 +394,10 @@ define('Sage/Platform/Mobile/Scene', [
             this._idle = remaining.length === 0;
             this._queue = remaining;
         },
-        _loadView: function(name, options, definition, at) {
-            require([definition.type], lang.hitch(this, this._onRequireComplete, name, options, definition, at));
+        _loadView: function(name, options, definition, at, navigation) {
+            require([definition.type], lang.hitch(this, this._onRequireComplete, name, options, definition, at, navigation));
         },
-        _onRequireComplete: function(name, options, definition, at, ctor) {
+        _onRequireComplete: function(name, options, definition, at, navigation, ctor) {
             console.log('require complete: %s', name);
 
             /* todo: always replace id with name? */
@@ -412,20 +413,20 @@ define('Sage/Platform/Mobile/Scene', [
                 if (this._wait[name])
                 {
                     console.log('queuing show of %s due to wait for %s', name, this._wait[name]);
-                    this._queue.push([name, instance, options, at]);
+                    this._queue.push([name, instance, options, at, navigation]);
                 }
                 else
                 {
-                    this._showViewInstance(name, instance, options, at);
+                    this._showViewInstance(name, instance, options, at, navigation);
                 }
             }
             else
             {
                 console.log('queuing show of %s due to activity', name);
-                this._queue.push([name, instance, options, at]);
+                this._queue.push([name, instance, options, at, navigation]);
             }
         },
-        back: function() {
+        back: function(navigation) {
             /* todo: let browser history handle this for us? use hashchange to do this? */
             if (this._state.length <= 1) return;
 
@@ -434,7 +435,7 @@ define('Sage/Platform/Mobile/Scene', [
             this._state.pop();
 
             var stateSet = this._state[this._state.length - 1],
-                viewSet = this._createViewSet(stateSet, {reverse: true});
+                viewSet = this._createViewSet(stateSet, lang.mixin({reverse: true}, navigation));
 
             array.forEach(viewSet, function(item, index) {
                 if (item.view) item.view.activate(stateSet[index].context.options);

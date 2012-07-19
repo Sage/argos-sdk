@@ -123,7 +123,8 @@ define('Sage/Platform/Mobile/Layout', [
             if (sceneHint.empty)
             {
                 return {
-                    transition: 'zoom'
+                    transition: 'zoom',
+                    always: sceneHint.always
                 };
             }
 
@@ -139,14 +140,16 @@ define('Sage/Platform/Mobile/Layout', [
             {
                 return {
                     transition: 'slide',
-                    reverse: !sceneHint.reverse
+                    reverse: !sceneHint.reverse,
+                    always: sceneHint.always
                 };
             }
             else
             {
                 return {
                     transition: 'slide',
-                    reverse: sceneHint.reverse
+                    reverse: sceneHint.reverse,
+                    always: sceneHint.always
                 };
             }
         },

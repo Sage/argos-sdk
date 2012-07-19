@@ -23,6 +23,7 @@ define('Sage/Platform/Mobile/Toolbar', [
     'dijit/_WidgetBase',
     './_EventMapMixin',
     './_UiComponent',
+    './_CommandMixin',
     './ToolbarButton',
     './Utility',
     'argos!scene'
@@ -36,11 +37,12 @@ define('Sage/Platform/Mobile/Toolbar', [
     _WidgetBase,
     _EventMapMixin,
     _UiComponent,
+    _CommandSupportMixin,
     ToolbarButton,
     utility,
     scene
 ) {
-    return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _EventMapMixin, _UiComponent], {
+    return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _UiComponent, _CommandSupportMixin, _EventMapMixin], {
         events: {
             'click': true
         },
@@ -51,6 +53,7 @@ define('Sage/Platform/Mobile/Toolbar', [
         context: null,
         visible: true,
         enabled: true,
+
         _items: null,
         _itemsByName: null,
 
@@ -58,48 +61,12 @@ define('Sage/Platform/Mobile/Toolbar', [
             this._items = [];
             this._itemsByName = {};
         },
-        invoke: function(evt, node) {
-            var name = node && domAttr.get(node, 'data-tool');
-
-            this._invokeItemByName(name);
-        },
-        _invokeItemByName: function(name) {
-            var item = name && this._itemsByName[name];
-            if (item) this._invokeItem(item);
-        },
-        _invokeItem: function(item) {
-            var context = this.get('context'),
-                scope = item.scope || context || item,
-                args = utility.expand(item, item.args, context, item) || [];
-
-            if (item.fn)
-            {
-                item.fn.apply(scope, args.concat(context, item));
-            }
-            else if (item.show)
-            {
-                scene().showView(item.show, args);
-            }
-            else if (item.action)
-            {
-                var method = scope && scope[item.action];
-
-                if (typeof method === 'function') method.apply(scope, args.concat(context, item));
-            }
-            else if (item.publish)
-            {
-                topic.publish.apply(topic, [item.publish].concat(args, context, item));
-            }
-        },
         _getContextAttr: function() {
             if (this.context) return this.context;
 
             var parent = this.getParent();
 
             return parent && parent.active;
-        },
-        _setContextAttr: function(value) {
-            this.context = value;
         },
         _setEnabledAttr: function(value) {
             this.enabled = value;
@@ -139,7 +106,7 @@ define('Sage/Platform/Mobile/Toolbar', [
             this.onPositionChange(this.position, null);
         },
         _onToolbarInvoke: function(name) {
-            this._invokeItemByName(name);
+            this.invoke(name);
         },
         _onToolbarToggle: function(name, value) {
             if (this.position == name) this.set('enabled', value);
@@ -155,6 +122,8 @@ define('Sage/Platform/Mobile/Toolbar', [
 
                 this._items = [];
                 this._itemsByName = {};
+
+                this._commandsByName = {};
             }
         },
         hide: function() {
@@ -221,6 +190,8 @@ define('Sage/Platform/Mobile/Toolbar', [
 
             this._items = items;
             this._itemsByName = itemsByName;
+
+            this._commandsByName = itemsByName;
 
             this.onContentChange();
         },

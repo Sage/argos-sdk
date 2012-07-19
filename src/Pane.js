@@ -163,7 +163,7 @@ define('Sage/Platform/Mobile/Pane', [
             console.log('transition: %s', (view && view.id) || 'empty');
 
             var active = this.active;
-            if (active === view)
+            if (active === view && !transitionOptions.always)
             {
                 /* todo: should we return a deferred? or use `when` on the calling side to handle both? */
                 deferred = deferred || new Deferred();
@@ -193,7 +193,7 @@ define('Sage/Platform/Mobile/Pane', [
 
             var fx = transition.findByName(transitionOptions.transition);
 
-            return fx(this.viewContainerNode || this.domNode, view, active, transitionOptions, deferred);
+            return fx(this.viewContainerNode || this.domNode, view, active === view ? null : active, transitionOptions, deferred);
         },
         empty: function(transitionOptions) {
             console.log('empty: %s', this.id);

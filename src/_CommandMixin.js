@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_CommandSupportMixin', [
+define('Sage/Platform/Mobile/_CommandMixin', [
     'dojo/_base/declare',
     'dojo/dom-attr',
     'dojo/topic',
@@ -12,12 +12,14 @@ define('Sage/Platform/Mobile/_CommandSupportMixin', [
     scene
 ) {
     /* todo: convert toolbar to use this */
-    return declare('Sage.Platform.Mobile._CommandSupportMixin', null, {
+    return declare('Sage.Platform.Mobile._CommandMixin', null, {
         _commandsByName: null,
-        _commands: null,
 
         context: null,
 
+        constructor: function() {
+            this._commandsByName = {};
+        },
         _getContextAttr: function() {
             if (this.context) return this.context;
 
@@ -37,7 +39,7 @@ define('Sage/Platform/Mobile/_CommandSupportMixin', [
         _invokeCommand: function(command) {
             var context = this.get('context'),
                 scope = command.scope || context || command,
-                args = utility.expand(command, command.args, context, command) || [];
+                args = utility.expand(command, command.args, command, context, this) || [];
 
             if (command.fn)
             {
@@ -45,7 +47,7 @@ define('Sage/Platform/Mobile/_CommandSupportMixin', [
             }
             else if (command.show)
             {
-                scene().showView(command.show, args);
+                scene().showView.apply(scene(), [command.show].concat(args));
             }
             else if (command.action)
             {

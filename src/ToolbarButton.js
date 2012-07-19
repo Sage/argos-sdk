@@ -54,7 +54,7 @@ define('Sage/Platform/Mobile/ToolbarButton', [
         _setNameAttr: function(value) {
             this.name = value;
 
-            domAttr.set(this.domNode, 'data-tool', value);
+            domAttr.set(this.domNode, 'data-command', value);
 
             if (!this.get('label')) this.set('label', value);
         },
