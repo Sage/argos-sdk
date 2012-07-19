@@ -851,6 +851,7 @@ define('Sage/Platform/Mobile/List', [
             if (this.options.allowEmptySelection)
                 domClass.add(this.domNode, 'list-has-empty-opt');
 
+            this._loadPreviousSelections();
         },
         hasMoreData: function() {
             /// <summary>
