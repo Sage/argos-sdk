@@ -450,7 +450,7 @@ define('Sage/Platform/Mobile/Detail', [
                 {
                     sectionStarted = true;
                     section = domConstruct.toDom(this.sectionTemplate.apply(layout, this));
-                    sectionNode = section.lastChild;
+                    sectionNode = section.lastChild || section;
                     domConstruct.place(section, this.contentNode);
                 }
 
