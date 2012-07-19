@@ -96,11 +96,8 @@ define('Sage/Platform/Mobile/Edit', [
                 '<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
             '{% } %}',
-            '{% if ($.list) { %}',
-            '<ul class="{%= $.cls %}"></ul>',
-            '{% } else { %}',
-            '<div class="{%= $.cls %}"></div>',
-            '{% } %}'
+            '<fieldset class="{%= $.cls %}">',
+            '</fieldset>'
         ]),
         rowTemplate: new Simplate([
             '<div class="row row-edit {%= $.containerClass || $.cls %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',

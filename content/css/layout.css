@@ -1373,6 +1373,11 @@ visibility: hidden;
     display: block;
 }
 
+.field-collection-entry.has-items > .edit-content
+{
+    border-top: solid 1px #DDD;
+}
+
 .field-collection-entry > .list-content > li:last-child
 {
     border-bottom: none 0px;
@@ -1390,12 +1395,13 @@ visibility: hidden;
 
 .edit-actions
 {
-
+    text-align: right;
 }
 
 .edit-actions > button
 {
-    margin: 8px 8px 8px auto;
+    display: inline-block;
+    margin: 8px;
     padding: 2px 8px;
     height: auto;
 }
