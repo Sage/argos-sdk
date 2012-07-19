@@ -35,7 +35,6 @@ define('Sage/Platform/Mobile/Fields/DateField', [
         invalidDateFormatErrorText: "Field '${0}' has Invalid date format.",
 
         widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button data-dojo-attach-point="triggerNode" class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange:_onChange" type="text" />'
         ]),

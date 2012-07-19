@@ -1342,3 +1342,48 @@ visibility: hidden;
 	0% { transform: scale(1.0, 1.0); }
 	100% { transform: scale(0.0, 0.0); }
 }
+
+.field-collection-entry > .list-content
+{
+    margin: 10px 10px 10px 50px;
+    border: solid 1px #DDD;
+    border-radius: 13px;
+    display: none;
+}
+
+.field-collection-entry.has-items > .list-content
+{
+    display: block;
+}
+
+.field-collection-entry > .list-content > li:last-child
+{
+    border-bottom: none 0px;
+}
+
+.field-collection-entry > .edit-content > div > .row:first-child
+{
+    border-top: solid 1px #DDD;
+}
+
+.field-collection-entry > .edit-content
+{
+    border-bottom: solid 1px #DDD;
+}
+
+.edit-actions
+{
+
+}
+
+.edit-actions > button
+{
+    margin: 8px 8px 8px auto;
+    padding: 2px 8px;
+    height: auto;
+}
+
+.row-collection-entry
+{
+    padding: 0 !important;
+}

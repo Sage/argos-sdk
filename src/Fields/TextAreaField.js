@@ -24,7 +24,6 @@ define('Sage/Platform/Mobile/Fields/TextAreaField', [
         rows: 4,
         enableClearButton: false,
         widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<textarea data-dojo-attach-point="inputNode" name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %}></textarea>'
         ])
     });

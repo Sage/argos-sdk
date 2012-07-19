@@ -81,9 +81,12 @@ define('Sage/Platform/Mobile/Detail', [
             '</div>'
         ]),
         sectionTemplate: new Simplate([
-            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}is-collapsed{% } %} {% if ($.title === false) { %}is-hidden{% } %}">',
-            '{%: ($.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
+            '{% if ($.title !== false) { %}',
+            '<h2 data-action="toggleCollapse" class="{% if ($.collapsed) { %}is-collapsed{% } %}">',
+                '<span>{%: ($.title) %}</span>',
+                '<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
+            '{% } %}',
             '{% if ($.list) { %}',
             '<ul class="{%= $.cls %}"></ul>',
             '{% } else { %}',
@@ -189,7 +192,7 @@ define('Sage/Platform/Mobile/Detail', [
             property = property || '$key';
             return string.substitute(fmt, [utility.getValue(entry, property)]);
         },
-        toggleSection: function(evt, node) {
+        toggleCollapse: function(evt, node) {
             if (node) domClass.toggle(node, 'is-collapsed');
 
             this.onContentChange();

@@ -38,7 +38,6 @@ define('Sage/Platform/Mobile/Fields/CameraField', [
         quality: 15,
 
         widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button data-action="onCameraClick" class="button simpleSubHeaderButton" aria-label="{%: $.cameraLabelText %}"><span aria-hidden="true">{%: $.cameraText %}</span></button>',
             '<img data-dojo-attach-point="cameraNode" src="" width="{%= $.thumbWidth %}" height="{%= $.thumbHeight %}" alt="" />',
             '<input data-dojo-attach-point="inputNode" type="hidden">'

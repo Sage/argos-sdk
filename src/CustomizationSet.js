@@ -179,7 +179,7 @@ define('Sage/Platform/Mobile/CustomizationSet', [
 
                     if (row)
                     {
-                        var children = (row['children'] && 'children') || (row['components'] && 'components') || (row['as'] && 'as');
+                        var children = (row['children'] && 'children') || (row['components'] && 'components') || (row['layout'] && 'layout');
                         if (children)
                         {
                             // make a shallow copy if we haven't already

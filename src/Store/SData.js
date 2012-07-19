@@ -55,8 +55,13 @@ define('Sage/Platform/Mobile/Store/SData', [
                     resourceKind = utility.expand(this, getOptions.resourceKind || this.resourceKind),
                     resourceProperty = utility.expand(this, getOptions.resourceProperty || this.resourceProperty),
                     resourcePredicate = id
-                        ? /(\s+)/.test(id) ? id : json.stringify(id) /* string keys are quoted, numeric keys are left alone */
+                        ? /(\s+)/.test(id)
+                            ? id
+                            : string.substitute("'${0}'", [id]) /* string keys are quoted, numeric keys are left alone */
                         : utility.expand(this, getOptions.resourcePredicate || this.resourcePredicate);
+                    // resourcePredicate = id
+                    //    ? /(\s+)/.test(id) ? id : json.stringify(id) /* string keys are quoted, numeric keys are left alone */
+                    //    : utility.expand(this, getOptions.resourcePredicate || this.resourcePredicate);
 
                 if (resourceProperty)
                 {

@@ -14,7 +14,7 @@
  */
 
 define('Sage/Platform/Mobile/Fields/FieldRegistry', [
-    'dojo/_base/lang',
+    'exports',
     './BooleanField',
     './CameraField',
     './DateField',
@@ -27,9 +27,10 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
     './SelectField',
     './SignatureField',
     './TextAreaField',
-    './TextField'
+    './TextField',
+    './CollectionEntryField'
 ], function(
-    lang,
+    exports,
     BooleanField,
     CameraField,
     DateField,
@@ -42,7 +43,8 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
     SelectField,
     SignatureField,
     TextAreaField,
-    TextField
+    TextField,
+    CollectionEntryField
 ) {
     var fromType = {
         'boolean': BooleanField,
@@ -57,18 +59,18 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
         'select': SelectField,
         'signature': SignatureField,
         'textarea': TextAreaField,
-        'text': TextField
+        'text': TextField,
+        'collection-entry': CollectionEntryField
     };
-    return lang.setObject('Sage.Platform.Mobile.Fields.FieldRegistry', {
-        fromType: fromType,
-        getFieldFor: function(props, fallback) {
-            var name = typeof props == 'string'
-                ? props
-                : props['type'];
-            return this.fromType[name] || ((fallback !== false) && TextField);
-        },
-        register: function(type, ctor) {
-            fromType[type] = ctor;
-        }
-    });
+
+    exports.fromType = fromType;
+    exports.getFieldFor = function(props, fallback) {
+        var name = typeof props == 'string'
+            ? props
+            : props['type'];
+        return this.fromType[name] || ((fallback !== false) && TextField);
+    };
+    exports.register = function(type, ctor) {
+        fromType[type] = ctor;
+    };
 });

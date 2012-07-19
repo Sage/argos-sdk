@@ -21,7 +21,7 @@ define('Sage/Platform/Mobile/Fields/HiddenField', [
     TextField
 ) {
     return declare('Sage.Platform.Mobile.Fields.HiddenField', [TextField], {
-        propertyTemplate: new Simplate([
+        rowTemplate: new Simplate([
             '<div style="display: none;" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'
         ]),

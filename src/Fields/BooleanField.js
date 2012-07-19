@@ -33,7 +33,6 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
             }
         },
         widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<div class="toggle" data-dojo-attach-point="toggleNode" data-dojo-attach-event="onclick:_onClick" toggled="{%= !!$.checked %}">',
                 '<span class="thumb"></span>',
                 '<span class="toggleOn">{%= $.onText %}</span>',

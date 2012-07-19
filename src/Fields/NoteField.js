@@ -30,7 +30,6 @@ define('Sage/Platform/Mobile/Fields/NoteField', [
             }
         },
         widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
             '<div data-dojo-attach-point="inputNode" class="note-text"></div>'
         ]),

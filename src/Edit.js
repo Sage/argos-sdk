@@ -81,7 +81,6 @@ define('Sage/Platform/Mobile/Edit', [
             ]}
         ],
         baseClass: 'view edit',
-        _setEditContentAttr: {node: 'contentNode', type: 'innerHTML'},
         _setValidationContentAttr: {node: 'validationContentNode', type: 'innerHTML'},
 
         validationSummaryItemTemplate: new Simplate([
@@ -91,15 +90,21 @@ define('Sage/Platform/Mobile/Edit', [
             '</li>'
         ]),
         sectionTemplate: new Simplate([
-            '<h2 data-action="toggleSection" class="{% if ($.collapsed) { %}is-collapsed{% } %} {% if ($.title === false) { %}is-hidden{% } %}">',
-            '{%: ($.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
+            '{% if ($.title !== false) { %}',
+            '<h2 data-action="toggleCollapse" class="{% if ($.collapsed) { %}is-collapsed{% } %}">',
+                '<span>{%: ($.title) %}</span>',
+                '<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
-            '<fieldset class="{%= $.cls %}">',
-            '<a href="#" class="android-6059-fix">fix for android issue #6059</a>',
-            '</fieldset>'
+            '{% } %}',
+            '{% if ($.list) { %}',
+            '<ul class="{%= $.cls %}"></ul>',
+            '{% } else { %}',
+            '<div class="{%= $.cls %}"></div>',
+            '{% } %}'
         ]),
-        propertyTemplate: new Simplate([
-            '<div class="row row-edit {%= $.cls %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
+        rowTemplate: new Simplate([
+            '<div class="row row-edit {%= $.containerClass || $.cls %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
+            '<label for="{%= $.name %}">{%: $.label %}</label>',
             '</div>'
         ]),
         id: 'generic_edit',
@@ -187,7 +192,7 @@ define('Sage/Platform/Mobile/Edit', [
         _onDisableField: function(field) {
             domClass.add(field.containerNode, 'row-disabled');
         },
-        toggleSection: function(evt, node) {
+        toggleCollapse: function(evt, node) {
             if (node) domClass.toggle(node, 'is-collapsed');
 
             this.onContentChange();
@@ -224,7 +229,7 @@ define('Sage/Platform/Mobile/Edit', [
             }
             else
             {
-                domConstruct.place(this.notAvailableTemplate.apply(this), this.contentNode, 'only');
+                /* todo: show error message? */
             }
 
             domClass.remove(this.domNode, 'is-loading');
@@ -273,18 +278,20 @@ define('Sage/Platform/Mobile/Edit', [
             return this.layout || [];
         },
         _processLayoutRow: function(layout, row, sectionNode) {
-            var ctor = FieldRegistry.getFieldFor(row['type'], false),
+            var ctor = typeof row['type'] === 'string'
+                    ? FieldRegistry.getFieldFor(row['type'], false)
+                    : row['type'],
                 field = this.fields[row['name'] || row['property']] = new ctor(lang.mixin({
                     owner: this
                 }, row)),
-                template = field.propertyTemplate || this.propertyTemplate;
+                rowTemplate = field.rowTemplate || this.rowTemplate;
 
             this.connect(field, 'onShow', this._onShowField);
             this.connect(field, 'onHide', this._onHideField);
             this.connect(field, 'onEnable', this._onEnableField);
             this.connect(field, 'onDisable', this._onDisableField);
 
-            domConstruct.place(template.apply(field, this), sectionNode, 'last');
+            domConstruct.place(rowTemplate.apply(field, this), sectionNode, 'last');
         },
         _processLayout: function(layout)
         {
@@ -318,7 +325,7 @@ define('Sage/Platform/Mobile/Edit', [
                 {
                     sectionStarted = true;
                     section = domConstruct.toDom(this.sectionTemplate.apply(layout, this));
-                    sectionNode = section.lastChild;
+                    sectionNode = section.lastChild || section;
                     domConstruct.place(section, this.contentNode);
                 }
 
@@ -370,7 +377,7 @@ define('Sage/Platform/Mobile/Edit', [
 
                 if (typeof defaultValue === 'undefined') continue;
 
-                field.setValue(this.expandExpression(defaultValue, field));
+                field.setValue(utility.expand(this, defaultValue, field));
             }
         },
         clearValues: function() {
@@ -418,8 +425,8 @@ define('Sage/Platform/Mobile/Edit', [
                 field = this.fields[name];
                 value = field.getValue();
 
-                include = this.expandExpression(field.include, value, field, this);
-                exclude = this.expandExpression(field.exclude, value, field, this);
+                include = utility.expand(this, field.include, value, field, this);
+                exclude = utility.expand(this, field.exclude, value, field, this);
 
                 /**
                  * include:
@@ -451,7 +458,7 @@ define('Sage/Platform/Mobile/Edit', [
             return empty ? false : o;
         },
         validate: function() {
-            this.errors = [];
+            var errors = [];
 
             for (var name in this.fields)
             {
@@ -462,9 +469,8 @@ define('Sage/Platform/Mobile/Edit', [
                 {
                     domClass.add(field.containerNode, 'row-error');
 
-                    this.errors.push({
-                        name: name,
-                        message: result
+                    array.forEach(lang.isArray(result) ? result : [result], function(message) {
+                        errors.push({name: name, message: message});
                     });
                 }
                 else
@@ -473,8 +479,10 @@ define('Sage/Platform/Mobile/Edit', [
                 }
             }
 
-            return this.errors.length > 0
-                ? this.errors
+            this.errors = errors;
+
+            return errors.length > 0
+                ? errors
                 : false;
         },
         createItem: function() {
@@ -733,10 +741,7 @@ define('Sage/Platform/Mobile/Edit', [
             {
                 if (this.options.template)
                 {
-                    this.itemTemplate = this._processItem(this.options.template);
-
-                    // todo: should the template be applied to the store, fully? or just to the form?
-                    this.setValues(this.itemTemplate, true);
+                    this._processTemplateData(this.options.template);
                 }
                 else
                 {

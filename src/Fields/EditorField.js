@@ -38,7 +38,6 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
             }
         },
         widgetTemplate: new Simplate([
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
             '<input data-dojo-attach-point="inputNode" type="text" />'
         ]),
