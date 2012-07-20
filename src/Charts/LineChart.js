@@ -26,7 +26,6 @@ define('Sage/Platform/Mobile/Charts/LineChart', [
     win,
     domGeom,
     _Chart,
-    ChartManager,
     LinesPlot
 ) {
     return declare('Sage.Platform.Mobile.Charts.LineChart', [_Chart], {

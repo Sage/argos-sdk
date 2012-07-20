@@ -19,12 +19,12 @@
 			"text": "sdata-client-debug.js",
 			"path": "../libraries/sdata/"
 		},{
-			"text": "reui.js",
-			"path": "../libraries/reui/"
+			"text": "moment.js",
+			"path": "../libraries/moment/"
 		},{
-			"text": "date.js",
-			"path": "../libraries/datejs/build/"
-		}]
+            "text": "iscroll-lite.js",
+            "path": "../libraries/"
+        }]
 	}],
 	"resources": [{
 		"src": "../content",
@@ -34,5 +34,9 @@
 		"src": "../libraries/dojo/dojo",
 		"dest": "content/dojo/dojo",
 		"filters": "(dojo\\.js|acme\\.js)"
-	}]
+	},{
+      "src": "../libraries/dojo/dojox",
+      "dest": "content/dojo/dojox",
+      "filters": "(gfx\\.js)"
+    }]
 }

@@ -73,4 +73,6 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
     exports.register = function(type, ctor) {
         fromType[type] = ctor;
     };
+
+    return exports;
 });

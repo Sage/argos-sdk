@@ -18,7 +18,7 @@ define('Sage/Platform/Mobile/Views/Chart', [
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/dom-construct',
-    'Sage/Platform/Mobile/ChartManager',
+    // 'Sage/Platform/Mobile/ChartManager', // todo: fix
     'Sage/Platform/Mobile/View',
     'Sage/Platform/Mobile/Charts/ColumnChart',
     'Sage/Platform/Mobile/Charts/PieChart',
@@ -30,7 +30,7 @@ define('Sage/Platform/Mobile/Views/Chart', [
     lang,
     array,
     domConstruct,
-    ChartManager,
+    // ChartManager,
     View
 ) {
 

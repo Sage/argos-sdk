@@ -25,12 +25,12 @@
           "path": "../libraries/sdata/"
         },
         {
-          "text": "reui.js",
-          "path": "../libraries/reui/"
+          "text": "moment.js",
+          "path": "../libraries/moment/"
         },
         {
-          "text": "date.js",
-          "path": "../libraries/datejs/build/"
+          "text": "iscroll-lite.js",
+          "path": "../libraries/"
         }
       ]
     },
@@ -40,6 +40,70 @@
       "isDebug": true,
       "fileIncludes": [
         {
+          "text": "Utility.js",
+          "path": "../src"
+        },
+        {
+          "text": "_Component.js",
+          "path": "../src"
+        },
+        {
+          "text": "_UiComponent.js",
+          "path": "../src"
+        },
+        {
+          "text": "_EventMapMixin.js",
+          "path": "../src"
+        },
+        {
+          "text": "main.js",
+          "path": "../loader"
+        },
+        {
+          "text": "_CommandMixin.js",
+          "path": "../src"
+        },
+        {
+          "text": "Control.js",
+          "path": "../src"
+        },
+        {
+          "text": "ToolbarButton.js",
+          "path": "../src"
+        },
+        {
+          "text": "Toolbar.js",
+          "path": "../src"
+        },
+        {
+          "text": "TitleBar.js",
+          "path": "../src"
+        },
+        {
+          "text": "Transition.js",
+          "path": "../src"
+        },
+        {
+          "text": "Pane.js",
+          "path": "../src"
+        },
+        {
+          "text": "Layout.js",
+          "path": "../src"
+        },
+        {
+          "text": "View.js",
+          "path": "../src"
+        },
+        {
+          "text": "Scene.js",
+          "path": "../src"
+        },
+        {
+          "text": "CustomizationSet.js",
+          "path": "../src"
+        },
+        {
           "text": "Application.js",
           "path": "../src"
         },
@@ -48,19 +112,7 @@
           "path": "../src"
         },
         {
-          "text": "_ActionMixin.js",
-          "path": "../src"
-        },
-        {
-          "text": "_CustomizationMixin.js",
-          "path": "../src"
-        },
-        {
-          "text": "_Templated.js",
-          "path": "../src"
-        },
-        {
-          "text": "View.js",
+          "text": "_TemplatedWidgetMixin.js",
           "path": "../src"
         },
         {
@@ -68,15 +120,43 @@
           "path": "../src"
         },
         {
+          "text": "_Chart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "AreaChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "BarChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "ColumnChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "LineChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "PieChart.js",
+          "path": "../src/Charts"
+        },
+        {
+          "text": "ChartRegistry.js",
+          "path": "../src/Charts"
+        },
+        {
           "text": "Convert.js",
           "path": "../src"
         },
         {
-          "text": "Format.js",
-          "path": "../src"
+          "text": "SDataStore.js",
+          "path": "../src/Data"
         },
         {
-          "text": "Utility.js",
+          "text": "Format.js",
           "path": "../src"
         },
         {
@@ -84,11 +164,15 @@
           "path": "../src"
         },
         {
+          "text": "ScrollContainer.js",
+          "path": "../src"
+        },
+        {
           "text": "Detail.js",
           "path": "../src"
         },
         {
-          "text": "FieldManager.js",
+          "text": "DomContentComponent.js",
           "path": "../src"
         },
         {
@@ -97,6 +181,10 @@
         },
         {
           "text": "BooleanField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "CameraField.js",
           "path": "../src/Fields"
         },
         {
@@ -148,7 +236,23 @@
           "path": "../src/Fields"
         },
         {
+          "text": "_CompositeMixin.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "CollectionEntryField.js",
+          "path": "../src/Fields"
+        },
+        {
+          "text": "FieldRegistry.js",
+          "path": "../src/Fields"
+        },
+        {
           "text": "Edit.js",
+          "path": "../src"
+        },
+        {
+          "text": "Environment.js",
           "path": "../src"
         },
         {
@@ -164,23 +268,35 @@
           "path": "../src"
         },
         {
-          "text": "Toolbar.js",
-          "path": "../src"
-        },
-        {
-          "text": "MainToolbar.js",
-          "path": "../src"
-        },
-        {
           "text": "PersistentStorage.js",
           "path": "../src"
+        },
+        {
+          "text": "SData.js",
+          "path": "../src/Store"
+        },
+        {
+          "text": "Chart.js",
+          "path": "../src/Views"
         },
         {
           "text": "Signature.js",
           "path": "../src/Views"
         },
         {
-          "text": "_ServiceMixin.js",
+          "text": "_SDataDetailMixin.js",
+          "path": "../src"
+        },
+        {
+          "text": "_SDataEditMixin.js",
+          "path": "../src"
+        },
+        {
+          "text": "_SDataListMixin.js",
+          "path": "../src"
+        },
+        {
+          "text": "_TemplatedContentMixin.js",
           "path": "../src"
         }
       ]
@@ -196,6 +312,11 @@
       "src": "../libraries/dojo/dojo",
       "dest": "content/dojo/dojo",
       "filters": "(dojo\\.js|acme\\.js)"
+    },
+    {
+      "src": "../libraries/dojo/dojox",
+      "dest": "content/dojo/dojox",
+      "filters": "(gfx\\.js)"
     }
   ]
 }

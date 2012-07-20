@@ -7,7 +7,6 @@ if exist deploy (
 mkdir deploy\content\javascript
 mkdir deploy\content\images
 mkdir deploy\content\css
-mkdir deploy\content\reui
 mkdir deploy\content\dojo\dojo
 mkdir deploy\content\dojo\dojo\selector
 mkdir deploy\content\dojo\dijit
