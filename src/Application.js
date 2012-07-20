@@ -20,6 +20,7 @@ define('Sage/Platform/Mobile/Application', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/window',
+    'dojo/has',
     'dojo/string',
     './Utility',
     './_Component',
@@ -32,12 +33,15 @@ define('Sage/Platform/Mobile/Application', [
     declare,
     lang,
     win,
+    has,
     string,
     utility,
     _Component,
     Scene,
     CustomizationSet
 ) {
+
+    has.add('tablet-format', Math.max(window.innerHeight, window.innerWidth) > 960);
     
     lang.extend(Function, {
         bindDelegate: utility.bindDelegate

@@ -313,6 +313,11 @@ define('Sage/Platform/Mobile/Scene', [
 
             location = location || {tier: view.tier};
 
+            if (this.layout.maximized > -1)
+            {
+                location.tier = this.layout.maximized;
+            }
+
             /* todo: is `activate` the right name for this? */
             view.activate(options); /* activation required in order to build context (i.e. hash, etc.) */
 

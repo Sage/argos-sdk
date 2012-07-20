@@ -37,8 +37,11 @@ define('Sage/Platform/Mobile/Store/SData', [
         executeQueryAs: null,
         executeGetAs: null,
 
-        idProperty: '$key',
         itemsProperty: '$resources',
+        idProperty: '$key',
+        labelProperty: '$descriptor',
+        entityProperty: '$name',
+        versionProperty: '$etag',
 
         constructor: function(props) {
             lang.mixin(this, props);
@@ -239,6 +242,19 @@ define('Sage/Platform/Mobile/Store/SData', [
 
             return entry;
         },
+        _handleDateSerialization: function(entry) {
+            for (var prop in entry)
+            {
+                if (entry[prop] instanceof Date)
+                {
+                    entry[prop] = this.service.isJsonEnabled()
+                        ? convert.toJsonStringFromDate(entry[prop])
+                        : convert.toIsoStringFromDate(entry[prop]);
+                }
+            }
+
+            return entry;
+        },
         get: function(id, /* sdata only */ getOptions) {
             // summary:
             //		Retrieves an object by its identity
@@ -272,6 +288,15 @@ define('Sage/Platform/Mobile/Store/SData', [
 
             return lang.getObject(this.idProperty, false, object);
         },
+        getLabel: function(object) {
+            return lang.getObject(this.labelProperty, false, object);
+        },
+        getEntity: function(object) {
+            return lang.getObject(this.entityProperty, false, object);
+        },
+        getVersion: function(object) {
+            return lang.getObject(this.versionProperty, false, object);
+        },
         put: function(object, putOptions) {
             // summary:
             //		Stores an object
@@ -281,7 +306,35 @@ define('Sage/Platform/Mobile/Store/SData', [
             //		Additional directives for storing objects.
             // returns: Number|String
 
-            console.log('put %o, %o', object, putOptions);
+            putOptions = putOptions || {};
+
+            var id = putOptions.id || this.getIdentity(object),
+                entity = putOptions.entity || this.entityName,
+                version = putOptions.version || this.getVersion(object),
+                atom = !this.service.isJsonEnabled();
+
+            if (id) object['$key'] = id;
+            if (entity && atom) object['$name'] = entity;
+            if (version) object['$etag'] = version;
+
+            var handle = {},
+                deferred = new Deferred(lang.hitch(this, this._onCancel, handle)),
+                request = this._createEntryRequest(id, putOptions);
+
+            var method = putOptions.overwrite
+                ? request.update
+                : request.overwrite;
+
+            handle.value = method.call(request, object, {
+                success: lang.hitch(this, this._onTransmitEntrySuccess, deferred),
+                failure: lang.hitch(this, this._onRequestFailure, deferred),
+                abort: lang.hitch(this, this._onRequestAbort, deferred)
+            });
+
+            return deferred;
+        },
+        _onTransmitEntrySuccess: function(deferred, entry) {
+            deferred.resolve(this.doDateConversion ? this._handleDateConversion(entry) : entry);
         },
         add: function(object, addOptions) {
             // summary:
@@ -363,7 +416,19 @@ define('Sage/Platform/Mobile/Store/SData', [
             // returns: dojo.store.api.Store.QueryResults
             //		A result set of the children of the parent object.
         },
-        getMetadata: function(object){
+        getMetadata: function(object) {
+            if (object)
+            {
+                return {
+                    id: this.getIdentity(object),
+                    label: this.getLabel(object),
+                    entity: this.getEntity(object),
+                    version: this.getVersion(object)
+                };
+            }
+
+            return null;
+
             // summary:
             //		Returns any metadata about the object. This may include attribution,
             //		cache directives, history, or version information.

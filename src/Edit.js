@@ -490,16 +490,10 @@ define('Sage/Platform/Mobile/Edit', [
                 : this.createItemForInsert(values);
         },
         createItemForUpdate: function(values) {
-            return lang.mixin(values, {
-                '$key': this.entry['$key'],
-                '$etag': this.entry['$etag'],
-                '$name': this.entry['$name']
-            });
+            return values;
         },
         createItemForInsert: function(values) {
-            return lang.mixin(values, {
-                '$name': this.entityName
-            });
+            return values;
         },
         isFormDisabled: function() {
             return this.busy;
@@ -583,7 +577,8 @@ define('Sage/Platform/Mobile/Edit', [
 
                 var store = this.get('store'),
                     putOptions = {
-                        overwrite: true
+                        overwrite: true,
+                        id: store.getIdentity(this.item)
                     },
                     item = this.createItemForUpdate(values);
 
@@ -601,7 +596,7 @@ define('Sage/Platform/Mobile/Edit', [
         },
         _applyStateToPutOptions: function(putOptions) {
         },
-        _buildRefreshMessage: function(item) {
+        _buildRefreshMessage: function(item, result) {
             if (item)
             {
                 var store = this.get('store'),
@@ -609,14 +604,14 @@ define('Sage/Platform/Mobile/Edit', [
                 return {
                     id: id,
                     key: id,
-                    data: item
+                    data: result
                 };
             }
         },
         _onPutComplete: function(item, result) {
             this.enable();
 
-            var message = this._buildRefreshMessage(item);
+            var message = this._buildRefreshMessage(item, result);
 
             connect.publish('/app/refresh', [message]);
 

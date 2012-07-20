@@ -19,7 +19,7 @@ define('Sage/Platform/Mobile/_SDataEditMixin', [
      * SData enablement for the Detail view.
      */
     return declare('Sage.Platform.Mobile._SDataEditMixin', [_SDataDetailMixin], {
-        _buildRefreshMessage: function(item) {
+        _buildRefreshMessage: function(item, result) {
             var message = this.inherited(arguments);
 
             return lang.mixin(message, {
@@ -60,6 +60,15 @@ define('Sage/Platform/Mobile/_SDataEditMixin', [
                 request.setQueryArg(Sage.SData.Client.SDataUri.QueryArgNames.Include, this.queryInclude.join(','));
 
             return request;
+        },
+        _applyStateToPutOptions: function(putOptions) {
+            var store = this.get('store');
+
+            putOptions.version = store.getVersion(this.item);
+            putOptions.entity = store.getEntity(this.item) || this.entityName;
+        },
+        _applyStateToAddOptions: function(addOptions) {
+            addOptions.entity = this.entityName;
         }
     });
 });
