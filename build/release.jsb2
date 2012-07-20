@@ -176,6 +176,10 @@
           "path": "../src"
         },
         {
+          "text": "FieldRegistry.js",
+          "path": "../src/Fields"
+        },
+        {
           "text": "_Field.js",
           "path": "../src/Fields"
         },
@@ -244,10 +248,6 @@
           "path": "../src/Fields"
         },
         {
-          "text": "FieldRegistry.js",
-          "path": "../src/Fields"
-        },
-        {
           "text": "Edit.js",
           "path": "../src"
         },
@@ -305,7 +305,7 @@
   "resources": [
     {
       "src": "../content",
-      "dest": "content",
+      "dest": "content/platform",
       "filters": ".*(\\.css|\\.jpg|\\.png|\\.gif)"
     },
     {
@@ -316,7 +316,7 @@
     {
       "src": "../libraries/dojo/dojox",
       "dest": "content/dojo/dojox",
-      "filters": "(gfx\\.js)"
+      "filters": "((gfx|svg|shape|path)\\.js)"
     }
   ]
 }

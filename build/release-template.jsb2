@@ -28,7 +28,7 @@
 	}],
 	"resources": [{
 		"src": "../content",
-		"dest": "content",
+		"dest": "content/platform",
 		"filters": ".*(\\.css|\\.jpg|\\.png|\\.gif)"
 	},{
 		"src": "../libraries/dojo/dojo",
@@ -37,6 +37,6 @@
 	},{
       "src": "../libraries/dojo/dojox",
       "dest": "content/dojo/dojox",
-      "filters": "(gfx\\.js)"
+      "filters": "(gfx\\.js|svg\\.js)"
     }]
 }
