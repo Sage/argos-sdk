@@ -14,65 +14,76 @@
  */
 
 define('Sage/Platform/Mobile/Fields/FieldRegistry', [
-    'exports',
-    './BooleanField',
-    './CameraField',
-    './DateField',
-    './DecimalField',
-    './DurationField',
-    './HiddenField',
-    './LookupField',
-    './NoteField',
-    './PhoneField',
-    './SelectField',
-    './SignatureField',
-    './TextAreaField',
-    './TextField',
-    './CollectionEntryField'
+    'dojo/_base/lang',
+    'require'
 ], function(
-    exports,
-    BooleanField,
-    CameraField,
-    DateField,
-    DecimalField,
-    DurationField,
-    HiddenField,
-    LookupField,
-    NoteField,
-    PhoneField,
-    SelectField,
-    SignatureField,
-    TextAreaField,
-    TextField,
-    CollectionEntryField
+    lang,
+    require
 ) {
-    var fromType = {
-        'boolean': BooleanField,
-        'camera': CameraField,
-        'date': DateField,
-        'decimal': DecimalField,
-        'duration': DurationField,
-        'hidden': HiddenField,
-        'lookup': LookupField,
-        'note': NoteField,
-        'phone': PhoneField,
-        'select': SelectField,
-        'signature': SignatureField,
-        'textarea': TextAreaField,
-        'text': TextField,
-        'collection-entry': CollectionEntryField
-    };
+    var FieldRegistry = lang.setObject('Sage.Platform.Mobile.Fields.FieldRegistry', {
+        fromType: {},
+        defaultType: null,
+        getFieldFor: function(props, fallback) {
+            var name = typeof props == 'string'
+                ? props
+                : props['type'];
+            return this.fromType[name] || ((fallback !== false) && this.defaultType);
+        },
+        register: function(type, ctor) {
+            this.fromType[type] = ctor;
+        }
+    });
 
-    exports.fromType = fromType;
-    exports.getFieldFor = function(props, fallback) {
-        var name = typeof props == 'string'
-            ? props
-            : props['type'];
-        return this.fromType[name] || ((fallback !== false) && TextField);
-    };
-    exports.register = function(type, ctor) {
-        fromType[type] = ctor;
-    };
+    require([
+        './BooleanField',
+        './CameraField',
+        './DateField',
+        './DecimalField',
+        './DurationField',
+        './HiddenField',
+        './LookupField',
+        './NoteField',
+        './PhoneField',
+        './SelectField',
+        './SignatureField',
+        './TextAreaField',
+        './TextField',
+        './CollectionEntryField'
+    ], function(
+        BooleanField,
+        CameraField,
+        DateField,
+        DecimalField,
+        DurationField,
+        HiddenField,
+        LookupField,
+        NoteField,
+        PhoneField,
+        SelectField,
+        SignatureField,
+        TextAreaField,
+        TextField,
+        CollectionEntryField
+    ) {
+        FieldRegistry.fromType = {
+            'boolean': BooleanField,
+            'camera': CameraField,
+            'date': DateField,
+            'decimal': DecimalField,
+            'duration': DurationField,
+            'hidden': HiddenField,
+            'lookup': LookupField,
+            'note': NoteField,
+            'phone': PhoneField,
+            'select': SelectField,
+            'signature': SignatureField,
+            'textarea': TextAreaField,
+            'text': TextField,
+            'collection-entry': CollectionEntryField
+        };
 
-    return exports;
+        FieldRegistry.defaultType = TextField;
+    });
+
+    return FieldRegistry;
 });
