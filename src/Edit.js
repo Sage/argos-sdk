@@ -341,7 +341,7 @@ define('Sage/Platform/Mobile/Edit', [
 
             this.setValues(this.itemTemplate, true);
 
-            this.applyDefaultValues();
+            this.applyDefaultValues(this.fields);
             this.applyContext(template);
 
             // Re-apply any passed changes as they may have been overwritten
@@ -366,11 +366,14 @@ define('Sage/Platform/Mobile/Edit', [
         },
         applyContext: function(templateEntry) {
         },
-        applyDefaultValues: function(){
-            for (var name in this.fields)
+        applyDefaultValues: function(fields){
+            for (var name in fields)
             {
-                var field = this.fields[name],
+                var field = fields[name],
                     defaultValue = field['default'];
+
+                if (typeof field['fields'] !== 'undefined')
+                    this.applyDefaultValues(field['fields']);
 
                 if (typeof defaultValue === 'undefined') continue;
 
