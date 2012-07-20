@@ -33,8 +33,7 @@ define('Sage/Platform/Mobile/_CommandMixin', [
                     ? evt
                     : node && domAttr.get(node, 'data-command'),
                 command = this._commandsByName[name];
-
-            this._invokeCommand(command);
+            if (command) this._invokeCommand(command);
         },
         _invokeCommand: function(command) {
             var context = this.get('context'),
