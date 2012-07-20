@@ -13,6 +13,9 @@
 			"text": "Simplate.js",
 			"path": "../libraries/"
 		},{
+			"text": "canvas2image.js",
+			"path": "../libraries/"
+		},{
 			"text": "sdata-client-dependencies-debug.js",
 			"path": "../libraries/sdata/"
 		},{
