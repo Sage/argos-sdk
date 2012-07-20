@@ -14,6 +14,11 @@
  */
 
 define('Sage/Platform/Mobile/Charts/_Chart', [
+    'dojo/_base/Deferred',
+    'dijit/_WidgetBase',
+    '../_TemplatedWidgetMixin',
+    '../_SDataListMixin',
+    'argos!application',
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -24,11 +29,13 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     'dojo/dom-geometry',
     'dojox/charting/Chart',
     'dojox/charting/widget/Legend',
-    'dojox/charting/plot2d/Grid',
-    'dojo/_base/Deferred',
-    'dijit/_WidgetBase',
-    '../_TemplatedWidgetMixin'
+    'dojox/charting/plot2d/Grid'
 ], function(
+    Deferred,
+    _WidgetBase,
+    _TemplatedWidgetMixin,
+    _SDataListMixin,
+    application,
     declare,
     lang,
     array,
@@ -39,13 +46,10 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     domGeom,
     Chart,
     Legend,
-    Grid,
-    Deferred,
-    _WidgetBase,
-    _TemplatedWidgetMixin
+    Grid
 ) {
 
-    return declare('Sage.Platform.Mobile.Charts._Chart', [_WidgetBase, _TemplatedWidgetMixin], {
+    return declare('Sage.Platform.Mobile.Charts._Chart', [_WidgetBase, _TemplatedWidgetMixin, _SDataListMixin], {
         widgetTemplate: new Simplate([
             '<div class="chart-content {%: $.cls %}">',
                 '<div class="chart" data-dojo-attach-point="chartNode"></div>',
@@ -313,6 +317,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
          */
         getSeries: function(feed) {
             var values = [];
+
             for (var i = 0; i < feed.length; i++)
             {
                 var o = feed[i],
@@ -342,11 +347,11 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
             this.containerNode = node;
             this.placeAt(node);
 
-            this.requestData();
+            this._requestData();
         },
         refresh: function() {
             this.clear();
-            this.requestData();
+            this._requestData();
         },
         expandExpression: function(expression) {
             if (typeof expression === 'function')
@@ -357,16 +362,16 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         _getStoreAttr: function() {
             return this.store || (this.store = this.createStore());
         },
-        createStore: function() {
-            return null;
+        getConnection: function() {
+            return application().getConnection(this.connectionName || this.serviceName);
         },
-        requestData:function() {
+        _requestData:function() {
             domClass.add(this.chartNode, 'is-loading');
+
             var store = this.get('store'),
                 queryOptions = { start: 0 },
                 queryExpression = this._buildQueryExpression() || null,
                 queryResults = store.query(queryExpression, queryOptions);
-
             Deferred.when(queryResults,
                 lang.hitch(this, this._onQueryComplete, queryResults),
                 lang.hitch(this, this._onQueryError, queryOptions)
@@ -377,7 +382,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         _buildQueryExpression: function() {
             return this.where;
         },
-        _onQueryComplete: function(items, request) {
+        _onQueryComplete: function(queryResults, items) {
             domClass.remove(this.chartNode, 'is-loading');
             this.processFeed(items);
             this.resize();
