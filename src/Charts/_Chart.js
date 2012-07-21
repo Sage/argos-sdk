@@ -17,7 +17,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     'dojo/_base/Deferred',
     'dijit/_WidgetBase',
     '../_TemplatedWidgetMixin',
-    '../_SDataListMixin',
+    '../_SDataListMixin', // todo: SHOULD NOT PULL THIS IN
     'argos!application',
     'dojo/_base/declare',
     'dojo/_base/lang',

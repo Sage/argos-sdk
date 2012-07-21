@@ -69,7 +69,7 @@ define('Sage/Platform/Mobile/Edit', [
         },
         components: [
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
-            {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
+            {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', props: {enableFormFix:true}, components: [
                 {name: 'scroll', tag: 'div', components: [
                     {name: 'loading', content: Simplate.make('<div class="loading-indicator"><div>{%: $.loadingText %}</div></div>')},
                     {name: 'validation', tag: 'div', attrs: {'class': 'validation-summary'}, components: [

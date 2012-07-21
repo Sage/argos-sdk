@@ -119,6 +119,30 @@
           "text": "Calendar.js",
           "path": "../src"
         },
+          {
+            "text": "Convert.js",
+            "path": "../src"
+          },
+          {
+            "text": "ErrorManager.js",
+            "path": "../src"
+          },
+          {
+            "text": "SData.js",
+            "path": "../src/Store"
+          },
+          {
+            "text": "_SDataDetailMixin.js",
+            "path": "../src"
+          },
+          {
+            "text": "_SDataEditMixin.js",
+            "path": "../src"
+          },
+          {
+            "text": "_SDataListMixin.js",
+            "path": "../src"
+          },
         {
           "text": "_Chart.js",
           "path": "../src/Charts"
@@ -148,19 +172,11 @@
           "path": "../src/Charts"
         },
         {
-          "text": "Convert.js",
-          "path": "../src"
-        },
-        {
           "text": "SDataStore.js",
           "path": "../src/Data"
         },
         {
           "text": "Format.js",
-          "path": "../src"
-        },
-        {
-          "text": "ErrorManager.js",
           "path": "../src"
         },
         {
@@ -272,28 +288,12 @@
           "path": "../src"
         },
         {
-          "text": "SData.js",
-          "path": "../src/Store"
-        },
-        {
           "text": "Chart.js",
           "path": "../src/Views"
         },
         {
           "text": "Signature.js",
           "path": "../src/Views"
-        },
-        {
-          "text": "_SDataDetailMixin.js",
-          "path": "../src"
-        },
-        {
-          "text": "_SDataEditMixin.js",
-          "path": "../src"
-        },
-        {
-          "text": "_SDataListMixin.js",
-          "path": "../src"
         },
         {
           "text": "_TemplatedContentMixin.js",

@@ -26,9 +26,18 @@ define('Sage/Platform/Mobile/ScrollContainer', [
     _WidgetBase,
     _UiComponent
 ) {
+    var onBeforeScrollStart = function(e) {
+        var target = e.target;
+        while (target.nodeType != 1) target = target.parentNode;
+
+        if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA')
+            e.preventDefault();
+    };
+
     /* todo: going to need some way to temporarily turn off the iScroll container when view is not visible, i.e. resize events. */
     return declare('Sage.Platform.Mobile.ScrollContainer', [_WidgetBase, _UiComponent], {
         baseClass: 'scroll-container',
+        enableFormFix: false,
         startup: function() {
             this.inherited(arguments);
 
@@ -38,12 +47,16 @@ define('Sage/Platform/Mobile/ScrollContainer', [
             var hasTouch = 'ontouchstart' in window;
             if (hasTouch)
             {
-                this._scroll = new iScroll(this.domNode, {
+                var options = {
                     useTransition: true,
                     checkDOMChanges: false,
                     hScrollbar: false,
                     vScrollbar: false
-                });
+                };
+
+                if (this.enableFormFix) options.onBeforeScrollStart = onBeforeScrollStart;
+
+                this._scroll = new iScroll(this.domNode, options);
             }
         },
         onContentChange: function() {
