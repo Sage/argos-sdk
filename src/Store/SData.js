@@ -323,7 +323,7 @@ define('Sage/Platform/Mobile/Store/SData', [
 
             var method = putOptions.overwrite
                 ? request.update
-                : request.overwrite;
+                : request.create;
 
             handle.value = method.call(request, object, {
                 success: lang.hitch(this, this._onTransmitEntrySuccess, deferred),
