@@ -84,6 +84,11 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         currentItems: null,
         currentIndex: null,
 
+        /**
+         * Clears out selected values in the collection entry fields after an item is added if set to true
+         */
+        clearOnAdd: true,
+
         lookupLabelText: 'edit',
         lookupText: '...',
         emptyText: 'empty',
@@ -212,6 +217,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             }
         },
         clearValue: function() {
+            this.inherited(arguments);
             this.setValue(null, true);
         },
         add: function() {
@@ -220,9 +226,17 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
             this.currentValue[index] = item;
 
-            domConstruct.place(this.collectionRowTemplate.apply(item, this), this.collectionNode, 'last');
+            var itemNode = domConstruct.place(this.collectionRowTemplate.apply(item, this), this.collectionNode, 'last');
+
+            this.onAdd(item, itemNode, index);
+
+            if (this.clearOnAdd)
+                _CompositeMixin.prototype.clearValue.call(this);
 
             domClass.add(this.domNode, 'has-items');
+        },
+        onAdd: function(item, node, index) {
+
         }
     });
 });
