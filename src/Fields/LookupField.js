@@ -62,7 +62,8 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         // Localization
         dependentErrorText: "A value for '${0}' must be selected.",
         emptyText: '',
-        completeText: 'Select',
+        completeText: 'OK',
+        cancelText: 'Cancel',
         lookupLabelText: 'lookup',
         lookupText: '...',
         
@@ -141,10 +142,12 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                         top: [{
                             name: 'complete',
                             cls: this.singleSelect && (this.singleSelectAction || 'complete'),
+                            label: this.completeText,
                             fn: this.complete,
                             scope: this
                         },{
                             name: 'cancel',
+                            label: this.cancelText,
                             place: 'left',
                             publish: '/app/scene/back'
                         }]

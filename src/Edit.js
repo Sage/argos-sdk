@@ -113,6 +113,7 @@ define('Sage/Platform/Mobile/Edit', [
         customizationSet: 'edit',
 
         saveText: 'Save',
+        cancelText: 'Cancel',
         titleText: 'Edit',
         toggleCollapseText: 'toggle collapse',
         validationSummaryText: 'Validation Summary',
@@ -161,14 +162,15 @@ define('Sage/Platform/Mobile/Edit', [
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'top': [{
-                    id: 'save',
+                    name: 'save',
                     label: this.saveText,
                     action: 'save',
                     security: this.options && this.options.insert
                         ? this.insertSecurity
                         : this.updateSecurity
                 },{
-                    id: 'cancel',
+                    name: 'cancel',
+                    label: this.cancelText,
                     place: 'left',
                     publish: '/app/scene/back'
                 }]

@@ -47,6 +47,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
         lookupText: '...',
         emptyText: 'empty',
         completeText: 'OK',
+        cancelText: 'Cancel',
 
         formatValue: function(val) {
             return '';
@@ -76,7 +77,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
             return {
                 tools: {
                     top: [{
-                        name: 'editor-complete',
+                        name: 'complete',
                         cls: 'complete',
                         label: this.completeText,
                         fn: this.complete,
@@ -84,6 +85,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                     },{
                         name: 'cancel',
                         place: 'left',
+                        label: this.cancelText,
                         publish: '/app/scene/back'
                     }]
                 },
