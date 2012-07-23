@@ -38,7 +38,7 @@ define('Sage/Platform/Mobile/View', [
         tools: null,
         layout: null,
         security: null,
-        serviceName: false,
+        connection: null,
         connectionName: false,
         customizationSet: 'view',
         titleText: 'Generic View',
@@ -186,15 +186,8 @@ define('Sage/Platform/Mobile/View', [
 
             this.onTransitionAway(this);
         },
-        /**
-         * @deprecated
-         * @return {*}
-         */
-        getService: function() {
-            return this.getConnection();
-        },
         getConnection: function() {
-            return application().getConnection(this.connectionName || this.serviceName);
+            return application().getConnection(this.connectionName);
         },
         getTag: function() {
         },
