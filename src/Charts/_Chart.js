@@ -162,7 +162,6 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         stats: {},
 
         constructor: function(o) {
-            console.log(o);
             lang.mixin(this, o);
         },
         postCreate: function() {

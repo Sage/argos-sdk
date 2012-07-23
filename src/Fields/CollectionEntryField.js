@@ -58,11 +58,12 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             {name: 'collection', tag: 'ul', attrs: {'class': 'list-content'}, attachPoint: 'collectionNode'},
             {name: 'content', tag: 'div', attrs: {'class': 'edit-content'}, attachPoint: 'contentNode'},
             {name: 'actions', tag: 'div', attrs: {'class': 'edit-actions'}, components: [
-                {name: 'add', content: Simplate.make('<button class="button" data-action="add">{%: $.addItemText %}</button>')}
+                {name: 'add', content: Simplate.make('<button class="button {%= $.addButtonCls %}" data-action="add">{%: $.addItemText %}</button>')}
             ]}
         ],
         baseClass: 'field-collection-entry',
         containerClass: 'row-collection-entry',
+        addButtonCls: '',
         collectionNode: null,
         contentNode: null,
 
@@ -79,6 +80,8 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         collectionItemTemplate: new Simplate([
             '<h3>{%: $$.getLabel($) %}</h3>',
             '<h4>{%: $$.getIdentity($) %}</h4>'
+        ]),
+        summaryRowTemplate: new Simplate([
         ]),
 
         currentItems: null,
@@ -186,7 +189,6 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
                 for (var i = 0; i < count; i++)
                 {
                     var item = items[i];
-
                     this.currentIndex = i;
 
                     output.push(this.collectionRowTemplate.apply(item, this));
@@ -226,17 +228,24 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
             this.currentValue[index] = item;
 
-            var itemNode = domConstruct.place(this.collectionRowTemplate.apply(item, this), this.collectionNode, 'last');
+            domConstruct.place(this.collectionRowTemplate.apply(item, this), this.collectionNode, 'last');
 
-            this.onAdd(item, itemNode, index);
+            this._addSummaryRow();
 
             if (this.clearOnAdd)
                 _CompositeMixin.prototype.clearValue.call(this);
 
             domClass.add(this.domNode, 'has-items');
         },
-        onAdd: function(item, node, index) {
+        _addSummaryRow: function() {
+            if (this.summaryNode)
+                domConstruct.destroy(this.summaryNode);
 
+            var summary = this.aggregate(this.currentValue);
+            this.summaryNode = domConstruct.place(this.summaryRowTemplate.apply(summary, this), this.collectionNode, 'last');
+        },
+        aggregate: function(items) {
+            return items[0];
         }
     });
 });
