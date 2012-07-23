@@ -17,7 +17,6 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     'dojo/_base/Deferred',
     'dijit/_WidgetBase',
     '../_TemplatedWidgetMixin',
-    '../_SDataListMixin', // todo: SHOULD NOT PULL THIS IN
     'argos!application',
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -34,7 +33,6 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     Deferred,
     _WidgetBase,
     _TemplatedWidgetMixin,
-    _SDataListMixin,
     application,
     declare,
     lang,
@@ -49,7 +47,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
     Grid
 ) {
 
-    return declare('Sage.Platform.Mobile.Charts._Chart', [_WidgetBase, _TemplatedWidgetMixin, _SDataListMixin], {
+    return declare('Sage.Platform.Mobile.Charts._Chart', [_WidgetBase, _TemplatedWidgetMixin], {
         widgetTemplate: new Simplate([
             '<div class="chart-content {%: $.cls %}">',
                 '<div class="chart" data-dojo-attach-point="chartNode"></div>',
@@ -164,6 +162,7 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         stats: {},
 
         constructor: function(o) {
+            console.log(o);
             lang.mixin(this, o);
         },
         postCreate: function() {
