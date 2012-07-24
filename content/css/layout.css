@@ -1119,6 +1119,7 @@ visibility: hidden;
 .row-edit[data-field-type="camera"] > div > img
 {
     padding-left: 110px;
+    vertical-align: middle;
 }
 
 .chart-content
