@@ -15,38 +15,48 @@
 
 define('Sage/Platform/Mobile/Fields/CameraField', [
     'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/_base/config',
     'dojo/dom-class',
+    'dojo/dom-attr',
     './_Field',
-    '../_TemplatedWidgetMixin'
+    '../_TemplatedWidgetMixin',
+    '../_EventMapMixin'
 ], function(
     declare,
+    lang,
+    config,
     domClass,
+    domAttr,
     _Field,
-    _TemplatedWidgetMixin
+    _TemplatedWidgetMixin,
+    _EventMapMixin
 ) {
 
-    return declare('Sage.Platform.Mobile.Fields.CameraField', [_Field, _TemplatedWidgetMixin], {
+    return declare('Sage.Platform.Mobile.Fields.CameraField', [_Field, _EventMapMixin, _TemplatedWidgetMixin], {
+        events: {
+            'click': '_onClick'
+        },
+
         // Localization
         cameraLabelText: 'camera',
         cameraText: '...',
 
         width: 256,
         height: 256,
-        thumbWidth: 32,
-        thumbHeight: 32,
+        thumbWidth: 64,
+        thumbHeight: 64,
         dataUrl: true,
         quality: 15,
 
         widgetTemplate: new Simplate([
-            '<button data-action="onCameraClick" class="button simpleSubHeaderButton" aria-label="{%: $.cameraLabelText %}"><span aria-hidden="true">{%: $.cameraText %}</span></button>',
-            '<img data-dojo-attach-point="cameraNode" src="" width="{%= $.thumbWidth %}" height="{%= $.thumbHeight %}" alt="" />',
+            '<button class="button simpleSubHeaderButton" aria-label="{%: $.cameraLabelText %}"><span aria-hidden="true">{%: $.cameraText %}</span></button>',
+            '<img data-dojo-attach-point="imageNode" src="" width="{%= $.thumbWidth %}" height="{%= $.thumbHeight %}" alt="" />',
             '<input data-dojo-attach-point="inputNode" type="hidden">'
         ]),
-        cameraNode: null,
+        imageNode: null,
 
-        _setSrcAttr: {node: 'cameraNode', type: 'attr', attribute: 'src'},
         _setValueAttr: {node: 'inputNode', type: 'attr', attribute: 'value'},
-
 
         startup: function() {
             this.inherited(arguments);
@@ -54,6 +64,7 @@ define('Sage/Platform/Mobile/Fields/CameraField', [
             if (!this.supportsCamera())
             {
                 this.disable();
+
                 domClass.add(this.containerNode, 'row-disabled');
             }
         },
@@ -62,27 +73,36 @@ define('Sage/Platform/Mobile/Fields/CameraField', [
             return !!navigator.camera;
         },
 
-        onCameraClick: function() {
+        _onClick: function() {
             if (!this.supportsCamera()) return;
 
-            navigator.camera.getPicture(this.onCameraSuccess.bindDelegate(this), this.onCameraFail.bindDelegate(this), {
-                quality: this.quality,
-                destinationType: this.dataUrl ? Camera.DestinationType.DATA_URL : Camera.DestinationType.FILE_URI,
-                targetWidth: this.width,
-                targetHeight: this.height
-            });
+            navigator.camera.getPicture(
+                lang.hitch(this, this._onGetPictureSuccess),
+                lang.hitch(this, this._onGetPictureError),
+                {
+                    quality: this.quality,
+                    destinationType: this.dataUrl ? Camera.DestinationType.DATA_URL : Camera.DestinationType.FILE_URI,
+                    encodingType: Camera.EncodingType.JPEG,
+                    targetWidth: this.width,
+                    targetHeight: this.height
+                }
+            );
         },
-        onCameraSuccess: function(data) {
+        _onGetPictureSuccess: function(data) {
             this.setValue(data);
         },
-        onCameraFail: function(message) {
+        _onGetPictureError: function(message) {
+            console.log('camera failure:');
+            console.log(message);
         },
         setValue: function (val, initial) {
             if (initial) this.originalValue = val;
 
-            this.set('value', val || '');
+            var complete = (this.dataUrl ? 'data:image/jpeg;base64,' : '') + (val || '');
 
-            this.set('src', (this.dataUrl ? 'data:image/jpeg;base64,' : '') + val);
+            this.set('value', complete || '');
+
+            domAttr.set(this.imageNode, 'src', val ? complete : (config.blankGif || ''));
         },
         clearValue: function() {
             this.setValue('', true);
