@@ -93,6 +93,22 @@ define('Sage/Platform/Mobile/Scene', [
 
             lang.mixin(this, options);
         },
+        dumpState: function() {
+            var count = this._state.length,
+                output = [];
+
+            for (var position = 0; position < count; position++)
+            {
+                var stateSet = this._state[position],
+                    tuple = [];
+
+                for (var i = 0; i < stateSet.length; i++) tuple.push(stateSet[i].hash);
+
+                output.push('(' + tuple.join(', ') + ')');
+            }
+
+            console.log(output.join(' => '));
+        },
         onStartup: function() {
             this.inherited(arguments);
 
@@ -201,20 +217,50 @@ define('Sage/Platform/Mobile/Scene', [
 
             return true;
         },
-        _trimStateTo: function(stateSet) {
-            for (var i = this._state.length - 1; i >= 0; i--)
+        _trimStateTo: function(stateSet, navigation) {
+            var count = this._state.length,
+                position = -1;
+
+            for (position = count - 1; position >= 0; position--)
             {
-                if (this._isEquivalentStateSet(this._state[i], stateSet)) break;
+                if (this._isEquivalentStateSet(this._state[position], stateSet)) break;
             }
 
-            if (i >= 0)
+            if (position > -1)
             {
                 /* todo: sync browser history state */
+                /* previously, we flagged as `trimmed` and state was fixed later */
+                /* trimmed == true => new view pushed */
 
-                console.log('found trim state at %d', i);
-                this._state.splice(i, this._state.length - i);
+                console.log('found trim state at %d', position);
+                this._state.splice(position, count - position);
 
                 /* todo: persist new state */
+            }
+            else if (navigation && typeof navigation.returnTo !== 'undefined')
+            {
+                console.log('processing returnTo');
+
+                if (typeof navigation.returnTo === 'function')
+                {
+                    for (position = count - 1; position >= 0; position--)
+                        if (navigation.returnTo(this._state[position]))
+                            break;
+                }
+                else if (navigation.returnTo < 0)
+                {
+                    position = (count) + navigation.returnTo;
+                }
+
+                if (position > -1)
+                {
+                    /* todo: sync browser history state */
+                    /* previously, we flagged as NOT `trimmed` and state was fixed later. */
+                    /* trimmed == false => new view not pushed */
+
+                    console.log('finalized returnTo at %d', position);
+                    this._state.splice(position, count - position);
+                }
             }
         },
         _createStateSet: function(view, location) {
@@ -325,7 +371,7 @@ define('Sage/Platform/Mobile/Scene', [
                 viewSet = this._createViewSet(stateSet, lang.mixin({primary: view.id}, navigation));
 
             /* todo: trim state to item before match of `stateSet` */
-            this._trimStateTo(stateSet);
+            this._trimStateTo(stateSet, navigation);
 
             // console.log('view set to apply: %o', viewSet);
 
