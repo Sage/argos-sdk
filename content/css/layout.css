@@ -529,7 +529,7 @@ img
     right: 70px;
 }
 
-.search-active > .clear-button,
+.search-active > .clear-button
 {
     background: url('../images/delete.png') no-repeat 50% 50%;
 }
