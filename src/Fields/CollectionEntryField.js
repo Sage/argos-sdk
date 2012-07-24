@@ -220,6 +220,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         },
         clearValue: function() {
             this.inherited(arguments);
+
             this.setValue(null, true);
         },
         add: function() {
@@ -232,10 +233,11 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
             this._addSummaryRow();
 
-            if (this.clearOnAdd)
-                _CompositeMixin.prototype.clearValue.call(this);
+            if (this.clearOnAdd) this._setCompositeValues(null, true);
 
             domClass.add(this.domNode, 'has-items');
+
+            if (this.owner) this.owner.resize();
         },
         _addSummaryRow: function() {
             if (this.summaryNode)

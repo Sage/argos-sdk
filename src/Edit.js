@@ -199,11 +199,6 @@ define('Sage/Platform/Mobile/Edit', [
         createStore: function() {
             return null;
         },
-        resize: function() {
-            this.inherited(arguments);
-
-            this.onContentChange();
-        },
         onContentChange: function() {
         },
         _processItem: function(item) {

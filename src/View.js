@@ -78,6 +78,7 @@ define('Sage/Platform/Mobile/View', [
             console.log('refresh: %s', this.id);
         },
         resize: function() {
+            if (!this.refreshRequired) this.onContentChange();
         },
         reload: function() {
             /* todo: is this the right implementation? even though no transition is actually happening? */
