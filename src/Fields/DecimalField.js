@@ -15,10 +15,12 @@
 
 define('Sage/Platform/Mobile/Fields/DecimalField', [
     'dojo/_base/declare',
+    'dojo/_base/event',
     'dojo/string',
     './TextField'
 ], function(
     declare,
+    event,
     string,
     TextField
 ) {
@@ -37,6 +39,15 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
             val = val.replace('.', Mobile.CultureInfo.numberFormat.currencyDecimalSeparator);
 
             this.inherited(arguments, [val]);
+        },
+        _onFocus: function(evt) {
+            this.inherited(arguments);
+            // ios does not support .select(), using suggested https://developer.mozilla.org/en/DOM/Input.select
+            evt.target.setSelectionRange(0, 9999);
+        },
+        _onMouseUp: function(evt) {
+            this.inherited(arguments);
+            event.stop(evt); // prevent de-selecting focused text
         },
         getValue: function() {
             var value = this.inherited(arguments);
