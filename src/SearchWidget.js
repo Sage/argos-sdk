@@ -37,7 +37,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
         _setQueryValueAttr: { node: 'queryNode', type: 'attribute', attribute: 'value' },
         widgetTemplate: new Simplate([
             '<div class="search-header">',
-                '<input type="search" id="search-{%= $$.id %}" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="queryNode" data-dojo-attach-event="onfocus:_onFocus,onblur:_onBlur,onkeypress:_onKeyPress" />',
+                '<input type="text" id="search-{%= $$.id %}" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="queryNode" data-dojo-attach-event="onfocus:_onFocus,onblur:_onBlur,onkeypress:_onKeyPress" />',
                 '<button class="search-clear" data-dojo-attach-event="onclick: _onClearClick"></button>',
                 '<button class="search-button sub-header-button" data-dojo-attach-event="click: search"><span>{%= $.searchText %}</span></button>',
                 '<label data-dojo-attach-point="labelNode" for="search-{%= $$.id %}">{%= $.searchText %}</label>',
