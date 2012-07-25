@@ -256,6 +256,10 @@
           "path": "../src/Fields"
         },
         {
+          "text": "ValueOnlyField.js",
+          "path": "../src/Fields"
+        },
+        {
           "text": "_CompositeMixin.js",
           "path": "../src/Fields"
         },

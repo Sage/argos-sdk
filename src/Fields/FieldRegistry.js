@@ -48,6 +48,7 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
         './SignatureField',
         './TextAreaField',
         './TextField',
+        './ValueOnlyField',
         './CollectionEntryField'
     ], function(
         BooleanField,
@@ -63,6 +64,7 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
         SignatureField,
         TextAreaField,
         TextField,
+        ValueOnlyField,
         CollectionEntryField
     ) {
         FieldRegistry.fromType = {
@@ -79,6 +81,7 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
             'signature': SignatureField,
             'textarea': TextAreaField,
             'text': TextField,
+            'valueOnly': ValueOnlyField,
             'collection-entry': CollectionEntryField
         };
 
