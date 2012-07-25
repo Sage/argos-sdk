@@ -37,10 +37,12 @@ define('Sage/Platform/Mobile/Fields/TextField', [
             }
         },
         widgetTemplate: new Simplate([
+            '<div>',
             '{% if ($.enableClearButton && !$.readonly) { %}',
             '<button class="clear-button" data-dojo-attach-point="clearNode" data-dojo-attach-event="onclick:_onClearClick"></button>',
             '{% } %}',
-            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus, onmouseup: _onMouseUp" class="text-input" type="{%: $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>'
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus, onmouseup: _onMouseUp" class="text-input" type="{%= $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
+            '</div>'
         ]),
         inputNode: null,
         clearNode: null,
@@ -53,7 +55,7 @@ define('Sage/Platform/Mobile/Fields/TextField', [
 
         startup: function() {
             this.inherited(arguments);
-            
+
             if (this.validInputOnly)
                 this.connect(this.inputNode, 'onkeypress', this._onKeyPress);
         },

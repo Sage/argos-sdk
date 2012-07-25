@@ -28,6 +28,7 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
         precision: 2,
         enableClearButton: false,
         inputType: 'number',
+
         setValue: function(val) {
             if (isNaN(parseFloat(val)))
                 val = 0;
