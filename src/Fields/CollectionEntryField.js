@@ -195,6 +195,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
                 }
 
                 if (output.length > 0) domConstruct.place(output.join(''), this.collectionNode, 'last');
+                this._addSummaryRow();
 
                 domClass.add(this.domNode, 'has-items');
             }
