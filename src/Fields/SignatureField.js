@@ -15,12 +15,14 @@
 
 define('Sage/Platform/Mobile/Fields/SignatureField', [
     'dojo/_base/declare',
+    'dojo/_base/lang',
     'dojo/_base/json',
     'dojo/dom-attr',
     '../Format',
     './EditorField'
 ], function(
     declare,
+    lang,
     json,
     domAttr,
     format,
@@ -37,10 +39,11 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
         config: {
             scale: 1,
             lineWidth: 1,
-            penColor: 'blue',
-            width: 180,
-            height: 50
+            penColor: 'blue'
         },
+        previewWidth: 180,
+        previewHeight: 50,
+
         context: null,
         view: 'signature_edit',
         widgetTemplate: new Simplate([
@@ -81,7 +84,7 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
             if (!this.signature || Array != this.signature.constructor)
                 this.signature = [];
 
-            this.signatureNode.src = format.imageFromVector(this.signature, this.config, false);
+            this.signatureNode.src = format.imageFromVector(this.signature, lang.mixin(this.config, {width: this.previewWidth, height: this.previewHeight}), false);
         },
         clearValue: function() {
             this.setValue('', true);
