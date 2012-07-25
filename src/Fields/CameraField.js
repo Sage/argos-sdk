@@ -98,11 +98,14 @@ define('Sage/Platform/Mobile/Fields/CameraField', [
         setValue: function (val, initial) {
             if (initial) this.originalValue = val;
 
-            var complete = (this.dataUrl ? 'data:image/jpeg;base64,' : '') + (val || '');
+            var complete = (this.dataUrl && val ? 'data:image/jpeg;base64,' : '') + (val || '');
 
             this.set('value', complete || '');
 
             domAttr.set(this.imageNode, 'src', val ? complete : (config.blankGif || ''));
+        },
+        getValue: function() {
+            return this.get('value');
         },
         clearValue: function() {
             this.setValue('', true);
