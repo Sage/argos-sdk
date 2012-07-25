@@ -27,6 +27,7 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
     return declare('Sage.Platform.Mobile.Fields.DecimalField', [TextField], {
         precision: 2,
         enableClearButton: false,
+        inputType: 'number',
         setValue: function(val) {
             if (isNaN(parseFloat(val)))
                 val = 0;

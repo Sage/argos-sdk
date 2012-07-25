@@ -1122,6 +1122,15 @@ visibility: hidden;
     vertical-align: middle;
 }
 
+/* Hide number spinner for input type="number" */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button
+{
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
 .chart-content
 {
     width: 100%;
