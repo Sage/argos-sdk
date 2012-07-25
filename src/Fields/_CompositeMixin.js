@@ -90,6 +90,7 @@ define('Sage/Platform/Mobile/Fields/_CompositeMixin', [
         },
         _processLayout: function(layout)
         {
+            if (!layout) return;
             var rows = typeof layout['children'] === 'function'
                 ? layout['children'].call(this, layout)
                 : layout['children']
