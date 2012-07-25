@@ -165,7 +165,7 @@ define('Sage/Platform/Mobile/Fields/_CompositeMixin', [
                 delete this.fields;
             }
         },
-        isDirty: function() {
+        _isCompositeDirty: function() {
             for (var name in this.fields)
             {
                 if (this.fields[name].isDirty()) return true;
@@ -173,7 +173,10 @@ define('Sage/Platform/Mobile/Fields/_CompositeMixin', [
 
             return false;
         },
-        _setCompositeValues: function(values, initial) {
+        _clearCompositeValue: function() {
+            this._setCompositeValue(null, true)
+        },
+        _setCompositeValue: function(values, initial) {
             var noValue = {},
                 field,
                 value;
@@ -198,7 +201,7 @@ define('Sage/Platform/Mobile/Fields/_CompositeMixin', [
                 if (value !== noValue) field.setValue(value, initial);
             }
         },
-        _getCompositeValues: function(all) {
+        _getCompositeValue: function(all) {
             var o = {},
                 empty = true,
                 field,
@@ -244,16 +247,7 @@ define('Sage/Platform/Mobile/Fields/_CompositeMixin', [
             }
             return empty ? false : o;
         },
-        getValue: function() {
-            return this._getCompositeValues();
-        },
-        setValue: function(val, initial) {
-            this._setCompositeValues(val, initial);
-        },
-        clearValue: function() {
-            this._setCompositeValues(null, true);
-        },
-        validate: function() {
+        _validateComposite: function() {
             var errors = [];
 
             for (var name in this.fields)

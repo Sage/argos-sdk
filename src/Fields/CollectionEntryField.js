@@ -58,12 +58,12 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             {name: 'collection', tag: 'ul', attrs: {'class': 'list-content'}, attachPoint: 'collectionNode'},
             {name: 'content', tag: 'div', attrs: {'class': 'edit-content'}, attachPoint: 'contentNode'},
             {name: 'actions', tag: 'div', attrs: {'class': 'edit-actions'}, components: [
-                {name: 'add', content: Simplate.make('<button class="button {%= $.addButtonCls %}" data-action="add">{%: $.addItemText %}</button>')}
+                {name: 'add', content: Simplate.make('<button class="button {%= $.addButtonClass %}" data-action="add">{%: $.addItemText %}</button>')}
             ]}
         ],
         baseClass: 'field-collection-entry',
         containerClass: 'row-collection-entry',
-        addButtonCls: '',
+        addButtonClass: '',
         collectionNode: null,
         contentNode: null,
 
@@ -91,6 +91,8 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
          * Clears out selected values in the collection entry fields after an item is added if set to true
          */
         clearOnAdd: true,
+        validateForAdd: true,
+        validationResult: false,
 
         lookupLabelText: 'edit',
         lookupText: '...',
@@ -98,6 +100,28 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         completeText: 'OK',
         addItemText: 'Add',
 
+        onStartup: function() {
+            this.inherited(arguments);
+
+            if (this.validateForAdd)
+            {
+                for (var name in this.fields)
+                {
+                    var field = this.fields[name];
+                    if (field.validator)
+                    {
+                        this.connect(field, 'onChange', this._onValidationFieldChange);
+                    }
+                }
+            }
+
+            this._onValidationFieldChange();
+        },
+        _onValidationFieldChange: function() {
+            this.validationResult = this._validateComposite();
+
+            domClass.toggle(this.domNode, 'has-invalid-entry', this.validationResult !== false);
+        },
         getIndex: function(item) {
             return this.currentIndex;
         },
@@ -110,36 +134,6 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         constructor: function() {
             this.sourceItems = [];
             this.currentItems = [];
-        },
-        complete: function(view, item) {
-            var success = true;
-
-            if (view instanceof Sage.Platform.Mobile.Edit)
-            {
-                view.hideValidationSummary();
-
-                if (view.validate() !== false)
-                {
-                    view.showValidationSummary();
-                    return;
-                }
-            }
-
-            this.getValuesFromView(view);
-
-            this.setText(this.formatValue(this.validationValue));
-
-            // todo: remove
-            if (view.isValid && !view.isValid())
-                return;
-            else
-                ReUI.back();
-
-            // if the event is fired before the transition, any XMLHttpRequest created in an event handler and
-            // executing during the transition can potentially fail (status 0).  this might only be an issue with CORS
-            // requests created in this state (the pre-flight request is made, and the request ends with status 0).
-            // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
-            if (success) setTimeout(lang.hitch(this, this._onComplete), 0);
         },
         _onComplete: function() {
             this.onChange(this.currentValue, this);
@@ -195,6 +189,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
                 }
 
                 if (output.length > 0) domConstruct.place(output.join(''), this.collectionNode, 'last');
+
                 this._addSummaryRow();
 
                 domClass.add(this.domNode, 'has-items');
@@ -202,6 +197,8 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         },
         setValue: function(val, initial)
         {
+            domClass.remove(this.domNode, 'has-items');
+
             if (val)
             {
                 this.validationValue = this.currentValue = val.slice(0);
@@ -222,11 +219,15 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         clearValue: function() {
             this.inherited(arguments);
 
+            this._clearCompositeValue();
+
             this.setValue(null, true);
         },
         add: function() {
+            if (this.validateForAdd && this.validationResult !== false) return;
+
             var index = ++this.currentIndex,
-                item = this._getCompositeValues();
+                item = this._getCompositeValue();
 
             this.currentValue[index] = item;
 
@@ -234,18 +235,22 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
             this._addSummaryRow();
 
-            if (this.clearOnAdd) this._setCompositeValues(null, true);
+            if (this.clearOnAdd)
+            {
+                this._clearCompositeValue();
+                this._onValidationFieldChange();
+            }
 
             domClass.add(this.domNode, 'has-items');
 
             if (this.owner) this.owner.resize();
         },
         _addSummaryRow: function() {
-            if (this.summaryNode)
-                domConstruct.destroy(this.summaryNode);
+            if (this.summaryNode) domConstruct.destroy(this.summaryNode);
 
-            var summary = this.aggregate(this.currentValue);
-            this.summaryNode = domConstruct.place(this.summaryRowTemplate.apply(summary, this), this.collectionNode, 'last');
+            var aggregate = this.aggregate(this.currentValue);
+
+            this.summaryNode = domConstruct.place(this.summaryRowTemplate.apply(aggregate, this), this.collectionNode, 'last');
         },
         aggregate: function(items) {
             return items[0];

@@ -1373,7 +1373,6 @@ input::-webkit-inner-spin-button
 .field-collection-entry > .list-content
 {
     margin: 10px 10px 10px 50px;
-    border: solid 1px #DDD;
     border-radius: 13px;
     display: none;
 }
@@ -1381,26 +1380,6 @@ input::-webkit-inner-spin-button
 .field-collection-entry.has-items > .list-content
 {
     display: block;
-}
-
-.field-collection-entry.has-items > .edit-content
-{
-    border-top: solid 1px #DDD;
-}
-
-.field-collection-entry > .list-content > li:last-child
-{
-    border-bottom: none 0px;
-}
-
-.field-collection-entry > .edit-content > div > .row:first-child
-{
-    border-top: solid 1px #DDD;
-}
-
-.field-collection-entry > .edit-content
-{
-    border-bottom: solid 1px #DDD;
 }
 
 .edit-actions

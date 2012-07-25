@@ -696,6 +696,35 @@ body.landscape .datetime-picker > .time-content
     border-bottom: 1px black solid;
 }
 
+.field-collection-entry > .list-content
+{
+    border: solid 1px #DDD;
+}
+
+.field-collection-entry.has-items > .edit-content
+{
+    border-top: solid 1px #DDD;
+}
+
+.field-collection-entry > .list-content > li:last-child
+{
+    border-bottom: none 0px;
+}
+
+.field-collection-entry > .edit-content > div > .row:first-child
+{
+    border-top: solid 1px #DDD;
+}
+
+.field-collection-entry > .edit-content
+{
+    border-bottom: solid 1px #DDD;
+}
+
+.field-collection-entry.has-invalid-entry > .edit-actions > .action-button[data-action="add"]
+{
+    opacity: .3;
+}
 
 /* button */
 .button
