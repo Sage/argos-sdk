@@ -25,6 +25,15 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
     TextField
 ) {
     return declare('Sage.Platform.Mobile.Fields.DecimalField', [TextField], {
+        widgetTemplate: new Simplate([
+            '<div>',
+            '{% if ($.enableClearButton && !$.readonly) { %}',
+            '<button class="clear-button" data-dojo-attach-point="clearNode" data-dojo-attach-event="onclick:_onClearClick"></button>',
+            '{% } %}',
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus, onmouseup: _onMouseUp" class="text-input" type="{%= $.inputType %}" name="{%= $.name %}" step="any" {% if ($.readonly) { %} readonly {% } %}>',
+            '</div>'
+        ]),
+
         precision: 2,
         enableClearButton: false,
         inputType: 'number',
