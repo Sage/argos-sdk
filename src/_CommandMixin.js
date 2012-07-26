@@ -38,7 +38,7 @@ define('Sage/Platform/Mobile/_CommandMixin', [
         _invokeCommand: function(command) {
             var context = this.get('context'),
                 scope = command.scope || context || command,
-                args = utility.expand(command, command.args, command, context, this) || [];
+                args = utility.expandSafe(command, command.args, command, context, this) || [];
 
             if (command.enabled === false || command.disabled === true)
                 return;

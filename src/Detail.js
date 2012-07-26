@@ -486,9 +486,13 @@ define('Sage/Platform/Mobile/Detail', [
             return this.options && this.options.key;
         },
         getContext: function() {
+            var options = this.options,
+                id = options.id || options.key;
+
             return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
-                key: this.options.key,
+                key: id,
+                id: id,
                 descriptor: this.options.descriptor
             });
         },

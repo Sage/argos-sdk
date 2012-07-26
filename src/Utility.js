@@ -14,37 +14,37 @@
  */
 
 define('Sage/Platform/Mobile/Utility', [
-    'dojo/_base/lang'
+    'dojo/_base/lang',
+    'dojo/_base/array'
 ], function(
-    lang
+    lang,
+    array
 ) {
     var nameToPathCache = {};
     var nameToPath = function(name) {
-        if (typeof name !== 'string' || name === '.' || name === '') return []; // '', for compatibility
-        if (nameToPathCache[name]) return nameToPathCache[name];
-        var parts = name.split('.');
-        var path = [];
-        for (var i = 0; i < parts.length; i++)
-        {
-            var match = parts[i].match(/([a-zA-Z0-9_$]+)\[([^\]]+)\]/);
-            if (match)
+            if (typeof name !== 'string' || name === '.' || name === '') return []; // '', for compatibility
+            if (nameToPathCache[name]) return nameToPathCache[name];
+            var parts = name.split('.');
+            var path = [];
+            for (var i = 0; i < parts.length; i++)
             {
-                path.push(match[1]);
-                if (/^\d+$/.test(match[2]))
-                    path.push(parseInt(match[2], 10));
+                var match = parts[i].match(/([a-zA-Z0-9_$]+)\[([^\]]+)\]/);
+                if (match)
+                {
+                    path.push(match[1]);
+                    if (/^\d+$/.test(match[2]))
+                        path.push(parseInt(match[2], 10));
+                    else
+                        path.push(match[2]);
+                }
                 else
-                    path.push(match[2]);
+                {
+                    path.push(parts[i]);
+                }
             }
-            else
-            {
-                path.push(parts[i]);
-            }
-        }
-        return (nameToPathCache[name] = path.reverse());
-    };
-
-    return lang.setObject('Sage.Platform.Mobile.Utility', {
-        getValue: function(o, name, defaultValue) {
+            return (nameToPathCache[name] = path.reverse());
+        },
+        getValue = function(o, name, defaultValue) {
             var path = nameToPath(name).slice(0);
             var current = o;
             while (current && path.length > 0)
@@ -57,7 +57,7 @@ define('Sage/Platform/Mobile/Utility', [
             }
             return current;
         },
-        setValue: function(o, name, val) {
+        setValue = function(o, name, val) {
             var current = o;
             var path = nameToPath(name).slice(0);
             while ((typeof current !== "undefined") && path.length > 1)
@@ -77,7 +77,7 @@ define('Sage/Platform/Mobile/Utility', [
                 current[path[0]] = val;
             return o;
         },
-        bindDelegate: function(scope) {
+        bindDelegate = function(scope) {
             var fn = this;
 
             if (arguments.length == 1) return function() {
@@ -90,11 +90,55 @@ define('Sage/Platform/Mobile/Utility', [
                 return fn.apply(scope || this, called.concat(optional));
             };
         },
-        expand: function(scope, expression) {
+        expand = function(scope, expression) {
             if (typeof expression === 'function')
+            {
                 return expression.apply(scope, Array.prototype.slice.call(arguments, 2));
+            }
             else
+            {
                 return expression;
-        }
+            }
+        },
+        _clone = function(item) {
+            if (lang.isArray(item))
+            {
+                return item.slice(0);
+            }
+            else if (lang.isObject(item))
+            {
+                var clone = {};
+                for (var prop in item) clone[prop] = item[prop];
+                return clone;
+            }
+
+            return item;
+        },
+        expandSafe = function(scope, expression) {
+            var result = typeof expression === 'function'
+                ? expression.apply(scope, Array.prototype.slice.call(arguments, 2))
+                : expression;
+
+            if (result === expression)
+            {
+                if (lang.isArray(result))
+                {
+                    return result.map ? result.map(_clone) : array.map(result, _clone);
+                }
+                else
+                {
+                    return _clone(result);
+                }
+            }
+
+            return result;
+        };
+
+    return lang.setObject('Sage.Platform.Mobile.Utility', {
+        getValue: getValue,
+        setValue: setValue,
+        bindDelegate: bindDelegate,
+        expand: expand,
+        expandSafe: expandSafe
     });
 });

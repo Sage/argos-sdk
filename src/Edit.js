@@ -675,15 +675,16 @@ define('Sage/Platform/Mobile/Edit', [
             else
                 this.update();
         },
+        /* todo: move SData options into mixin */
         getContext: function() {
             var store = this.get('store'),
-                options = this.options;
+                options = this.options,
+                id = options.insert ? false : store && store.getIdentity(options.item || options.entry);
 
             return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
-                insert: options.insert,
-                key: options.insert ? false : store && store.getIdentity(options.item || options.entry),
-                id: options.insert ? false : store && store.getIdentity(options.item || options.entry)
+                key: id,
+                id: id
             });
         },
         getSecurity: function(access) {
@@ -693,6 +694,20 @@ define('Sage/Platform/Mobile/Edit', [
             };
 
             return lookup[access];
+        },
+        activate: function(options) {
+            if (options)
+            {
+                /* insert is a trigger once flag - will clear the form */
+                /* it should only ever be triggered by forward navigation, hence deleted from options */
+                this.inserting = (options.insert === true);
+
+                delete options.insert;
+
+                if (this.inserting) this.refreshRequired = true;
+            }
+
+            this.inherited(arguments);
         },
         beforeTransitionTo: function() {
             if (this.refreshRequired)
@@ -716,7 +731,7 @@ define('Sage/Platform/Mobile/Edit', [
                     if (this.options.key !== options.key) return true;
                     if (this.options.item !== options.item) return true;
                     if (this.options.entry !== options.entry) return true;
-                    if (this.options.insert !== options.insert) return true;
+                    /* if (this.options.insert !== options.insert) return true; */ /* todo: remove */
                     if (this.options.changes !== options.changes) return true;
                     if (this.options.template !== options.template) return true;
                 }
@@ -730,7 +745,7 @@ define('Sage/Platform/Mobile/Edit', [
             this.inherited(arguments);
 
             this.changes = false;
-            this.inserting = (this.options.insert === true);
+            /* this.inserting = (this.options.insert === true); */
             this.itemTemplate = false;
             this.item = false;
 
