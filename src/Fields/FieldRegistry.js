@@ -67,7 +67,7 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
         ValueOnlyField,
         CollectionEntryField
     ) {
-        FieldRegistry.fromType = {
+        lang.mixin(FieldRegistry.fromType, {
             'boolean': BooleanField,
             'camera': CameraField,
             'date': DateField,
@@ -83,7 +83,7 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
             'text': TextField,
             'valueOnly': ValueOnlyField,
             'collection-entry': CollectionEntryField
-        };
+        });
 
         FieldRegistry.defaultType = TextField;
     });
