@@ -555,10 +555,14 @@ define('Sage/Platform/Mobile/Edit', [
             this.enable();
         },
         onInsertComplete: function(result) {
-            var options = this.options;
-            if (options && options.returnTo)
+            var options = this.options,
+                returnTo = options && utility.expand(this, options.returnTo, result, this);
+            if (returnTo)
             {
-                scene().showView(options.returnTo);
+                if (lang.isArray(returnTo))
+                    scene().showView.apply(scene(), returnTo);
+                else
+                    scene().showView(options.returnTo);
             }
             else
             {
@@ -626,10 +630,14 @@ define('Sage/Platform/Mobile/Edit', [
             this.enable();
         },
         onUpdateComplete: function(item) {
-            var options = this.options;
-            if (options && options.returnTo)
+            var options = this.options,
+                returnTo = options && utility.expand(this, options.returnTo, item, this);
+            if (returnTo)
             {
-                scene().showView(options.returnTo);
+                if (lang.isArray(returnTo))
+                    scene().showView.apply(scene(), returnTo);
+                else
+                    scene().showView(options.returnTo);
             }
             else
             {

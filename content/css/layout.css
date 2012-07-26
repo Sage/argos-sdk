@@ -1122,6 +1122,11 @@ visibility: hidden;
     vertical-align: middle;
 }
 
+.row-disabled[data-field-type="camera"]
+{
+    display: none;
+}
+
 /* Hide number spinner for input type="number" */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button
