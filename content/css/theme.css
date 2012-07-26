@@ -1015,7 +1015,7 @@ body.landscape .datetime-picker > .time-content
     );
 }
 
-.tool-button-disabled
+.is-disabled
 {
     opacity: 0.25;
 }

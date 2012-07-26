@@ -40,6 +40,9 @@ define('Sage/Platform/Mobile/_CommandMixin', [
                 scope = command.scope || context || command,
                 args = utility.expand(command, command.args, command, context, this) || [];
 
+            if (command.enabled === false || command.disabled === true)
+                return;
+
             if (command.fn)
             {
                 command.fn.apply(scope, args.concat(context, command));

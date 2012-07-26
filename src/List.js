@@ -17,6 +17,7 @@ define('Sage/Platform/Mobile/List', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
+    'dojo/_base/connect',
     'dojo/_base/Deferred', /* todo: use `dojo/when` in 1.8 */
     'dojo/query',
     'dojo/NodeList-manipulate',
@@ -36,6 +37,7 @@ define('Sage/Platform/Mobile/List', [
     declare,
     lang,
     array,
+    connect,
     Deferred,
     query,
     queryManipulate,
@@ -604,6 +606,7 @@ define('Sage/Platform/Mobile/List', [
             if (start === 0) domConstruct.destroy(this.loadingIndicatorNode);
 
             this.onContentChange();
+            connect.publish('/app/toolbar/update', []);
         },
         _onQueryError: function(queryOptions, error) {
             if (error.aborted)

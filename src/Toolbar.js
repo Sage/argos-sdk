@@ -102,6 +102,7 @@ define('Sage/Platform/Mobile/Toolbar', [
 
             this.subscribe('/app/toolbar/invoke', this._onToolbarInvoke);
             this.subscribe('/app/toolbar/toggle', this._onToolbarToggle);
+            this.subscribe('/app/toolbar/update', this._onToolbarUpdate);
 
             this.onPositionChange(this.position, null);
         },
@@ -110,6 +111,9 @@ define('Sage/Platform/Mobile/Toolbar', [
         },
         _onToolbarToggle: function(name, value) {
             if (this.position == name) this.set('enabled', value);
+        },
+        _onToolbarUpdate: function(name) {
+            this.update();
         },
         clear: function() {
             if (this._items.length > 0)

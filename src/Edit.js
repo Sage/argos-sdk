@@ -230,6 +230,7 @@ define('Sage/Platform/Mobile/Edit', [
 
             /* this must take place when the content is visible */
             this.onContentChange();
+            connect.publish('/app/toolbar/update', []);
         },
         _onGetError: function(getOptions, error) {
             if (error.aborted)

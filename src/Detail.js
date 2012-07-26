@@ -16,6 +16,7 @@
 define('Sage/Platform/Mobile/Detail', [
     'dojo',
     'dojo/_base/declare',
+    'dojo/_base/connect',
     'dojo/_base/lang',
     'dojo/_base/Deferred',
     'dojo/string',
@@ -34,6 +35,7 @@ define('Sage/Platform/Mobile/Detail', [
 ], function(
     dojo,
     declare,
+    connect,
     lang,
     Deferred,
     string,
@@ -242,6 +244,8 @@ define('Sage/Platform/Mobile/Detail', [
 
             /* this must take place when the content is visible */
             this.onContentChange();
+
+            connect.publish('/app/toolbar/update', []);
         },
         _onGetError: function(getOptions, error) {
             if (error.aborted)
