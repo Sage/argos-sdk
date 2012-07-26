@@ -682,8 +682,8 @@ define('Sage/Platform/Mobile/Edit', [
             return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
                 insert: options.insert,
-                key: options.insert ? false : store.getIdentity(options.item || options.entry),
-                id: options.insert ? false : store.getIdentity(options.item || options.entry)
+                key: options.insert ? false : store && store.getIdentity(options.item || options.entry),
+                id: options.insert ? false : store && store.getIdentity(options.item || options.entry)
             });
         },
         getSecurity: function(access) {
