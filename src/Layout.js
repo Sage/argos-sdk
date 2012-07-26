@@ -102,6 +102,8 @@ define('Sage/Platform/Mobile/Layout', [
                     this.panesByTier[this.panes[name].tier] = this.panes[name];
             }
 
+            /* todo: this BREAKS input focus scrolling on iOS (sizes are calculated wrong) */
+            /*
             var hasTouch = 'ontouchstart' in window;
             if (hasTouch)
             {
@@ -111,6 +113,7 @@ define('Sage/Platform/Mobile/Layout', [
                 this._lastViewportHeight = window.innerHeight;
                 this._onCheckViewportHeightHandle = setInterval(lang.hitch(this, this._onCheckViewportHeight), 50);
             }
+            */
         },
         onDestroy: function() {
             this.inherited(arguments);
@@ -190,10 +193,13 @@ define('Sage/Platform/Mobile/Layout', [
             if (hasTouch)
             {
                 /* this is required in order to hide the native URL bar */
+                /* todo: this BREAKS input focus scrolling on iOS (sizes are calculated wrong) */
+                /*
                 domGeom.setMarginBox(this.domNode, {
                     w: window.innerWidth,
                     h: window.innerHeight
                 });
+                */
             }
 
             this.inherited(arguments);
