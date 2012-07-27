@@ -654,6 +654,8 @@ define('Sage/Platform/Mobile/Edit', [
             this.set('validationContent', content.join(''));
 
             domClass.add(this.domNode, 'has-error');
+
+            this.onContentChange();
         },
         hideValidationSummary: function() {
             domClass.remove(this.domNode, 'has-error');
