@@ -102,7 +102,7 @@ define('Sage/Platform/Mobile/Fields/_Field', [
                     if (definition.message)
                         result = typeof definition.message === 'function'
                             ? definition.message.call(definition.scope || this, value, this, this.owner)
-                            : string.substitute(definition.message, [value, this.name, this.label]);
+                            : string.substitute(definition.message, [value, this.name, this.label || this.name]);
 
                     return result;
                 }

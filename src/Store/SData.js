@@ -54,14 +54,16 @@ define('Sage/Platform/Mobile/Store/SData', [
             }
             else
             {
-                id = utility.expand(this, id || getOptions.resourcePredicate || this.resourcePredicate);
+                id = id || utility.expand(this, getOptions.resourcePredicate || this.resourcePredicate);
 
                 var contractName = utility.expand(this, getOptions.contractName || this.contractName),
                     resourceKind = utility.expand(this, getOptions.resourceKind || this.resourceKind),
                     resourceProperty = utility.expand(this, getOptions.resourceProperty || this.resourceProperty),
-                    resourcePredicate = typeof id === 'number'
-                        ? id
-                        : /\s+/.test(id) ? id : string.substitute("'${0}'", [id]);
+                    resourcePredicate = id
+                        ? typeof id === 'number'
+                            ? id
+                            : /\s+/.test(id) ? id : string.substitute("'${0}'", [id])
+                        : null;
 
                     // todo: double quotes break some SData providers
                     // resourcePredicate = id

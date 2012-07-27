@@ -489,7 +489,7 @@ define('Sage/Platform/Mobile/Scene', [
                 viewSet = this._createViewSet(stateSet, lang.mixin({reverse: true}, navigation));
 
             array.forEach(viewSet, function(item, index) {
-                if (item.view) item.view.activate(stateSet[index].context.options);
+                if (item.view) item.view.activate(stateSet[index].context.options, true);
             });
 
             /* todo: trim state to item before match of `stateSet` */

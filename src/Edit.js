@@ -695,19 +695,11 @@ define('Sage/Platform/Mobile/Edit', [
 
             return lookup[access];
         },
-        activate: function(options) {
-            if (options)
-            {
-                /* insert is a trigger once flag - will clear the form */
-                /* it should only ever be triggered by forward navigation, hence deleted from options */
-                this.inserting = (options.insert === true);
-
-                delete options.insert;
-
-                if (this.inserting) this.refreshRequired = true;
-            }
-
+        activate: function(options, previous) {
             this.inherited(arguments);
+
+            /* if we are not activating previous options, force a refresh of the view */
+            if (!previous) this.refreshRequired = true;
         },
         beforeTransitionTo: function() {
             if (this.refreshRequired)
@@ -731,7 +723,7 @@ define('Sage/Platform/Mobile/Edit', [
                     if (this.options.key !== options.key) return true;
                     if (this.options.item !== options.item) return true;
                     if (this.options.entry !== options.entry) return true;
-                    /* if (this.options.insert !== options.insert) return true; */ /* todo: remove */
+                    if (this.options.insert !== options.insert) return true;
                     if (this.options.changes !== options.changes) return true;
                     if (this.options.template !== options.template) return true;
                 }
@@ -745,7 +737,7 @@ define('Sage/Platform/Mobile/Edit', [
             this.inherited(arguments);
 
             this.changes = false;
-            /* this.inserting = (this.options.insert === true); */
+            this.inserting = (this.options.insert === true);
             this.itemTemplate = false;
             this.item = false;
 
