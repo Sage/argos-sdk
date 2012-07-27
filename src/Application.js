@@ -42,6 +42,7 @@ define('Sage/Platform/Mobile/Application', [
 ) {
 
     has.add('tablet-format', Math.max(window.innerHeight, window.innerWidth) > 960);
+    has.add('retina', window.devicePixelRatio == 2);
     
     lang.extend(Function, {
         bindDelegate: utility.bindDelegate
