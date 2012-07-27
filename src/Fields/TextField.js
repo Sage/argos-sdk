@@ -41,7 +41,7 @@ define('Sage/Platform/Mobile/Fields/TextField', [
             '{% if ($.enableClearButton && !$.readonly) { %}',
             '<button class="clear-button" data-dojo-attach-point="clearNode" data-dojo-attach-event="onclick:_onClearClick"></button>',
             '{% } %}',
-            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus, onmouseup: _onMouseUp" class="text-input" type="{%= $.inputType %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus, onmouseup: _onMouseUp" class="text-input" type="{%= $.inputType %}" placeholder="{%: $.placeHolder %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
             '</div>'
         ]),
         inputNode: null,
@@ -52,6 +52,7 @@ define('Sage/Platform/Mobile/Fields/TextField', [
 		inputType: 'text',
         enableClearButton: true,
         validInputOnly: false,
+        placeHolder: null,
 
         startup: function() {
             this.inherited(arguments);
