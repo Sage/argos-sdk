@@ -704,7 +704,7 @@ define('Sage/Platform/Mobile/List', [
 
             this.inherited(arguments);
         },
-        refresh: function() {
+        load: function() {
             this.inherited(arguments);
 
             this._requestData();

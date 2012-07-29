@@ -76,16 +76,16 @@ define('Sage/Platform/Mobile/View', [
         },
         refresh: function() {
             console.log('refresh: %s', this.id);
+
+            this.clear();
+            this.load();
+        },
+        clear: function() {
+        },
+        load: function() {
         },
         resize: function() {
             if (!this.refreshRequired) this.onContentChange();
-        },
-        reload: function() {
-            /* todo: is this the right implementation? even though no transition is actually happening? */
-            /* most of the full refresh logic is split between these two functions; that which needs to happen behind the scenes and that
-               which needs to happen after it is visible */
-            this.beforeTransitionTo();
-            this.transitionTo();
         },
         onStartup: function() {
             this.inherited(arguments);
@@ -175,7 +175,7 @@ define('Sage/Platform/Mobile/View', [
             if (this.refreshRequired)
             {
                 this.refreshRequired = false;
-                this.refresh();
+                this.load();
             }
 
             this.onTransitionTo(this);

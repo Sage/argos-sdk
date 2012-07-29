@@ -70,9 +70,9 @@ define('Sage/Platform/Mobile/Views/Chart', [
             }
 
         },
-        refresh: function() {
+        load: function() {
             this.inherited(arguments);
-            this.clear();
+
             if (this.options && this.options.chart)
                 this.processChart(this.options.chart);
             else

@@ -504,7 +504,7 @@ define('Sage/Platform/Mobile/Detail', [
                 this.clear();
             }
         },
-        refresh: function() {
+        load: function() {
             this.inherited(arguments);
 
             /* todo: why is this here? */

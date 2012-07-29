@@ -172,9 +172,8 @@ define('Sage/Platform/Mobile/Pane', [
                 this._before(view, viewOptions, view);
 
                 /* todo: is `reload` an appropriate name for this? */
+                /* todo: is a function call necessary since view lifecycle will occur in _before/_after? */
                 console.log('reload: %s', (view && view.id) || 'empty');
-
-                view.reload();
 
                 this._after(view, viewOptions, view);
 

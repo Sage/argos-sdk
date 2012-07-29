@@ -735,9 +735,10 @@ define('Sage/Platform/Mobile/Edit', [
             else
                 return this.inherited(arguments);
         },
-        refresh: function() {
+        load: function() {
             this.inherited(arguments);
 
+            /* todo: move this to clear? */
             this.changes = false;
             this.inserting = (this.options.insert === true);
             this.itemTemplate = false;
