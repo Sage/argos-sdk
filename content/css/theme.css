@@ -723,7 +723,7 @@ body.landscape .datetime-picker > .time-content
 
 .field-collection-entry.has-invalid-entry > .edit-actions > .action-button[data-action="add"]
 {
-    opacity: .3;
+    opacity: 0.25;
 }
 
 /* button */
