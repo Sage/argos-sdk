@@ -38,7 +38,7 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
         enableClearButton: false,
         inputType: 'number',
 
-        setValue: function(val) {
+        setValue: function(val, initial) {
             if (isNaN(parseFloat(val)))
                 val = 0;
 
@@ -49,7 +49,7 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
 
             val = val.replace('.', Mobile.CultureInfo.numberFormat.currencyDecimalSeparator);
 
-            this.inherited(arguments, [val]);
+            this.inherited(arguments, [val, initial]);
         },
         _onFocus: function(evt) {
             this.inherited(arguments);
