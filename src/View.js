@@ -16,19 +16,23 @@
 define('Sage/Platform/Mobile/View', [
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/_base/array',
     'dojo/dom-class',
     'dijit/_WidgetBase',
     './_EventMapMixin',
     './_UiComponent',
+    './Toolbar',
     'argos!application',
     'argos!customizations'
 ], function(
     declare,
     lang,
+    array,
     domClass,
     _WidgetBase,
     _EventMapMixin,
     _UiComponent,
+    Toolbar,
     application,
     customizations
 ) {
@@ -36,12 +40,16 @@ define('Sage/Platform/Mobile/View', [
         baseClass: 'view',
         title: null,
         tools: null,
+        toolbars: null,
         layout: null,
         security: null,
         connection: null,
         connectionName: false,
         customizationSet: 'view',
         titleText: 'Generic View',
+        constructor: function() {
+            this.toolbars = {};
+        },
         _preCreateComponents: function(components, proto) {
             if (proto)
             {
@@ -98,6 +106,20 @@ define('Sage/Platform/Mobile/View', [
                     if (this.$[name])
                         this.$[name].set('items', tools[name]);
                 }
+            }
+            array.forEach(this.getComponents(), function(component) {
+                if (component['$'])
+                    this.registerToolbarComponents(component['$']);
+            }, this);
+        },
+        registerToolbarComponents: function(components) {
+            for (var name in components)
+            {
+                var component = components[name];
+                if (component['$'])
+                    this.registerToolbarComponents(component['$']);
+
+                if (component.isInstanceOf && component.isInstanceOf(Toolbar)) this.toolbars[name] = component;
             }
         },
         onContentChange: function() {
@@ -158,6 +180,15 @@ define('Sage/Platform/Mobile/View', [
             /// <summary>
             ///     Called before the view is transitioned (slide animation complete) to.
             /// </summary>
+            for (var name in this.toolbars)
+            {
+                var toolbar = this.toolbars[name];
+                if (toolbar.managed)
+                {
+                    toolbar.clear();
+                    toolbar.show();
+                }
+            }
 
             this.onBeforeTransitionTo(this);
         },
@@ -176,6 +207,21 @@ define('Sage/Platform/Mobile/View', [
             {
                 this.refreshRequired = false;
                 this.load();
+            }
+
+            var tools = (this.options && this.options.tools) || this.get('tools') || {};
+
+            for (var name in this.toolbars)
+            {
+                var toolbar = this.toolbars[name];
+                if (toolbar.managed)
+                {
+                    toolbar.set('items', tools[name]);
+                }
+                else
+                {
+                    toolbar.update();
+                }
             }
 
             this.onTransitionTo(this);
