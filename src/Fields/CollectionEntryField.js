@@ -158,14 +158,14 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
             return false;
         },
-        getValue: function(all) {
+        getValue: function() {
             var original = this.originalValue,
                 current = this.currentValue,
                 value = [];
 
-            if (all)
-                return current && current.slice(0);
+            return current && current.slice(0);
 
+            /* todo: how to handle partial updates? */
             if (current)
             {
                 /* todo: how to tag for deletion? */
