@@ -158,10 +158,13 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
             return false;
         },
-        getValue: function() {
+        getValue: function(all) {
             var original = this.originalValue,
                 current = this.currentValue,
                 value = [];
+
+            if (all)
+                return current && current.slice(0);
 
             if (current)
             {
