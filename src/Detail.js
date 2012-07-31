@@ -491,9 +491,8 @@ define('Sage/Platform/Mobile/Detail', [
 
             return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
-                key: id,
-                id: id,
-                descriptor: this.options.descriptor
+                label: this.options.title,
+                id: id
             });
         },
         beforeTransitionTo: function() {

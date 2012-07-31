@@ -113,7 +113,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
             {
                 // todo: is this the appropriate way to handle this?  do not want $key, $name, etc., when applying values.
                 // difference is primarily "as component" vs. "as child".
-                this.currentValue = this.applyTo ? values : view.createEntry();
+                this.currentValue = this.applyTo ? values : view.createItem();
                 this.validationValue = view.getValues(true); // store all editor values for validation, not only dirty values
             }
         },
