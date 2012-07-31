@@ -103,6 +103,8 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         onStartup: function() {
             this.inherited(arguments);
 
+            this.currentIndex = -1;
+
             if (this.validateForAdd)
             {
                 for (var name in this.fields)
@@ -193,6 +195,13 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
                 this._addSummaryRow();
 
                 domClass.add(this.domNode, 'has-items');
+                this._onComplete();
+            }
+            else
+            {
+                this.currentIndex = -1;
+                domClass.remove(this.domNode, 'has-items');
+                domConstruct.empty(this.collectionNode);
             }
         },
         setValue: function(val, initial)
@@ -215,6 +224,23 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
                 domConstruct.empty(this.collectionNode);
             }
+        },
+        update: function(index, value) {
+            if (value !== null)
+            {
+                this.validationValue[index] = this.currentValue[index] = value;
+                domConstruct.empty(this.collectionNode);
+                this._processData(this.currentValue);
+            }
+            else
+            {
+                this.remove(index);
+            }
+        },
+        remove: function(index) {
+            this.currentValue.splice(index, 1);
+            domConstruct.empty(this.collectionNode);
+            this._processData(this.currentValue);
         },
         clearValue: function() {
             this.inherited(arguments);
@@ -242,6 +268,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             }
 
             domClass.add(this.domNode, 'has-items');
+            this._onComplete();
 
             if (this.owner) this.owner.resize();
         },
