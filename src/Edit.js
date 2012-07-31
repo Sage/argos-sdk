@@ -230,7 +230,6 @@ define('Sage/Platform/Mobile/Edit', [
 
             /* this must take place when the content is visible */
             this.onContentChange();
-
             connect.publish('/app/toolbar/update', []);
         },
         _onGetError: function(getOptions, error) {
@@ -356,6 +355,7 @@ define('Sage/Platform/Mobile/Edit', [
 
             /* this must take place when the content is visible */
             this.onContentChange();
+            connect.publish('/app/toolbar/update', []);
         },
         _requestTemplateData: function() {
             domClass.add(this.domNode, 'is-loading');
@@ -777,6 +777,7 @@ define('Sage/Platform/Mobile/Edit', [
                         this.changes = this.options.changes;
                         this.setValues(this.changes);
                     }
+                    connect.publish('/app/toolbar/update', []);
                 }
                 else
                 {
