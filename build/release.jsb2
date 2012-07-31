@@ -63,6 +63,14 @@
           "text": "_CommandMixin.js",
           "path": "../src"
         },
+          {
+            "text": "Message.js",
+            "path": "../src"
+          },
+          {
+            "text": "_MessageMapMixin.js",
+            "path": "../src"
+          },
         {
           "text": "Control.js",
           "path": "../src"
