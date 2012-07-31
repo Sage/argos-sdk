@@ -230,6 +230,7 @@ define('Sage/Platform/Mobile/Edit', [
 
             /* this must take place when the content is visible */
             this.onContentChange();
+
             connect.publish('/app/toolbar/update', []);
         },
         _onGetError: function(getOptions, error) {
@@ -276,7 +277,9 @@ define('Sage/Platform/Mobile/Edit', [
             var ctor = typeof row['type'] === 'string'
                     ? FieldRegistry.getFieldFor(row['type'], false)
                     : row['type'],
-                field = this.fields[row['name'] || row['property']] = new ctor(lang.mixin({
+                name = row['name'] || row['property'],
+                field = this.fields[name] = new ctor(lang.mixin({
+                    id: this.id + ':' + name,
                     owner: this
                 }, row)),
                 rowTemplate = field.rowTemplate || this.rowTemplate;
@@ -685,7 +688,6 @@ define('Sage/Platform/Mobile/Edit', [
 
             return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind,
-                key: id,
                 id: id
             });
         },

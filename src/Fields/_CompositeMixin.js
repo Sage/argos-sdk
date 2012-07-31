@@ -76,7 +76,9 @@ define('Sage/Platform/Mobile/Fields/_CompositeMixin', [
             var ctor = typeof row['type'] === 'string'
                     ? FieldRegistry.getFieldFor(row['type'], false)
                     : row['type'],
-                field = this.fields[row['name'] || row['property']] = new ctor(lang.mixin({
+                name = row['name'] || row['property'],
+                field = this.fields[name] = new ctor(lang.mixin({
+                    id: this.id + ':' + name,
                     owner: this
                 }, row)),
                 rowTemplate = field.rowTemplate || this.rowTemplate;

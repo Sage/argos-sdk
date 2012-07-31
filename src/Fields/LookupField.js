@@ -21,8 +21,9 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     'dojo/string',
     'dojo/query',
     '../_TemplatedWidgetMixin',
-    '../Utility',
+    '../_MessageMapMixin',
     './_Field',
+    '../Utility',
     'argos!scene'
 ], function(
     array,
@@ -32,32 +33,22 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     string,
     query,
     _TemplatedWidgetMixin,
-    utility,
+    _MessageMapMixin,
     _Field,
+    utility,
     scene
 ) {
-    return declare('Sage.Platform.Mobile.Fields.LookupField', [_Field, _TemplatedWidgetMixin], {
-        attributeMap: {
-            inputValue: {
-                node: 'inputNode',
-                type: 'attribute',
-                attribute: 'value'
-            },
-            inputDisabled: {
-                node: 'inputNode',
-                type: 'attribute',
-                attribute: 'disabled'
-            },
-            inputReadOnly: {
-                node: 'inputNode',
-                type: 'attribute',
-                attribute: 'readonly'
-            }
+    return declare('Sage.Platform.Mobile.Fields.LookupField', [_Field, _TemplatedWidgetMixin, _MessageMapMixin], {
+        messages: {
+            'onSelection': '_onSelection'
         },
         widgetTemplate: new Simplate([
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',
             '<input data-dojo-attach-point="inputNode" type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
+        _setInputValueAttr: { node: 'inputNode', type: 'attribute', attribute: 'value' },
+        _setInputDisabledAttr: { node: 'inputNode', type: 'attribute', attribute: 'disabled' },
+        _setInputReadOnlyAttr: { node: 'inputNode', type: 'attribute', attribute: 'readonly' },
 
         // Localization
         dependentErrorText: "A value for '${0}' must be selected.",
@@ -74,6 +65,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         textRenderer: null,
         valueKeyProperty: null,
         valueTextProperty: null,
+        useSelectionForNew: false,
         requireSelection: true,
         singleSelect: true,
         dependsOn: null,
@@ -138,6 +130,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                     where: this.where,
                     orderBy: this.orderBy,
                     negateHistory: true,
+                    notifyOnSelection: this.id,
                     tools: {
                         top: [{
                             name: 'complete',
@@ -180,6 +173,9 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             var options = this.createNavigationOptions();
 
             scene().showView(this.view, options);
+        },
+        _onSelection: function(selections) {
+            this.setSelection(selections[0]);
         },
         _onClick: function(evt) {
             var buttonNode = query(evt.target).closest('.button')[0];
@@ -304,8 +300,13 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             {
                 if (this.currentValue)
                 {
+                    if (this.useSelectionForNew && !this.currentValue.key)
+                    {
+                        return this.currentSelection;
+                    }
+
                     if (keyProperty)
-                        value = utility.setValue(value || {}, keyProperty, this.currentValue.key);
+                        value = utility.setValue(value || {}, keyProperty, this.currentValue.key || this.currentValue.text); /* todo: validate change from just `text` */
 
                     // if a text template has been applied there is no way to guarantee a correct
                     // mapping back to the property
@@ -330,10 +331,10 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                 if (this.currentValue)
                 {
                     value = this.requireSelection
-                        ? this.currentValue.key
+                        ? this.currentValue.key || this.currentValue.text /* todo: validate change from just `key` */
                         : this.currentValue.text != text && !this.textTemplate
                             ? text
-                            : this.currentValue.key;
+                            : this.currentValue.key || this.currentValue.text; /* todo: validate change from just `key` */
                 }
                 else if (!this.requireSelection && text.length > 0)
                 {
@@ -354,9 +355,12 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
 
             this.setText(text);
         },
-        setSelection: function(val, key) {
-            var key = utility.getValue(val, this.keyProperty, val) || key, // if we can extract the key as requested, use it instead of the selection key
+        setSelection: function(val, sourceKey) {
+            var key = utility.getValue(val, this.keyProperty),
                 text = utility.getValue(val, this.textProperty);
+
+            // if we can extract the key as requested, use it instead of the selection key
+            if (!key) key = sourceKey;
 
             if (text && this.textTemplate)
                 text = this.textTemplate.apply(text, this);
@@ -366,7 +370,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
             this.currentSelection = val;
 
             this.currentValue = {
-                key: key || text,
+                key: key, /* todo: validate change from `key || text` */
                 text: text || key
             };
 
@@ -408,7 +412,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                 if (key || text)
                 {
                     this.currentValue = {
-                        key: key || text,
+                        key: key, /* todo: validate change from `key || text` */
                         text: text || key
                     };
 

@@ -27,7 +27,7 @@ define('Sage/Platform/Mobile/_EventMapMixin', [
          */
         events: null,
         _eventSignals: null,
-        postCreate: function() {
+        startup: function() {
             this.inherited(arguments);
 
             this._eventSignals = (this._eventSignals || []);
