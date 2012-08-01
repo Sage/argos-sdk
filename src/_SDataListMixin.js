@@ -72,15 +72,16 @@ define('Sage/Platform/Mobile/_SDataListMixin', [
         createStore: function() {
             return new SData({
                 service: this.getConnection(),
-                contractName: utility.expand(this, this.contractName),
-                resourceKind: utility.expand(this, this.resourceKind),
-                resourceProperty: utility.expand(this, this.resourceProperty),
-                resourcePredicate: utility.expand(this, this.resourcePredicate),
-                include: utility.expand(this, this.queryInclude),
-                select: utility.expand(this, this.querySelect),
-                where: utility.expand(this, this.queryWhere),
-                orderBy: utility.expand(this, this.queryOrderBy),
-                idProperty: this.keyProperty
+                contractName: this.contractName,
+                resourceKind: this.resourceKind,
+                resourceProperty: this.resourceProperty,
+                resourcePredicate: this.resourcePredicate,
+                include: this.queryInclude,
+                select: this.querySelect,
+                where: this.queryWhere,
+                orderBy: this.queryOrderBy,
+                idProperty: this.keyProperty,
+                scope: this
             });
         },
         _buildQueryExpression: function() {

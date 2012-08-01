@@ -54,11 +54,11 @@ define('Sage/Platform/Mobile/Store/SData', [
             }
             else
             {
-                id = id || utility.expand(this, getOptions.resourcePredicate || this.resourcePredicate);
+                id = id || utility.expand(this.scope || this, getOptions.resourcePredicate || this.resourcePredicate);
 
-                var contractName = utility.expand(this, getOptions.contractName || this.contractName),
-                    resourceKind = utility.expand(this, getOptions.resourceKind || this.resourceKind),
-                    resourceProperty = utility.expand(this, getOptions.resourceProperty || this.resourceProperty),
+                var contractName = utility.expand(this.scope || this, getOptions.contractName || this.contractName),
+                    resourceKind = utility.expand(this.scope || this, getOptions.resourceKind || this.resourceKind),
+                    resourceProperty = utility.expand(this.scope || this, getOptions.resourceProperty || this.resourceProperty),
                     resourcePredicate = id
                         ? typeof id === 'number'
                             ? id
@@ -86,8 +86,8 @@ define('Sage/Platform/Mobile/Store/SData', [
                 if (resourceKind) request.setResourceKind(resourceKind);
             }
 
-            var select = utility.expand(this, getOptions.select || this.select),
-                include = utility.expand(this, getOptions.include || this.include);
+            var select = utility.expand(this.scope || this, getOptions.select || this.select),
+                include = utility.expand(this.scope || this, getOptions.include || this.include);
 
             if (select && select.length > 0)
                 request.setQueryArg('select', select.join(','));
@@ -105,11 +105,11 @@ define('Sage/Platform/Mobile/Store/SData', [
             }
             else
             {
-                var queryName = utility.expand(this, queryOptions.queryName || this.queryName),
-                    contractName = utility.expand(this, queryOptions.contractName || this.contractName),
-                    resourceKind = utility.expand(this, queryOptions.resourceKind || this.resourceKind),
-                    resourceProperty = utility.expand(this, queryOptions.resourceProperty || this.resourceProperty),
-                    resourcePredicate = utility.expand(this, queryOptions.resourcePredicate || this.resourcePredicate);
+                var queryName = utility.expand(this.scope || this, queryOptions.queryName || this.queryName),
+                    contractName = utility.expand(this.scope || this, queryOptions.contractName || this.contractName),
+                    resourceKind = utility.expand(this.scope || this, queryOptions.resourceKind || this.resourceKind),
+                    resourceProperty = utility.expand(this.scope || this, queryOptions.resourceProperty || this.resourceProperty),
+                    resourcePredicate = utility.expand(this.scope || this, queryOptions.resourcePredicate || this.resourcePredicate);
 
                 if (queryName)
                 {
@@ -133,9 +133,9 @@ define('Sage/Platform/Mobile/Store/SData', [
                 if (resourceKind) request.setResourceKind(resourceKind);
             }
 
-            var select = utility.expand(this, queryOptions.select || this.select),
-                include = utility.expand(this, queryOptions.include || this.include),
-                orderBy = utility.expand(this, queryOptions.sort || this.orderBy);
+            var select = utility.expand(this.scope || this, queryOptions.select || this.select),
+                include = utility.expand(this.scope || this, queryOptions.include || this.include),
+                orderBy = utility.expand(this.scope || this, queryOptions.sort || this.orderBy);
 
             if (select && select.length > 0)
                 request.setQueryArg('select', select.join(','));
@@ -163,8 +163,8 @@ define('Sage/Platform/Mobile/Store/SData', [
                 }
             }
 
-            var where = utility.expand(this, this.where),
-                query = utility.expand(this, query),
+            var where = utility.expand(this.scope || this, this.where),
+                query = utility.expand(this.scope || this, query),
                 conditions = [];
 
             if (where)

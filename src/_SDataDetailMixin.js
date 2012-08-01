@@ -41,13 +41,14 @@ define('Sage/Platform/Mobile/_SDataDetailMixin', [
         createStore: function() {
             return new SData({
                 service: this.getConnection(),
-                contractName: this.expandExpression(this.contractName),
-                resourceKind: this.expandExpression(this.resourceKind),
-                resourceProperty: this.expandExpression(this.resourceProperty),
-                resourcePredicate: this.expandExpression(this.resourcePredicate),
-                include: this.expandExpression(this.queryInclude),
-                select: this.expandExpression(this.querySelect),
-                identityProperty: this.keyProperty
+                contractName: this.contractName,
+                resourceKind: this.resourceKind,
+                resourceProperty: this.resourceProperty,
+                resourcePredicate: this.resourcePredicate,
+                include: this.queryInclude,
+                select: this.querySelect,
+                identityProperty: this.keyProperty,
+                scope: this
             });
         },
         _buildGetExpression: function() {
