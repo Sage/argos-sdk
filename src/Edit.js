@@ -273,7 +273,7 @@ define('Sage/Platform/Mobile/Edit', [
             return this.layout || [];
         },
         _processLayoutRow: function(layout, row, sectionNode) {
-            var ctor = typeof row['type'] === 'string'
+            var ctor = (typeof row['type'] === 'string')
                     ? FieldRegistry.getFieldFor(row['type'], false)
                     : row['type'],
                 name = row['name'] || row['property'],
