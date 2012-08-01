@@ -103,8 +103,6 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         onStartup: function() {
             this.inherited(arguments);
 
-            this.currentIndex = -1;
-
             if (this.validateForAdd)
             {
                 for (var name in this.fields)
@@ -188,28 +186,32 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
                 for (var i = 0; i < count; i++)
                 {
                     var item = items[i];
+
                     this.currentIndex = i;
 
                     output.push(this.collectionRowTemplate.apply(item, this));
                 }
 
-                if (output.length > 0) domConstruct.place(output.join(''), this.collectionNode, 'last');
+                if (output.length > 0) domConstruct.place(output.join(''), this.collectionNode, 'only');
 
                 this._addSummaryRow();
 
                 domClass.add(this.domNode, 'has-items');
+
                 this._onComplete();
             }
             else
             {
-                this.currentIndex = -1;
                 domClass.remove(this.domNode, 'has-items');
+
                 domConstruct.empty(this.collectionNode);
             }
         },
         setValue: function(val, initial)
         {
             domClass.remove(this.domNode, 'has-items');
+
+            this.currentIndex = -1;
 
             if (val)
             {
@@ -271,6 +273,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             }
 
             domClass.add(this.domNode, 'has-items');
+
             this._onComplete();
 
             if (this.owner) this.owner.resize();
