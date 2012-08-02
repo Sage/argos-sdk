@@ -507,14 +507,14 @@ define('Sage/Platform/Mobile/Edit', [
 
             topic.publish('/app/toolbar/toggle', 'top', false);
 
-            domClass.add(this.domNode, 'busy');
+            domClass.add(this.domNode, 'is-busy');
         },
         enable: function() {
             this.busy = false;
 
             topic.publish('/app/toolbar/toggle', 'top', true);
 
-            domClass.remove(this.domNode, 'busy');
+            domClass.remove(this.domNode, 'is-busy');
         },
         insert: function() {
             var values = this.getValues();
@@ -599,7 +599,7 @@ define('Sage/Platform/Mobile/Edit', [
             }
             else
             {
-                this.onUpdateCompleted(false);
+                this.onUpdateComplete(false);
             }
         },
         _applyStateToPutOptions: function(putOptions) {
