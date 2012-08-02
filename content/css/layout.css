@@ -1387,6 +1387,12 @@ input::-webkit-inner-spin-button
     display: block;
 }
 
+.field-collection-entry > .list-content > .empty-list
+{
+    padding: 0.5em;
+    text-align: center;
+}
+
 .edit-actions
 {
     text-align: right;

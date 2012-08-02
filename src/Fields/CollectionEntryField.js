@@ -66,6 +66,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         addButtonClass: '',
         collectionNode: null,
         contentNode: null,
+        emptyListNode: null,
 
         /* todo: make generic */
         idProperty: '$key',
@@ -81,6 +82,9 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             '<h3>{%: $$.getLabel($) %}</h3>',
             '<h4>{%: $$.getIdentity($) %}</h4>'
         ]),
+        emptyListTemplate: new Simplate([
+            '<li class="empty-list"><h4>{%: $.emptyListText %}</h4></li>'
+        ]),
         summaryRowTemplate: new Simplate([
         ]),
 
@@ -91,6 +95,21 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
          * Clears out selected values in the collection entry fields after an item is added if set to true
          */
         clearOnAdd: true,
+
+        /**
+         * If an aggregate function is defined it use the result with the
+         * summaryRowTemplate and append the final HTML as the last row
+         * @params Array - an array of each collection entry fields getValue()
+         * @return Object - to be passed as $ to summaryRowTemplate
+         */
+        aggregate: null,
+
+        /**
+         * Determines whether to apply the emptyListTemplate to the collectionNode when no
+         * items are present. If false it will completely empty the node and will be completely non-visible
+         */
+        displayEmptyList: true,
+
         validateForAdd: true,
         validationResult: false,
 
@@ -99,6 +118,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         emptyText: 'empty',
         completeText: 'OK',
         addItemText: 'Add',
+        emptyListText: 'No items have been added.',
 
         onStartup: function() {
             this.inherited(arguments);
@@ -202,15 +222,11 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             }
             else
             {
-                domClass.remove(this.domNode, 'has-items');
-
-                domConstruct.empty(this.collectionNode);
+                this.clearCollectionList();
             }
         },
         setValue: function(val, initial)
         {
-            domClass.remove(this.domNode, 'has-items');
-
             this.currentIndex = -1;
 
             if (val)
@@ -227,6 +243,18 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
                 if (initial) this.originalValue = [];
 
+                this.clearCollectionList();
+            }
+        },
+        clearCollectionList: function() {
+            if (this.displayEmptyList)
+            {
+                domClass.add(this.domNode, 'has-items');
+                this.emptyListNode = domConstruct.place(this.emptyListTemplate.apply(this), this.collectionNode, 'only');
+            }
+            else
+            {
+                domClass.remove(this.domNode, 'has-items');
                 domConstruct.empty(this.collectionNode);
             }
         },
@@ -234,7 +262,6 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             if (value !== null)
             {
                 this.validationValue[index] = this.currentValue[index] = value;
-                domConstruct.empty(this.collectionNode);
                 this._processData(this.currentValue);
             }
             else
@@ -244,7 +271,6 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         },
         remove: function(index) {
             this.currentValue.splice(index, 1);
-            domConstruct.empty(this.collectionNode);
             this._processData(this.currentValue);
         },
         clearValue: function() {
@@ -261,6 +287,9 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
                 item = this._getCompositeValue();
 
             this.currentValue[index] = item;
+
+            if (this.emptyListNode)
+                domConstruct.destroy(this.emptyListNode);
 
             domConstruct.place(this.collectionRowTemplate.apply(item, this), this.collectionNode, 'last');
 
@@ -281,12 +310,10 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         _addSummaryRow: function() {
             if (this.summaryNode) domConstruct.destroy(this.summaryNode);
 
-            var aggregate = this.aggregate(this.currentValue);
+            var aggregate = this.aggregate && this.aggregate(this.currentValue);
 
-            this.summaryNode = domConstruct.place(this.summaryRowTemplate.apply(aggregate, this), this.collectionNode, 'last');
-        },
-        aggregate: function(items) {
-            return items[0];
+            if (aggregate)
+                this.summaryNode = domConstruct.place(this.summaryRowTemplate.apply(aggregate, this), this.collectionNode, 'last');
         }
     });
 });
