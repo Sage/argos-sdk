@@ -360,13 +360,16 @@ define('Sage/Platform/Mobile/Application', [
                 depth = 0;
             }
 
-            var list = ReUI.context.history || [],
+            var list = this.scene._state || [],
                 depth = depth || 0;
 
             for (var i = list.length - 2, j = 0; i >= 0 && (depth <= 0 || j < depth); i--, j++)
-                if (predicate.call(scope || this, list[i].data))
-                    return list[i].data;
-
+            {
+                var set = list[i];
+                for (var k = 0; k < set.length; k++)
+                    if (predicate.call(scope || this, list[i][k].context))
+                        return list[i][k].context;
+            }
             return false;
         },
         isNavigationFromResourceKind: function(kind, predicate, scope) {
