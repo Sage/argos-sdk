@@ -178,9 +178,13 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
             if (this.chart)
                 this.chart.resize();
         },
-        clear: function() {
+        destroy: function() {
             if (this.chart)
                 this.chart.destroy();
+
+            this.inherited(arguments);
+        },
+        clear: function() {
             domConstruct.empty(this.chartNode);
         },
 
@@ -348,7 +352,6 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
             this._requestData();
         },
         refresh: function() {
-            this.clear();
             this._requestData();
         },
         expandExpression: function(expression) {
@@ -383,8 +386,12 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         _onQueryComplete: function(queryResults, items) {
             domClass.remove(this.chartNode, 'is-loading');
             this.processFeed(items);
-            this.resize();
-            this.render();
+            if (this.chart)
+                this.resize();
+            else
+                this.render();
+
+            this.update()
         },
         _onQueryError: function() {
             console.log('Chart Request Fail', arguments[0].stack);
@@ -429,16 +436,8 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
             this.chart.axes[this.valueAxis].opt.minorTickStep = majTickStep / div;
         },
 
-        /**
-         * Renders the dojo Chart to the chartNode
-         */
-        render: function() {
-            var chart = new Chart(this.chartNode, this.chartOptions);
-            this.chart = chart;
-            this.stats = {max: 0, min: 0};
-
-            chart.setTheme(this.getTheme());
-            chart.addPlot('default', this.getType());
+        update: function() {
+            var chart = this.chart;
 
             var axes = this.getAxes();
             if (!lang.isArray(axes))
@@ -466,6 +465,18 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
                 chart.connectToPlot('default', this, this.onChartEvent);
 
             chart.render();
+        },
+
+        /**
+         * Renders the dojo Chart to the chartNode
+         */
+        render: function() {
+            var chart = new Chart(this.chartNode, this.chartOptions);
+            this.chart = chart;
+            this.stats = {max: 0, min: 0};
+
+            chart.setTheme(this.getTheme());
+            chart.addPlot('default', this.getType());
 
             if (this.legend)
                 new Legend(lang.mixin({},{chart: chart}, this.legendOptions), this.legendNode);
