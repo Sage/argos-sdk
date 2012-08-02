@@ -77,6 +77,11 @@ define('Sage/Platform/Mobile/Utility', [
                 current[path[0]] = val;
             return o;
         },
+        contains = function(rootNode, testNode) {
+            return rootNode.contains
+                ? rootNode != testNode && rootNode.contains(testNode)
+                : !!(rootNode.compareDocumentPosition(testNode) & 16);
+        },
         bindDelegate = function(scope) {
             var fn = this;
 
@@ -137,6 +142,7 @@ define('Sage/Platform/Mobile/Utility', [
     return lang.setObject('Sage.Platform.Mobile.Utility', {
         getValue: getValue,
         setValue: setValue,
+        contains: contains,
         bindDelegate: bindDelegate,
         expand: expand,
         expandSafe: expandSafe
