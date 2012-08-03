@@ -47,7 +47,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
                     '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
                     '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
                 '</div>',
-            '<div>'
+            '</div>'
         ]),
         canvasTemplate: new Simplate([
             '<canvas class="signature-canvas" data-dojo-attach-point="signatureNode" width="{%: $.canvasNodeWidth %}" height="{%: $.canvasNodeHeight %}" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp"></canvas>'
