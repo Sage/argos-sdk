@@ -560,13 +560,16 @@ define('Sage/Platform/Mobile/Edit', [
         },
         onInsertComplete: function(result) {
             var options = this.options,
+                /* todo: should this be called `returnTo`? */
                 returnTo = options && utility.expand(this, options.returnTo, result, this);
             if (returnTo)
             {
                 if (lang.isArray(returnTo))
                     scene().showView.apply(scene(), returnTo);
-                else
+                else if (typeof returnTo === 'string')
                     scene().showView(options.returnTo);
+                else
+                    scene().back(-1 * options.returnTo);
             }
             else
             {
@@ -635,13 +638,16 @@ define('Sage/Platform/Mobile/Edit', [
         },
         onUpdateComplete: function(item) {
             var options = this.options,
+                /* todo: should this be called `returnTo`? */
                 returnTo = options && utility.expand(this, options.returnTo, item, this);
             if (returnTo)
             {
                 if (lang.isArray(returnTo))
                     scene().showView.apply(scene(), returnTo);
-                else
+                else if (typeof returnTo === 'string')
                     scene().showView(options.returnTo);
+                else
+                    scene().back(-1 * options.returnTo);
             }
             else
             {

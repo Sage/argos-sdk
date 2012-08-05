@@ -477,13 +477,19 @@ define('Sage/Platform/Mobile/Scene', [
                 this._queue.push([name, instance, options, at, navigation]);
             }
         },
-        back: function(navigation) {
+        back: function(count, navigation) {
+            if (typeof count !== 'number')
+            {
+                navigation = count;
+                count = 1;
+            }
+
             /* todo: let browser history handle this for us? use hashchange to do this? */
-            if (this._state.length <= 1) return;
+            if ((this._state.length - count) <= 1) return;
 
             this._idle = false;
 
-            this._state.pop();
+            this._state.splice(this._state.length - count);
 
             var stateSet = this._state[this._state.length - 1],
                 viewSet = this._createViewSet(stateSet, lang.mixin({reverse: true}, navigation));
