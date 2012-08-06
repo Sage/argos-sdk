@@ -477,6 +477,9 @@ define('Sage/Platform/Mobile/Scene', [
                 this._queue.push([name, instance, options, at, navigation]);
             }
         },
+        getView: function(id) {
+            return this._instancedViews[id];
+        },
         back: function(count, navigation) {
             if (typeof count !== 'number')
             {
