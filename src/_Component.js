@@ -176,9 +176,13 @@ define('Sage/Platform/Mobile/_Component', [
                 /* this component is responsible for the connection */
                 context.signals = (context.signals || []);
 
+                var target = instance.isInstanceOf(_Component)
+                        ? instance.getComponentValue()
+                        : instance;
+
                 for (var name in attachEvent)
                 {
-                    context.signals.push(connect.connect(instance, name, root, attachEvent[name]));
+                    context.signals.push(connect.connect(target, name, root, attachEvent[name]));
                 }
             }
 
