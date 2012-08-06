@@ -176,6 +176,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         },
         _onSelection: function(selections) {
             this.setSelection(selections[0]);
+            this._onComplete();
         },
         _onClick: function(evt) {
             var buttonNode = query(evt.target).closest('.button')[0];
