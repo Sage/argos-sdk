@@ -107,6 +107,9 @@ define('Sage/Platform/Mobile/View', [
                         this.$[name].set('items', tools[name]);
                 }
             }
+
+            /* todo: fix how toolbars are being discovered */
+            /* perhaps use attach point `toolbars.<name>`. */
             array.forEach(this.getComponents(), function(component) {
                 if (component['$'])
                     this.registerToolbarComponents(component['$']);
