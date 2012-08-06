@@ -84,8 +84,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
         },
         resize: function() {
             this.inherited(arguments);
-            this._sizeCanvas();
-            this.redraw(this.signature, this.signatureNode, this.config);
+            this.onResize();
         },
         onBeforeTransitionTo: function() {
             this.inherited(arguments);
