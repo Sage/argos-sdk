@@ -161,6 +161,10 @@ define('Sage/Platform/Mobile/Scene', [
         getViewRegistration: function(name) {
             return this._registeredViews[name];
         },
+        /* todo: add a method, restoreView(name), to restore a view to the most recent point in _state. will not show, only restore. */
+        restoreView: function(name) {
+        },
+        /* todo: this should return a deferred */
         showView: function(name, options, at, navigation) {
             /* todo: add a fix for when the same view is shown multiple times before completion, i.e. multiple click on initial show, due to lag */
 
@@ -480,6 +484,7 @@ define('Sage/Platform/Mobile/Scene', [
         getView: function(id) {
             return this._instancedViews[id];
         },
+        /* todo: this should return a deferred */
         back: function(count, navigation) {
             if (typeof count !== 'number')
             {

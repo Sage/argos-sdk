@@ -88,7 +88,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         summaryRowTemplate: new Simplate([
         ]),
 
-        currentItems: null,
+        deletedValue: null,
         currentIndex: null,
 
         /**
@@ -109,6 +109,11 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
          * items are present. If false it will completely empty the node and will be completely non-visible
          */
         displayEmptyList: true,
+
+        /**
+         * If `true`, only return modified values, otherwise return entire collection.
+         */
+        returnOnlyModified: false,
 
         validateForAdd: true,
         validationResult: false,
@@ -151,10 +156,6 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         getLabel: function(item) {
             return item[this.labelProperty];
         },
-        constructor: function() {
-            this.sourceItems = [];
-            this.currentItems = [];
-        },
         _onComplete: function() {
             this.onChange(this.currentValue, this);
         },
@@ -176,22 +177,50 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
             return false;
         },
+        validate: function(value) {
+            return typeof value === 'undefined'
+                ? this.inherited(arguments, [this.validationValue])
+                : this.inherited(arguments);
+        },
+        /* todo: is this the appropriate naming? */
+        formatDeletedValue: function(item) {
+            return null;
+        },
         getValue: function() {
             var original = this.originalValue,
                 current = this.currentValue,
-                value = [];
+                deleted = this.deletedValue,
+                value = [],
+                previous, candidate, formatted, i;
 
-            return current && current.slice(0);
-
-            /* todo: how to handle partial updates? */
             if (current)
             {
-                /* todo: how to tag for deletion? */
-                var result = [];
-
-                for (var i = 0; i < current.length; i++)
+                for (i = 0; i < current.length; i++)
                 {
-                    if (current[i] && current[i] !== original[i]) value.push(current[i]);
+                    previous = original[i];
+                    candidate = current[i];
+
+                    if (candidate)
+                    {
+                        if ((candidate !== previous) || !this.returnOnlyModified)
+                        {
+                            value.push(candidate);
+                        }
+                    }
+                }
+            }
+
+            if (deleted)
+            {
+                for (i = 0; i < deleted.length && i < original.length; i++)
+                {
+                    candidate = deleted[i];
+
+                    if (candidate)
+                    {
+                        formatted = this.formatDeletedValue(candidate);
+                        if (formatted) value.push(formatted);
+                    }
                 }
             }
 
@@ -206,10 +235,12 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
                 for (var i = 0; i < count; i++)
                 {
                     var item = items[i];
+                    if (item)
+                    {
+                        this.currentIndex = i;
 
-                    this.currentIndex = i;
-
-                    output.push(this.collectionRowTemplate.apply(item, this));
+                        output.push(this.collectionRowTemplate.apply(item, this));
+                    }
                 }
 
                 if (output.length > 0) domConstruct.place(output.join(''), this.collectionNode, 'only');
@@ -231,7 +262,10 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
             if (val)
             {
-                this.validationValue = this.currentValue = val.slice(0);
+                this.deletedValue = [];
+                this.currentValue = val.slice(0);
+
+                this.validationValue = val.slice(0);
 
                 if (initial) this.originalValue = val;
 
@@ -239,7 +273,10 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             }
             else
             {
-                this.validationValue = this.currentValue = [];
+                this.deletedValue = [];
+                this.currentValue = [];
+
+                this.validationValue = [];
 
                 if (initial) this.originalValue = [];
 
@@ -250,18 +287,23 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             if (this.displayEmptyList)
             {
                 domClass.add(this.domNode, 'has-items');
+
                 this.emptyListNode = domConstruct.place(this.emptyListTemplate.apply(this), this.collectionNode, 'only');
             }
             else
             {
                 domClass.remove(this.domNode, 'has-items');
+
                 domConstruct.empty(this.collectionNode);
             }
         },
         update: function(index, value) {
             if (value !== null)
             {
-                this.validationValue[index] = this.currentValue[index] = value;
+                this.currentValue[index] = value;
+
+                this.validationValue = this._compact(this.currentValue);
+
                 this._processData(this.currentValue);
             }
             else
@@ -270,7 +312,11 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
             }
         },
         remove: function(index) {
-            this.currentValue.splice(index, 1);
+            this.deletedValue[index] = this.currentValue[index];
+            this.currentValue[index] = null;
+
+            this.validationValue = this._compact(this.currentValue);
+
             this._processData(this.currentValue);
         },
         clearValue: function() {
@@ -287,6 +333,8 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
                 item = this._getCompositeValue();
 
             this.currentValue[index] = item;
+
+            this.validationValue = this._compact(this.currentValue);
 
             if (this.emptyListNode)
                 domConstruct.destroy(this.emptyListNode);
@@ -307,13 +355,27 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
 
             if (this.owner) this.owner.resize();
         },
+        _compact: function(values) {
+            var result = [];
+
+            if (values)
+            {
+                for (var i = 0; i < values.length; i++)
+                {
+                    if (values[i]) result.push(values[i]);
+                }
+            }
+
+            return result;
+        },
         _addSummaryRow: function() {
             if (this.summaryNode) domConstruct.destroy(this.summaryNode);
 
-            var aggregate = this.aggregate && this.aggregate(this.currentValue);
-
+            var aggregate = this.aggregate && this.aggregate(this.validationValue);
             if (aggregate)
+            {
                 this.summaryNode = domConstruct.place(this.summaryRowTemplate.apply(aggregate, this), this.collectionNode, 'last');
+            }
         }
     });
 });

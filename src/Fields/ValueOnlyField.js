@@ -20,6 +20,7 @@ define('Sage/Platform/Mobile/Fields/ValueOnlyField', [
     declare,
     _Field
 ) {
+    /* todo: figure out a way to not do any rendering for this field. */
     return declare('Sage.Platform.Mobile.Fields.ValueOnlyField', [_Field], {
         rowTemplate: new Simplate([
             '<div style="display: none;" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
