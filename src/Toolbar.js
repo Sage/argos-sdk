@@ -116,6 +116,7 @@ define('Sage/Platform/Mobile/Toolbar', [
             this.update();
         },
         clear: function() {
+            console.log('clearing..', this.position);
             if (this._items.length > 0)
             {
                 array.forEach(this._items, function(item) {
@@ -168,15 +169,16 @@ define('Sage/Platform/Mobile/Toolbar', [
             return new ctor(props);
         },
         _place: function(item) {
+            console.log('placing...', this.position);
             item.placeAt(this.containerNode || this.domNode);
         },
         _setItemsAttr: function(values, options) {
             /* todo: use options for animation, caching */
             /* todo: cache items per key and exact source object */
-
-            this.clear();
-
             if (typeof values == 'undefined') return;
+
+            console.log('about to clear', this.position, arguments);
+            this.clear();
 
             var context = this.get('context'),
                 key = options && options.key,
