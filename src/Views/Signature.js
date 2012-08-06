@@ -20,7 +20,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
     'dojo/dom-geometry',
     'dojo/window',
     '../Format',
-    '../_TemplatedWidgetMixin',
+    '../ScrollContainer',
     '../View'
 ], function(
     declare,
@@ -29,37 +29,38 @@ define('Sage/Platform/Mobile/Views/Signature', [
     domGeom,
     win,
     format,
-    _TemplatedWidgetMixin,
+    ScrollContainer,
     View
 ) {
 
-    return declare('Sage.Platform.Mobile.Views.Signature', [View, _TemplatedWidgetMixin], {
+    return declare('Sage.Platform.Mobile.Views.Signature', [View], {
         // Localization
         titleText: 'Signature',
         clearCanvasText: 'Erase',
         undoText: 'Undo',
 
         //Templates
-        widgetTemplate: new Simplate([
-            '<div id="{%= $.id %}" title="{%: $.titleText %}" class="panel signature-view {%= $.cls %}">',
-                '{%! $.canvasTemplate %}',
-                '<div class="signature-buttons">',
-                    '<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>',
-                    '<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>',
-                '</div>',
-            '</div>'
-        ]),
-        canvasTemplate: new Simplate([
-            '<canvas class="signature-canvas" data-dojo-attach-point="signatureNode" width="{%: $.canvasNodeWidth %}" height="{%: $.canvasNodeHeight %}" data-dojo-attach-event="onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp"></canvas>'
-        ]),
+        events: {
+            'click': true
+        },
+        components: [
+            {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
+            {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
+                {name: 'scroll', tag: 'div', components: [
+                    {name: 'canvas', tag: 'canvas', attrs: {'class': 'signature-canvas', width: 360, height: 120}, attachPoint: 'signatureNode', attachEvent: 'onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp'},
+                    {name: 'buttons', tag: 'div', attrs: {'class': 'signature-buttons'}, components: [
+                        {name: 'undo', content: Simplate.make('<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>')},
+                        {name: 'clear', content: Simplate.make('<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>')}
+                    ]}
+                ]}
+            ]}
+        ],
+        baseClass: 'view signature-view',
         signatureNode: null,
 
         //View Properties
         id: 'signature_edit',
         tier: 1,
-        events: {
-            'click': true
-        },
         expose: false,
         signature: [],
         trace: [],
@@ -76,11 +77,15 @@ define('Sage/Platform/Mobile/Views/Signature', [
         canvasNodeWidth: 360, // starting default size
         canvasNodeHeight: 120, // adjusted on show()
 
-        startup: function() {
+        onStartup: function() {
             this.inherited(arguments);
 
-            this.subscribe('/app/resize', this.onResize);
             this.context = this.signatureNode.getContext('2d');
+        },
+        resize: function() {
+            this.inherited(arguments);
+            this._sizeCanvas();
+            this.redraw(this.signature, this.signatureNode, this.config);
         },
         onBeforeTransitionTo: function() {
             this.inherited(arguments);
@@ -90,9 +95,6 @@ define('Sage/Platform/Mobile/Views/Signature', [
             if (options && options.penColor)  { this.config.penColor  = options.penColor;  }
             if (options && options.drawColor) { this.config.drawColor = options.drawColor; }
             this.signature = (options && options.signature) ? options.signature : [];
-
-            this._sizeCanvas();
-            this.redraw(this.signature, this.signatureNode, this.config);
         },
         getValues: function() {
             return json.toJson(this.optimizeSignature());
@@ -193,6 +195,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
         },
         redraw: function (vector, canvas, options) {
             format.canvasDraw(vector, canvas, options);
+            this.onContentChange();
         },
         rescale: function (scale) {
             var rescaled = [];
