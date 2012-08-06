@@ -163,15 +163,19 @@ define('Sage/Platform/Mobile/Views/Signature', [
             this.redraw(this.signature, this.signatureNode, this.config);
         },
         _sizeCanvas: function () {
-            this.canvasNodeWidth  = Math.floor(win.getBox().w * 0.92);
-
-            this.canvasNodeHeight = Math.min(
-                Math.floor(this.canvasNodeWidth * 0.5),
-                win.getBox().h - query('.toolbar')[0].offsetHeight - query('.toolbar-bottom')[0].offsetHeight
-            );
+            this.canvasNodeWidth  = this.calculateWidth();
+            this.canvasNodeHeight = this.calculateHeight();
 
             this.signatureNode.width  = this.canvasNodeWidth;
             this.signatureNode.height = this.canvasNodeHeight;
+        },
+        calculateWidth: function() {
+            return Math.floor(win.getBox().w * 0.92);
+        },
+        calculateHeight: function() {
+            return Math.min(Math.floor(this.canvasNodeWidth * 0.5),
+                            win.getBox().h - query('.toolbar')[0].offsetHeight - query('.toolbar-bottom')[0].offsetHeight
+                        );
         },
         onResize: function (e) {
             var newScale,
