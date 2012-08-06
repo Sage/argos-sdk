@@ -62,6 +62,7 @@ define('Sage/Platform/Mobile/Pane', [
         onStartup: function() {
             this.inherited(arguments);
 
+            /* todo: use the same method as the view in order to discover toolbars */
             array.forEach(this.getComponents(), function(component) {
                 if (component.isInstanceOf(Toolbar)) this.toolbars[component.getComponentName()] = component;
             }, this);

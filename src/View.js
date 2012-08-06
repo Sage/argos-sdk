@@ -95,36 +95,6 @@ define('Sage/Platform/Mobile/View', [
         resize: function() {
             if (!this.refreshRequired) this.onContentChange();
         },
-        onStartup: function() {
-            this.inherited(arguments);
-
-            var tools = this.get('tools');
-            if (tools)
-            {
-                for (var name in tools)
-                {
-                    if (this.$[name])
-                        this.$[name].set('items', tools[name]);
-                }
-            }
-
-            /* todo: fix how toolbars are being discovered */
-            /* perhaps use attach point `toolbars.<name>`. */
-            array.forEach(this.getComponents(), function(component) {
-                if (component['$'])
-                    this.registerToolbarComponents(component['$']);
-            }, this);
-        },
-        registerToolbarComponents: function(components) {
-            for (var name in components)
-            {
-                var component = components[name];
-                if (component['$'])
-                    this.registerToolbarComponents(component['$']);
-
-                if (component.isInstanceOf && component.isInstanceOf(Toolbar)) this.toolbars[name] = component;
-            }
-        },
         onContentChange: function() {
         },
         /**
@@ -212,14 +182,15 @@ define('Sage/Platform/Mobile/View', [
                 this.load();
             }
 
-            var tools = (this.options && this.options.tools) || this.get('tools') || {};
+            var toolsFromOptions = this.options && this.options.tools || {},
+                toolsFromSelf = this.get('tools') || {};
 
             for (var name in this.toolbars)
             {
                 var toolbar = this.toolbars[name];
                 if (toolbar.managed)
                 {
-                    toolbar.set('items', tools[name]);
+                    toolbar.set('items', toolsFromOptions[name] || toolsFromSelf[name]);
                 }
                 else
                 {
