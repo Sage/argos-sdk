@@ -116,7 +116,7 @@ define('Sage/Platform/Mobile/Fields/CollectionEntryField', [
         lookupLabelText: 'edit',
         lookupText: '...',
         emptyText: 'empty',
-        completeText: 'OK',
+        completeText: 'Ok',
         addItemText: 'Add',
         emptyListText: 'No items have been added.',
 

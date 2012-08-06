@@ -46,7 +46,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
         lookupLabelText: 'edit',
         lookupText: '...',
         emptyText: 'empty',
-        completeText: 'OK',
+        completeText: 'Ok',
         cancelText: 'Cancel',
 
         formatValue: function(val) {

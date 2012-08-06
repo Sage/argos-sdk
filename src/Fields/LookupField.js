@@ -53,7 +53,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
         // Localization
         dependentErrorText: "A value for '${0}' must be selected.",
         emptyText: '',
-        completeText: 'OK',
+        completeText: 'Ok',
         cancelText: 'Cancel',
         lookupLabelText: 'lookup',
         lookupText: '...',
