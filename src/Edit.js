@@ -531,7 +531,7 @@ define('Sage/Platform/Mobile/Edit', [
                 this._applyStateToAddOptions(addOptions);
 
                 Deferred.when(store.add(item, addOptions),
-                    lang.hitch(this, this._onAddComplete),
+                    lang.hitch(this, this._onAddComplete, item),
                     lang.hitch(this, this._onAddError, addOptions)
                 );
             }
@@ -542,10 +542,10 @@ define('Sage/Platform/Mobile/Edit', [
         },
         _applyStateToAddOptions: function(addOptions) {
         },
-        _onAddComplete: function(result) {
+        _onAddComplete: function(item, result) {
             this.enable();
 
-            var message = this._buildRefreshMessage();
+            var message = this._buildRefreshMessage(item, result);
 
             connect.publish('/app/refresh', [message]);
 
