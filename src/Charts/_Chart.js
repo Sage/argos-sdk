@@ -431,9 +431,15 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
         },
 
         setMinorTickStep: function(div) {
-            var majTickStep = Math.pow(10, Math.floor(Math.log(this.stats.max - this.stats.min) / Math.LN10));
+            var majTickStep = this.stats.major || Math.pow(10, Math.floor(Math.log(this.stats.max - this.stats.min) / Math.LN10));
 
             this.chart.axes[this.valueAxis].opt.minorTickStep = majTickStep / div;
+        },
+        setMajorTickStep: function(div) {
+            var originalStep = Math.pow(10, Math.floor(Math.log(this.stats.max - this.stats.min) / Math.LN10)),
+                step = this.stats.major = Math.floor(Math.ceil(this.stats.max / originalStep) * originalStep / div);
+
+            this.chart.axes[this.valueAxis].opt.majorTickStep = step;
         },
 
         update: function() {
@@ -455,6 +461,8 @@ define('Sage/Platform/Mobile/Charts/_Chart', [
                 this.addSeries(series['name'], series['data'], series['options'] || {});
             }, chart);
 
+            if (this.majorTickDivisions)
+                this.setMajorTickStep(this.majorTickDivisions);
             if (this.minorTickDivisions)
                 this.setMinorTickStep(this.minorTickDivisions);
 
