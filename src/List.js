@@ -575,8 +575,24 @@ define('Sage/Platform/Mobile/List', [
             }
         },
         _onQueryComplete: function(queryResults, items) {
-            var start = this.position,
-                size = queryResults.total;
+            var start = this.position;
+
+            Deferred.when(queryResults.total, lang.hitch(this, this._onQueryTotal));
+
+            /* todo: move to a more appropriate location */
+            if (this.options && this.options.allowEmptySelection) domClass.add(this.domNode, 'has-empty');
+
+            this._processData(items);
+
+            domClass.remove(this.domNode, 'is-loading');
+
+            /* remove the loading indicator so that it does not get re-shown while requesting more data */
+            if (start === 0) domConstruct.destroy(this.loadingIndicatorNode);
+
+            this.onContentChange();
+            connect.publish('/app/toolbar/update', []);
+        },
+        _onQueryTotal: function(size) {
             if (size === 0)
             {
                 domConstruct.place(this.noDataTemplate.apply(this), this.contentNode, 'only');
@@ -594,19 +610,6 @@ define('Sage/Platform/Mobile/List', [
 
                 this.position = this.position + this.pageSize;
             }
-
-            /* todo: move to a more appropriate location */
-            if (this.options && this.options.allowEmptySelection) domClass.add(this.domNode, 'has-empty');
-
-            this._processData(items);
-
-            domClass.remove(this.domNode, 'is-loading');
-
-            /* remove the loading indicator so that it does not get re-shown while requesting more data */
-            if (start === 0) domConstruct.destroy(this.loadingIndicatorNode);
-
-            this.onContentChange();
-            connect.publish('/app/toolbar/update', []);
         },
         _onQueryError: function(queryOptions, error) {
             if (error.aborted)
