@@ -19,9 +19,29 @@ define('Sage/Platform/Mobile/Store/SData', [
     convert,
     utility
 ) {
+    var parseOrderByRE = /((?:\w+)(?:\.\w+)?)(?:\s+(asc|desc))?/g,
+        parseOrderBy = function(expression) {
+            if (typeof expression !== 'string') return expression;
+
+            var match,
+                result = [];
+
+            while (match = parseOrderByRE.exec(expression))
+            {
+                result.push({
+                    attribute: match[1],
+                    descending: match[2] && match[2].toLowerCase() == 'desc'
+                });
+            }
+
+            return result;
+        };
+
     return declare('Sage.Platform.Mobile.Store.SData', null, {
         doDateConversion: false,
 
+        /* todo: is this the appropriate name for the expansion scope? */
+        scope: null,
         where: null,
         select: null,
         include: null,

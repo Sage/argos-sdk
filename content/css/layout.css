@@ -830,7 +830,7 @@ h2 > .collapsed-indicator
     float: left;
 }
 
-.edit-content > fieldset
+.edit-content > fieldset,
 .edit-content > div,
 .edit-content > ul,
 .edit .validation-summary > ul

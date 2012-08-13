@@ -60,12 +60,12 @@ define('Sage/Platform/Mobile/_SDataDetailMixin', [
             var options = this.options;
             if (options)
             {
-                if (options.select) getOptions.select = this.expandExpression(options.select);
-                if (options.include) getOptions.include = this.expandExpression(options.include);
-                if (options.contractName) getOptions.contractName = this.expandExpression(options.contractName);
-                if (options.resourceKind) getOptions.resourceKind = this.expandExpression(options.resourceKind);
-                if (options.resourceProperty) getOptions.resourceProperty = this.expandExpression(options.resourceProperty);
-                if (options.resourcePredicate) getOptions.resourcePredicate = this.expandExpression(options.resourcePredicate);
+                if (options.select) getOptions.select = options.select;
+                if (options.include) getOptions.include = options.include;
+                if (options.contractName) getOptions.contractName = options.contractName;
+                if (options.resourceKind) getOptions.resourceKind = options.resourceKind;
+                if (options.resourceProperty) getOptions.resourceProperty = options.resourceProperty;
+                if (options.resourcePredicate) getOptions.resourcePredicate = options.resourcePredicate;
             }
         }
     });
