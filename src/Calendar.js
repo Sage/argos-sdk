@@ -230,7 +230,14 @@ define('Sage/Platform/Mobile/Calendar', [
             if (this.showTimePicker) {
                 domClass.remove(this.timeNode, 'time-content-hidden');
                 // hide meridiem toggle when using 24hr time format:
-                if (this.is24hrTimeFormat) { domStyle.set(this.meridiemNode.parentNode, 'display', 'none'); }
+                if (this.is24hrTimeFormat) {
+                    domStyle.set(this.meridiemNode.parentNode, 'display', 'none');
+                } else if (12 > this.date.getHours()) {
+                    // ensure initial toggle state reflects actual time
+                    domClass.add(this.meridiemNode, 'toggleStateOn');
+                } else {
+                    domClass.remove(this.meridiemNode, 'toggleStateOn');
+                }
             } else {
                 domClass.add(this.timeNode, 'time-content-hidden');
             }
