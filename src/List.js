@@ -169,7 +169,8 @@ define('Sage/Platform/Mobile/List', [
                     {name: 'more', tag: 'div', attrs: {'class': 'list-more'}, components: [
                         {name: 'moreRemaining', tag: 'span', attrs: {'class': 'list-remaining'}, attachPoint: 'remainingContentNode'},
                         {name: 'moreButton', content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
-                    ]}
+                    ]},
+                    {name: 'list-actions', tag: 'li', attrs: {'class': 'actions-row'}, attachPoint: 'actionsNode'}
                 ]}
             ]}
         ],
@@ -198,8 +199,10 @@ define('Sage/Platform/Mobile/List', [
          */
         rowTemplate: new Simplate([
             '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
-            '<div data-action="selectEntry" class="list-item-selector"></div>',
-            '{%! $$.itemTemplate %}',
+            '<button data-action="selectEntry" class="list-item-selector button">',
+            '<img src="{%= $$.icon || $$.selectIcon %}" class="icon" />',
+            '</button>',
+            '<div class="list-item-content">{%! $$.itemTemplate %}</div>',
             '</li>'
         ]),
         /**
@@ -226,6 +229,22 @@ define('Sage/Platform/Mobile/List', [
             '</li>'
         ]),
         /**
+         * The template used to render a single action item (button)
+         * The default template uses the following properties
+         *
+         *      name                description
+         *      ----------------------------------------------------------------
+         *      title               Used for the ARIA label
+         *      icon                Path to the icon to use for the action item
+         *      label               Text shown beneath the icon
+         */
+        listActionItemTemplate: new Simplate([
+            '<button data-action="invokeActionItem" data-id="{%= $.actionIndex %}" aria-label="{%: $.title || $.id %}">',
+            '<img src="{%= $.icon %}" alt="{%= $.id %}" />',
+            '<label>{%: $.label %}</label>',
+            '</button>'
+        ]),
+        /**
          * @cfg {String} id
          * The id for the view, and it's main DOM element.
          */
@@ -249,6 +268,11 @@ define('Sage/Platform/Mobile/List', [
          * @type {Boolean}
          */
         hideSearch: false,
+        /**
+         * True to enable action based panel (defaults to false).
+         * @type {Boolean}
+         */
+        enableActions: false,
         /**
          * True to allow selection in the view (defaults to false).
          * @type {Boolean}
@@ -350,6 +374,7 @@ define('Sage/Platform/Mobile/List', [
          */
         requestErrorText: 'A server error occurred while requesting data.',
         customizationSet: 'list',
+        actionsNode: null,
         _selectionModel: null,
         _selectionConnects: null,
         _setSelectionModelAttr: function(selectionModel) {
@@ -380,8 +405,10 @@ define('Sage/Platform/Mobile/List', [
 
             domClass.toggle(this.domNode, 'has-search-header', this.hideSearch);
 
-            if (this.searchText)
+            if (this.searchText && this.enableSearch)
                 this.$.search.setLabel(this.searchText);
+
+            this.createActions(this.createActionLayout());
 
             this.clear(true);
         },
@@ -410,21 +437,120 @@ define('Sage/Platform/Mobile/List', [
                 }]
             });
         },
+        createActionLayout: function() {
+            return this.actions || {};
+        },
+        createActions: function(actions) {
+            for (var i = 0; i < actions.length; i++)
+            {
+                var action = actions[i],
+                    options = {
+                        actionIndex: i,
+                        hasAccess: (action.security && App.hasAccessTo(this.expandExpression(action.security))) || true
+                    },
+                    actionTemplate = action.template || this.listActionItemTemplate;
+
+                lang.mixin(action, options);
+console.log(action, options, this.actionsNode);
+                domConstruct.place(actionTemplate.apply(action, action.id), this.actionsNode, 'last');
+            }
+
+            this.actions = actions;
+        },
+        invokeActionItem: function(parameters, evt, node) {
+            var index = parameters['id'],
+                action = this.actions[index],
+                selectedItems = this.get('selectionModel').getSelections(),
+                selection = null;
+
+            if (!action.isEnabled) return;
+
+            for (var key in selectedItems)
+            {
+                selection = selectedItems[key];
+                break;
+            }
+
+            if (action['fn'])
+                action['fn'].call(action['scope'] || this, action, selection);
+            else
+            if (action['action'])
+                if (this.hasAction(action['action']))
+                    this.invokeAction(action['action'], action, selection);
+        },
+        checkActionState: function() {
+            var selectedItems = this.get('selectionModel').getSelections(),
+                selection = null;
+
+            for (var key in selectedItems)
+            {
+                selection = selectedItems[key];
+                break;
+            }
+
+            for (var i = 0; i < this.actions.length; i++)
+            {
+                var action = this.actions[i];
+
+                action.isEnabled = (typeof action['enabled'] === 'undefined')
+                    ? true
+                    : this.expandExpression(action['enabled'], action, selection);
+
+                if (!action.hasAccess)
+                    action.isEnabled = false;
+
+                domClass.toggle(this.actionsNode.childNodes[i], 'toolButton-disabled', !action.isEnabled);
+            }
+
+        },
+        showActionPanel: function(rowNode) {
+            this.checkActionState();
+
+            domClass.add(rowNode, 'list-action-selected');
+            domConstruct.place(this.actionsNode, rowNode, 'after');
+
+            if (this.actionsNode.offsetTop + this.actionsNode.clientHeight + 48 > document.documentElement.clientHeight)
+                this.actionsNode.scrollIntoView(false);
+        },
+        setSource: function(source) {
+            lang.mixin(source, {
+                resourceKind: this.resourceKind
+            });
+
+            this.options.source = source;
+        },
+        hideActionPanel: function(rowNode) {
+            domClass.remove(rowNode, 'list-action-selected');
+        },
         isNavigationDisabled: function() {
             return ((this.options && this.options.selectionOnly) || (this.selectionOnly));
         },
         isSelectionDisabled: function() {
-            return !((this.options && this.options.selectionOnly) || (this.allowSelection));
+            return !((this.options && this.options.selectionOnly) || this.enableActions || this.allowSelection);
         },
         _onSelectionModelSelect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
-            if (node)
-                domClass.add(node, 'list-item-selected');
+            if (!node) return;
+
+            if (this.enableActions)
+            {
+                this.showActionPanel(node);
+                return;
+            }
+
+            domClass.add(node, 'list-item-selected');
         },
         _onSelectionModelDeselect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
-            if (node)
-                domClass.remove(node, 'list-item-selected');
+            if (!node) return;
+
+            if (this.enableActions)
+            {
+                this.hideActionPanel(node);
+                return;
+            }
+
+            domClass.remove(node, 'list-item-selected');
         },
         _onSelectionModelClear: function() {
         },
@@ -454,7 +580,7 @@ define('Sage/Platform/Mobile/List', [
             if (this._selectionModel && key)
                 this._selectionModel.toggle(key, this.items[key], row);
 
-            if (this.options.singleSelect && this.options.singleSelectAction)
+            if (this.options.singleSelect && this.options.singleSelectAction && !this.enableActions)
                 this.invokeSingleSelectAction();
         },
         activateEntry: function(evt, node) {
@@ -537,6 +663,14 @@ define('Sage/Platform/Mobile/List', [
         },
         createStore: function() {
             return null;
+        },
+        navigateToRelatedView:  function(action, selection, viewId, whereQueryFmt) {
+            var options = {};
+
+            if (whereQueryFmt && selection)
+                options['where'] = string.substitute(whereQueryFmt, [selection.data['$key']]);
+
+            scene().showView(viewId, options);
         },
         navigateToDetailView: function(key, descriptor) {
             scene().showView(this.detailView, {
@@ -691,6 +825,15 @@ define('Sage/Platform/Mobile/List', [
             if (this._selectionModel && !this.isSelectionDisabled())
                 this._selectionModel.useSingleSelection(this.options.singleSelect);
 
+            if (typeof this.options.enableActions !== 'undefined')
+                this.enableActions = this.options.enableActions;
+
+            domClass.toggle(this.domNode, 'list-show-actions', this.enableActions);
+            if (this.enableActions)
+            {
+                this._selectionModel.useSingleSelection(true);
+            }
+
             if (this.refreshRequired)
             {
                 this.clear();
@@ -698,7 +841,7 @@ define('Sage/Platform/Mobile/List', [
             else
             {
                 // if enabled, clear any pre-existing selections
-                if (this._selectionModel && this.autoClearSelection)
+                if (this._selectionModel && this.autoClearSelection && !this.enableActions)
                     this._selectionModel.clear();
             }
         },
