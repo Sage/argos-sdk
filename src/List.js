@@ -408,7 +408,8 @@ define('Sage/Platform/Mobile/List', [
             if (this.searchText && this.enableSearch)
                 this.$.search.setLabel(this.searchText);
 
-            this.createActions(this.createActionLayout());
+            var customizationSet = customizations();
+            this.createActions(customizationSet.apply(customizationSet.toPath('actions', null, this.id), this.createActionLayout()));
 
             this.clear(true);
         },
