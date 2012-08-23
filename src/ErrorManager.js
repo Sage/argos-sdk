@@ -17,12 +17,14 @@ define('Sage/Platform/Mobile/ErrorManager', [
     'dojo/_base/json',
     'dojo/_base/lang',
     'dojo/_base/connect',
-    'dojo/string'
+    'dojo/string',
+    './Utility'
 ], function(
     json,
     lang,
     connect,
-    string
+    string,
+    utility
 ) {
     var errors = [];
     try
@@ -36,139 +38,28 @@ define('Sage/Platform/Mobile/ErrorManager', [
     }
 
     return lang.setObject('Sage.Platform.Mobile.ErrorManager', {
-        //Localization
-        abortedText: 'Aborted',
-        scopeSaveText: 'Scope is not saved in error report',
-
         /**
          * Total amount of errors to keep
          */
         errorCacheSizeMax: 10,
 
         /**
-         * Adds a custom error item by combining error message/options for easier tech support
-         * @param serverResponse Full response from server, status, responsetext, etc.
-         * @param requestOptions GET or POST options sent, only records the URL at this time
-         * @param viewOptions The View Options of the view in which the error occurred
-         * @param failType String, either "failure" or "aborted" as each response has different properties
+         * Adds a custom error item and fires the onErrorAdd event
+         * @param description Short title or description of the Error. Ex: Duplicate Found, Invalid Email
+         * @param error Object The error object that will be JSON-stringified and stored for use.
          */
-        addError: function(serverResponse, requestOptions, viewOptions, failType) {
-            var errorDate = new Date(),
-                dateStamp = string.substitute('/Date(${0})/',[errorDate.getTime()]),
-                errorItem = {
-                    errorDate: errorDate.toString(),
-                    errorDateStamp: dateStamp,
-                    url: requestOptions.url,
-                    viewOptions: this.serializeValues(viewOptions),
-                    "$key": dateStamp
+        addError: function(description, error) {
+            var errorItem = {
+                    '$key': new Date().getTime(),
+                    'Date': moment().format(),
+                    'Description': description,
+                    'Error': json.toJson(utility.sanitizeForJson(error))
                 };
-
-            if (failType === 'failure')
-                lang.mixin(errorItem, this.extractFailureResponse(serverResponse));
-
-            if (failType === 'aborted')
-                lang.mixin(errorItem, this.extractAbortResponse(serverResponse));
 
             this.checkCacheSize();
             errors.push(errorItem);
             this.onErrorAdd();
             this.save();
-        },
-
-        /**
-         * Explicitly extract values due to how read-only objects are enforced
-         * @param response XMLHttpRequest object sent back from server
-         * @return Object with only relevant, standard properties
-         */
-        extractFailureResponse: function(response) {
-            var failureResponse = {
-                "$descriptor": response.statusText,
-                "serverResponse": {
-                    "readyState": response.readyState,
-                    "responseXML": response.responseXML,
-                    "status": response.status,
-                    "responseType": response.responseType,
-                    "withCredentials": response.withCredentials,
-                    "responseText": response.responseText
-                        ? this.fromJsonArray(response.responseText)
-                        : "",
-                    "statusText": response.statusText
-                }
-            };
-            return failureResponse;
-        },
-
-        /**
-         * Attempts to parse a json string into a javascript object
-         * The need for this function is the fallback in case of failure
-         * @param json String Json formatted string
-         */
-        fromJsonArray: function(json) {
-            var o;
-            try
-            {
-                o = json.fromJson(json);
-                o = o[0];
-            }
-            catch(e)
-            {
-                o = {
-                    message: json,
-                    severity: ""
-                };
-            }
-            return o;
-        },
-
-        /**
-         * Abort error is hardset due to exceptions from reading properties
-         * FF 3.6: https://bugzilla.mozilla.org/show_bug.cgi?id=238559
-         * @param response XMLHttpRequest object sent back from server
-         * @return Object with hardset abort info
-         */
-        extractAbortResponse: function(response) {
-            var abortResponse = {
-                "$descriptor": this.abortedText,
-                "serverResponse": {
-                    "readyState": 4,
-                    "responseXML": "",
-                    "status": 0,
-                    "responseType": "",
-                    "withCredentials": response.withCredentials,
-                    "responseText": "",
-                    "statusText": this.abortedText
-                }
-            };
-            return abortResponse;
-        },
-
-        /**
-         * JSON serializes an object by recursively discarding non value keys
-         * @param obj Object to be JSON serialized
-         */
-        serializeValues: function(obj) {
-            for (var key in obj){
-                switch(typeof obj[key]){
-                    case 'undefined':
-                        obj[key] = 'undefined';
-                        break;
-                    case 'function':
-                        delete obj[key];
-                        break;
-                    case 'object':
-                        if (obj[key] === null) {
-                            obj[key] = 'null';
-                            break;
-                        }
-                        if(key === 'scope') { // eliminate recursive self call
-                            obj[key] = this.scopeSaveText;
-                            break;
-                        }
-                        obj[key] = this.serializeValues(obj[key]);
-                        break;
-                }
-            }
-            return obj;
         },
 
         /**

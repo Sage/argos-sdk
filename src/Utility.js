@@ -15,10 +15,12 @@
 
 define('Sage/Platform/Mobile/Utility', [
     'dojo/_base/lang',
-    'dojo/_base/array'
+    'dojo/_base/array',
+    'dojo/_base/json'
 ], function(
     lang,
-    array
+    array,
+    json
 ) {
     var nameToPathCache = {};
     var nameToPath = function(name) {
@@ -137,7 +139,60 @@ define('Sage/Platform/Mobile/Utility', [
             }
 
             return result;
+        },
+        /**
+         * Sanitizes an Object so that JSON.stringify will work without errors by discarding non-stringable keys
+         * @param obj Object that can be JSON.stringified
+         */
+        sanitizeForJson = function(obj) {
+            var type;
+            for (var key in obj)
+            {
+                try
+                {
+                    type = typeof obj[key];
+                }
+                catch(e)
+                {
+                    delete obj[key];
+                    continue;
+                }
+
+                switch(type)
+                {
+                    case 'undefined':
+                        obj[key] = 'undefined';
+                        break;
+
+                    case 'function':
+                        delete obj[key];
+                        break;
+
+                    case 'object':
+                        if (obj[key] === null) {
+                            obj[key] = 'null';
+                            break;
+                        }
+                        if(key === 'scope')
+                        {
+                            obj[key] = 'null';
+                            break;
+                        }
+                        obj[key] = this.sanitizeForJson(obj[key]);
+                        break;
+                    case 'string':
+                        try
+                        {
+                            obj[key] = json.fromJson(obj[key]);
+                            obj[key] = this.sanitizeForJson(obj[key]);
+                        }
+                        catch(e){}
+                        break;
+                }
+            }
+            return obj;
         };
+
 
     return lang.setObject('Sage.Platform.Mobile.Utility', {
         getValue: getValue,
@@ -145,6 +200,7 @@ define('Sage/Platform/Mobile/Utility', [
         contains: contains,
         bindDelegate: bindDelegate,
         expand: expand,
-        expandSafe: expandSafe
+        expandSafe: expandSafe,
+        sanitizeForJson: sanitizeForJson
     });
 });

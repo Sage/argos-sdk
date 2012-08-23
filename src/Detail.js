@@ -261,7 +261,11 @@ define('Sage/Platform/Mobile/Detail', [
                 alert(string.substitute(this.requestErrorText, [error]));
             }
 
-            ErrorManager.addError(error.xhr, getOptions, this.options, error.aborted ? 'aborted' : 'failure');
+            var errorItem = {
+                viewOptions: this.options,
+                serverError: error
+            };
+            ErrorManager.addError(this.requestErrorText, errorItem);
 
             domClass.remove(this.domNode, 'is-loading');
         },

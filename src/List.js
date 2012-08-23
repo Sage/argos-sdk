@@ -451,7 +451,6 @@ define('Sage/Platform/Mobile/List', [
                     actionTemplate = action.template || this.listActionItemTemplate;
 
                 lang.mixin(action, options);
-console.log(action, options, this.actionsNode);
                 domConstruct.place(actionTemplate.apply(action, action.id), this.actionsNode, 'last');
             }
 
@@ -755,7 +754,11 @@ console.log(action, options, this.actionsNode);
                 alert(string.substitute(this.requestErrorText, [error]));
             }
 
-            ErrorManager.addError(error.xhr, queryOptions, this.options, error.aborted ? 'aborted' : 'failure');
+            var errorItem = {
+                viewOptions: this.options,
+                serverError: error
+            };
+            ErrorManager.addError(this.requestErrorText, errorItem);
 
             domClass.remove(this.domNode, 'is-loading');
         },

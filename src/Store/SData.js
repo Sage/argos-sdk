@@ -5,7 +5,7 @@ define('Sage/Platform/Mobile/Store/SData', [
     'dojo/_base/Deferred',
     'dojo/store/util/QueryResults',
     'dojo/string',
-    'dojo/json',
+    'dojo/_base/json',
     '../Convert',
     '../Utility'
 ], function (
@@ -237,8 +237,8 @@ define('Sage/Platform/Mobile/Store/SData', [
 
             error.xhr = xhr;
             error.status = xhr.status;
-            error.responseText = xhr.responseText;
             error.aborted = false;
+            error.url = xhrOptions.url;
 
             deferred.reject(error);
         },

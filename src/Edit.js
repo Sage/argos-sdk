@@ -246,7 +246,11 @@ define('Sage/Platform/Mobile/Edit', [
                 alert(string.substitute(this.requestErrorText, [error]));
             }
 
-            ErrorManager.addError(error.xhr, getOptions, this.options, error.aborted ? 'aborted' : 'failure');
+            var errorItem = {
+                viewOptions: this.options,
+                serverError: error
+            };
+            ErrorManager.addError(this.requestErrorText, errorItem);
 
             domClass.remove(this.domNode, 'is-loading');
         },
@@ -554,7 +558,11 @@ define('Sage/Platform/Mobile/Edit', [
         _onAddError: function(addOptions, error) {
             alert(string.substitute(this.requestErrorText, [error]));
 
-            ErrorManager.addError(error.xhr, addOptions, this.options, error.aborted ? 'aborted' : 'failure');
+            var errorItem = {
+                viewOptions: this.options,
+                serverError: error
+            };
+            ErrorManager.addError(this.requestErrorText, errorItem);
 
             this.enable();
         },
@@ -578,7 +586,12 @@ define('Sage/Platform/Mobile/Edit', [
         },
         onRequestFailure: function(response, o) {
             alert(string.substitute(this.requestErrorText, [response, o]));
-            ErrorManager.addError(response, o, this.options, 'failure');
+
+            var errorItem = {
+                viewOptions: this.options,
+                serverError: response
+            };
+            ErrorManager.addError(this.requestErrorText, errorItem);
         },
         update: function() {
             var values = this.getValues();
@@ -632,7 +645,11 @@ define('Sage/Platform/Mobile/Edit', [
 
             alert(string.substitute(this.requestErrorText, [error]));
 
-            ErrorManager.addError(error.xhr, putOptions, this.options, error.aborted ? 'aborted' : 'failure');
+            var errorItem = {
+                viewOptions: this.options,
+                serverError: error
+            };
+            ErrorManager.addError(this.requestErrorText, errorItem);
 
             this.enable();
         },
