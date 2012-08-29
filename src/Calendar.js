@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/**
+ *
+ * @alternateClassName Calendar
+ */
 define('Sage/Platform/Mobile/Calendar', [
     'dojo/_base/declare',
     'dojo/string',

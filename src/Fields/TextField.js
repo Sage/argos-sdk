@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 define('Sage/Platform/Mobile/Fields/TextField', [
     'dojo/_base/declare',
     'dojo/_base/event',
@@ -28,6 +29,9 @@ define('Sage/Platform/Mobile/Fields/TextField', [
     _Field,
     FieldManager
 ) {
+    /**
+     *
+     */
     var control = declare('Sage.Platform.Mobile.Fields.TextField', [_Field], {
         attributeMap: {
             inputValue: {
@@ -36,6 +40,14 @@ define('Sage/Platform/Mobile/Fields/TextField', [
                 attribute: 'value'
             }
         },
+        /**
+         * @property {Simplate}
+         * Simplate that defines the fields HTML Markup
+         *
+         * * `$` => Field instance
+         * * `$$` => Owner View instance
+         *
+         */
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '{% if ($.enableClearButton && !$.readonly) { %}',

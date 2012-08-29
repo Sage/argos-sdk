@@ -22,11 +22,23 @@ define('Sage/Platform/Mobile/Fields/HiddenField', [
     TextField,
     FieldManager
 ) {
+    /**
+     *
+     */
     var control = declare('Sage.Platform.Mobile.Fields.HiddenField', [TextField], {
         propertyTemplate: new Simplate([
             '<div style="display: none;" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'
         ]),
+
+        /**
+         * @property {Simplate}
+         * Simplate that defines the fields HTML Markup
+         *
+         * * `$` => Field instance
+         * * `$$` => Owner View instance
+         *
+         */
         widgetTemplate: new Simplate([
             '<input data-dojo-attach-point="inputNode" type="hidden">'
         ]),

@@ -29,6 +29,9 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
     FieldManager
 ) {
 
+    /**
+     *
+     */
     var control = declare('Sage.Platform.Mobile.Fields.SignatureField', [EditorField], {
         // Localization
         emptyText: '',
@@ -45,6 +48,14 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
             height: 50
         },
         context: null,
+        /**
+         * @property {Simplate}
+         * Simplate that defines the fields HTML Markup
+         *
+         * * `$` => Field instance
+         * * `$$` => Owner View instance
+         *
+         */
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.signatureLabelText %}"><span aria-hidden="true">{%: $.signatureText %}</span></button>',

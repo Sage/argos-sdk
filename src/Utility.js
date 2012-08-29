@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * Utility provides functions that are more javascript enhancers than application related code.
+ * @alternateClassName utility
+ * @singleton
+ */
 define('Sage/Platform/Mobile/Utility', [
     'dojo/_base/lang'
 ], function(

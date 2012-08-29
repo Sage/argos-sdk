@@ -24,6 +24,9 @@ define('Sage/Platform/Mobile/Fields/NoteField', [
     EditorField,
     FieldManager
 ) {
+    /**
+     *
+     */
     var control = declare('Sage.Platform.Mobile.Fields.NoteField', [EditorField], {
         attributeMap: {
             noteText: {
@@ -31,6 +34,14 @@ define('Sage/Platform/Mobile/Fields/NoteField', [
                 type: 'innerHTML'
             }
         },
+        /**
+         * @property {Simplate}
+         * Simplate that defines the fields HTML Markup
+         *
+         * * `$` => Field instance
+         * * `$$` => Owner View instance
+         *
+         */
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',

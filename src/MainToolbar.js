@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * MainToolbar is designed to handle the top application bar with markup and logic to set
+ * a title and position toolbar items to the left or right
+ * @alternateClassName MainToolbar
+ * @extends Toolbar
+ */
 define('Sage/Platform/Mobile/MainToolbar', [
     'dojo/_base/declare',
     'dojo/query',
@@ -29,17 +35,34 @@ define('Sage/Platform/Mobile/MainToolbar', [
 ) {
 
     return declare('Sage.Platform.Mobile.MainToolbar', [Toolbar], {
+        /**
+         * @property {Object}
+         * Used to set the title node's innerHTML
+         */
         attributeMap: {
             'title': {
                 node: 'titleNode',
                 type: 'innerHTML'
             }
         },
+        /**
+         * @property {Simplate}
+         * Simplate that defines the main HTML Markup of the toolbar
+         *
+         * `$` - the toolbar instance
+         */
         widgetTemplate: new Simplate([
             '<div class="toolbar {%= $.cls %}">',            
             '<h1 id="pageTitle" class="toolbar-title" data-dojo-attach-point="titleNode">{%= $.titleText %}</h1>',
             '</div>'
         ]),
+        /**
+         * @property {Simplate}
+         * Simplate that defines the toolbar item HTML Markup
+         *
+         * `$` - The toolbar item object
+         * `$$` - The toolbar instance
+         */
         toolTemplate: new Simplate([
             '<button class="button toolButton toolButton-{%= $.side || "right" %} {%= ($$.enabled) ? "" : "toolButton-disabled" %} {%= $.cls %}"',
                     'data-action="invokeTool" data-tool="{%= $.id %}"',
@@ -51,15 +74,30 @@ define('Sage/Platform/Mobile/MainToolbar', [
                 '{% } %}',
             '</button>'
         ]),
+        /**
+         * @property {Number}
+         * Current number of toolbar items set
+         */
         size: 0,
 
+        /**
+         * Text that is placed into the toolbar titleNode
+         */
         titleText: 'Mobile',
-        
+
+        /**
+         * Calls parent {@link Toolbar#clear clear} and removes all toolbar items from DOM.
+         */
         clear: function() {
             this.inherited(arguments);
 
             query("> [data-action], .toolButton-right", this.domNode).remove();
         },
+        /**
+         * Calls parent {@link Toolbar#showTools showTools} which sets the tool collection.
+         * The collection is then looped over and added to DOM, adding the left or right styling
+         * @param {Object[]} tools Array of toolbar item definitions
+         */
         showTools: function(tools) {
             this.inherited(arguments);
 

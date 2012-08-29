@@ -13,6 +13,35 @@
  * limitations under the License.
  */
 
+/**
+ * Search Widget is an SData-enabled search component that {@link List List} uses by default for search.
+ *
+ * The search widget is a dijit Widget with all the Widget aspects.
+ *
+ * It supports two types of shortcuts:
+ *
+ * 1\. `#text` - The key `text` will be replaced with the matching expression. This is a "hashtag".
+
+ * 2\. `#!Name eq 'John'` - The `Name eq 'John'` will be inserted directly, avoiding {@link List#formatSearchQuery formatSearchQuery}. This is a "custom expression".
+ *
+ * Multiple hashtags is supported as well as hashtags with additional text that gets sent through {@link List#formatSearchQuery formatSearchQuery}.
+ *
+ * To go through a full example, take this expression:
+ * `#open #urgent Bob`
+ *
+ * `#open` is replaced with: `TicketStatus eq 1`
+ *
+ * `#urgent` is replaced with: `TicketUrgency gt 3`
+ *
+ * `Bob` is passed to `formatSearchQuery` which returns `TicketId eq ("Bob") or TicketOwner like "Bob"
+ *
+ * The final result is "anded" together, resulting in this final where clause:
+ * `where=(TicketStatus eq 1) and (TicketUrgency gt 3) and (TicketId eq ("Bob") or TicketOwner like "Bob")
+ *
+ * See the [Defining Hash Tags guide](#!/guides/v2_beyond_the_guide_defining_hashtags) for more information and how it supports localization.
+ * @alternateClassName SearchWidget
+ * @mixins _Templated
+ */
 define('Sage/Platform/Mobile/SearchWidget', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -31,9 +60,17 @@ define('Sage/Platform/Mobile/SearchWidget', [
     _Templated
 ) {
     return declare('Sage.Platform.Mobile.SearchWidget', [_Widget, _Templated], {
+        /**
+         * @property {Object}
+         * Provides a setter for HTML node attributes, namely the value for search text
+         */
         attributeMap: {
             queryValue: { node: 'queryNode', type: 'attribute', attribute: 'value' }
         },
+        /**
+         * @property {Simplate}
+         * Simple that defines the HTML Markup
+         */
         widgetTemplate: new Simplate([
             '<div class="search-widget">',
                 '<input type="text" name="query" class="query" autocorrect="off" autocapitalize="off" data-dojo-attach-point="queryNode" data-dojo-attach-event="onfocus:_onFocus,onblur:_onBlur,onkeypress:_onKeyPress" />',
@@ -42,27 +79,49 @@ define('Sage/Platform/Mobile/SearchWidget', [
                 '<label data-dojo-attach-point="labelNode">{%= $.searchText %}</label>',
             '</div>'
         ]),
-        
+
+        /**
+         * @property {String}
+         * Text that is used when no value is in the search box - "placeholder" text.
+         */
         searchText: 'Search',
         
         /**
+         * @property {RegExp}
          * The regular expression used to determine if a search query is a custom search expression.  A custom search
          * expression is not processed, and directly passed to SData.
-         * @type {Object}
          */
         customSearchRE: /^#!/,
         /**
+         * @type {RegExp}
          * The regular expression used to determine if a search query is a hash tag search.
-         * @type {Object}
          */
         hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
+        /**
+         * @property {Object[]}
+         * Array of hash tag definitions
+         */
         hashTagQueries: null,
+        /**
+         * Dojo attach point to the search input
+         */
         queryNode: null,
 
+        /**
+         * Sets search text to empty and removes active styling
+         */
         clear: function() {
             domClass.remove(this.domNode, 'search-active');
             this.set('queryValue', '');
         },
+        /**
+         * This function is invoked from the search button and it:
+         *
+         * * Gathers the inputted search text
+         * * Determines if its a custom expression, hash tag, or normal search
+         * * Calls the appropriate handler
+         * * Fires the {@link #onSearchExpression onSearchExpression} event which {@link List#_onSearchExpression listens to}.
+         */
         search: function() {
             var searchQuery = this.queryNode.value,
                 formattedQuery,
@@ -137,28 +196,51 @@ define('Sage/Platform/Mobile/SearchWidget', [
 
             return query;
         },
+        /**
+         * Configure allows the controller List view to overwrite properties as the passed object will be mixed in.
+         * @param {Object} options Properties to be mixed into Search Widget
+         */
         configure: function(options) {
             // todo: for now, we simply mixin the options
             lang.mixin(this, options);
         },
+        /**
+         * Expands the passed expression if it is a function.
+         * @param {String/Function} expression Returns string directly, if function it is called and the result returned.
+         * @return {String} String expression.
+         */
         expandExpression: function(expression) {
             if (typeof expression === 'function')
                 return expression.apply(this, Array.prototype.slice.call(arguments, 1));
             else
                 return expression;
         },
+        /**
+         * Clears the search input text and attempts to re-open the keyboard
+         * @param {Event} evt Click event
+         */
         _onClearClick: function(evt){
             event.stop(evt);
             this.clear();
             this.queryNode.focus();
             this.queryNode.click();
         },
+        /**
+         * Tests to see if the search input is empty and toggles the active styling
+         */
         _onBlur: function() {
             domClass.toggle(this.domNode, 'search-active', !!this.queryNode.value);
         },
+        /**
+         * Adds the search active styling
+         */
         _onFocus: function() {
             domClass.add(this.domNode, 'search-active');
         },
+        /**
+         * Detects the enter/return key and fires {@link #search search}
+         * @param {Event} evt Key press event
+         */
         _onKeyPress: function(evt) {
             if (evt.keyCode == 13 || evt.keyCode == 10)
             {
@@ -168,7 +250,8 @@ define('Sage/Platform/Mobile/SearchWidget', [
             }
         },
         /**
-         * The event that fires when the search widget provides an explicit search query
+         * The event that fires when the search widget provides a search query.
+         * Listened to by the controlling {@link List#_onSearchExpression List View}
          * @param expression
          * @param widget
          */

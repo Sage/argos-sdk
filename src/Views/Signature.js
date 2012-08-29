@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+/**
+ *
+ */
 define('Sage/Platform/Mobile/Views/Signature', [
     'dojo/_base/declare',
     'dojo/_base/json',

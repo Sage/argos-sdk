@@ -25,13 +25,28 @@ define('Sage/Platform/Mobile/_Templated',
         'dijit/_base/wai'
 ],
 function(domConstruct, declare, query, parser, array, lang, registry, wai) {
-    // not inheriting from dijit._Templated, but using similar functionality.
-    // this is required for contentTemplate to work property.
+    /**
+     * _Templated serves as an override for dijit Widgets to enable the use of
+     * Simplates for templates as well as fixing a few incompatabilities.
+     *
+     * @alternateClassName _Templated
+     */
     var templated = declare('Sage.Platform.Mobile._Templated', null, {
+        /*
+         * Not inheriting from dijit._Templated, but using similar functionality.
+         * this is required for contentTemplate to work property.
+         */
+
+        /**
+         * Initializes _attachPoints and _attachEvents
+         */
         constructor: function () {
             this._attachPoints = [];
             this._attachEvents = [];
         },
+        /**
+         * Processes `this.widgetTemplate` or `this.contentTemplate`
+         */
         buildRendering: function () {
             if (this.widgetTemplate && this.contentTemplate)
             {
@@ -93,12 +108,14 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
                 this._fillContent(this.srcNodeRef);
             }
         },
-        _fillContent: function(/*DomNode*/ source) {
-            // summary:
-            //		Relocate source contents to templated container node.
-            //		this.containerNode must be able to receive children, or exceptions will be thrown.
-            // tags:
-            //		protected
+        /**
+         * Relocate source contents to templated container node.
+         *
+         * this.containerNode must be able to receive children, or exceptions will be thrown.
+         * @param {HTMLElement} source
+         * @protected
+         */
+        _fillContent: function(source) {
             var dest = this.containerNode;
             if (source && dest)
             {
@@ -108,25 +125,22 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
                 }
             }
         },
+        /**
+         * Iterate through the template and attach functions and nodes accordingly.
+         *
+         * Map widget properties and functions to the handlers specified in
+         * the dom node and it's descendants. This function iterates over all
+         * nodes and looks for these properties:
+         *
+         * * dojoAttachPoint
+         * * dojoAttachEvent
+         * * waiRole
+         * * waiState
+         *
+         * @param {HTMLElement/Object[]} rootNode The node to search for properties. All children will be searched.
+         * @param getAttrFunc {Function} A function which will be used to obtain property for a given DomNode/Widget
+         */
         _attachTemplateNodes: function(rootNode, getAttrFunc) {
-            // summary:
-            //		Iterate through the template and attach functions and nodes accordingly.
-            // description:
-            //		Map widget properties and functions to the handlers specified in
-            //		the dom node and it's descendants. This function iterates over all
-            //		nodes and looks for these properties:
-            //			* dojoAttachPoint
-            //			* dojoAttachEvent
-            //			* waiRole
-            //			* waiState
-            // rootNode: DomNode|Array[Widgets]
-            //		the node to search for properties. All children will be searched.
-            // getAttrFunc: Function?
-            //		a function which will be used to obtain property for a given
-            //		DomNode/Widget
-            // tags:
-            //		private
-
             getAttrFunc = getAttrFunc || function (n,p){ return n.getAttribute(p); };
 
             var nodes = (rootNode instanceof Array) ? rootNode : (rootNode.all || rootNode.getElementsByTagName("*"));
@@ -216,6 +230,9 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
                 }
             }
         },
+        /**
+         * Extends the parent implementation by also calling startup on any attached widgets
+         */
         startup: function() {
             array.forEach(this._startupWidgets, function(w){
                 if (w && !w._started && w.startup)
@@ -225,6 +242,9 @@ function(domConstruct, declare, query, parser, array, lang, registry, wai) {
             });
             this.inherited(arguments);
         },
+        /**
+         * Extends the parent implementation by also destroying _attachPoints and disconnecting _attachEvents
+         */
         destroyRendering: function() {
             // Delete all attach points to prevent IE6 memory leaks.
             array.forEach(this._attachPoints, function(point) {

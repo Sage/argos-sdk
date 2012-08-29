@@ -1,0 +1,61 @@
+[
+    {
+        "name": "Argos SDK",
+        "groups": [
+            {
+                "name": "Base",
+                "classes": [
+                    "Sage.Platform.Mobile.Application",
+                    "Sage.Platform.Mobile.ApplicationModule",
+                    "Sage.Platform.Mobile.Calendar",
+                    "Sage.Platform.Mobile.ErrorManager",
+                    "Sage.Platform.Mobile.Format",
+                    "Sage.Platform.Mobile.MainToolbar",
+                    "Sage.Platform.Mobile.PersistentStorage",
+                    "Sage.Platform.Mobile.SearchWidget",
+                    "Sage.Platform.Mobile.SelectionModel",
+                    "Sage.Platform.Mobile.Toolbar",
+                    "Sage.Platform.Mobile.Utility"
+                ]
+            },
+            {
+                "name": "Views",
+                "classes": [
+                    "Sage.Platform.Mobile.View",
+                    "Sage.Platform.Mobile.List",
+                    "Sage.Platform.Mobile.GroupedList",
+                    "Sage.Platform.Mobile.Detail",
+                    "Sage.Platform.Mobile.Edit",
+                    "Sage.Platform.Mobile.Views.*"
+                ]
+            },
+            {
+                "name": "Fields",
+                "classes": [
+                    "Sage.Platform.Mobile.FieldManager",
+                    "Sage.Platform.Mobile.Fields.*"
+                ]
+            },
+            {
+                "name": "Mixins",
+                "classes": [
+                    "Sage.Platform.Mobile._ActionMixin",
+                    "Sage.Platform.Mobile._CustomizationMixin",
+                    "Sage.Platform.Mobile._ServiceMixin",
+                    "Sage.Platform.Mobile._Templated"
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Libraries",
+        "groups": [
+            {
+                "name": "Simplate",
+                "classes": [
+                    "Simplate"
+                ]
+            }
+        ]
+    }
+]

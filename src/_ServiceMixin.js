@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/**
+ *
+ * @alternateClassName _ServiceMixin
+ */
 define('Sage/Platform/Mobile/_ServiceMixin', [
     'dojo/_base/declare'
 ], function(

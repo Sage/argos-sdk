@@ -13,6 +13,21 @@
  * limitations under the License.
  */
 
+/**
+ * Customization Mixin is a general purpose Customization Engine. It takes a customization object and
+ * a layout object and applies the customization defined to the layout.
+ *
+ * A customization object has the following properties:
+ *
+ * * `at`: `function(item)` - passes the current item in the list, the function should return true if this is the item being modified (or is at where you want to insert something).
+ * * `at`: `{Number}` - May optionally define the index of the item instead of a function.
+ * * `type`: `{String}` - enum of `insert`, `modify`, `replace` or `remove` that indicates the type of customization.
+ * * `where`: `{String}` - enum of `before` or `after` only needed when type is `insert`.
+ * * `value`: `{Object}` - the entire object to create (insert or replace) or the values to overwrite (modify), not needed for remove.
+ * * `value`: `{Object[]}` - if inserting you may pass an array of items to create.
+ *
+ * @alternateClassName _CustomizationMixin
+ */
 define('Sage/Platform/Mobile/_CustomizationMixin', [
     'dojo/_base/declare',
     'dojo/_base/lang'
@@ -86,11 +101,11 @@ define('Sage/Platform/Mobile/_CustomizationMixin', [
                 {
                     row = layout[i];
 
-                    /*** for compatibility ***/
+                    /* for compatibility */
                     // will modify the underlying row
                     if (typeof row['name'] === 'undefined' && typeof row['property'] === 'string')
                         row['name'] = row['property'];
-                    /*************************/
+                    /* */
 
                     insertRowsBefore = [];
                     insertRowsAfter = [];
@@ -162,10 +177,10 @@ define('Sage/Platform/Mobile/_CustomizationMixin', [
                     output.push.apply(output, insertRowsAfter);
                 }
             
-                /**
-                 * for any non-applied, insert only, customizations, if they have an `or` property that expands into a true expression
-                 * the value is applied at the end of the parent group that the `or` property (ideally) matches.
-                 */
+                /*
+                 for any non-applied, insert only, customizations, if they have an `or` property that expands into a true expression
+                 the value is applied at the end of the parent group that the `or` property (ideally) matches.
+                */
                 for (var k = 0; k < customizationCount; k++)
                 {
                     if (applied[k]) continue;

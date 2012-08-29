@@ -28,6 +28,9 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
     LookupField,
     FieldManager
 ) {
+    /**
+     *
+     */
     var control = declare('Sage.Platform.Mobile.Fields.DurationField', [LookupField], {
         attributeMap: {
             inputValue: {
@@ -46,6 +49,14 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
                 attribute: 'innerHTML'
             }
         },
+        /**
+         * @property {Simplate}
+         * Simplate that defines the fields HTML Markup
+         *
+         * * `$` => Field instance
+         * * `$$` => Owner View instance
+         *
+         */
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<div class="autoComplete-watermark" data-dojo-attach-point="autoCompleteNode"></div>',

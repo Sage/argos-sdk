@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/**
+ * @deprecated Not used.
+ * @alternateClassName PersistentStorage
+ */
 define('Sage/Platform/Mobile/PersistentStorage', [
     'dojo/_base/declare',
     'dojo/_base/lang',

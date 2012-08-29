@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * Field Manager is a registry for field types that enables the Edit View layouts to
+ * simply define `type: 'myFieldType'`.
+ * @alternateClassName FieldManager
+ * @singleton
+ */
 define('Sage/Platform/Mobile/FieldManager', [
     'dojo/_base/lang'
 ], function(
@@ -20,10 +26,24 @@ define('Sage/Platform/Mobile/FieldManager', [
 ) {
     var store = {};
     return lang.setObject('Sage.Platform.Mobile.FieldManager', {
+        /**
+         * @property {Object}
+         * The type map that translates string type names to constructor functions
+         */
         types: store,
+        /**
+         * Registers a field type by providing a unique name and the constructor to be called
+         * @param {String} name Unique string name of field, will be what is used in Edit View layouts.
+         * @param {Function} ctor Constructor function of field
+         */
         register: function(name, ctor) {
             return (store[name] = ctor);
         },
+        /**
+         * Retrieves a constructor for the given field name
+         * @param name Unique name of field
+         * @return {Function} Constructor for the given field type
+         */
         get: function(name) {
             return store[name];
         }

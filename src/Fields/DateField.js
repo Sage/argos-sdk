@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 define('Sage/Platform/Mobile/Fields/DateField', [
     'dojo/_base/declare',
     'dojo/string',
@@ -29,12 +30,43 @@ define('Sage/Platform/Mobile/Fields/DateField', [
     FieldManager,
     EditorField
 ) {
+    /**
+     * The DateField is an extension of the {@link EditorField EditorField} by accepting Date Objects
+     * for values and using the {@link Calendar Calendar} view for user input.
+     * @alternateClassName DateField
+     * @extends EditorField
+     * @requires Calendar
+     * @requires format
+     */
     var control = declare('Sage.Platform.Mobile.Fields.DateField', [EditorField], {
         // Localization
+        /**
+         * @property {String}
+         * The text shown when no value (or null/undefined) is set to the field.
+         */
         emptyText: '',
+        /**
+         * @property {String}
+         * The [Datejs format](http://code.google.com/p/datejs/wiki/FormatSpecifiers) the date will be
+         * formatted when displaying in the field.
+         */
         dateFormatText: 'MM/dd/yyyy',
+        /**
+         * @property {String}
+         * The error validation message for this field.
+         *
+         * `${0}` => Label
+         */
         invalidDateFormatErrorText: "Field '${0}' has Invalid date format.",
 
+        /**
+         * @property {Simplate}
+         * Simplate that defines the fields HTML Markup
+         *
+         * * `$` => Field instance
+         * * `$$` => Owner View instance
+         *
+         */
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button data-dojo-attach-point="triggerNode" data-action="navigateToEditView" class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',

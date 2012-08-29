@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/**
+ *
+ * @alternateClassName Edit
+ */
 define('Sage/Platform/Mobile/Edit', [
     'dojo/_base/declare',
     'dojo/_base/lang',

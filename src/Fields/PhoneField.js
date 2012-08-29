@@ -27,6 +27,9 @@ define('Sage/Platform/Mobile/Fields/PhoneField', [
     TextField,
     FieldManager
 ) {
+    /**
+     *
+     */
     var control = declare('Sage.Platform.Mobile.Fields.PhoneField', [TextField], {
         /*
             {0}: original value

@@ -26,7 +26,25 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
     Field,
     FieldManager
 ) {
+    /**
+     * The Boolean Field is used for true/false values and is visualized as a toggle or light switch.
+     *
+     * ###Example:
+     *     {
+     *         name: 'IsLead',
+     *         property: 'IsLead',
+     *         label: this.isLeadText,
+     *         type: 'boolean'
+     *     }
+     *
+     * @alternateClassName BooleanField
+     * @extends _Field
+     */
     var control = declare('Sage.Platform.Mobile.Fields.BooleanField', [Field], {
+        /**
+         * @property {Object}
+         * Provides a setter to the toggleNodes toggled attribute
+         */
         attributeMap: {
             toggled:{
                 node: 'toggleNode',
@@ -34,6 +52,14 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
                 attribute: 'toggled'
             }
         },
+        /**
+         * @property {Simplate}
+         * Simplate that defines the fields HTML Markup
+         *
+         * * `$` => Field instance
+         * * `$$` => Owner View instance
+         *
+         */
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<div class="toggle" data-dojo-attach-point="toggleNode" data-dojo-attach-event="onclick:_onClick" toggled="{%= !!$.checked %}">',
@@ -42,12 +68,35 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
                 '<span class="toggleOff">{%= $.offText %}</span>',
             '</div>'
         ]),
+        /**
+         * @property {HTMLElement}
+         * The div node that holds the toggled attribute
+         */
         toggleNode: null,
 
+        /**
+         * @property {Boolean}
+         * When clearing the boolean field it sets the fields value to `this.checked`
+         */
+        checked: false,
+
         //Localization
+        /**
+         * @property {String}
+         * The text placed within the "on" part of the toggle switch
+         */
         onText: 'ON',
+        /**
+         * @property {String}
+         * The text placed within the "off" part of the toggle switch
+         */
         offText: 'OFF',
 
+        /**
+         * Fires with the toggle switch is pressed and sets the value to
+         * the opposite of the current value
+         * @param {Event} evt The click/tap event
+         */
         _onClick: function(evt) {
             if (this.isDisabled()) return;
 
@@ -55,9 +104,21 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
 
             this.setValue(toggledValue);
         },
+        /**
+         * Returns the current toggled state
+         * @return {Boolean}
+         */
         getValue: function() {
             return (domAttr.get(this.toggleNode, 'toggled') === true);
         },
+        /**
+         * Sets the toggled attribute of the field and applies the needed styling.
+         *
+         * It also directly fires the {@link _Field#onChange onChange} event.
+         *
+         * @param {Boolean/String/Number} val If string is passed it will use `'true'` or `'t'` for true. If number then 0 for true.
+         * @param {Boolean} initial If true sets the value as the original value and is later used for dirty/modified detection.
+         */
         setValue: function(val, initial) {
             val = typeof val === 'string'
                 ? /^(true|t|0)$/i.test(val)
@@ -74,11 +135,20 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
 
             this.onChange(val, this);
         },
+        /**
+         * Sets the value back to `this.checked` as the initial value. If true is passed it sets
+         * `this.checked` as a dirty/modified value.
+         * @param {Boolean} flag Signifies if the cleared value should be set as modified (true) or initial (false/undefined)
+         */
         clearValue: function(flag) {
             var initial = flag !== true;
 
             this.setValue(this.checked, initial);
         },
+        /**
+         * Determines if the field has been modified from it's original value
+         * @return {Boolean}
+         */
         isDirty: function() {
             return (this.originalValue != this.getValue());
         }

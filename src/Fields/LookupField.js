@@ -34,6 +34,9 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     _Field,
     FieldManager
 ) {
+    /**
+     *
+     */
     var control = declare('Sage.Platform.Mobile.Fields.LookupField', [_Field], {
         attributeMap: {
             inputValue: {
@@ -52,6 +55,14 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                 attribute: 'readonly'
             }
         },
+        /**
+         * @property {Simplate}
+         * Simplate that defines the fields HTML Markup
+         *
+         * * `$` => Field instance
+         * * `$$` => Owner View instance
+         *
+         */
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',

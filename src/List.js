@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * A base list view.
+ * @extends View
+ * @alternateClassName List
+ */
 define('Sage/Platform/Mobile/List', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -45,28 +50,86 @@ define('Sage/Platform/Mobile/List', [
     SearchWidget
 ) {
 
+    /**
+     * SelectionModel provides a simple in-memory store for data that fires events
+     * when a item is selected (added) or deselected (removed)
+     * @alternateClassName SelectionModel
+     */
     var SelectionModel = declare('Sage.Platform.Mobile.SelectionModel', null, {
+        /**
+         * @property {Number}
+         * Number of selections
+         */
         count: 0,
+        /**
+         * @property {Object}
+         * Collection of selections where the key is the selections key
+         */
         selections: null,
+        /**
+         * @property {Boolean}
+         * Flag that determines how to clear:
+         *
+         * True: Deselect is called on every item, firing onDeselect for each and firing onClear at the end
+         *
+         * False: Collection is immediately wiped and only onClear is fired
+         *
+         */
         clearAsDeselect: true,
+        /**
+         * @property {Boolean}
+         * Flag that control the firing of action events: onSelect, onDeselect, onClear
+         */
         _fireEvents: true,
         constructor: function(options) {
             this.selections = {};
             
             lang.mixin(this, options);
         },
+        /**
+         * Prevents the firing of action events: onSelect, onDeselect, onClear
+         */
         suspendEvents: function() {
             this._fireEvents = false;
         },
+        /**
+         * Enables the firing of action events:  onSelect, onDeselect, onClear
+         */
         resumeEvents: function() {
             this._fireEvents = true;
         },
+        /**
+         * Event that happens when an item is selected/added.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item stored
+         * @param tag
+         * @param self
+         * @template
+         */
         onSelect: function(key, data, tag, self) {
         },
+        /**
+         * Event that happens when an item is deselected/removed.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item removed
+         * @param tag
+         * @param self
+         * @template
+         */
         onDeselect: function(key, data, tag, self) {
         },
+        /**
+         * Event that happens when the store is cleared
+         * @param self
+         */
         onClear: function(self) {
         },
+        /**
+         * Adds an item to the `selections` if it is not already stored.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item being selected
+         * @param tag
+         */
         select: function(key, data, tag) {
             if (!this.selections.hasOwnProperty(key))
             {
@@ -75,12 +138,23 @@ define('Sage/Platform/Mobile/List', [
                 if (this._fireEvents) this.onSelect(key, data, tag, this);
             }
         },
+        /**
+         * Adds an item to the `selections` if it is not already stored, if it is
+         * stored, then it deselects (removes) the item.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item being selected
+         * @param tag
+         */
         toggle: function(key, data, tag) {
             if (this.isSelected(key))
                 this.deselect(key);
             else
                 this.select(key, data, tag);
         },
+        /**
+         * Removes an item from the store
+         * @param {String} key Unique identifier string that was given when the item was added
+         */
         deselect: function(key) {
             if (this.selections.hasOwnProperty(key))
             {
@@ -93,6 +167,9 @@ define('Sage/Platform/Mobile/List', [
                     this.onDeselect(key, selection.data, selection.tag, this);
             }
         },
+        /**
+         * Removes all items from the store
+         */
         clear: function() {
             if (this.clearAsDeselect)
             {
@@ -106,15 +183,32 @@ define('Sage/Platform/Mobile/List', [
 
             if (this._fireEvents) this.onClear(this);
         },
+        /**
+         * Determines if the given key is in the selections collection.
+         * @param {String} key Unique identifier string that was given when the item was added
+         * @return {Boolean} True if the item is in the store.
+         */
         isSelected: function(key) {
             return !!this.selections[key];
         },
+        /**
+         * Returns the number of items in the store
+         * @return {Number} Current count of items
+         */
         getSelectionCount: function() {
             return this.count;
         },
+        /**
+         * Returns all items in the store
+         * @return {Object} The entire selection collection
+         */
         getSelections: function() {
             return this.selections;
         },
+        /**
+         * Returns a list of unique identifier keys used in the selection collection
+         * @return {String[]} All keys in the store
+         */
         getSelectedKeys: function() {
             var keys = [];
             for (var key in this.selections)
@@ -124,14 +218,39 @@ define('Sage/Platform/Mobile/List', [
         }
     });
 
+    /**
+     * The ConfigurableSelectionModel adds the logic to the SelectionModel to only have one item selected at a time via the `singleSelection` flag.
+     * @alternateClassName ConfigurableSelectionModel
+     * @extends SelectionModel
+     */
     var ConfigurableSelectionModel = declare('Sage.Platform.Mobile.ConfigurableSelectionModel', [SelectionModel], {
+        /**
+         * @property {Boolean}
+         * Flag that controls if only one item is selectable at a time. Meaning if this is true
+         * then when a selection is made it first {@link SelectionModel#clear clears} the store.
+         */
         singleSelection: false,
+        /**
+         * This function is called in Lists {@link List#beforeTransitionTo beforeTransitionTo} and
+         * it is always passed the Lists navigation options `singleSelect`.
+         *
+         * It then sets the flag `singleSelection` to the value if the passed value.
+         *
+         * @param {Boolean} val The state that `singleSelection` should be in.
+         */
         useSingleSelection: function(val) {
             if (this.singleSelection != !!val) //false != undefined = true, false != !!undefined = false
             {
                 this.singleSelection = val;
             }
         },
+        /**
+         * Extends the base {@link SelectionModel#select select} by first clearing out the entire
+         * store if `singleSelection` is true and there are items already in the store.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item being selected
+         * @param tag
+         */
         select: function(key, data, tag) {
             if (this.singleSelection)
             {
@@ -142,18 +261,21 @@ define('Sage/Platform/Mobile/List', [
         }
     });
 
-    /**
-     * A base list view.
-     * @constructor
-     * @extends Sage.Platform.Mobile.View
-     * @param {Object} options The options for the view
-     */
     return declare('Sage.Platform.Mobile.List', [View], {
+        /**
+         * @property {Object}
+         * Creates a setter map to html nodes, namely:
+         *
+         * * listContent => contentNode's innerHTML
+         * * remainingContent => remainingContentNode's innerHTML
+         *
+         */
         attributeMap: {
             listContent: {node: 'contentNode', type: 'innerHTML'},
             remainingContent: {node: 'remainingContentNode', type: 'innerHTML'}
         },
         /**
+         * @property {Simplate}
          * The template used to render the view's main DOM element when the view is initialized.
          * This template includes {@link #searchTemplate} and {@link #moreTemplate}.
          */
@@ -168,6 +290,7 @@ define('Sage/Platform/Mobile/List', [
             '</div>'
         ]),
         /**
+         * @property {Simplate}
          * The template used to render the loading message when the view is requesting more data.
          *
          * The default template uses the following properties:
@@ -180,6 +303,7 @@ define('Sage/Platform/Mobile/List', [
             '<li class="list-loading-indicator"><div>{%= $.loadingText %}</div></li>'
         ]),
         /**
+         * @property {Simplate}
          * The template used to render the pager at the bottom of the view.  This template is not directly rendered, but is
          * included in {@link #viewTemplate}.
          *
@@ -202,6 +326,7 @@ define('Sage/Platform/Mobile/List', [
             '</div>'
         ]),
         /**
+         * @property {Simplate}
          * Template used on lookups to have empty Selection option.
          * This template is not directly rendered but included in {@link #viewTemplate}.
          *
@@ -223,6 +348,7 @@ define('Sage/Platform/Mobile/List', [
             '</div>'
         ]),
         /**
+         * @property {Simplate}
          * The template used to render a row in the view.  This template includes {@link #itemTemplate}.
          */
         rowTemplate: new Simplate([
@@ -234,16 +360,19 @@ define('Sage/Platform/Mobile/List', [
             '</li>'
         ]),
         /**
+         * @property {Simplate}
          * The template used to render the content of a row.  This template is not directly rendered, but is
          * included in {@link #rowTemplate}.
          *
          * This property should be overridden in the derived class.
+         * @template
          */
         itemTemplate: new Simplate([
             '<h3>{%: $.$descriptor %}</h3>',
             '<h4>{%: $.$key %}</h4>'
         ]),
         /**
+         * @property {Simplate}
          * The template used to render a message if there is no data available.
          * The default template uses the following properties:
          *
@@ -256,22 +385,67 @@ define('Sage/Platform/Mobile/List', [
             '<h3>{%= $.noDataText %}</h3>',
             '</li>'
         ]),
+        /**
+         * @property {Simplate}
+         * The template used to render the single list action row.
+         */
         listActionTemplate: new Simplate([
             '<li data-dojo-attach-point="actionsNode" class="actions-row"></li>'
         ]),
+        /**
+         * @property {Simplate}
+         * The template used to render a list action item.
+         * The default template uses the following properties:
+         *
+         *      name                description
+         *      ----------------------------------------------------------------
+         *      actionIndex         The correlating index number of the action collection
+         *      title               Text used for ARIA-labeling
+         *      icon                Relative path to the icon to use
+         *      id                  Unique name of action, also used for alt image text
+         *      label               Text added below the icon
+         */
         listActionItemTemplate: new Simplate([
             '<button data-action="invokeActionItem" data-id="{%= $.actionIndex %}" aria-label="{%: $.title || $.id %}">',
                 '<img src="{%= $.icon %}" alt="{%= $.id %}" />',
                 '<label>{%: $.label %}</label>',
             '</button>'
         ]),
-            
-        contentNode:null,
+
+        /**
+         * @property {HTMLElement}
+         * Attach point for the main view content
+         */
+        contentNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the remaining items content
+         */
         remainingContentNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the search widget
+         */
         searchNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the empty, or no selection, container
+         */
         emptySelectionNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the remaining items container
+         */
         remainingNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the request more items container
+         */
         moreNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the list actions container
+         */
         actionsNode: null,
 
         /**
@@ -280,74 +454,74 @@ define('Sage/Platform/Mobile/List', [
          */
         id: 'generic_list',
         /**
-         * @cfg {String} resourceKind
+         * @cfg {String}
          * The SData resource kind the view is responsible for.  This will be used as the default resource kind
          * for all SData requests.
-         * @type {String}
          */
         resourceKind: '',
         /**
+         * @property {String[]}
          * A list of fields to be selected in an SData request.
-         * @type {Array.<String>}
          */
         querySelect: null,
         /**
+         * @property {String[]}
          * A list of child properties to be included in an SData request.
-         * @type {Array.<String>}
          */
         queryInclude: null,
         /**
+         * @property {String}
          * The default order by expression for an SData request.
-         * @type {String}
          */
         queryOrderBy: null,
         /**
+         * @property {String/Function}
          * The default where expression for an SData request.
-         * @type {String|Function}
          */
         queryWhere: null,
         /**
+         * @property {String/Function}
          * The default resource property for an SData request.
-         * @type {String|Function}
          */
         resourceProperty: null,
         /**
+         * @property {String/Function}
          * The default resource predicate for an SData request.
-         * @type {String|Function}
          */
         resourcePredicate: null,
         /**
-         * The page size (defaults to 20).
-         * @type {Number}
+         * @property {Number}
+         * The number of items to request per SData payload.
          */
         pageSize: 20,
         /**
-         * True if search is enabled (defaults to true).
+         * @property {Boolean}
+         * Controls the addition of a search widget.
          */
         enableSearch: true,
         /**
-         * True to enable action based panel (defaults to false).
-         * @type {Boolean}
+         * @property {Boolean}
+         * Flag that determines if the list actions panel should be in use.
          */
         enableActions: false,
         /**
-         * True to hide the search bar (defaults to false).
-         * @type {Boolean}
+         * @property {Boolean}
+         * Controls the visibility of the search widget.
          */
         hideSearch: false,
         /**
-         * True to allow selection in the view (defaults to false).
-         * @type {Boolean}
+         * @property {Boolean}
+         * True to allow selections via the SelectionModel in the view.
          */
         allowSelection: false,
         /**
-         * True to clear the selection when the view is shown (defaults to true).
-         * @type {Boolean}
+         * @property {Boolean}
+         * True to clear the selection model when the view is shown.
          */
         autoClearSelection: true,
         /**
-         * The id of the detail view to show when a row is clicked.
-         * @type {?String}
+         * @property {String/View}
+         * The id of the detail view, or view instance, to show when a row is clicked.
          */
         detailView: null,
         /**

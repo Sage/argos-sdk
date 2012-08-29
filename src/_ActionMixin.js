@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/**
+ *
+ * @alternateClassName _ActionMixin
+ */
 define('Sage/Platform/Mobile/_ActionMixin', [
     'dojo/_base/array',
     'dojo/_base/declare',

@@ -13,6 +13,16 @@
  * limitations under the License.
  */
 
+/**
+ * View is the root Class for all views and incorporates all the base features,
+ * events, and hooks needed to successfully render, hide, show, and transition.
+ *
+ * All Views are dijit Widgets, namely utilizing its: widgetTemplate, connections, and attributeMap
+ * @alternateClassName View
+ * @mixins _ActionMixin
+ * @mixins _CustomizationMixin
+ * @mixins _Templated
+ */
 define('Sage/Platform/Mobile/View', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -29,6 +39,9 @@ define('Sage/Platform/Mobile/View', [
     _Templated
 ) {
     return declare('Sage.Platform.Mobile.View', [_Widget, _ActionMixin, _CustomizationMixin, _Templated], {
+        /**
+         * This map provides quick access to HTML properties, most notably the selected property of the container
+         */
         attributeMap: {
             'title': {
                 node: 'domNode',
@@ -41,27 +54,64 @@ define('Sage/Platform/Mobile/View', [
                 attribute: 'selected'
             }
         },
+        /**
+         * The widgetTemplate is a Simplate that will be used as the main HTML markup of the View.
+         * @property {Simplate}
+         */
         widgetTemplate: new Simplate([
             '<ul id="{%= $.id %}" title="{%= $.titleText %}" class="{%= $.cls %}">',
             '</ul>'
         ]),
         _loadConnect: null,
+        /**
+         * The id is used to uniquely define a view and is used in navigating, history and for HTML markup.
+         * @property {String}
+         */
         id: 'generic_view',
+        /**
+         * The titleText string will be applied to the top toolbar during {@link #show show}.
+         */
         titleText: 'Generic View',
+        /**
+         * This views toolbar layout that defines all toolbar items in all toolbars.
+         * @property {Object}
+         */
         tools: null,
+        /**
+         * May be defined along with {@link App#hasAccessTo Application hasAccessTo} to incorporate View restrictions.
+         */
         security: null,
+        /**
+         * May be used to specify the service name to use for data requests. Setting false will force the use of the default service.
+         * @property {String/Boolean}
+         */
         serviceName: false,
 
+        /**
+         * Called from {@link App#_viewTransitionTo Applications view transition handler} and returns
+         * the fully customized toolbar layout.
+         * @return {Object} The toolbar layout
+         */
         getTools: function() {
             return this._createCustomizedLayout(this.createToolLayout(), 'tools');
         },
+        /**
+         * Returns the tool layout that defines all toolbar items for the view
+         * @return {Object} The toolbar layout
+         */
         createToolLayout: function() {
             return this.tools || {};
         },
+        /**
+         * Called on loading of the application.
+         */
         init: function() {
             this.startup();
             this.initConnects();
         },
+        /**
+         * Establishes this views connections to various events
+         */
         initConnects: function() {
             this._loadConnect = this.connect(this.domNode, 'onload', this._onLoad);
         },
@@ -77,12 +127,21 @@ define('Sage/Platform/Mobile/View', [
         load: function() {
             // todo: remove load entirely?
         },
+        /**
+         * Called in {@link #show show()} before ReUI is invoked.
+         * @param {Object} options Navigation options passed from the previous view.
+         * @return {Boolean} True indicates view needs to be refreshed.
+         */
         refreshRequiredFor: function(options) {
             if (this.options)
                 return !!options; // if options provided, then refresh
             else
                 return true;
         },
+        /**
+         * Should refresh the view, such as but not limited to:
+         * Emptying nodes, requesting data, rendering new content
+         */
         refresh: function() {
         },
         /**
@@ -134,11 +193,12 @@ define('Sage/Platform/Mobile/View', [
 
             this.onActivate(this);
         },
+        /**
+         * Shows the view using iUI in order to transition to the new element.
+         * @param {Object} options The navigation options passed from the previous view.
+         * @param transitionOptions {Object} Optional transition object that is forwarded to ReUI.
+         */
         show: function(options, transitionOptions) {
-            /// <summary>
-            ///     Shows the view using iUI in order to transition to the new element.
-            /// </summary>
-
             if (this.onShow(this) === false) return;
 
             if (this.refreshRequiredFor(options))
@@ -152,37 +212,33 @@ define('Sage/Platform/Mobile/View', [
 
             ReUI.show(this.domNode, lang.mixin(transitionOptions || {}, {tag: this.getTag(), data: this.getContext()}));
         },
+        /**
+         * Expands the passed expression if it is a function.
+         * @param {String/Function} expression Returns string directly, if function it is called and the result returned.
+         * @return {String} String expression.
+         */
         expandExpression: function(expression) {
-            /// <summary>
-            ///     Expands the passed expression if it is a function.
-            /// </summary>
-            /// <param name="expression" type="String">
-            ///     1: function - Called on this object and must return a string.
-            ///     2: string - Returned directly.
-            /// </param>
             if (typeof expression === 'function')
                 return expression.apply(this, Array.prototype.slice.call(arguments, 1));
             else
                 return expression;
         },
+        /**
+         * Called before the view is transitioned (slide animation complete) to.
+         */
         beforeTransitionTo: function() {
-            /// <summary>
-            ///     Called before the view is transitioned (slide animation complete) to.
-            /// </summary>
-
             this.onBeforeTransitionTo(this);
         },
+        /**
+         * Called before the view is transitioned (slide animation complete) away from.
+         */
         beforeTransitionAway: function() {
-            /// <summary>
-            ///     Called before the view is transitioned (slide animation complete) away from.
-            /// </summary>
-
             this.onBeforeTransitionAway(this);
         },
+        /**
+         * Called after the view has been transitioned (slide animation complete) to.
+         */
         transitionTo: function() {
-            /// <summary>
-            ///     Called after the view has been transitioned (slide animation complete) to.
-            /// </summary>
             if (this.refreshRequired)
             {
                 this.refreshRequired = false;
@@ -191,32 +247,43 @@ define('Sage/Platform/Mobile/View', [
 
             this.onTransitionTo(this);
         },
+        /**
+         * Called after the view has been transitioned (slide animation complete) away from.
+         */
         transitionAway: function() {
-            /// <summary>
-            ///     Called after the view has been transitioned (slide animation complete) away from.
-            /// </summary>
-
             this.onTransitionAway(this);
         },
+        /**
+         * Returns the primary SDataService instance for the view.
+         * @return {Object} The Sage.SData.Client.SDataService instance.
+         */
         getService: function() {
-            /// <summary>
-            ///     Returns the primary SDataService instance for the view.
-            /// </summary>
-            /// <returns type="Sage.SData.Client.SDataService">The SDataService instance.</returns>
             return App.getService(this.serviceName); /* if false is passed, the default service will be returned */
         },
         getTag: function() {
         },
+        /**
+         * Returns the options used for the View {@link #getContext getContext()}.
+         * @return {Object} Options to be used for context.
+         */
         getOptionsContext: function() {
             if (this.options && this.options.negateHistory)
                 return { negateHistory: true };
             else
                 return this.options;
         },
+        /**
+         * Returns the context of the view which is a small summary of key properties.
+         * @return {Object} Vital View properties.
+         */
         getContext: function() {
             // todo: should we track options?
             return {id: this.id, options: this.getOptionsContext()};
         },
+        /**
+         * Returns the defined security.
+         * @param access
+         */
         getSecurity: function(access) {
             return this.security;
         }

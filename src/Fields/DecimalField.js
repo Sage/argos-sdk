@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+
 define('Sage/Platform/Mobile/Fields/DecimalField', [
     'dojo/_base/declare',
     'dojo/string',
@@ -24,6 +25,9 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
     TextField,
     FieldManager
 ) {
+    /**
+     *
+     */
     var control = declare('Sage.Platform.Mobile.Fields.DecimalField', [TextField], {
         precision: 2,
         enableClearButton: false,

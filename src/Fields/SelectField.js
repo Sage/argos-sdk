@@ -22,6 +22,9 @@ define('Sage/Platform/Mobile/Fields/SelectField', [
     LookupField,
     FieldManager
 ) {
+    /**
+     *
+     */
     var control = declare('Sage.Platform.Mobile.Fields.SelectField', [LookupField], {
         valueKeyProperty: false,
         valueTextProperty: false,

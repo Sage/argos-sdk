@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * Format is a singleton that provides various formatting functions.
+ * @alternateClassName format
+ * @requires convert
+ * @singleton
+ */
 define('Sage/Platform/Mobile/Format', [
     'dojo/_base/json',
     'dojo/_base/lang',
@@ -69,33 +75,102 @@ define('Sage/Platform/Mobile/Format', [
     }
 
     return lang.setObject('Sage.Platform.Mobile.Format', {
+        /**
+         * @property {String}
+         * Text used in {@link #yesNo yesNo} formatter for true values
+         */
         yesText: 'Yes',
+        /**
+         * @property {String}
+         * Text used in {@link #yesNo yesNo} formatter for false values
+         */
         noText: 'No',
+        /**
+         * @property {String}
+         * Text used in {@link #bool bool} formatter for true values
+         */
         trueText: 'T',
+        /**
+         * @property {String}
+         * Text used in {@link #bool bool} formatter for false values
+         */
         falseText: 'F',
+        /**
+         * @property {String}
+         * Text used in {@link #timespan timespan} formatter for more than one hour
+         */
         hoursText: 'hours',
+        /**
+         * @property {String}
+         * Text used in {@link #timespan timespan} formatter for exactly one hour
+         */
         hourText: 'hour',
+        /**
+         * @property {String}
+         * Text used in {@link #timespan timespan} formatter for more than one minute
+         */
         minutesText: 'minutes',
+        /**
+         * @property {String}
+         * Text used in {@link #timespan timespan} formatter for exactly one minute
+         */
         minuteText: 'minute',
 
+        /**
+         * Takes a String and encodes `&`, `<`, `>`, `"` to HTML entities
+         * @param {String} String to encode
+         * @return {String} Html encoded string
+         */
         encode: encode,
+        /**
+         * Takes a String and decodes `&`, `<`, `>`, `"` from HTML entities back to the character
+         * @param {String} String to decode
+         * @return {String} Html decoded string
+         */
         decode: decode,
+        /**
+         * Determines if the given item is an empty string or empty arry
+         * @param {String/Array} Item to check if empty
+         * @return {Boolean} If passed item is empty
+         */
         isEmpty: isEmpty,
+        /**
+         * Takes a url string and wraps it with an `<a>` element with `href=` pointing to the url.
+         * @param {String} val Url string to be wrapped
+         * @return {String} An `<a>` element as a string.
+         */
         link: function(val) {
             if (typeof val !== 'string')
                 return val;
 
             return string.substitute('<a target="_blank" href="http://${0}">${0}</a>', [val]);
         },
+        /**
+         * Takes an email string and wraps it with an `<a>` element with `href="mailto:"` pointing to the email.
+         * @param {String} val Email string to be wrapped
+         * @return {String} An `<a>` element as a string.
+         */
         mail: function(val) {
             if (typeof val !== 'string')
                 return val;
 
             return string.substitute('<a href="mailto:${0}">${0}</a>', [val]);
         },
+        /**
+         * Removes whitespace from from and end of string
+         * @param {String} val String to be trimmed
+         * @return {String} String without space on either end
+         */
         trim: function(val) {
             return val.replace(/^\s+|\s+$/g,'');
         },
+        /**
+         * Takes a date and format string and returns the formatted date as a string.
+         * @param {Date/String} val Date to be converted. If string is passed it is converted to a date using {@link convert#toDateFromString Converts toDateFromString}.
+         * @param {String} fmt Format string following [datejs formatting](http://code.google.com/p/datejs/wiki/FormatSpecifiers).
+         * @param {Boolean} utc If a date should be in UTC time set this flag to true to counter-act javascripts built-in timezone applier.
+         * @return {String} Date formatted as a string.
+         */
         date: function(val, fmt, utc) {
             var date = val instanceof Date
                 ? val
@@ -112,6 +187,17 @@ define('Sage/Platform/Mobile/Format', [
 
             return val;
         },
+        /**
+         * Takes a number and decimal place and floors the number to that place:
+         *
+         * `fixed(5.555, 0)` => `5`
+         * `fixed(5.555, 2)` => `5.55`
+         * `fixed(5.555, 5)` => `5.555`
+         *
+         * @param {Number/String} val The value will be `parseFloat` before operating.
+         * @param {Number} d Number of decimals places to keep, defaults to 2 if not provided.
+         * @return {Number} Fixed number.
+         */
         fixed: function(val, d) {
             if (typeof d !== 'number')
                 d = 2;
@@ -121,17 +207,35 @@ define('Sage/Platform/Mobile/Format', [
 
             return v;
         },
+        /**
+         * Takes a decimal number, multiplies by 100 and adds the % sign.
+         *
+         * `perecent(0.35)` => `'35%'`
+         * `percent(2)` => `'200%'`
+         *
+         * @param {Number/String} val The value will be `parseFloat` before operating.
+         * @return {String} Number as a percentage with % sign.
+         */
         percent: function(val) {
             var intVal = Math.floor(100 * (parseFloat(val) || 0));
             return intVal + "%";
         },
+        /**
+         * Takes a boolean value and returns the string Yes or No for true or false
+         * @param {Boolean/String} val If string it tests if the string is `true` for true, else assumes false
+         * @return {String} Yes for true, No for false.
+         */
         yesNo: function(val) {
             if (typeof val === 'string') val = /^true$/i.test(val);
 
-            return val
-                ? Sage.Platform.Mobile.Format.yesText || 'Yes'
+            return val ? Sage.Platform.Mobile.Format.yesText || 'Yes'
                 : Sage.Platform.Mobile.Format.noText || 'No';
         },
+        /**
+         * Takes a boolean value and returns the string T or F for true or false
+         * @param {Boolean/String} val If string it tests if the string is `true` for true, else assumes false
+         * @return {String} T for true, F for false.
+         */
         bool: function(val) {
             if (typeof val === 'string') val = /^true$/i.test(val);
 
@@ -139,11 +243,21 @@ define('Sage/Platform/Mobile/Format', [
                 ? Sage.Platform.Mobile.Format.trueText || 'T'
                 : Sage.Platform.Mobile.Format.falseText || 'F';
         },
+        /**
+         * Takes a string and converts all new lines `\n` to HTML `<br>` elements.
+         * @param {String} val String with newlines
+         * @return {String} String with replaced `\n` with `<br>`
+         */
         nl2br: function(val) {
             if (typeof val !== 'string') return val;
 
             return val.replace(/\n/g, '<br />');
         },
+        /**
+         * Takes a number of minutes and turns it into the string: `'n hours m minutes'`
+         * @param {Number/String} val Number of minutes, will be `parseFloat` before operations and fixed to 2 decimal places
+         * @return {String} A string representation of the minutes as `'n hours m minutes'`
+         */
         timespan: function(val) {
             var v = Sage.Platform.Mobile.Format.fixed(val);
             if (isNaN(v) || !v) return '';
@@ -161,6 +275,14 @@ define('Sage/Platform/Mobile/Format', [
             return (hrs && mins) ? hrs +" "+ mins
                                  : hrs === 0 ? mins : hrs;
         },
+        /**
+         * Takes a 2D array of `[[x,y],[x,y]]` number coordinates and draws them onto the provided canvas
+         * The first point marks where the "pen" starts, each sequential point is then "drawn to" as if holding a
+         * pen on paper and moving the pen to the new point.
+         * @param {Number[][]} vector A series of x,y coordinates in the format of: `[[[0,0],[1,5]]`
+         * @param {HTMLElement} canvas The `<canvas>` element to be drawn on
+         * @param {Object} options Canvas options: scale, lineWidth and penColor.
+         */
         canvasDraw: function (vector, canvas, options) {
             var scale, x, y,
                 context = canvas.getContext('2d');
@@ -187,6 +309,13 @@ define('Sage/Platform/Mobile/Format', [
                 }
             }
         },
+        /**
+         * Returns the image data (or img element) for a series of vectors
+         * @param {Number[][]} vector A series of x,y coordinates in the format of: `[[0,0],[1,5]]`. These will be drawn sequentially as one line.
+         * @param {Object} options Canvas options: scale, lineWidth and penColor.
+         * @param {Boolean} html Flag for returning image as a data-uri or as a stringified `<img>` element.
+         * @return {String} The encoded data of the drawn image, optionally wrapped in `<img>` if html was passed as true
+         */
         imageFromVector: function (vector, options, html) {
             var img,
                 canvasNode = domConstruct.create('canvas');

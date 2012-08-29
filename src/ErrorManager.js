@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * ErrorManager is a singleton that parses and stores SData error responses into localStorage.
+ * @alternateClassName ErrorManager
+ * @singleton
+ */
 define('Sage/Platform/Mobile/ErrorManager', [
     'dojo/_base/json',
     'dojo/_base/lang',
@@ -37,20 +42,28 @@ define('Sage/Platform/Mobile/ErrorManager', [
 
     return lang.setObject('Sage.Platform.Mobile.ErrorManager', {
         //Localization
+
+        /**
+         * Text used in place of statusText for aborted errors.
+         */
         abortedText: 'Aborted',
+        /**
+         * Text put in place of the scope property to prevent circular references.
+         */
         scopeSaveText: 'Scope is not saved in error report',
 
         /**
+         * @property {Number}
          * Total amount of errors to keep
          */
         errorCacheSizeMax: 10,
 
         /**
          * Adds a custom error item by combining error message/options for easier tech support
-         * @param serverResponse Full response from server, status, responsetext, etc.
-         * @param requestOptions GET or POST options sent, only records the URL at this time
-         * @param viewOptions The View Options of the view in which the error occurred
-         * @param failType String, either "failure" or "aborted" as each response has different properties
+         * @param {Object} serverResponse Full response from server, status, responsetext, etc.
+         * @param {Object} requestOptions GET or POST options sent, only records the URL at this time
+         * @param {Object} viewOptions The View Options of the view in which the error occurred
+         * @param {String} failType Either "failure" or "aborted" as each response has different properties
          */
         addError: function(serverResponse, requestOptions, viewOptions, failType) {
             var errorDate = new Date(),
@@ -77,8 +90,8 @@ define('Sage/Platform/Mobile/ErrorManager', [
 
         /**
          * Explicitly extract values due to how read-only objects are enforced
-         * @param response XMLHttpRequest object sent back from server
-         * @return Object with only relevant, standard properties
+         * @param {Object} response XMLHttpRequest object sent back from server
+         * @return {Object} Object with only relevant, standard properties
          */
         extractFailureResponse: function(response) {
             var failureResponse = {
@@ -101,7 +114,8 @@ define('Sage/Platform/Mobile/ErrorManager', [
         /**
          * Attempts to parse a json string into a javascript object
          * The need for this function is the fallback in case of failure
-         * @param json String Json formatted string
+         * @param {String} json Json formatted string or array.
+         * @return {Object} Javascript object from json string.
          */
         fromJsonArray: function(json) {
             var o;
@@ -123,8 +137,8 @@ define('Sage/Platform/Mobile/ErrorManager', [
         /**
          * Abort error is hardset due to exceptions from reading properties
          * FF 3.6: https://bugzilla.mozilla.org/show_bug.cgi?id=238559
-         * @param response XMLHttpRequest object sent back from server
-         * @return Object with hardset abort info
+         * @param {Object} response XMLHttpRequest object sent back from server
+         * @return {Object} Object with hardset abort info
          */
         extractAbortResponse: function(response) {
             var abortResponse = {
@@ -143,8 +157,9 @@ define('Sage/Platform/Mobile/ErrorManager', [
         },
 
         /**
-         * JSON serializes an object by recursively discarding non value keys
-         * @param obj Object to be JSON serialized
+         * Prepares an object for JSON serialization by recursively discarding non value keys
+         * @param {Object} obj Object to be JSON serialized
+         * @return {Object} Cleaned object for for JSON serialization
          */
         serializeValues: function(obj) {
             for (var key in obj){
@@ -173,6 +188,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
 
         /**
          * Ensures there is at least 1 open spot for a new error by checking against errorCacheSizeMax
+         * and removing old errors as needed
          */
         checkCacheSize: function() {
             var errLength = errors.length,
@@ -184,9 +200,9 @@ define('Sage/Platform/Mobile/ErrorManager', [
 
         /**
          * Retrieve a error item that has the specified key|value pair
-         * @param key Property of error item to check, such as errorDate or url
-         * @param value Value of the key to match against
-         * @return errorItem Returns the first error item in the match set or null if none found
+         * @param {String} key Property of error item to check, such as errorDate or url
+         * @param {Number/String} value Value of the key to match against
+         * @return {Object} Returns the first error item in the match set or null if none found
          */
         getError: function(key, value) {
             var errorList = this.getAllErrors();
@@ -200,20 +216,35 @@ define('Sage/Platform/Mobile/ErrorManager', [
             return null;
         },
 
+        /**
+         * Returns a copy of all errors.
+         * @return {Object[]} Array of error objects.
+         */
         getAllErrors: function() {
             return lang.clone(errors);
         },
 
+        /**
+         * Removes the specified index from the error list.
+         * @param {Number} index Index of error to remove.
+         * @param {Number} amount Number of errors to remove from indexed point, if not provided defaults to 1.
+         */
         removeError: function(index, amount) {
             errors.splice(index, amount || 1);
         },
 
+        /**
+         * Publishes the `/app/refresh` event to notify that an error has been added
+         */
         onErrorAdd: function() {
             connect.publish('/app/refresh', [{
                 resourceKind: 'errorlogs'
             }]);
         },
 
+        /**
+         * Attempts to save all errors into localStorage under the `errorlog` key.
+         */
         save: function() {
             try
             {
