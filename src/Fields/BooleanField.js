@@ -16,11 +16,13 @@
 define('Sage/Platform/Mobile/Fields/BooleanField', [
     'dojo/_base/declare',
     'dojo/dom-attr',
+    'dojo/dom-class',
     '../_TemplatedWidgetMixin',
     './_Field'
 ], function(
     declare,
     domAttr,
+    domClass,
     _TemplatedWidgetMixin,
     _Field
 ) {
