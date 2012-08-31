@@ -26,11 +26,41 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
     FieldManager
 ) {
     /**
+     * The Decimal Field is used for inputting numbers and extends {@link TextField TextField} with:
      *
+     * * hides the clear (x) button;
+     * * when setting a value, it converts the decimal and thousands group separator to the localized versions; and
+     * * when getting a value, it back-converts the localized punctuation into the en-US format and converts the result into a float (Number).
+     *
+     * ###Example:
+     *     {
+     *         name: 'SalesPotential',
+     *         property: 'SalesPotential',
+     *         label: this.salesPotentialText,
+     *         type: 'decimal'
+     *     }
+     *
+     * @alternateClassName DecimalField
+     * @extends TextField
+     * @requires FieldManager
      */
     var control = declare('Sage.Platform.Mobile.Fields.DecimalField', [TextField], {
+        /**
+         * @cfg {Number}
+         * Defines how many decimal places to format when setting the value.
+         */
         precision: 2,
+        /**
+         * @property {Boolean}
+         * Disables the display of the clear (x) button inherited from {@link TextField TextField}.
+         */
         enableClearButton: false,
+        /**
+         * Before calling the {@link TextField#setValue parent implementation} it parses the value
+         * via `parseFloat`, trims the decimal place and then applies localization for the decimal
+         * and thousands punctuation.
+         * @param {Number/String} val Value to be set
+         */
         setValue: function(val) {
             val = parseFloat(val).toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
             val = isNaN(val)
@@ -44,6 +74,11 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
 
             this.inherited(arguments, [val]);
         },
+        /**
+         * Retrieves the value from the {@link TextField#getValue parent implementation} but before
+         * returning it de-converts the punctuation back to `en-US` format.
+         * @return {Number}
+         */
         getValue: function() {
             var value = this.inherited(arguments);
             // SData (and other functions) expect American formatted numbers

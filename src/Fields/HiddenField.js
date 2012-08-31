@@ -23,7 +23,20 @@ define('Sage/Platform/Mobile/Fields/HiddenField', [
     FieldManager
 ) {
     /**
+     * The Hidden Field is {@link TextField TextField} but instead binds to an `<input type="hidden"`>.
      *
+     * Meaning that the field will not be displayed on screen but may still store strings of text.
+     *
+     * ###Example:
+     *     {
+     *         name: 'StatusCodeKey',
+     *         property: 'StatusCodeKey',
+     *         type: 'hidden'
+     *     }
+     *
+     * @alternateClassName HiddenField
+     * @extends TextField
+     * @requires FieldManager
      */
     var control = declare('Sage.Platform.Mobile.Fields.HiddenField', [TextField], {
         propertyTemplate: new Simplate([
@@ -42,7 +55,9 @@ define('Sage/Platform/Mobile/Fields/HiddenField', [
         widgetTemplate: new Simplate([
             '<input data-dojo-attach-point="inputNode" type="hidden">'
         ]),
-        enableClearButton: false,
+        /**
+         * @deprecated
+         */
         bind: function() {
             // call field's bind. we don't want event handlers for this.
             this.inherited(arguments);

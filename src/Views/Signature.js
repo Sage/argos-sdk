@@ -15,6 +15,7 @@
 
 /**
  *
+ * @alternateClassName SignatureView
  */
 define('Sage/Platform/Mobile/Views/Signature', [
     'dojo/_base/declare',

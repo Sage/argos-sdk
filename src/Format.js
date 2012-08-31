@@ -279,7 +279,7 @@ define('Sage/Platform/Mobile/Format', [
          * Takes a 2D array of `[[x,y],[x,y]]` number coordinates and draws them onto the provided canvas
          * The first point marks where the "pen" starts, each sequential point is then "drawn to" as if holding a
          * pen on paper and moving the pen to the new point.
-         * @param {Number[][]} vector A series of x,y coordinates in the format of: `[[[0,0],[1,5]]`
+         * @param {Number[][]} vector A series of x,y coordinates in the format of: `[[0,0],[1,5]]`
          * @param {HTMLElement} canvas The `<canvas>` element to be drawn on
          * @param {Object} options Canvas options: scale, lineWidth and penColor.
          */

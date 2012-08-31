@@ -39,6 +39,7 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
      *
      * @alternateClassName BooleanField
      * @extends _Field
+     * @requires FieldManager
      */
     var control = declare('Sage.Platform.Mobile.Fields.BooleanField', [Field], {
         /**
@@ -79,6 +80,11 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
          * When clearing the boolean field it sets the fields value to `this.checked`
          */
         checked: false,
+
+        /**
+         * Value used during dirty/modified comparison
+         */
+        originalValue: null,
 
         //Localization
         /**
