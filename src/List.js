@@ -563,7 +563,7 @@ define('Sage/Platform/Mobile/List', [
                     var row = query((string.substitute('[data-key="${0}"], [data-descriptor="${0}"]', [previousSelections[i]])), this.contentNode)[0];
 
                     if (row)
-                        this.selectEntry({$source: row});
+                        this.selectEntry(null, row);
                 }
             }
         },

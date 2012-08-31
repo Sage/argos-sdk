@@ -146,7 +146,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
                         }]
                     }
                 },
-                expand = ['resourceKind', 'resourcePredicate', 'where'],
+                expand = ['resourceKind', 'resourcePredicate', 'where', 'previousSelections'],
                 dependentValue = this.getDependentValue();
 
             if (this.dependsOn && !dependentValue)
