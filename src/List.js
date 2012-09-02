@@ -14,7 +14,8 @@
  */
 
 /**
- * A base list view.
+ * A List View is a view used to display a collection of items in an easy to skim list. The List View also has a
+ * selection model built in for selecting rows from the list and may be used in a number of different manners.
  * @extends View
  * @alternateClassName List
  */
@@ -81,6 +82,10 @@ define('Sage/Platform/Mobile/List', [
          * Flag that control the firing of action events: onSelect, onDeselect, onClear
          */
         _fireEvents: true,
+        /**
+         * Initializes the selections to be empty and mixes the passed object overriding any default properties.
+         * @param {Object} options The object to be mixed in.
+         */
         constructor: function(options) {
             this.selections = {};
             
@@ -360,7 +365,7 @@ define('Sage/Platform/Mobile/List', [
             '</li>'
         ]),
         /**
-         * @property {Simplate}
+         * @cfg {Simplate}
          * The template used to render the content of a row.  This template is not directly rendered, but is
          * included in {@link #rowTemplate}.
          *
@@ -525,25 +530,25 @@ define('Sage/Platform/Mobile/List', [
          */
         detailView: null,
         /**
-         * The view to show, either an id or an instance, if there is no {@link #insertView} specified, when
+         * @property {String}
+         * The view id to show if there is no `insertView` specified, when
          * the {@link #navigateToInsertView} action is invoked.
-         * @type {?(String|Sage.Platform.Mobile.View)}
          */
         editView: null,
         /**
-         * The view to show, either an id or an instance, when the {@link #navigateToInsertView} action is invoked.
-         * @type {?(String|Sage.Platform.Mobile.View)}
+         * @property {String}
+         * The view id to show when the {@link #navigateToInsertView} action is invoked.
          */
         insertView: null,
         /**
-         * The view to show, either an id or an instance, when the {@link #navigateToContextView} action is invoked.
-         * @type {?(String|Sage.Platform.Mobile.View)}
+         * @property {String}
+         * The view id to show when the {@link #navigateToContextView} action is invoked.
          */
         contextView: false,
         /**
+         * @property {Object}
          * A dictionary of hash tag search queries.  The key is the hash tag, without the symbol, and the value is
          * either a query string, or a function that returns a query string.
-         * @type {?Object}
          */
         hashTagQueries: null,
         /**
@@ -552,47 +557,50 @@ define('Sage/Platform/Mobile/List', [
          */
         moreText: 'Retrieve More Records',
         /**
+         * @property {String}
          * The text displayed in the emptySelection button.
-         * @type {String}
          */
         emptySelectionText: 'None',
         /**
+         * @property {String}
          * The text displayed as the default title.
-         * @type {String}
          */
         titleText: 'List',
         /**
+         * @property {String}
          * The format string for the text displayed for the remaining record count.  This is used in a {@link String#format} call.
-         * @type {String}
          */
         remainingText: '${0} records remaining',
         /**
+         * @property {String}
          * The text displayed on the cancel button.
-         * @type {String}
          * @deprecated
          */
         cancelText: 'Cancel',
         /**
+         * @property {String}
          * The text displayed on the insert button.
-         * @type {String}
          * @deprecated
          */
         insertText: 'New',
         /**
+         * @property {String}
          * The text displayed when no records are available.
-         * @type {String}
          */
         noDataText: 'no records',
         /**
+         * @property {String}
          * The text displayed when data is being requested.
-         * @type {String}
          */
         loadingText: 'loading...',
         /**
+         * @property {String}
          * The text displayed when a data request fails.
-         * @type {String}
          */
         requestErrorText: 'A server error occurred while requesting data.',
+        /**
+         * @property {String}
+         */
         customizationSet: 'list',
         selectIcon: 'content/images/icons/OK_24.png',
         searchWidget: null,
