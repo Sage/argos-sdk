@@ -600,13 +600,50 @@ define('Sage/Platform/Mobile/List', [
         requestErrorText: 'A server error occurred while requesting data.',
         /**
          * @property {String}
+         * The customization identifier for this class. When a customization is registered it is passed
+         * a path/identifier which is then matched to this property.
          */
         customizationSet: 'list',
+        /**
+         * @property {String}
+         * The relative path to the checkmark or select icon for row selector
+         */
         selectIcon: 'content/images/icons/OK_24.png',
+        /**
+         * @property {Object}
+         * The search widget instance for the view
+         */
         searchWidget: null,
+        /**
+         * @property {SearchWidget}
+         * The class constructor to use for the search widget
+         */
         searchWidgetClass: SearchWidget,
+        /**
+         * @property {Object}
+         * The selection model for the view
+         */
         _selectionModel: null,
+        /**
+         * @property {Object}
+         * The selection event connections
+         */
         _selectionConnects: null,
+        /**
+         * @property {Object}
+         * The toolbar layout definition for all toolbar items.
+         */
+        tools: null,
+        /**
+         * The list action layout definition for the list action bar.
+         */
+        actions: null,
+        /**
+         * Setter method for the selection model, also binds the various selection model select events
+         * to the respective List event handler for each.
+         * @param {SelectionModel} selectionModel The selection model instance to save to the view
+         * @private
+         */
         _setSelectionModelAttr: function(selectionModel) {
             if (this._selectionConnects)
                 array.forEach(this._selectionConnects, this.disconnect, this);
@@ -623,9 +660,18 @@ define('Sage/Platform/Mobile/List', [
                 );
             }
         },
+        /**
+         * Getter nmethod for the selection model
+         * @return {SelectionModel}
+         * @private
+         */
         _getSelectionModelAttr: function() {
             return this._selectionModel;
         },
+        /**
+         * Extends dijit Widget postCreate to setup the selection model, search widget and bind
+         * to the global refresh publish
+         */
         postCreate: function() {
             this.inherited(arguments);
 
@@ -656,6 +702,9 @@ define('Sage/Platform/Mobile/List', [
 
             this.clear();
         },
+        /**
+         * Called on application startup to configure the search widget if present and create the list actions.
+         */
         startup: function() {
             this.inherited(arguments);
 
@@ -667,6 +716,9 @@ define('Sage/Platform/Mobile/List', [
 
             this.createActions(this._createCustomizedLayout(this.createActionLayout(), 'actions'));
         },
+        /**
+         * Extends dijit Widget to destroy the search widget before destroying the view.
+         */
         destroy: function() {
 			if (this.searchWidget)
             {
@@ -678,6 +730,12 @@ define('Sage/Platform/Mobile/List', [
             
 			this.inherited(arguments);
 		},
+        /**
+         * Sets and returns the toolbar item layout definition, this method should be overriden in the view
+         * so that you may define the views toolbar items.
+         * @return {Object} this.tools
+         * @template
+         */
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'tbar': [{
@@ -687,9 +745,20 @@ define('Sage/Platform/Mobile/List', [
                 }]
             });
         },
+        /**
+         * Sets and returns the list-action actions layout definition, this method should be overriden in the view
+         * so that you may define the action items for that view.
+         * @return {Object} this.acttions
+         */
         createActionLayout: function() {
             return this.actions || {};
         },
+        /**
+         * Creates the action bar and adds it to the DOM. Note that it replaces `this.actions` with the passed
+         * param as the passed param should be the result of the customization mixin and `this.actions` needs to be the
+         * final actions state.
+         * @param {Object[]} actions
+         */
         createActions: function(actions) {
             for (var i = 0; i < actions.length; i++)
             {
@@ -707,6 +776,17 @@ define('Sage/Platform/Mobile/List', [
 
             this.actions = actions;
         },
+        /**
+         * This is the data-action handler for list-actions, it will locate the action instance viw the data-id attribute
+         * and invoke either the `fn` with `scope` or the named `action` on the current view.
+         *
+         * The resulting function being called will be passed not only the action item definition but also
+         * the first (only) selection from the lists selection model.
+         *
+         * @param {Object} parameters Collection of data- attributes already gathered from the node
+         * @param {Event} evt The click/tap event
+         * @param {HTMLElement} node The node that invoked the action
+         */
         invokeActionItem: function(parameters, evt, node) {
             var index = parameters['id'],
                 action = this.actions[index],
@@ -728,6 +808,11 @@ define('Sage/Platform/Mobile/List', [
                     if (this.hasAction(action['action']))
                         this.invokeAction(action['action'], action, selection);
         },
+        /**
+         * Called when showing the action bar for a newly selected row, it sets the disabled state for each action
+         * item using the currently selected row as context by passing the action instance the selected row to the
+         * action items `enabled` property.
+         */
         checkActionState: function() {
             var selectedItems = this.get('selectionModel').getSelections(),
                 selection = null;
@@ -753,6 +838,16 @@ define('Sage/Platform/Mobile/List', [
             }
 
         },
+        /**
+         * Handler for showing the list-action panel/bar - it needs to do several things:
+         *
+         * 1. Check each item for context-enabledment
+         * 1. Move the action panel to the current row and show it
+         * 1. Adjust the scrolling if needed (if selected row is at bottom of screen, the action-bar shows off screen
+         * which is bad)
+         *
+         * @param {HTMLElement} rowNode The currently selected row node
+         */
         showActionPanel: function(rowNode) {
             this.checkActionState();
 
