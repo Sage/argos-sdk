@@ -857,6 +857,12 @@ define('Sage/Platform/Mobile/List', [
             if (this.actionsNode.offsetTop + this.actionsNode.clientHeight + 48 > document.documentElement.clientHeight)
                 this.actionsNode.scrollIntoView(false);
         },
+        /**
+         * Sets the `this.options.source` to passed param after adding the views resourceKind. This function is used so
+         * that when the next view queries the navigation context we can include the passed param as a data point.
+         *
+         * @param {Object} source The object to set as the options.source.
+         */
         setSource: function(source) {
             lang.mixin(source, {
                 resourceKind: this.resourceKind
@@ -864,15 +870,36 @@ define('Sage/Platform/Mobile/List', [
 
             this.options.source = source;
         },
+        /**
+         * Hides the passed list-action row/panel by removing the selected styling
+         * @param {HTMLElement} rowNode The currently selected row.
+         */
         hideActionPanel: function(rowNode) {
             domClass.remove(rowNode, 'list-action-selected');
         },
+        /**
+         * Determines if the view is a navigatible view or a selection view by returning `this.selectionOnly` or the
+         * navigation `this.options.selectionOnly`.
+         * @return {Boolean}
+         */
         isNavigationDisabled: function() {
             return ((this.options && this.options.selectionOnly) || (this.selectionOnly));
         },
+        /**
+         * Determines if the selections are disabled by checking the `allowSelection` and `enableActions`
+         * @return {Boolean}
+         */
         isSelectionDisabled: function() {
             return !((this.options && this.options.selectionOnly) || this.enableActions || this.allowSelection);
-        },        
+        },
+        /**
+         * Handler for when the selection model adds an item. Adds the selected state to the row or shows the list
+         * actions panel.
+         * @param {String} key The extracted key from the selected row.
+         * @param {Object} data The actual row's matching data point
+         * @param {String/HTMLElement} tag An indentifier, may be the actual row node or some other id.
+         * @private
+         */
         _onSelectionModelSelect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.contentNode)[0];
             if (!node) return;
@@ -885,6 +912,14 @@ define('Sage/Platform/Mobile/List', [
 
             domClass.add(node, 'list-item-selected');
         },
+        /**
+         * Handler for when the selection model removes an item. Removes the selected state to the row or hides the list
+         * actions panel.
+         * @param {String} key The extracted key from the de-selected row.
+         * @param {Object} data The actual row's matching data point
+         * @param {String/HTMLElement} tag An indentifier, may be the actual row node or some other id.
+         * @private
+         */
         _onSelectionModelDeselect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.contentNode)[0];
             if (!node) return;
@@ -897,8 +932,17 @@ define('Sage/Platform/Mobile/List', [
 
             domClass.remove(node, 'list-item-selected');
         },
+        /**
+         * Handler for when the selection model clears the selections.
+         * @private
+         */
         _onSelectionModelClear: function() {
         },
+        /**
+         * Attempts to activate entries passed in `this.options.previousSelections` where previousSelections is an array
+         * of data-keys or data-descriptors to search the list rows for.
+         * @private
+         */
         _loadPreviousSelections: function() {
             var previousSelections = this.options && this.options.previousSelections;
             if (previousSelections)
@@ -916,12 +960,27 @@ define('Sage/Platform/Mobile/List', [
                 }
             }
         },
+        /**
+         * Handler for the global `/app/refresh` event. Sets `refreshRequired` to true if the resourceKind matches.
+         * @param {Object} options The object published by the event.
+         * @private
+         */
         _onRefresh: function(options) {
             if (this.resourceKind && options.resourceKind === this.resourceKind)
             {
                 this.refreshRequired = true;
             }
         },
+        /**
+         * Handler for the select or action node data-action. Finds the nearest node with the data-key attribute and
+         * toggles it in the views selection model.
+         *
+         * If singleSelectAction is defined, invoke the singleSelectionAction.
+         *
+         * @param {Object} params Collection of `data-` attributes from the node.
+         * @param {Event} evt The click/tap event.
+         * @param {HTMLElement} node The element that initiated the event.
+         */
         selectEntry: function(params, evt, node) {
             var row = query(node).closest('[data-key]')[0],
                 key = row ? row.getAttribute('data-key') : false;
@@ -932,6 +991,16 @@ define('Sage/Platform/Mobile/List', [
             if (this.options.singleSelect && this.options.singleSelectAction && !this.enableActions)
                 this.invokeSingleSelectAction();
         },
+        /**
+         * Handler for each row.
+         *
+         * If a selection model is defined and navigation is disabled then toggle the entry/row
+         * in the model and if singleSelectionAction is true invoke the singleSelectAction.
+         *
+         * Else navigate to the detail view for the extracted data-key.
+         *
+         * @param {Object} params Collection of `data-` attributes from the node.
+         */
         activateEntry: function(params) {
             if (params.key)
             {
@@ -947,6 +1016,10 @@ define('Sage/Platform/Mobile/List', [
                 }
             }
         },
+        /**
+         * Invokes the corresponding top toolbar tool using `this.options.singleSelectAction` as the name.
+         * If autoClearSelection is true, clear the selection model.
+         */
         invokeSingleSelectAction: function() {
             if (App.bars['tbar'])
                 App.bars['tbar'].invokeTool({tool: this.options.singleSelectAction});
@@ -954,19 +1027,45 @@ define('Sage/Platform/Mobile/List', [
             if (this.autoClearSelection)
                 this._selectionModel.clear();
         },
+        /**
+         * Constructs a where expression using the provided format string and extracting the needed property from entry
+         * @param {Object} entry Data point to extract from.
+         * @param {String} fmt Format string to be replaced where `${0}` will be the extracted property.
+         * @param {String} property Property name to extract from the entry. May be a path: `'Address.City'`.
+         * @return {String}
+         */
         formatRelatedQuery: function(entry, fmt, property) {
             return string.substitute(fmt, [lang.getObject(property || '$key', false, entry)]);
         },
+        /**
+         * Called to transform a textual query into an SData query compatible search expression.
+         *
+         * Views should override this function to provide their own formatting tailored to their entity.
+         *
+         * @param {String} searchQuery User inputted text from the search widget.
+         * @return {String/Boolean} An SData query compatible search expression.
+         * @template
+         */
         formatSearchQuery: function(searchQuery) {
-            /// <summary>
-            ///     Called to transform a textual query into an SData query compatible search expression.
-            /// </summary>
-            /// <returns type="String">An SData query compatible search expression.</returns>
             return false;
         },
+        /**
+         * Replaces a single `"` with two `""` for proper SData query expressions.
+         * @param {String} searchQuery Search expression to be escaped.
+         * @return {String}
+         */
         escapeSearchQuery: function(searchQuery) {
             return (searchQuery || '').replace(/"/g, '""');
         },
+        /**
+         * Handler for the search widgets search.
+         *
+         * Prepares the view by clearing it and setting `this.query` to the given search expression. Then calls
+         * {@link #requestData requestData} which start the request process.
+         *
+         * @param {String} expression String expression as returned from the search widget
+         * @private
+         */
         _onSearchExpression: function(expression) {
 
             this.clear(false);
@@ -975,6 +1074,10 @@ define('Sage/Platform/Mobile/List', [
 
             this.requestData();
         },
+        /**
+         * Sets the default search expression (acting as a pre-filter) to `this.options.query` and configures the
+         * search widget by passing in the current view context.
+         */
         configureSearch: function() {
             this.query = this.options && this.options.query || null;
             if (this.searchWidget)
@@ -982,12 +1085,24 @@ define('Sage/Platform/Mobile/List', [
                     'context': this.getContext()
                 });
         },
+        /**
+         * Creates SDataResourceCollectionRequest instance and sets a number of known properties.
+         *
+         * List of properties used from `this.property/this.options.property`:
+         *
+         * `pageSize`, `contractName`, `resourceKind`, `resourceProperty`, `resourcePredicate`, `querySelect/select`,
+         * `queryOrderBy/orderBy`, `queryInclude`, `queryWhere/where`, `query`
+         *
+         * The where parts are joined via `AND`.
+         *
+         * The Start Index is set by checking the saved `this.feed` and if its `$startIndex` and `$itemsPerPage` greater
+         * than 0 -- then it adds them together to get the instead. If no feed or not greater than 0 then set the index
+         * to 1.
+         *
+         * @param {object} o Optional request options.
+         * @return {Object} Sage.SData.Client.SDataResourceCollectionRequest instance.
+         */
         createRequest:function(o) {
-            /// <summary>
-            ///     Creates SDataResourceCollectionRequest instance and sets a number of known properties.
-            /// </summary>
-            /// <returns type="Sage.SData.Client.SDataResourceCollectionRequest">An SDataResourceCollectionRequest instance.<returns>
-
             // todo: should we cache the request? the only thing that needs to change on subsequent requests is the paging.
 
             var where = [],
@@ -1046,6 +1161,15 @@ define('Sage/Platform/Mobile/List', [
 
             return request;
         },
+        /**
+         * Helper method for list actions. Takes a view id, data point and where format string, sets the nav options
+         * `where` to the formatted expression using the data point and shows the given view id with that option.
+         * @param {Object} action Action instance, not used.
+         * @param {Object} selection Data entry for the selection.
+         * @param {String} viewId View id to be shown
+         * @param {String} whereQueryFmt Where expression format string to be passed. `${0}` will be the `$key`
+         * property of the passed selection data.
+         */
         navigateToRelatedView:  function(action, selection, viewId, whereQueryFmt) {
             var view = App.getView(viewId),
                 options = {
@@ -1055,10 +1179,12 @@ define('Sage/Platform/Mobile/List', [
             if (view && options)
                 view.show(options);
         },
+        /**
+         * Navigates to the defined `this.detailView` passing the params as navigation options.
+         * @param {String} key Key of the entry to be shown in detail
+         * @param {String} descriptor Description of the entry, will be used as the top toolbar title text.
+         */
         navigateToDetailView: function(key, descriptor) {
-            /// <summary>
-            ///     Navigates to the requested detail view.
-            /// </summary>
             var view = App.getView(this.detailView);
             if (view)
                 view.show({
@@ -1066,6 +1192,12 @@ define('Sage/Platform/Mobile/List', [
                     key: key
                 });
         },
+        /**
+         * Helper method for list-actions. Navigates to the defined `this.editView` passing the given selections `$key`
+         * property in the navigation options (which is then requested and result used as default data).
+         * @param {Object} action Action instance, not used.
+         * @param {Object} selection Data entry for the selection.
+         */
         navigateToEditView: function(action, selection) {
             var view = App.getView(this.editView || this.insertView);
             if (view)
@@ -1075,6 +1207,11 @@ define('Sage/Platform/Mobile/List', [
                 });
             }
         },
+        /**
+         * Navigates to the defined `this.insertView`, or `this.editView` passing the current views id as the `returnTo`
+         * option and setting `insert` to true.
+         * @param {HTMLElement} el Node that initiated the event.
+         */
         navigateToInsertView: function(el) {
             var view = App.getView(this.insertView || this.editView);
             if (view)
@@ -1085,11 +1222,15 @@ define('Sage/Platform/Mobile/List', [
                 });
             }
         },
+        /**
+         * Processes the feed result from the SData request and renders out the resource feed entries.
+         *
+         * Saves the feed to `this.feed` and saves each entry to the `this.entries` collection using the entries `$key`
+         * as the key.
+         *
+         * @param {Object} feed The SData result
+         */
         processFeed: function(feed) {
-            /// <summary>
-            ///     Processes the feed result from the SData request and renders out the resource feed entries.
-            /// </summary>
-            /// <param name="feed" type="Object">The feed object.</param>
             if (!this.feed) this.set('listContent', '');
 
             this.feed = feed;
@@ -1130,11 +1271,11 @@ define('Sage/Platform/Mobile/List', [
 
             this._loadPreviousSelections();
         },
+        /**
+         * Deterimines if there is more data to be shown by inspecting the last feed result.
+         * @return {Boolean} True if the feed has more data; False otherwise.
+         */
         hasMoreData: function() {
-            /// <summary>
-            ///     Deterimines if there is more data to be shown by inspecting the last feed result.
-            /// </summary>
-            /// <returns type="Boolean">True if the feed has more data; False otherwise.</returns>
             if (this.feed['$startIndex'] > 0 && this.feed['$itemsPerPage'] > 0 && this.feed['$totalResults'] >= 0)
             {
                 var start = this.feed['$startIndex'];
@@ -1148,32 +1289,43 @@ define('Sage/Platform/Mobile/List', [
                 return true; // no way to determine, always assume more data
             }
         },
+        /**
+         * Handler when an error occurs while request data from the SData endpoint.
+         * @param {Object} response The response object.
+         * @param {Object} o The options that were passed when creating the Ajax request.
+         */
         onRequestDataFailure: function(response, o) {
-            /// <summary>
-            ///     Called when an error occurs while request data from the SData endpoint.
-            /// </summary>
-            /// <param name="response" type="Object">The response object.</param>
-            /// <param name="o" type="Object">The options that were passed to Ext when creating the Ajax request.</param>
             alert(string.substitute(this.requestErrorText, [response, o]));
             ErrorManager.addError(response, o, this.options, 'failure');
             domClass.remove(this.domNode, 'list-loading');
         },
+        /**
+         * Handler when an a request is aborted from an SData endpoint.
+         *
+         * Clears the `this.options` object which will by default force a refresh of the view.
+         *
+         * @param {Object} response The response object.
+         * @param {Object} o The options that were passed when creating the Ajax request.
+         */
         onRequestDataAborted: function(response, o) {
             this.options = false; // force a refresh
             ErrorManager.addError(response, o, this.options, 'aborted');
 
             domClass.remove(this.domNode, 'list-loading');
         },
+        /**
+         * Handler when a request to SData is successful
+         * @param {Object} feed The SData response
+         */
         onRequestDataSuccess: function(feed) {
             this.processFeed(feed);
 
             domClass.remove(this.domNode, 'list-loading');
         },
+        /**
+         * Initiates the SData request.
+         */
         requestData: function() {
-            /// <summary>
-            ///     Initiates the SData request.
-            /// </summary>
-
             domClass.add(this.domNode, 'list-loading');
 
             var request = this.createRequest();
@@ -1184,21 +1336,28 @@ define('Sage/Platform/Mobile/List', [
                 scope: this
             });
         },
+        /**
+         * Handler for the more button. Simply calls {@link #requestData requestData} which already has the info for
+         * setting the start index as needed.
+         */
         more: function() {
-            /// <summary>
-            ///     Called when the more button is clicked.
-            /// </summary>
             this.requestData();
         },
+        /**
+         * Handler for the none/no selection button is pressed. Used in selection views when not selecting is an option.
+         * Invokes the `this.options.singleSelectAction` tool.
+         */
         emptySelection: function() {
-            /// <summary>
-            ///     Called when the emptySelection/None button is clicked.
-            /// </summary>
             this._selectionModel.clear();
 
             if (App.bars['tbar'])
                 App.bars['tbar'].invokeTool({tool: this.options.singleSelectAction}); // invoke action of tool
         },
+        /**
+         * Determines if the view should be refresh by inspecting and comparing the passed navigation options with current values.
+         * @param {Object} options Passed navigation options.
+         * @return {Boolean} True if the view should be refreshed, false if not.
+         */
         refreshRequiredFor: function(options) {
             if (this.options)
             {
@@ -1216,11 +1375,20 @@ define('Sage/Platform/Mobile/List', [
             else
                 return this.inherited(arguments);
         },
+        /**
+         * Returns the current views context by expanding upon the {@link View#getContext parent implementation} to include
+         * the views resourceKind.
+         * @return {Object} context.
+         */
         getContext: function() {
             return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind
             });
         },
+        /**
+         * Extends the {@link View#beforeTransitionTo parent implementation} by also toggling the visibility of the views
+         * components and clearing the view and selection model as needed.
+         */
         beforeTransitionTo: function() {
             this.inherited(arguments);
 
@@ -1254,6 +1422,10 @@ define('Sage/Platform/Mobile/List', [
                     this._selectionModel.clear();
             }
         },
+        /**
+         * Extends the {@link View#transitionTo parent implementation} to also configure the search widget and
+         * load previous selections into the selection model.
+         */
         transitionTo: function()
         {
             this.configureSearch();
@@ -1262,6 +1434,11 @@ define('Sage/Platform/Mobile/List', [
             
             this.inherited(arguments);
         },
+        /**
+         * Generates the hash tag layout by taking the hash tags defined in `this.hashTagQueries` and converting them
+         * into individual objects in an array to be used in the customization engine.
+         * @return {Object[]}
+         */
         createHashTagQueryLayout: function() {
             // todo: always regenerate this layout? always regenerating allows for all existing customizations
             // to still work, at expense of potential (rare) performance issues if many customizations are registered.
@@ -1274,13 +1451,23 @@ define('Sage/Platform/Mobile/List', [
                 });
             return layout;
         },
+        /**
+         * Called when the view needs to be reset. Invokes the request data process.
+         */
         refresh: function() {
             this.requestData();
         },
+        /**
+         * Clears the view by:
+         *
+         *  * clearing the selection model, but without it invoking the event handlers;
+         *  * clears the views data such as `this.entries` and `this.feed`;
+         *  * clears the search width if passed true; and
+         *  * applies the default template.
+         *
+         * @param {Boolean} all If true, also clear the search widget.
+         */
         clear: function(all) {
-            /// <summary>
-            ///     Clears the view and re-applies the default content template.
-            /// </summary>
             if (this._selectionModel)
             {
                 this._selectionModel.suspendEvents();
