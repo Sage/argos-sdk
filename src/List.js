@@ -18,6 +18,8 @@
  * selection model built in for selecting rows from the list and may be used in a number of different manners.
  * @extends View
  * @alternateClassName List
+ * @requires ErrorManager
+ * @requires SearchWidget
  */
 define('Sage/Platform/Mobile/List', [
     'dojo/_base/declare',
@@ -282,7 +284,17 @@ define('Sage/Platform/Mobile/List', [
         /**
          * @property {Simplate}
          * The template used to render the view's main DOM element when the view is initialized.
-         * This template includes {@link #searchTemplate} and {@link #moreTemplate}.
+         * This template includes emptySelectionTemplate, moreTemplate and listActionTemplate.
+         *
+         * The default template uses the following properties:
+         *
+         *      name                description
+         *      ----------------------------------------------------------------
+         *      id                   main container div id
+         *      title                main container div title attr
+         *      cls                  additional class string added to the main container div
+         *      resourceKind         set to data-resource-kind
+         *
          */
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%= $.titleText %}" class="list {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',
