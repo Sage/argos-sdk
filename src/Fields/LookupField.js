@@ -35,7 +35,26 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     FieldManager
 ) {
     /**
+     * The LookupField is similiar to an Edit View in that it is a field that takes the user to another
+     * view but the difference is that an EditorField takes the user to an Edit View, whereas LookupField
+     * takes the user to a List View.
      *
+     * Meaning that LookupField is meant for establishing relationships by only storing the key for a value
+     * and with displayed text.
+     *
+     * ###Example:
+     *     {
+     *         name: 'Owner',
+     *         property: 'Owner',
+     *         label: this.ownerText,
+     *         type: 'lookup',
+     *         view: 'user_list'
+     *     }
+     *
+     * @alternateClassName LookupField
+     * @extends _Field
+     * @requires FieldManager
+     * @requires utility
      */
     var control = declare('Sage.Platform.Mobile.Fields.LookupField', [_Field], {
         attributeMap: {

@@ -90,7 +90,7 @@ define('Sage/Platform/Mobile/List', [
          */
         constructor: function(options) {
             this.selections = {};
-            
+
             lang.mixin(this, options);
         },
         /**
@@ -275,7 +275,6 @@ define('Sage/Platform/Mobile/List', [
          *
          * * listContent => contentNode's innerHTML
          * * remainingContent => remainingContentNode's innerHTML
-         *
          */
         attributeMap: {
             listContent: {node: 'contentNode', type: 'innerHTML'},

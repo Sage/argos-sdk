@@ -30,7 +30,20 @@ define('Sage/Platform/Mobile/Fields/TextField', [
     FieldManager
 ) {
     /**
+     * The TextAreaField extends the base TextField by changing the input element to
+     * an `<textarea>` element with a configurable amount of visible rows.
      *
+     * ###Example:
+     *     {
+     *         name: 'LastName',
+     *         property: 'LastName',
+     *         label: this.lastNameText,
+     *         type: 'text',
+     *     }
+     *
+     * @alternateClassName TextField
+     * @extends _Field
+     * @requires FieldManager
      */
     var control = declare('Sage.Platform.Mobile.Fields.TextField', [_Field], {
         attributeMap: {

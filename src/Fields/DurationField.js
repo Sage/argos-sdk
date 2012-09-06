@@ -115,6 +115,18 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
             'week(s)': 10080,
             'year(s)': 525960
         },
+        /**
+         * @property {Boolean}
+         * Overrides the {@link LookupField LookupField} default to explicitly set it to false forcing
+         * the view to use the currentValue instead of a key/descriptor
+         */
+        valueKeyProperty: false,
+        /**
+         * @property {Boolean}
+         * Overrides the {@link LookupField LookupField} default to explicitly set it to false forcing
+         * the view to use the currentValue instead of a key/descriptor
+         */
+        valueTextProperty: false,
 
         /**
          * @property {String}

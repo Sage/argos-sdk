@@ -24,10 +24,32 @@ define('Sage/Platform/Mobile/Fields/TextAreaField', [
     FieldManager
 ) {
     /**
+     * The TextAreaField extends the base TextField by changing the input element to
+     * an `<textarea>` element with a configurable amount of visible rows.
      *
+     * ###Example:
+     *     {
+     *         name: 'Description',
+     *         property: 'Description',
+     *         label: this.descriptionText,
+     *         type: 'textarea',
+     *         rows: 6
+     *     }
+     *
+     * @alternateClassName TextAreaField
+     * @extends TextField
+     * @requires FieldManager
      */
     var control = declare('Sage.Platform.Mobile.Fields.TextAreaField', [TextField], {
+        /**
+         * @cfg {Number}
+         * Number of rows to show visually, does not constrain input.
+         */
         rows: 4,
+        /**
+         * @property {Boolean}
+         * Overrides default to hide the clear button.
+         */
         enableClearButton: false,
         /**
          * @property {Simplate}

@@ -14,7 +14,17 @@
  */
 
 /**
+ * The EditorField is not a field per say but a base class for another field type to inherit from. The
+ * intent of an EditorField is you have a field where the input should come from another form. EditorField
+ * will handle the navigation, gathering values from the other view, going back and applying to the form
+ * the field is on.
  *
+ * A prime example of an editor field extension would be an AddressField - say you are entering a contacts
+ * details and need the address. You could make an AddressField that extends EditorField for handling all
+ * the address parts and takes the user to an address_edit with all the street/city/postal etc.
+ *
+ * @alternateClassName EditorField
+ * @extends _Field
  */
 define('Sage/Platform/Mobile/Fields/EditorField', [
     'dojo/_base/declare',
