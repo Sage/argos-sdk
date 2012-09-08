@@ -117,7 +117,7 @@ define('Sage/Platform/Mobile/Detail', [
         ]),
         /**
          * @property {Simplate}
-         * HTML that end a section
+         * HTML that ends a section
          *
          * `$` => the view instance
          */

@@ -14,8 +14,34 @@
  */
 
 /**
+ * An Edit View is a dual purpose view - used for both Creating and Updating records. It is comprised
+ * of a layout similar to Detail rows but are instead Edit fields.
+ *
+ * A unique part of the Edit view is it's lifecycle in comparison to Detail. The Detail view is torn
+ * down and rebuilt with every record. With Edit the form is emptied (HTML left in-tact) and new values
+ * are applied to the fields.
+ *
+ * Since Edit Views are typically the "last" view (you always come from a List or Detail view) it warrants
+ * special attention to the navigation options that are passed, as they greatly control how the Edit view
+ * functions and operates.
  *
  * @alternateClassName Edit
+ * @extends View
+ * @requires convert
+ * @requires utility
+ * @requires ErrorManager
+ * @requires FieldManager
+ * @requires BooleanField
+ * @requires DecimalField
+ * @requires DurationField
+ * @requires HiddenField
+ * @requires LookupField
+ * @requires NoteField
+ * @requires PhoneField
+ * @requires SelectField
+ * @requires SignatureField
+ * @requires TextAreaField
+ * @requires TextField
  */
 define('Sage/Platform/Mobile/Edit', [
     'dojo/_base/declare',
@@ -66,12 +92,34 @@ define('Sage/Platform/Mobile/Edit', [
 ) {
 
     return declare('Sage.Platform.Mobile.Edit', [View], {
+        /**
+         * @property {Object}
+         * Creates a setter map to html nodes, namely:
+         *
+         * * validationContent => validationContentNode's innerHTML
+         *
+         */
         attributeMap: {
             validationContent: {
                 node: 'validationContentNode',
                 type: 'innerHTML'
             }
         },
+        /**
+         * @property {Simplate}
+         * The template used to render the view's main DOM element when the view is initialized.
+         * This template includes loadingTemplate and validationSummaryTemplate.
+         *
+         * The default template uses the following properties:
+         *
+         *      name                description
+         *      ----------------------------------------------------------------
+         *      id                   main container div id
+         *      title                main container div title attr
+         *      cls                  additional class string added to the main container div
+         *      resourceKind         set to data-resource-kind
+         *
+         */
         widgetTemplate: new Simplate([
             '<div id="{%= $.id %}" title="{%: $.titleText %}" class="edit panel {%= $.cls %}" {% if ($.resourceKind) { %}data-resource-kind="{%= $.resourceKind %}"{% } %}>',            
             '{%! $.loadingTemplate %}',
@@ -79,11 +127,23 @@ define('Sage/Platform/Mobile/Edit', [
             '<div class="panel-content" data-dojo-attach-point="contentNode"></div>',
             '</div>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML shown when data is being loaded.
+         *
+         * `$` => the view instance
+         */
         loadingTemplate: new Simplate([
             '<fieldset class="panel-loading-indicator">',
             '<div class="row"><div>{%: $.loadingText %}</div></div>',
             '</fieldset>'        
         ]),
+        /**
+         * @property {Simplate}
+         * HTML for the validation summary area, this div is shown/hidden as needed.
+         *
+         * `$` => the view instance
+         */
         validationSummaryTemplate: new Simplate([
             '<div class="panel-validation-summary">',
             '<h2>{%: $.validationSummaryText %}</h2>',
@@ -91,6 +151,13 @@ define('Sage/Platform/Mobile/Edit', [
             '</ul>',
             '</div>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML shown when data is being loaded.
+         *
+         * * `$` => validation error object
+         * * `$$` => field instance that the error is on
+         */
         validationSummaryItemTemplate: new Simplate([
             '<li>',
             '<a href="#{%= $.name %}">',
@@ -99,6 +166,12 @@ define('Sage/Platform/Mobile/Edit', [
             '</a>',
             '</li>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that starts a new section including the collapsible header
+         *
+         * `$` => the view instance
+         */
         sectionBeginTemplate: new Simplate([
             '<h2 data-action="toggleSection" class="{% if ($.collapsed || $.options.collapsed) { %}collapsed{% } %}">',
             '{%: ($.title || $.options.title) %}<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
@@ -106,20 +179,37 @@ define('Sage/Platform/Mobile/Edit', [
             '<fieldset class="{%= ($.cls || $.options.cls) %}">',
             '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that ends a section
+         *
+         * `$` => the view instance
+         */
         sectionEndTemplate: new Simplate([
             '</fieldset>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML created for each property (field row).
+         *
+         * * `$` => the field row object defined in {@link #createLayout createLayout}.
+         * * `$$` => the view instance
+         */
         propertyTemplate: new Simplate([
             '<a name="{%= $.name || $.property %}"></a>',
             '<div class="row row-edit {%= $.cls %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'
         ]),
+
         transitionEffect: 'slide',
         id: 'generic_edit',
         layout: null,
         enableCustomizations: true,
         customizationSet: 'edit',
         expose: false,
+        insertSecurity: false,
+        updateSecurity: false,
+
         saveText: 'Save',
         titleText: 'Edit',
         toggleCollapseText: 'toggle collapse',
@@ -127,8 +217,7 @@ define('Sage/Platform/Mobile/Edit', [
         detailsText: 'Details',
         loadingText: 'loading...',
         requestErrorText: 'A server error occured while requesting data.',
-        insertSecurity: false,
-        updateSecurity: false,
+
         constructor: function(o) {
             this.fields = {};
         },

@@ -14,8 +14,8 @@
  */
 
 /**
- *
  * @alternateClassName _ServiceMixin
+ * @depracated
  */
 define('Sage/Platform/Mobile/_ServiceMixin', [
     'dojo/_base/declare'
@@ -27,6 +27,7 @@ define('Sage/Platform/Mobile/_ServiceMixin', [
         serviceMap: null,
         constructor: function() {
             var map = this.serviceMap;
+            console.log(map);
             if (map)
             {
                 for (var property in map)

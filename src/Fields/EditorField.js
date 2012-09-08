@@ -39,6 +39,12 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
 ) {
 
     return declare('Sage.Platform.Mobile.Fields.EditorField', [_Field], {
+        /**
+         * @property {Object}
+         * Creates a setter map to html nodes, namely:
+         *
+         * * inputValue => inputNode's value attribute
+         */
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -62,35 +68,100 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
         ]),
 
         // Localization
+        /**
+         * @property {String}
+         * The ARIA label text
+         */
         lookupLabelText: 'edit',
+        /**
+         * @property {String}
+         * Text placed in the lookup button
+         */
         lookupText: '...',
+        /**
+         * @property {String}
+         * Value placed when the field is cleared or set to null
+         */
         emptyText: 'empty',
+        /**
+         * @property {String}
+         * Text that may be used in the toolbar item that is passed to the editor view
+         */
         completeText: 'Ok',
 
+        /**
+         * @cfg {String}
+         * The view id that the user will be taken to when the edit button is clicked.
+         */
+        view: null,
+        /**
+         * @property {String}
+         * Value storage for keeping track of modified/unmodified values. Used in {@link #isDirty isDirty}.
+         */
+        originalValue: null,
+        /**
+         * @property {Object/String/Date/Number}
+         * Value storage for current value, as it must be formatted for display this is the full value.
+         */
+        currentValue: null,
+        /**
+         * @property {Object/String/Date/Number}
+         * Value storage for the value to use in validation, when gathering values from the editor view
+         * the validationValue is set using `getValues(true)` which returns all values even non-modified ones.
+         */
+        validationValue: null,
+
+        /**
+         * Returns the formatted value. This should be overwritten to provide proper formatting
+         * @param val
+         * @template
+         */
         formatValue: function(val) {
             return '';
         },
+        /**
+         * Extends the parent implementation to connect the `onclick` event of the fields container
+         * to {@link #_onClick _onClick}.
+         */
         init: function() {
             this.inherited(arguments);
 
             this.connect(this.containerNode, "onclick", this._onClick);
         },
+        /**
+         * Extends the parent implementation to also call {@link #_enableTextElement _enableTextElement}.
+         */
         enable: function() {
             this.inherited(arguments);
 
             this._enableTextElement();
         },
+        /**
+         * Sets the input nodes' disabled attribute to false
+         */
         _enableTextElement: function() {
             this.inputNode.disabled = false;
         },
+        /**
+         * Extends the parent implementation to also call {@link #_disableTextElement _disableTextElement}.
+         */
         disable: function() {
             this.inherited(arguments);
             
             this._disableTextElement();
         },
+        /**
+         * Sets the input nodes' disabled attribute to true
+         */
         _disableTextElement: function() {
             this.inputNode.disabled = true;
         },
+        /**
+         * Creates the navigation options to be passed to the editor view. The important part
+         * of this code is that it passes `tools` that overrides the editors view toolbar with an item
+         * that operates within this fields scope.
+         * @return Navigation options
+         */
         createNavigationOptions: function() {
             return {
                 tools: {
@@ -111,6 +182,9 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                 negateHistory: true
             };
         },
+        /**
+         * Navigates to the given `this.view` using the options from {@link #createNavigationOptions createNavigationOptions}.
+         */
         navigateToEditView: function() {
             if (this.isDisabled()) return;
 
@@ -123,11 +197,22 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                 view.show(options);
             }
         },
+        /**
+         * Handler for the `onclick` event of the fields container.
+         *
+         * Invokes {@link #navigateToEditView navigateToEditView}.
+         *
+         * @param {Event} evt
+         */
         _onClick: function(evt) {
             event.stop(evt);
             
             this.navigateToEditView();
         },
+        /**
+         * Gets the values from the editor view and applies it to the this fields `this.currentValue` and
+         * `this.validationValue`.
+         */
         getValuesFromView: function() {
             var view = App.getPrimaryActiveView(),
                 values = view && view.getValues();
@@ -140,6 +225,14 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                 this.validationValue = view.getValues(true); // store all editor values for validation, not only dirty values
             }
         },
+        /**
+         * Handler for the toolbar item that is passed to the editor view. When this function fires
+         * the view shown is the editor view but the function is fired in scope of the field.
+         *
+         * It gets a handler of the current active view and validates the form, if it passes it gathers
+         * the value, sets the fields text, calls `ReUI.back` and fires {@link #_onComplete _onComplete}.
+         *
+         */
         complete: function() {
             var view = App.getPrimaryActiveView();
             var success = true;
@@ -171,23 +264,54 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
             // wrapping thing in a timeout and placing after the transition starts, mitigates this issue.
             if (success) setTimeout(lang.hitch(this, this._onComplete), 0);
         },
+        /**
+         * Handler for `_onComplete` which is fired after the user has completed the form in the editor view
+         *
+         * Fires {@link #onChange onChange}.
+         *
+         */
         _onComplete: function() {
             this.onChange(this.currentValue, this);
         },
+        /**
+         * Sets the displayed text to the input.
+         * @param {String} text
+         */
         setText: function(text) {
             this.set('inputValue', text);
         },
+        /**
+         * Determines if the value has been modified from the default/original state
+         * @return {Boolean}
+         */
         isDirty: function() {
             return this.originalValue !== this.currentValue;
         },
+        /**
+         * Returns the current value
+         * @return {Object/String/Date/Number}
+         */
         getValue: function() {
             return this.currentValue;
         },
+        /**
+         * Extends the parent implementation to use the `this.validationValue` instead of `this.getValue()`.
+         * @param value
+         */
         validate: function(value) {
             return typeof value === 'undefined'
                 ? this.inherited(arguments, [this.validationValue])
                 : this.inherited(arguments);
         },
+        /**
+         * Sets the current value to the item passed, as the default if initial is true. Then it sets
+         * the displayed text using {@link #setText setText} with the {@link #formatValue formatted} value.
+         *
+         * If null/false is passed all is cleared and `this.emptyText` is set as the displayed text.
+         *
+         * @param {Object/String/Date/Number} val Value to be set
+         * @param {Boolean} initial True if the value is the default/clean value, false if it is a meant as a dirty value
+         */
         setValue: function(val, initial)
         {            
             if (val)
@@ -207,6 +331,9 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
                 this.setText(this.emptyText);
             }
         },
+        /**
+         * Clears the value by passing `null` to {@link #setValue setValue}
+         */
         clearValue: function() {
             this.setValue(null, true);
         }
