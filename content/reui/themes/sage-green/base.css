@@ -256,6 +256,7 @@ input:not([type|=radio]):not([type|=checkbox]) {
     padding: 8px 32px 8px 6px;
 }
 .list-show-selectors .list-item-content,
+.list-show-actions .list-item-content,
 .list-item-static-selector + .list-item-content
 {
     padding-left: 42px;
