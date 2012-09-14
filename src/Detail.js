@@ -230,7 +230,7 @@ define('Sage/Platform/Mobile/Detail', [
          */
         layout: null,
         /**
-         * @property {String/Object}
+         * @cfg {String/Object}
          * May be used for verifying the view is accessible
          */
         security: false,
@@ -245,9 +245,12 @@ define('Sage/Platform/Mobile/Detail', [
          * Controls if the view should be exposed
          */
         expose: false,
+        /**
+         * @depracated
+         */
         editText: 'Edit',
         /**
-         * @property {String}
+         * @cfg {String}
          * Default title text shown in the top toolbar
          */
         titleText: 'Detail',
@@ -277,7 +280,7 @@ define('Sage/Platform/Mobile/Detail', [
          */
         notAvailableText: 'The requested entry is not available.',
         /**
-         * @property {String}
+         * @cfg {String}
          * The view id to be taken to when the Edit button is pressed in the toolbar
          */
         editView: false,
