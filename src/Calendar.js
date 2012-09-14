@@ -174,7 +174,7 @@ define('Sage/Platform/Mobile/Calendar', [
             for (var i=min; i <= max; i++)
             {
                 var opt = domConstruct.create('option', {
-                    innerHTML: (this.monthNode == el) ? uCase(this.months[i]) : pad(i),
+                    innerHTML: (this.monthNode == el) ? uCase(Date.CultureInfo.abbreviatedMonthNames[i]) : pad(i),
                     value: i,
                     selected: (i == val)
                 });
@@ -187,7 +187,7 @@ define('Sage/Platform/Mobile/Calendar', [
                 fields = { y:'year', M:'month', d:'day', h:'hour', H:'hour', m:'minute' };
 
             var whichField = fields[ (3 > formatIndex)
-                ? this.dateFormat.split(/[^a-z]/i)[formatIndex].charAt(0)
+                ? Date.CultureInfo.formatPatterns.shortDate.split(/[^a-z]/i)[formatIndex].charAt(0)
                 : Date.CultureInfo.formatPatterns.shortTime.split(/[^a-z]/i)[formatIndex - 3].charAt(0)
                 ];
 
@@ -312,7 +312,7 @@ define('Sage/Platform/Mobile/Calendar', [
             this.datePickControl.caption.innerHTML = t.toString('dddd'); // weekday text
             if (this.showTimePicker)
             {
-                this.timePickControl.caption.innerHTML = t.toString(this.timeFormat);
+                this.timePickControl.caption.innerHTML = t.toString(Date.CultureInfo.formatPatterns.shortTime);
             }
         },
         getDateTime: function() {
