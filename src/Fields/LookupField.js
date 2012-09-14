@@ -111,7 +111,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
          */
         emptyText: '',
         /**
-         * @depracated
+         * @deprecated
          */
         completeText: 'Select',
         /**

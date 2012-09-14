@@ -15,7 +15,7 @@
 
 /**
  * @alternateClassName _ServiceMixin
- * @depracated
+ * @deprecated
  */
 define('Sage/Platform/Mobile/_ServiceMixin', [
     'dojo/_base/declare'

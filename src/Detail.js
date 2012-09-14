@@ -246,7 +246,7 @@ define('Sage/Platform/Mobile/Detail', [
          */
         expose: false,
         /**
-         * @depracated
+         * @deprecated
          */
         editText: 'Edit',
         /**

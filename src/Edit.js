@@ -244,7 +244,7 @@ define('Sage/Platform/Mobile/Edit', [
         updateSecurity: false,
 
         /**
-         * @depracated
+         * @deprecated
          */
         saveText: 'Save',
         /**
