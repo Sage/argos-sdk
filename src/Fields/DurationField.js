@@ -109,11 +109,11 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
          * Override ride this object to change the autocomplete units or their localization.
          */
         autoCompleteText: {
-            'minute(s)': 1,
-            'hour(s)': 60,
-            'day(s)': 1440,
-            'week(s)': 10080,
-            'year(s)': 525960
+            1 : 'minute(s)',
+            60 : 'hour(s)',
+            1440 : 'day(s)',
+            10080 : 'week(s)',
+            525960 : 'year(s)'
         },
         /**
          * @property {Boolean}
@@ -190,10 +190,10 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
 
             for (var key in this.autoCompleteText)
             {
-                if (this.isWordMatch(match[2], key))
+                if (this.isWordMatch(match[2], this.autoCompleteText[key]))
                 {
-                    this.currentKey = key;
-                    this.showAutoComplete(match[1] + key);
+                    this.currentKey = this.autoCompleteText[key];
+                    this.showAutoComplete(match[1] + this.autoCompleteText[key]);
                     return true;
                 }
             }
@@ -242,7 +242,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
         _onBlur: function(evt) {
             var val = this.inputNode.value.toString(),
                 match = this.autoCompleteValueRE.exec(val),
-                multiplier = this.autoCompleteText[this.currentKey],
+                multiplier = this.getMultiplier(this.currentKey),
                 newValue = 0;
 
             if (val.length < 1) return true;
@@ -250,6 +250,18 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
 
             newValue = parseFloat(match[0]) * multiplier;
             this.setValue(newValue);
+        },
+        /**
+         * Returns the corresponding value in minutes to the passed key (currentKey)
+         * @return {Number}
+         */
+        getMultiplier: function(key) {
+            var k;
+            for (k in this.autoCompleteText) {
+                if (this.autoCompleteText.hasOwnProperty(k) && key == this.autoCompleteText[k])
+                    break;
+            }
+            return k;
         },
         /**
          * Returns the current value in minutes
@@ -289,16 +301,16 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
 
             for (var key in autoCompleteValues)
             {
-                stepValue = autoCompleteValues[key];
+                stepValue = key;
                 if (val === 0 && stepValue === 1)
                 {
-                    this.currentKey = key;
+                    this.currentKey = autoCompleteValues[key];
                     break;
                 }
                 if (val / stepValue >= 1)
                 {
                     finalUnit = stepValue;
-                    this.currentKey = key;
+                    this.currentKey = autoCompleteValues[key];
                 }
             }
             return this.convertUnit(val, finalUnit) + ' ' +this.currentKey;
