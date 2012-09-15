@@ -247,6 +247,63 @@ img
     margin-left: 10px;
 }
 
+.action-toolbar
+{
+    height: auto !important;
+    position: static !important;
+    width: 100%;
+    background: #F2F2F2;
+    padding: 12px 6px 6px 6px;
+    margin: 0;
+    border: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+.action-toolbar:before,
+.action-toolbar:after
+{
+    content: "";
+    display: table;
+}
+.action-toolbar:after
+{
+    clear: both;
+}
+
+.action-toolbar > button
+{
+    height: auto !important;
+}
+
+.action-toolbar > button > div
+{
+    height: auto !important;
+    width: auto !important;
+}
+
+.action-toolbar > .on-left
+{
+    float: left;
+    height: auto !important;
+    width: 44%;
+    margin: 0;
+}
+.action-toolbar > .on-right
+{
+    float: right;
+    height: auto !important;
+    width: 44%;
+    margin: 0;
+}
+.action-toolbar > .on-full
+{
+    width: 100%;
+    margin: 0;
+}
+
+
 /* view */
 .view
 {
@@ -1551,4 +1608,69 @@ input::-webkit-inner-spin-button
 .row-collection-entry
 {
     padding: 0 !important;
+}
+
+.calendar-widget > .date-header
+{
+    height: 42px;
+    line-height: 42px;
+    padding: 0px 12px;
+    z-index: 2;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.calendar-widget > .date-header > .month
+{
+    float: left;
+}
+.calendar-widget > .date-header > .year
+{
+    float: right;
+}
+
+.calendar-widget > .scroll-container
+{
+    top: 42px; /* matches date-header height */
+}
+
+.calendar-widget > .scroll-container > .scroll-content
+{
+    height: 300%;
+}
+.calendar-widget > .scroll-container > .scroll-content > .calendar-content
+{
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.calendar-widget > .scroll-container > .scroll-content > table > tr > td
+{
+    text-align: center;
+    background-color: #efefef;
+    color: #999;
+    box-shadow: 1px 1px 3px 0px #AAA;
+    border-radius: 3px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.calendar-widget > .scroll-container > .scroll-content > .month-0 > tr > td[data-month="0"],
+.calendar-widget > .scroll-container > .scroll-content > .month-1 > tr > td[data-month="1"],
+.calendar-widget > .scroll-container > .scroll-content > .month-2 > tr > td[data-month="2"],
+.calendar-widget > .scroll-container > .scroll-content > .month-3 > tr > td[data-month="3"],
+.calendar-widget > .scroll-container > .scroll-content > .month-4 > tr > td[data-month="4"],
+.calendar-widget > .scroll-container > .scroll-content > .month-5 > tr > td[data-month="5"],
+.calendar-widget > .scroll-container > .scroll-content > .month-6 > tr > td[data-month="6"],
+.calendar-widget > .scroll-container > .scroll-content > .month-7 > tr > td[data-month="7"],
+.calendar-widget > .scroll-container > .scroll-content > .month-8 > tr > td[data-month="8"],
+.calendar-widget > .scroll-container > .scroll-content > .month-9 > tr > td[data-month="9"],
+.calendar-widget > .scroll-container > .scroll-content > .month-10 > tr > td[data-month="10"],
+.calendar-widget > .scroll-container > .scroll-content > .month-11 > tr > td[data-month="11"]
+{
+    background-color: #fff;
+    color: #000;
 }

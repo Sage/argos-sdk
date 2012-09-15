@@ -255,7 +255,7 @@ iScroll.prototype = {
 			}
 		}
 
-		that.moved = true;
+		that.moved = (that.absDistX > 0 || that.absDistY > 0);
 		that._pos(newX, newY);
 		that.dirX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
 		that.dirY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;

@@ -39,7 +39,7 @@ define('Sage/Platform/Mobile/Fields/DateField', [
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange:_onChange" type="text" />'
         ]),
 
-        view: 'generic_calendar',
+        view: 'datetimepicker',
         showTimePicker: false,
         timeless: false,
 

@@ -97,6 +97,13 @@ define('Sage/Platform/Mobile/Utility', [
                 return fn.apply(scope || this, called.concat(optional));
             };
         },
+        /**
+         * If given expression is a function it is called with the given scope and returned,
+         * else the expression is just returned.
+         * @params {Object} scope Scope to call the function in (`this` definition)
+         * @params {Function/String} expression Value to expand
+         * @returns {Function/String}
+         */
         expand = function(scope, expression) {
             if (typeof expression === 'function')
             {

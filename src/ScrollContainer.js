@@ -18,13 +18,15 @@ define('Sage/Platform/Mobile/ScrollContainer', [
     'dojo/_base/lang',
     'dojo/dom-class',
     'dijit/_WidgetBase',
-    './_UiComponent'
+    './_UiComponent',
+    './Utility'
 ], function(
     declare,
     lang,
     domClass,
     _WidgetBase,
-    _UiComponent
+    _UiComponent,
+    utility
 ) {
     var onBeforeScrollStart = function(e) {
         var target = e.target;
@@ -38,17 +40,51 @@ define('Sage/Platform/Mobile/ScrollContainer', [
     return declare('Sage.Platform.Mobile.ScrollContainer', [_WidgetBase, _UiComponent], {
         baseClass: 'scroll-container',
         enableFormFix: false,
+        /**
+         * @cfg {Boolean}
+         * Bypass the touch detection and force iscroll to be used.
+         */
+        forceScroller: false,
+        useTransition: true,
+        /**
+         * @cfg {String}
+         * Similar to a `data-action`, set to the name of a function on the parent view to be called
+         * when the scroll is "pulled down" beyond the top of container.
+         */
+        onPullDown: null,
+        /**
+         * @cfg {String}
+         * Similar to a `data-action`, set to the name of a function on the parent view to be called
+         * when the scroll is "pulled up" below the container.
+         */
+        onPullUp: null,
+        onMove: null,
+        onStart: null,
+        onEnd: null,
+        /**
+         * @property {Boolean}
+         * Scroll down below the container detected in {@link #onScrollMove onScrollMove},
+         * to then invoke the related action in {@link #onScrollEnd onScrollEnd}.
+         */
+        _pulledDown: null,
+        /**
+         * @property {Boolean}
+         * Scroll up above the container detected in {@link #onScrollMove onScrollMove},
+         * to then invoke the related action in {@link #onScrollEnd onScrollEnd}.
+         */
+        _pulledUp: null,
+
         startup: function() {
             this.inherited(arguments);
 
             var child = this.domNode.children[0];
             if (child) domClass.add(child, 'scroll-content');
 
-            var hasTouch = 'ontouchstart' in window;
-            if (hasTouch)
+            var useScroller = this.forceScroller || ('ontouchstart' in window);
+            if (useScroller)
             {
                 var options = {
-                    useTransition: true,
+                    useTransition: this.useTransition,
                     checkDOMChanges: false,
                     hScrollbar: false,
                     vScrollbar: false
@@ -56,8 +92,50 @@ define('Sage/Platform/Mobile/ScrollContainer', [
 
                 if (this.enableFormFix) options.onBeforeScrollStart = onBeforeScrollStart;
 
+                if (this.onMove || this.onStart || this.onEnd)
+                {
+                    var scope = this.getComponentOwner();
+                    if (this.onMove) options.onScrollMove = utility.expand(scope, this.onMove);
+                    if (this.onStart) options.onScrollStart = utility.expand(scope, this.onStart);
+                    if (this.onEnd) options.onScrollEnd = utility.expand(scope, this.onEnd);
+                }
+
+                if (this.onPullDown || this.onPullUp)
+                {
+                    options.onScrollMove = this._onScrollMove.bindDelegate(this);
+                    options.onScrollEnd = this._onScrollEnd.bindDelegate(this);
+                }
+
+
                 this._scroll = new iScroll(this.domNode, options);
             }
+        },
+        _onScrollMove: function(e) {
+            var scroller = this._scroll;
+            if (scroller.y > 5)
+            {
+                this._pulledDown = true;
+                scroller.minScrollY = 0;
+            }
+            else if (scroller.y < (scroller.maxScrollY - 5))
+            {
+                this._pulledUp = true;
+            }
+        },
+        _onScrollEnd: function() {
+            var scope = this.getComponentOwner();
+
+            if (this._pulledDown && this.onPullDown)
+            {
+                scope[this.onPullDown].apply(scope);
+            }
+            else if (this._pulledUp && this.onPullUp)
+            {
+                scope[this.onPullUp].apply(scope);
+            }
+
+            this._pulledDown = false;
+            this._pulledUp = false;
         },
         onContentChange: function() {
             console.log('content changed: %s', this.getComponentOwner().id);

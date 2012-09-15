@@ -726,6 +726,28 @@ body.landscape .datetime-picker > .time-content
     opacity: 0.25;
 }
 
+.calendar-widget > .date-header
+{
+    color: #000;
+    text-shadow: #fff 0px 1px 0px;
+
+    border-color: #b3b3b3;
+
+    background-color: #e6e6e6;
+    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(1, #cccccc)
+    );
+    background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 2px 3px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 2px 3px;
+}
+
 /* button */
 .button
 {
