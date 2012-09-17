@@ -50,7 +50,7 @@ define('Sage/Platform/Mobile/Calendar', [
         calendarNode: null,
         timeNode: null,
         meridiemNode: null,
-        months: moment.monthsShort,
+        monthsShortText: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         dateFormat: moment.longDateFormat.L,
         timeFormatText: 'h:mm A',
         is24hrTimeFormat: moment.longDateFormat.LT.match(/H\:/),
@@ -172,7 +172,7 @@ define('Sage/Platform/Mobile/Calendar', [
             for (var i=min; i <= max; i++)
             {
                 var opt = domConstruct.create('option', {
-                    innerHTML: (this.monthNode == el) ? uCase(this.months[i]) : pad(i),
+                    innerHTML: (this.monthNode == el) ? uCase(this.monthsShortText[i]) : pad(i),
                     value: i,
                     selected: (i == val)
                 });
@@ -185,7 +185,7 @@ define('Sage/Platform/Mobile/Calendar', [
                 fields = { y:'year', Y:'year', M:'month', d:'day', D:'day', h:'hour', H:'hour', m:'minute' };
 
             var whichField = fields[ (3 > formatIndex)
-                ? this.dateFormat.split(/[^a-z]/i)[formatIndex].charAt(0)
+                ? moment.longDateFormat.L.split(/[^a-z]/i)[formatIndex].charAt(0)
                 : this.timeFormatText.split(/[^a-z]/i)[formatIndex - 3].charAt(0)
                 ];
 
