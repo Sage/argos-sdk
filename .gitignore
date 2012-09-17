@@ -36,4 +36,5 @@ Thumbs.db
 
 deploy/
 .idea/
+docs/
 *.patch

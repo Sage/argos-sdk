@@ -1636,16 +1636,9 @@ input::-webkit-inner-spin-button
     top: 42px; /* matches date-header height */
 }
 
-.calendar-widget > .scroll-container > .scroll-content
-{
-    height: 300%;
-}
 .calendar-widget > .scroll-container > .scroll-content > .calendar-content
 {
     width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 .calendar-widget > .scroll-container > .scroll-content > table > tr > td
