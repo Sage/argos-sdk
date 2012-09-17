@@ -20,8 +20,8 @@ define('Sage/Platform/Mobile/Views/DateTimePicker', [
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/dom-style',
-    './_TemplatedWidgetMixin',
-    './View'
+    '../_TemplatedWidgetMixin',
+    '../View'
 ], function(
     declare,
     string,

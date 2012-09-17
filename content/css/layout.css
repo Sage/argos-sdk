@@ -1622,9 +1622,21 @@ input::-webkit-inner-spin-button
     width: 100%;
     box-sizing: border-box;
 }
-.calendar-widget > .date-header > .month
+.calendar-widget > .date-header > .button
 {
     float: left;
+    width: 36px;
+    height: 36px;
+    margin: 3px;
+}
+.calendar-widget > .date-header > .button:first-child
+{
+    margin-left: 0;
+}
+.calendar-widget > .date-header > .month
+{
+    float: right;
+    margin-right: 12px;
 }
 .calendar-widget > .date-header > .year
 {
@@ -1635,10 +1647,15 @@ input::-webkit-inner-spin-button
 {
     top: 42px; /* matches date-header height */
 }
+.calendar-widget > .scroll-container > .scroll-content
+{
+    height: 100%;
+}
 
 .calendar-widget > .scroll-container > .scroll-content > .calendar-content
 {
     width: 100%;
+    height: 100%;
 }
 
 .calendar-widget > .scroll-container > .scroll-content > table > tr > td
@@ -1650,6 +1667,8 @@ input::-webkit-inner-spin-button
     border-radius: 3px;
     overflow: hidden;
     white-space: nowrap;
+    box-sizing: border-box;
+    border: 2px groove transparent;
 }
 .calendar-widget > .scroll-container > .scroll-content > .month-0 > tr > td[data-month="0"],
 .calendar-widget > .scroll-container > .scroll-content > .month-1 > tr > td[data-month="1"],

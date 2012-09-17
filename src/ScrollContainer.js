@@ -13,6 +13,24 @@
  * limitations under the License.
  */
 
+/**
+ * ScrollContainer is a {@link #_Component Component} that provides an iscroll enabled container.
+ *
+ * For proper iscrolling you will need to bind `onContentChange` and call it whenever HTML is added/removed.
+ *
+ * Example:
+ *
+ *     {name: 'scroller', type: ScrollContainer, props: {subscribeEvent: 'onContentChange:onContentChange', components: [
+ *         {name: 'scroll', tag: 'div', components: [
+ *             {name: 'content', tag: 'div', attachPoint: 'contentNode'}
+ *         ]}
+ *     ]}
+ *
+ * @alternateClassName ScrollContainer
+ * @mixins _WidgetBase
+ * @extends _UiComponent
+ * @requires utility
+ */
 define('Sage/Platform/Mobile/ScrollContainer', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -38,13 +56,25 @@ define('Sage/Platform/Mobile/ScrollContainer', [
 
     /* todo: going to need some way to temporarily turn off the iScroll container when view is not visible, i.e. resize events. */
     return declare('Sage.Platform.Mobile.ScrollContainer', [_WidgetBase, _UiComponent], {
+        /**
+         * @property {String}
+         * CSS class string to be added to the container node
+         */
         baseClass: 'scroll-container',
+        /**
+         * @cfg {Boolean}
+         * Option to enable the form elemtns (select, input, textarea) scroll fixes for iscroll
+         */
         enableFormFix: false,
         /**
          * @cfg {Boolean}
          * Bypass the touch detection and force iscroll to be used.
          */
         forceScroller: false,
+        /**
+         * @cfg {Boolean}
+         * Option to use TransitionTimingFunction CSS for scroll animating
+         */
         useTransition: true,
         /**
          * @cfg {String}
@@ -58,8 +88,20 @@ define('Sage/Platform/Mobile/ScrollContainer', [
          * when the scroll is "pulled up" below the container.
          */
         onPullUp: null,
+        /**
+         * @cfg {Function}
+         * Function to be fired when the iscroll moves.
+         */
         onMove: null,
+        /**
+         * @cfg {Function}
+         * Function to be fired when the iscroll is first starts a scroll event (on mouse down/touch start)
+         */
         onStart: null,
+        /**
+         * @cfg {Function}
+         * Function to be fired when the iscroll finishes scrolling (on mouse up, touch end)
+         */
         onEnd: null,
         /**
          * @property {Boolean}
