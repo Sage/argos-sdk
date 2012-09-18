@@ -258,7 +258,7 @@ ReUI = {};
 
         D.clearTimer(context.check);
 
-        scrollTo(0, 1);
+        // scrollTo(0, 1);
 
         D.addClass(R.rootEl, 'transition');
 
@@ -401,7 +401,7 @@ ReUI = {};
             D.removeClass(R.rootEl, 'landscape');
         }
 
-        D.wait(scrollTo, 100, 0, 1); 
+        // D.wait(scrollTo, 100, 0, 1); 
     };
 
     var context = {
