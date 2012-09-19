@@ -144,21 +144,7 @@
 {
     font-size: 0.9em;
     line-height: 30px;
-    z-index: 5;
-
-    /* these are marked !important due to Chrome CSS fix */
-    /* todo: needed still? */
-    padding: 0 128px 0 5px !important;
-    -moz-border-radius: 3px !important;
-    -webkit-border-radius: 3px !important;
-    border: solid 1px #000 !important;
-    background: #fff;
-
-    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
-    -webkit-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding-box;
+    border: 0;
 }
 
 .list-search .searchButton
@@ -550,8 +536,53 @@ input.text-input {
     padding:  8px 34px 8px 110px !important;
 }
 
+div.table-layout
+{
+    display: table;
+    width: 99%;
+
+    padding: 0 0 0 5px;
+    border: 1px solid #000;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    background: #fff;
+
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding-box;
+}
+div.table-layout > div
+{
+    display: table-cell;
+    vertical-align: middle;
+}
+div.table-layout div.hasButton
+{
+    width: 30px;
+    white-space: nowrap;
+}
+div.table-layout div.hasButton > button
+{
+    margin: 0;
+    border: 0;
+}
+div.table-layout div.hasButton > button.searchButton
+{
+    border-left: 1px solid #000;
+}
+div.table-layout div input:not([type|=radio]):not([type|=checkbox])
+{
+    border: 0;
+    padding: 0 6px;
+    background-color: transparent;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+}
 .clear-button {
-    position: absolute !important;
+    position: absolute;
     right: 4px;
     margin: 1px 1px 0 0 !important;
     padding: 0;
@@ -564,9 +595,9 @@ input.text-input {
 }
 div.search-widget button.clear-button
 {
-    right: 70px;
+    position: static; height: 30px;
 }
-div.search-active > button.clear-button,
+div.search-active button.clear-button,
 div.text-field-active > button.clear-button
 {
     background: url('../images/delete.png') no-repeat 50% 50%;
