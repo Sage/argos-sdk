@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_Component', [
+define('Argos/_Component', [
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
@@ -23,7 +23,7 @@ define('Sage/Platform/Mobile/_Component', [
         return map;
     };
 
-    var _Component = declare('Sage.Platform.Mobile._Component', null, {
+    var _Component = declare('Argos._Component', null, {
         _components: null,
         /**
          * Contains information about `this` component.

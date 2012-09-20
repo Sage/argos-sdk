@@ -1,5 +1,5 @@
-define('FieldManagerTests', ['dojo/_base/lang','Sage/Platform/Mobile/FieldManager'], function(lang, FieldManager) {
-return describe('Sage.Platform.Mobile.FieldManager', function() {
+define('FieldManagerTests', ['dojo/_base/lang','Argos/FieldManager'], function(lang, FieldManager) {
+return describe('Argos.FieldManager', function() {
 
     it('Can register an item', function() {
         FieldManager.register('test', 'item');

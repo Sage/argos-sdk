@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/Data/SDataStore', [
+define('Argos/Data/SDataStore', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',

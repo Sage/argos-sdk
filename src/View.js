@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/View', [
+define('Argos/View', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -36,7 +36,7 @@ define('Sage/Platform/Mobile/View', [
     application,
     customizations
 ) {
-    return declare('Sage.Platform.Mobile.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
+    return declare('Argos.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
         baseClass: 'view',
         title: null,
         tools: null,

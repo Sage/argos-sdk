@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Layout', [
+define('Argos/Layout', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/window',
@@ -40,7 +40,7 @@ define('Sage/Platform/Mobile/Layout', [
     _UiComponent,
     Pane
 ) {
-    return declare('Sage.Platform.Mobile.Layout', [FixedSplitter, _UiComponent], {
+    return declare('Argos.Layout', [FixedSplitter, _UiComponent], {
         components: [
             {name: 'navigation', type: Pane, attachPoint: 'panes.navigation', props:{'class':'layout-left', tier: false}},
             {name: 'list', type: Pane, attachPoint: 'panes.list', props:{'class':'layout-center', tier: 0}},

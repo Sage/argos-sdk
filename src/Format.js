@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Format', [
+define('Argos/Format', [
     'dojo/_base/json',
     'dojo/_base/lang',
     'dojo/dom-construct',
     'dojo/string',
-    'Sage/Platform/Mobile/Convert'
+    'Argos/Convert'
 ], function(
     json,
     lang,
@@ -68,7 +68,7 @@ define('Sage/Platform/Mobile/Format', [
             .replace(/&quot;/g, '"');
     }
 
-    return lang.setObject('Sage.Platform.Mobile.Format', {
+    return lang.setObject('Argos.Format', {
         yesText: 'Yes',
         noText: 'No',
         trueText: 'T',
@@ -110,7 +110,7 @@ define('Sage/Platform/Mobile/Format', [
                 if (utc)
                     date = date.add({minutes: date.zone()});
 
-                return date.format(fmt || Sage.Platform.Mobile.Format.shortDateFormatText);
+                return date.format(fmt || Argos.Format.shortDateFormatText);
             }
 
             return val;
@@ -132,15 +132,15 @@ define('Sage/Platform/Mobile/Format', [
             if (typeof val === 'string') val = /^true$/i.test(val);
 
             return val
-                ? Sage.Platform.Mobile.Format.yesText || 'Yes'
-                : Sage.Platform.Mobile.Format.noText || 'No';
+                ? Argos.Format.yesText || 'Yes'
+                : Argos.Format.noText || 'No';
         },
         bool: function(val) {
             if (typeof val === 'string') val = /^true$/i.test(val);
 
             return val
-                ? Sage.Platform.Mobile.Format.trueText || 'T'
-                : Sage.Platform.Mobile.Format.falseText || 'F';
+                ? Argos.Format.trueText || 'T'
+                : Argos.Format.falseText || 'F';
         },
         nl2br: function(val) {
             if (typeof val !== 'string') return val;
@@ -148,18 +148,18 @@ define('Sage/Platform/Mobile/Format', [
             return val.replace(/\n/g, '<br />');
         },
         timespan: function(val) {
-            var v = Sage.Platform.Mobile.Format.fixed(val);
+            var v = Argos.Format.fixed(val);
             if (isNaN(v) || !v) return '';
 
             var hrs = Math.floor(v / 60);
             var mins  = v % 60;
 
             if (hrs)
-                hrs = hrs > 1 ? string.substitute('${0} ${1}', [hrs, (Sage.Platform.Mobile.Format.hoursText || 'hours')])
-                              : string.substitute('${0} ${1}', [hrs, (Sage.Platform.Mobile.Format.hourText || 'hour')]);
+                hrs = hrs > 1 ? string.substitute('${0} ${1}', [hrs, (Argos.Format.hoursText || 'hours')])
+                              : string.substitute('${0} ${1}', [hrs, (Argos.Format.hourText || 'hour')]);
             if (mins)
-                mins = mins > 1 ? string.substitute('${0} ${1}', [mins, (Sage.Platform.Mobile.Format.minutesText || 'minutes')])
-                                : string.substitute('${0} ${1}', [mins, (Sage.Platform.Mobile.Format.minuteText || 'minute')]);
+                mins = mins > 1 ? string.substitute('${0} ${1}', [mins, (Argos.Format.minutesText || 'minutes')])
+                                : string.substitute('${0} ${1}', [mins, (Argos.Format.minuteText || 'minute')]);
 
             return (hrs && mins) ? hrs +" "+ mins
                                  : hrs === 0 ? mins : hrs;
@@ -212,7 +212,7 @@ define('Sage/Platform/Mobile/Format', [
                 canvasNode.height / size.height
             );
 
-            Sage.Platform.Mobile.Format.canvasDraw(vector, canvasNode, options);
+            Argos.Format.canvasDraw(vector, canvasNode, options);
 
             img = canvasNode.toDataURL('image/png');
             if (img.indexOf("data:image/png") != 0)

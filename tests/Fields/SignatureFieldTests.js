@@ -1,5 +1,5 @@
-define('Fields/SignatureFieldTests', ['Sage/Platform/Mobile/Fields/SignatureField'], function(Signature) {
-return describe('Sage.Platform.Mobile.Fields.SignatureField', function() {
+define('Fields/SignatureFieldTests', ['Argos/Fields/SignatureField'], function(Signature) {
+return describe('Argos.Fields.SignatureField', function() {
 
     it('Can clear value', function() {
         var field = new Signature();

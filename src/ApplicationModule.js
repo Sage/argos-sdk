@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/ApplicationModule', [
+define('Argos/ApplicationModule', [
     'dojo/_base/array',
     'dojo/_base/connect',
     'dojo/_base/declare',
     'dojo/_base/lang',
-    'Sage/Platform/Mobile/Application'
+    'Argos/Application'
 ], function(
     array,
     connect,
@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/ApplicationModule', [
     lang
 ) {
 
-    return declare('Sage.Platform.Mobile.ApplicationModule', null, {
+    return declare('Argos.ApplicationModule', null, {
         _signals: null,
         application: null,
         constructor: function(options) {

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Control', [
+define('Argos/Control', [
     './_UiComponent'
 ], function(
     _UiComponent

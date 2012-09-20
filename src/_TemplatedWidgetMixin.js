@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_TemplatedWidgetMixin', [
+define('Argos/_TemplatedWidgetMixin', [
     'dojo/_base/declare',
     'dojo/dom-construct',
     'dijit/_TemplatedMixin'
@@ -7,7 +7,7 @@ define('Sage/Platform/Mobile/_TemplatedWidgetMixin', [
     domConstruct,
     _TemplatedMixin
 ) {
-    return declare('Sage.Platform.Mobile._TemplatedWidgetMixin', null, {
+    return declare('Argos._TemplatedWidgetMixin', null, {
         widgetTemplate: null,
         constructor: function(){
             this._attachPoints = [];

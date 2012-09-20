@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/Store/SData', [
+define('Argos/Store/SData', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -37,7 +37,7 @@ define('Sage/Platform/Mobile/Store/SData', [
             return result;
         };
 
-    return declare('Sage.Platform.Mobile.Store.SData', null, {
+    return declare('Argos.Store.SData', null, {
         doDateConversion: false,
 
         /* todo: is this the appropriate name for the expansion scope? */

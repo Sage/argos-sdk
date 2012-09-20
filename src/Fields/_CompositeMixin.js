@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/_CompositeMixin', [
+define('Argos/Fields/_CompositeMixin', [
     'dojo/_base/declare',
     'dojo/_base/event',
     'dojo/_base/lang',
@@ -38,7 +38,7 @@ define('Sage/Platform/Mobile/Fields/_CompositeMixin', [
     FieldRegistry,
     utility
 ) {
-    return declare('Sage.Platform.Mobile.Fields._CompositeMixin', null, {
+    return declare('Argos.Fields._CompositeMixin', null, {
         sectionTemplate: new Simplate([
             '{% if ($.title !== false) { %}',
             '<h2 data-action="toggleCollapse" class="{% if ($.collapsed) { %}is-collapsed{% } %}">',

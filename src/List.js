@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/List', [
+define('Argos/List', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -21,6 +21,7 @@ define('Sage/Platform/Mobile/List', [
     'dojo/_base/Deferred', /* todo: use `dojo/when` in 1.8 */
     'dojo/query',
     'dojo/NodeList-manipulate',
+    'dojo/dom-attr',
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/dom',
@@ -41,6 +42,7 @@ define('Sage/Platform/Mobile/List', [
     Deferred,
     query,
     queryManipulate,
+    domAttr,
     domClass,
     domConstruct,
     dom,
@@ -55,7 +57,7 @@ define('Sage/Platform/Mobile/List', [
     customizations
 ) {
 
-    var SelectionModel = declare('Sage.Platform.Mobile.SelectionModel', null, {
+    var SelectionModel = declare('Argos.SelectionModel', null, {
         count: 0,
         selections: null,
         clearAsDeselect: true,
@@ -134,7 +136,7 @@ define('Sage/Platform/Mobile/List', [
         }
     });
 
-    var ConfigurableSelectionModel = declare('Sage.Platform.Mobile.ConfigurableSelectionModel', [SelectionModel], {
+    var ConfigurableSelectionModel = declare('Argos.ConfigurableSelectionModel', [SelectionModel], {
         singleSelection: false,
         useSingleSelection: function(val) {
             if (this.singleSelection != !!val) //false != undefined = true, false != !!undefined = false
@@ -153,7 +155,7 @@ define('Sage/Platform/Mobile/List', [
         }
     });
 
-    var List = declare('Sage.Platform.Mobile.List', [View], {
+    var List = declare('Argos.List', [View], {
         events: {
             'click': true
         },
@@ -291,17 +293,17 @@ define('Sage/Platform/Mobile/List', [
         /**
          * The view to show, either an id or an instance, if there is no {@link #insertView} specified, when
          * the {@link #navigateToInsertView} action is invoked.
-         * @type {?(String|Sage.Platform.Mobile.View)}
+         * @type {?(String|Argos.View)}
          */
         editView: null,
         /**
          * The view to show, either an id or an instance, when the {@link #navigateToInsertView} action is invoked.
-         * @type {?(String|Sage.Platform.Mobile.View)}
+         * @type {?(String|Argos.View)}
          */
         insertView: null,
         /**
          * The view to show, either an id or an instance, when the {@link #navigateToContextView} action is invoked.
-         * @type {?(String|Sage.Platform.Mobile.View)}
+         * @type {?(String|Argos.View)}
          */
         contextView: false,
         /**
@@ -457,8 +459,8 @@ define('Sage/Platform/Mobile/List', [
 
             this.actions = actions;
         },
-        invokeActionItem: function(parameters, evt, node) {
-            var index = parameters['id'],
+        invokeActionItem: function(evt, node) {
+            var index = domAttr.get(node, 'data-id'),
                 action = this.actions[index],
                 selectedItems = this.get('selectionModel').getSelections(),
                 selection = null;
@@ -473,10 +475,8 @@ define('Sage/Platform/Mobile/List', [
 
             if (action['fn'])
                 action['fn'].call(action['scope'] || this, action, selection);
-            else
-            if (action['action'])
-                if (this.hasAction(action['action']))
-                    this.invokeAction(action['action'], action, selection);
+            else if (action['action'] && this[action['action']])
+                    this[action['action']].call(action['scope'] || this, action, selection);
         },
         checkActionState: function() {
             var selectedItems = this.get('selectionModel').getSelections(),
@@ -676,6 +676,11 @@ define('Sage/Platform/Mobile/List', [
             scene().showView(this.detailView, {
                 descriptor: descriptor,
                 key: key
+            });
+        },
+        navigateToEditView: function(action, selection) {
+            scene().showView(this.editView || this.insertView, {
+                key: selection.data['$key']
             });
         },
         navigateToInsertView: function() {

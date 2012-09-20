@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/BooleanField', [
+define('Argos/Fields/BooleanField', [
     'dojo/_base/declare',
     'dojo/dom-attr',
     'dojo/dom-class',
@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/Fields/BooleanField', [
     _TemplatedWidgetMixin,
     _Field
 ) {
-    return declare('Sage.Platform.Mobile.Fields.BooleanField', [_Field, _TemplatedWidgetMixin], {
+    return declare('Argos.Fields.BooleanField', [_Field, _TemplatedWidgetMixin], {
         attributeMap: {
             toggled:{
                 node: 'toggleNode',

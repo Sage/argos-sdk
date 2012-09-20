@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_CommandMixin', [
+define('Argos/_CommandMixin', [
     'dojo/_base/declare',
     'dojo/dom-attr',
     'dojo/topic',
@@ -12,7 +12,7 @@ define('Sage/Platform/Mobile/_CommandMixin', [
     scene
 ) {
     /* todo: convert toolbar to use this */
-    return declare('Sage.Platform.Mobile._CommandMixin', null, {
+    return declare('Argos._CommandMixin', null, {
         _commandsByName: null,
 
         context: null,

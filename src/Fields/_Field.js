@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/_Field', [
+define('Argos/Fields/_Field', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/string',
@@ -24,7 +24,7 @@ define('Sage/Platform/Mobile/Fields/_Field', [
     string,
     _WidgetBase
 ) {
-    return declare('Sage.Platform.Mobile.Fields._Field', [_WidgetBase], {
+    return declare('Argos.Fields._Field', [_WidgetBase], {
         owner: false,
         applyTo: false,
         alwaysUseValue: false,

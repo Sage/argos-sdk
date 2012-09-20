@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/GroupedList', [
+define('Argos/GroupedList', [
     'dojo/_base/declare',
     'dojo/query',
     'dojo/string',
     'dojo/dom-class',
     'dojo/dom-construct',
-    'Sage/Platform/Mobile/List'
+    'Argos/List'
 ], function(
     declare,
     query,
@@ -29,7 +29,7 @@ define('Sage/Platform/Mobile/GroupedList', [
     List
 ) {
 
-    return declare('Sage.Platform.Mobile.GroupedList', [List], {
+    return declare('Argos.GroupedList', [List], {
         baseClass: 'view list list-grouped has-search-header',
         groupTemplate: new Simplate([
             '<h2 data-action="toggleGroup" class="{% if ($.collapsed) { %}collapsed{% } %} {% if ($.title === false) { %}hidden-section{% } %}">',

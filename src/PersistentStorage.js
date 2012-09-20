@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/PersistentStorage', [
+define('Argos/PersistentStorage', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/json',
-    'Sage/Platform/Mobile/Convert',
-    'Sage/Platform/Mobile/Utility'
+    'Argos/Convert',
+    'Argos/Utility'
 ], function(
     declare,
     lang,
@@ -28,7 +28,7 @@ define('Sage/Platform/Mobile/PersistentStorage', [
 ) {
     var sosCache = {};
 
-    return declare('Sage.Platform.Mobile.PersistentStorage', null, {
+    return declare('Argos.PersistentStorage', null, {
 
         name: false,
         singleObjectStore: false,

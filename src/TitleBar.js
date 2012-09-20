@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/TitleBar', [
+define('Argos/TitleBar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/query',
@@ -36,7 +36,7 @@ define('Sage/Platform/Mobile/TitleBar', [
     domAttr,
     Toolbar
 ) {
-    return declare('Sage.Platform.Mobile.TitleBar', [Toolbar], {
+    return declare('Argos.TitleBar', [Toolbar], {
         position: 'top',
         components: [
             {tag: 'h1', attrs: {'class':'toolbar-title'}, components: [

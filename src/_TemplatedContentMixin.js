@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_TemplatedContentMixin', [
+define('Argos/_TemplatedContentMixin', [
     'dojo/_base/declare',
     'dojo/query',
     'dojo/parser',
@@ -11,7 +11,7 @@ define('Sage/Platform/Mobile/_TemplatedContentMixin', [
     registry,
     domConstruct
 ) {
-    return declare('Sage.Platform.Mobile._TemplatedContentMixin', null, {
+    return declare('Argos._TemplatedContentMixin', null, {
         contentTemplate: null,
         buildRendering: function() {
             this.inherited();

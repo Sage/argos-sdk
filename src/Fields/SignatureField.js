@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/SignatureField', [
+define('Argos/Fields/SignatureField', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/json',
@@ -28,7 +28,7 @@ define('Sage/Platform/Mobile/Fields/SignatureField', [
     format,
     EditorField
 ) {
-    return declare('Sage.Platform.Mobile.Fields.SignatureField', [EditorField], {
+    return declare('Argos.Fields.SignatureField', [EditorField], {
         // Localization
         emptyText: '',
         titleText: 'Signature',

@@ -1,5 +1,5 @@
-define('CalendarTests', ['dojo/dom-attr','dojo/dom-class','Sage/Platform/Mobile/Calendar'], function(domAttr, domClass, Calendar) {
-return describe('Sage.Platform.Mobile.Calendar', function() {
+define('CalendarTests', ['dojo/dom-attr','dojo/dom-class','Argos/Calendar'], function(domAttr, domClass, Calendar) {
+return describe('Argos.Calendar', function() {
 
     var calendar = new Calendar();
     beforeEach(function() {

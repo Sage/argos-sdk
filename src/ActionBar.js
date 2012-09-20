@@ -33,7 +33,7 @@
  * @alternateClassName ActionBar
  * @extends Toolbar
  */
-define('Sage/Platform/Mobile/ActionBar', [
+define('Argos/ActionBar', [
     'dojo/_base/declare',
     'dojo/dom-attr',
     'dojo/dom-class',
@@ -47,7 +47,7 @@ define('Sage/Platform/Mobile/ActionBar', [
     Toolbar
 ) {
 
-    return declare('Sage.Platform.Mobile.ActionBar', [Toolbar], {
+    return declare('Argos.ActionBar', [Toolbar], {
         /**
          * @property {String}
          * The base CSS classes added to the main dom node.

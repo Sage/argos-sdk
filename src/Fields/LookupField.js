@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/LookupField', [
+define('Argos/Fields/LookupField', [
     'dojo/_base/array',
     'dojo/_base/declare',
     'dojo/_base/event',
@@ -38,7 +38,7 @@ define('Sage/Platform/Mobile/Fields/LookupField', [
     utility,
     scene
 ) {
-    return declare('Sage.Platform.Mobile.Fields.LookupField', [_Field, _TemplatedWidgetMixin, _MessageMapMixin], {
+    return declare('Argos.Fields.LookupField', [_Field, _TemplatedWidgetMixin, _MessageMapMixin], {
         messages: {
             'onSelection': '_onSelection'
         },

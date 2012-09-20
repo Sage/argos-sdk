@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DurationField', [
+define('Argos/Fields/DurationField', [
     'dojo/_base/declare',
     'dojo/string',
     'dojo/dom-class',
@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/Fields/DurationField', [
     format,
     LookupField
 ) {
-    return declare('Sage.Platform.Mobile.Fields.DurationField', [LookupField], {
+    return declare('Argos.Fields.DurationField', [LookupField], {
         attributeMap: {
             inputValue: {
                 node: 'inputNode',

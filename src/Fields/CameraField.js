@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/CameraField', [
+define('Argos/Fields/CameraField', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/config',
@@ -33,7 +33,7 @@ define('Sage/Platform/Mobile/Fields/CameraField', [
     _EventMapMixin
 ) {
 
-    return declare('Sage.Platform.Mobile.Fields.CameraField', [_Field, _EventMapMixin, _TemplatedWidgetMixin], {
+    return declare('Argos.Fields.CameraField', [_Field, _EventMapMixin, _TemplatedWidgetMixin], {
         events: {
             'click': '_onClick'
         },

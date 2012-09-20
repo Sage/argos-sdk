@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Detail', [
+define('Argos/Detail', [
     'dojo',
     'dojo/_base/declare',
     'dojo/_base/connect',
@@ -61,7 +61,7 @@ define('Sage/Platform/Mobile/Detail', [
             return data['valueTemplate'].apply(data.value, container);
         };
 
-    var Detail = declare('Sage.Platform.Mobile.Detail', [View], {
+    var Detail = declare('Argos.Detail', [View], {
         events: {
             'click': true
         },

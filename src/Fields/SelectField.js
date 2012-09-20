@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/SelectField', [
+define('Argos/Fields/SelectField', [
     'dojo/_base/declare',
     './LookupField'
 ], function(
     declare,
     LookupField
 ) {
-    return declare('Sage.Platform.Mobile.Fields.SelectField', [LookupField], {
+    return declare('Argos.Fields.SelectField', [LookupField], {
         valueKeyProperty: false,
         valueTextProperty: false,
         createNavigationOptions: function() {

@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_EventMapMixin', [
+define('Argos/_EventMapMixin', [
     'dojo/on',
     'dojo/_base/declare',
     'dojo/_base/array',
@@ -18,7 +18,7 @@ define('Sage/Platform/Mobile/_EventMapMixin', [
     /**
      * Allows a widget to map events to actions by defining an event map.
      */
-    return declare('Sage.Platform.Mobile._EventMapMixin', null, {
+    return declare('Argos._EventMapMixin', null, {
         /**
          * Can be in the form:
          *   * `'<event>': '<action>'`

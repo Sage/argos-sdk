@@ -1,5 +1,5 @@
-define('Fields/TextFieldTests', ['dojo/query','dojo/dom-attr','dojo/dom-class','Sage/Platform/Mobile/Fields/TextField'], function(query, domAttr, domClass, TextField) {
-return describe('Sage.Platform.Mobile.Fields.TextField', function() {
+define('Fields/TextFieldTests', ['dojo/query','dojo/dom-attr','dojo/dom-class','Argos/Fields/TextField'], function(query, domAttr, domClass, TextField) {
+return describe('Argos.Fields.TextField', function() {
 
     it('Can bind onkeypress on init when validInputOnly is true', function() {
         var field = new TextField();

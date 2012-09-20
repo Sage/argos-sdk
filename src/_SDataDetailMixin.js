@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_SDataDetailMixin', [
+define('Argos/_SDataDetailMixin', [
     'dojo/_base/declare',
     './Store/SData'
 ], function(
@@ -8,7 +8,7 @@ define('Sage/Platform/Mobile/_SDataDetailMixin', [
     /**
      * SData enablement for the Detail view.
      */
-    return declare('Sage.Platform.Mobile._SDataDetailMixin', null, {
+    return declare('Argos._SDataDetailMixin', null, {
         /**
          * @cfg {String} resourceKind
          * The SData resource kind the view is responsible for.  This will be used as the default resource kind

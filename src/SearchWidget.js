@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/SearchWidget', [
+define('Argos/SearchWidget', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/event',
@@ -32,7 +32,7 @@ define('Sage/Platform/Mobile/SearchWidget', [
     _WidgetBase,
     _TemplatedWidgetMixin
 ) {
-    return declare('Sage.Platform.Mobile.SearchWidget', [_WidgetBase, _TemplatedWidgetMixin], {
+    return declare('Argos.SearchWidget', [_WidgetBase, _TemplatedWidgetMixin], {
         _setLabelAttr: {node: 'labelNode', type: 'innerHTML'},
         _setQueryValueAttr: { node: 'queryNode', type: 'attribute', attribute: 'value' },
         widgetTemplate: new Simplate([

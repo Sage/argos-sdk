@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/CustomizationSet', [
+define('Argos/CustomizationSet', [
     'dojo/_base/declare',
     'dojo/_base/lang'
 ], function(
@@ -27,7 +27,7 @@ define('Sage/Platform/Mobile/CustomizationSet', [
             return expression;
     };
 
-    return declare('Sage.Platform.Mobile.CustomizationSet', null, {
+    return declare('Argos.CustomizationSet', null, {
         _compiled: null,
         _compiledFrom: null,
         _customizations: null,

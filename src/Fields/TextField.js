@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/TextField', [
+define('Argos/Fields/TextField', [
     'dojo/_base/declare',
     'dojo/_base/event',
     'dojo/dom-attr',
@@ -28,7 +28,7 @@ define('Sage/Platform/Mobile/Fields/TextField', [
     _TemplatedWidgetMixin,
     _Field
 ) {
-    return declare('Sage.Platform.Mobile.Fields.TextField', [_Field, _TemplatedWidgetMixin], {
+    return declare('Argos.Fields.TextField', [_Field, _TemplatedWidgetMixin], {
         attributeMap: {
             inputValue: {
                 node: 'inputNode',

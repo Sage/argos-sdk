@@ -1,5 +1,5 @@
-define('ConvertTests', ['Sage/Platform/Mobile/Convert'], function(convert) {
-return describe('Sage.Platform.Mobile.Convert', function() {
+define('ConvertTests', ['Argos/Convert'], function(convert) {
+return describe('Argos.Convert', function() {
 
     it('Can convert non-true string to boolean (false)', function() {
         var testStr = 'test';

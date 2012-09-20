@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DateField', [
+define('Argos/Fields/DateField', [
     'dojo/_base/declare',
     'dojo/string',
     'dojo/dom-class',
@@ -28,7 +28,7 @@ define('Sage/Platform/Mobile/Fields/DateField', [
     format,
     EditorField
 ) {
-    return declare('Sage.Platform.Mobile.Fields.DateField', [EditorField], {
+    return declare('Argos.Fields.DateField', [EditorField], {
         // Localization
         emptyText: '',
         dateFormatText: 'MM/DD/YYYY',
@@ -39,7 +39,7 @@ define('Sage/Platform/Mobile/Fields/DateField', [
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange:_onChange" type="text" />'
         ]),
 
-        view: 'datetimepicker',
+        view: 'generic_calendar',
         showTimePicker: false,
         timeless: false,
 

@@ -1,5 +1,5 @@
-define('UtilityTests', ['dojo/_base/lang', 'Sage/Platform/Mobile/Utility'], function(lang, utility) {
-return describe('Sage.Platform.Mobile.Utility', function() {
+define('UtilityTests', ['dojo/_base/lang', 'Argos/Utility'], function(lang, utility) {
+return describe('Argos.Utility', function() {
 
     it('Can get single level property of object', function() {
         var testObj = {

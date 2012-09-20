@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/CalendarWidget', [
+define('Argos/CalendarWidget', [
     'dojo/_base/declare',
     'dojo/_base/connect',
     'dojo/_base/event',
@@ -50,7 +50,7 @@ define('Sage/Platform/Mobile/CalendarWidget', [
     scene
 ) {
 
-    return declare('Sage.Platform.Mobile.CalendarWidget', [_WidgetBase, _UiComponent, _CommandMixin, _EventMapMixin], {
+    return declare('Argos.CalendarWidget', [_WidgetBase, _UiComponent, _CommandMixin, _EventMapMixin], {
         events: {
             'click': true
         },

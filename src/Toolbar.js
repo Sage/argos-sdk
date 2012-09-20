@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Toolbar', [
+define('Argos/Toolbar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -42,7 +42,7 @@ define('Sage/Platform/Mobile/Toolbar', [
     utility,
     scene
 ) {
-    return declare('Sage.Platform.Mobile.Toolbar', [_WidgetBase, _UiComponent, _CommandSupportMixin, _EventMapMixin], {
+    return declare('Argos.Toolbar', [_WidgetBase, _UiComponent, _CommandSupportMixin, _EventMapMixin], {
         events: {
             'click': true
         },

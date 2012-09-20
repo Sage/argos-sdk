@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/PhoneField', [
+define('Argos/Fields/PhoneField', [
     'dojo/_base/declare',
     'dojo/has',
     'dojo/string',
@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/Fields/PhoneField', [
     TextField,
     sniff
 ) {
-    return declare('Sage.Platform.Mobile.Fields.PhoneField', [TextField], {
+    return declare('Argos.Fields.PhoneField', [TextField], {
         /*
             {0}: original value
             {1}: cleaned value

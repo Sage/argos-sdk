@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/ErrorManager', [
+define('Argos/ErrorManager', [
     'dojo/_base/json',
     'dojo/_base/lang',
     'dojo/_base/connect',
@@ -37,7 +37,7 @@ define('Sage/Platform/Mobile/ErrorManager', [
 
     }
 
-    return lang.setObject('Sage.Platform.Mobile.ErrorManager', {
+    return lang.setObject('Argos.ErrorManager', {
         /**
          * Total amount of errors to keep
          */

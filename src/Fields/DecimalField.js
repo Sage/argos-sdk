@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/DecimalField', [
+define('Argos/Fields/DecimalField', [
     'dojo/_base/declare',
     'dojo/_base/event',
     'dojo/string',
@@ -24,7 +24,7 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
     string,
     TextField
 ) {
-    return declare('Sage.Platform.Mobile.Fields.DecimalField', [TextField], {
+    return declare('Argos.Fields.DecimalField', [TextField], {
         widgetTemplate: new Simplate([
             '<div>',
             '{% if ($.enableClearButton && !$.readonly) { %}',

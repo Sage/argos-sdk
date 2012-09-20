@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Edit', [
+define('Argos/Edit', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/connect',
@@ -63,7 +63,7 @@ define('Sage/Platform/Mobile/Edit', [
     scene
 ) {
 
-    return declare('Sage.Platform.Mobile.Edit', [View], {
+    return declare('Argos.Edit', [View], {
         events: {
             'click': true
         },

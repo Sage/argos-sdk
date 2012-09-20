@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/ToolbarButton', [
+define('Argos/ToolbarButton', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/dom-class',
@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/ToolbarButton', [
     domAttr,
     Control
 ) {
-    return declare('Sage.Platform.Mobile.ToolbarButton', [Control], {
+    return declare('Argos.ToolbarButton', [Control], {
         tag: 'button',
         attrs: {
             'data-action': 'invoke'

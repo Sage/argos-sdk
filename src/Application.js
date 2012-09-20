@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Application', [
+define('Argos/Application', [
     'dojo/_base/json',
     'dojo/_base/array',
     'dojo/_base/connect',
@@ -81,7 +81,7 @@ define('Sage/Platform/Mobile/Application', [
         'mergeConfiguration': mergeConfiguration
     });
 
-    return declare('Sage.Platform.Mobile.Application', [_Component], {
+    return declare('Argos.Application', [_Component], {
         _started: false,
         _signals: null,
         _connections: null,

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Charts/PieChart', [
+define('Argos/Charts/PieChart', [
     'dojo/_base/declare',
     'dojo/dom-geometry',
     './_Chart',
@@ -25,7 +25,7 @@ define('Sage/Platform/Mobile/Charts/PieChart', [
     _Chart,
     PiePlot
 ) {
-    return declare('Sage.Platform.Mobile.Charts.PieChart', [_Chart], {
+    return declare('Argos.Charts.PieChart', [_Chart], {
         plotType: PiePlot,
         plotOptions: {
             labelStyle: 'columns',

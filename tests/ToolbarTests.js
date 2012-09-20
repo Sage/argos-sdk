@@ -1,13 +1,13 @@
 define('ToolbarTests', [
     'dojo/dom-style',
     'dojo/dom-class',
-    'Sage/Platform/Mobile/Toolbar'
+    'Argos/Toolbar'
 ], function(
     domStyle,
     domClass,
     Toolbar
 ) {
-return describe('Sage.Platform.Mobile.Toolbar', function() {
+return describe('Argos.Toolbar', function() {
 
     // mock of App
     window.App = {};

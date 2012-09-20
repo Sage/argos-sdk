@@ -1,5 +1,5 @@
-define('MainToolbarTests', ['dojo/query', 'dojo/dom-construct', 'dojo/dom-class', 'Sage/Platform/Mobile/MainToolbar'], function(query, domConstruct, domClass, MainToolbar) {
-return describe('Sage.Platform.Mobile.MainToolbar', function() {
+define('MainToolbarTests', ['dojo/query', 'dojo/dom-construct', 'dojo/dom-class', 'Argos/MainToolbar'], function(query, domConstruct, domClass, MainToolbar) {
+return describe('Argos.MainToolbar', function() {
 
     it('Can clear right toolbar items', function() {
         var bar = new MainToolbar();

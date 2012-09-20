@@ -1,5 +1,5 @@
-define('Fields/TextAreaFieldTests', ['dojo/query','Sage/Platform/Mobile/Fields/TextAreaField'], function(query, TextArea) {
-return describe('Sage.Platform.Mobile.Fields.TextArea', function() {
+define('Fields/TextAreaFieldTests', ['dojo/query','Argos/Fields/TextAreaField'], function(query, TextArea) {
+return describe('Argos.Fields.TextArea', function() {
 
     it('Can default to 4 rows', function() {
         var field = new TextArea();

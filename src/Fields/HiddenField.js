@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/HiddenField', [
+define('Argos/Fields/HiddenField', [
     'dojo/_base/declare',
     './TextField'
 ], function(
     declare,
     TextField
 ) {
-    return declare('Sage.Platform.Mobile.Fields.HiddenField', [TextField], {
+    return declare('Argos.Fields.HiddenField', [TextField], {
         rowTemplate: new Simplate([
             '<div style="display: none;" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'

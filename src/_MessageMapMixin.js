@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_MessageMapMixin', [
+define('Argos/_MessageMapMixin', [
     'dojo/_base/declare',
     './Message'
 ], function(
@@ -8,7 +8,7 @@ define('Sage/Platform/Mobile/_MessageMapMixin', [
     /**
      * Allows a widget to map messages to actions by defining an message map.
      */
-    return declare('Sage.Platform.Mobile._MessageMapMixin', null, {
+    return declare('Argos._MessageMapMixin', null, {
         messages: null,
 
         startup: function() {

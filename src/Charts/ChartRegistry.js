@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Charts/ChartRegistry', [
+define('Argos/Charts/ChartRegistry', [
     'dojo/_base/lang',
     './AreaChart',
     './BarChart',
@@ -36,7 +36,7 @@ define('Sage/Platform/Mobile/Charts/ChartRegistry', [
         'pie': PieChart
     };
 
-    return lang.setObject('Sage.Platform.Mobile.Charts.ChartRegistry', {
+    return lang.setObject('Argos.Charts.ChartRegistry', {
         fromType: fromType,
         getChartFor: function(props, fallback) {
             var name = typeof props == 'string'

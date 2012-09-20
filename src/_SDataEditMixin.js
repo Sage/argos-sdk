@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/_SDataEditMixin', [
+define('Argos/_SDataEditMixin', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/string',
@@ -18,7 +18,7 @@ define('Sage/Platform/Mobile/_SDataEditMixin', [
     /**
      * SData enablement for the Detail view.
      */
-    return declare('Sage.Platform.Mobile._SDataEditMixin', [_SDataDetailMixin], {
+    return declare('Argos._SDataEditMixin', [_SDataDetailMixin], {
         _buildRefreshMessage: function(item, result) {
             var message = this.inherited(arguments);
 

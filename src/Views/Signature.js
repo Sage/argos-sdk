@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Views/Signature', [
+define('Argos/Views/Signature', [
     'dojo/_base/declare',
     'dojo/_base/json',
     'dojo/query',
@@ -33,7 +33,7 @@ define('Sage/Platform/Mobile/Views/Signature', [
     View
 ) {
 
-    return declare('Sage.Platform.Mobile.Views.Signature', [View], {
+    return declare('Argos.Views.Signature', [View], {
         // Localization
         titleText: 'Signature',
         clearCanvasText: 'Erase',

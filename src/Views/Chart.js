@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Views/Chart', [
+define('Argos/Views/Chart', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/dom-construct',
-    // 'Sage/Platform/Mobile/ChartManager', // todo: fix
-    'Sage/Platform/Mobile/View',
-    'Sage/Platform/Mobile/Charts/ColumnChart',
-    'Sage/Platform/Mobile/Charts/PieChart',
-    'Sage/Platform/Mobile/Charts/LineChart',
-    'Sage/Platform/Mobile/Charts/BarChart',
-    'Sage/Platform/Mobile/Charts/AreaChart'
+    // 'Argos/ChartManager', // todo: fix
+    'Argos/View',
+    'Argos/Charts/ColumnChart',
+    'Argos/Charts/PieChart',
+    'Argos/Charts/LineChart',
+    'Argos/Charts/BarChart',
+    'Argos/Charts/AreaChart'
 ], function(
     declare,
     lang,
@@ -40,7 +40,7 @@ define('Sage/Platform/Mobile/Views/Chart', [
         return 'chart-'+count;
     }
 
-    return declare('Sage.Platform.Mobile.Views.Chart', [View], {
+    return declare('Argos.Views.Chart', [View], {
         // Localization
         titleText: 'Chart',
 

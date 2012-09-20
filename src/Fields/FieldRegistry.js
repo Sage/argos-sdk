@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/FieldRegistry', [
+define('Argos/Fields/FieldRegistry', [
     'dojo/_base/lang',
     'require'
 ], function(
     lang,
     require
 ) {
-    var FieldRegistry = lang.setObject('Sage.Platform.Mobile.Fields.FieldRegistry', {
+    var FieldRegistry = lang.setObject('Argos.Fields.FieldRegistry', {
         fromType: {},
         defaultType: null,
         getFieldFor: function(props, fallback) {
@@ -30,7 +30,17 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
             return this.fromType[name] || ((fallback !== false) && this.defaultType);
         },
         register: function(type, ctor) {
-            this.fromType[type] = ctor;
+            if (lang.isObject(type))
+            {
+                for (var fromType in type)
+                {
+                    this.fromType[fromType] = type[fromType];
+                }
+            }
+            else if (lang.isString(type) && ctor)
+            {
+                this.fromType[type] = ctor;
+            }
         }
     });
 
@@ -42,7 +52,6 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
         './DurationField',
         './HiddenField',
         './LookupField',
-        './NoteField',
         './PhoneField',
         './SelectField',
         './SignatureField',
@@ -58,7 +67,6 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
         DurationField,
         HiddenField,
         LookupField,
-        NoteField,
         PhoneField,
         SelectField,
         SignatureField,
@@ -75,7 +83,6 @@ define('Sage/Platform/Mobile/Fields/FieldRegistry', [
             'duration': DurationField,
             'hidden': HiddenField,
             'lookup': LookupField,
-            'note': NoteField,
             'phone': PhoneField,
             'select': SelectField,
             'signature': SignatureField,

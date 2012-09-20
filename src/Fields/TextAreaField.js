@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/TextAreaField', [
+define('Argos/Fields/TextAreaField', [
     'dojo/_base/declare',
     './TextField'
 ], function(
     declare,
     TextField
 ) {
-    return declare('Sage.Platform.Mobile.Fields.TextAreaField', [TextField], {
+    return declare('Argos.Fields.TextAreaField', [TextField], {
         rows: 4,
         enableClearButton: false,
         widgetTemplate: new Simplate([

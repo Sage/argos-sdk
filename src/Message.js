@@ -1,4 +1,4 @@
-define('Sage/Platform/Mobile/Message', [
+define('Argos/Message', [
     'dojo/_base/lang',
     'dojo/_base/array'
 ], function(
@@ -7,7 +7,7 @@ define('Sage/Platform/Mobile/Message', [
 ) {
     /* async point to point messaging */
     /* for everything else, use pub-sub */
-    return lang.setObject('Sage.Platform.Mobile.Message', {
+    return lang.setObject('Argos.Message', {
         queues: null,
         channels: null,
         send: function(channel, message) {

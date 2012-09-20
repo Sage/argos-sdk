@@ -1,5 +1,5 @@
-define('GroupedListTests', ['dojo/query','dojo/dom-class','Sage/Platform/Mobile/GroupedList'], function(query, domClass, GroupedList) {
-return describe('Sage.Platform.Mobile.GroupedList', function() {
+define('GroupedListTests', ['dojo/query','dojo/dom-class','Argos/GroupedList'], function(query, domClass, GroupedList) {
+return describe('Argos.GroupedList', function() {
 
     var list = new GroupedList();
     beforeEach(function() {

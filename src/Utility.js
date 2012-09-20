@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Utility', [
+define('Argos/Utility', [
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/_base/json'
@@ -201,7 +201,7 @@ define('Sage/Platform/Mobile/Utility', [
         };
 
 
-    return lang.setObject('Sage.Platform.Mobile.Utility', {
+    return lang.setObject('Argos.Utility', {
         getValue: getValue,
         setValue: setValue,
         contains: contains,

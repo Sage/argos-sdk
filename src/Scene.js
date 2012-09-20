@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Scene', [
+define('Argos/Scene', [
     'require',
     'dojo/_base/array',
     'dojo/_base/declare',
@@ -53,7 +53,7 @@ define('Sage/Platform/Mobile/Scene', [
         - track the original tier each item in the state set was shown with
         - simply play-forward the standard algorithm, with the correct tier
      */
-    return declare('Sage.Platform.Mobile.Scene', [_Component], {
+    return declare('Argos.Scene', [_Component], {
         _registeredViews: null,
         _instancedViews: null,
         _signals: null,

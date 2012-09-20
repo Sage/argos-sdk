@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Charts/ColumnChart', [
+define('Argos/Charts/ColumnChart', [
     'dojo/_base/declare',
     'dojo/dom-geometry',
     './_Chart',
@@ -26,7 +26,7 @@ define('Sage/Platform/Mobile/Charts/ColumnChart', [
     _Chart,
     Columns
 ) {
-    return declare('Sage.Platform.Mobile.Charts.ColumnChart', [_Chart], {
+    return declare('Argos.Charts.ColumnChart', [_Chart], {
         plotType: Columns,
 
         plotOptions: {

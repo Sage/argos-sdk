@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Charts/AreaChart', [
+define('Argos/Charts/AreaChart', [
     'dojo/_base/declare',
     'dojo/dom-attr',
     'dojo/dom-class',
@@ -28,7 +28,7 @@ define('Sage/Platform/Mobile/Charts/AreaChart', [
     _Chart,
     Areas
 ) {
-    return declare('Sage.Platform.Mobile.Charts.AreaChart', [_Chart], {
+    return declare('Argos.Charts.AreaChart', [_Chart], {
         xAxis: {
             fixLower: 'major',
             fixUpper: 'major',

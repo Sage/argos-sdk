@@ -1,5 +1,5 @@
-define('ErrorManagerTests', ['Sage/Platform/Mobile/ErrorManager'], function(ErrorManager) {
-return describe('Sage.Platform.Mobile.ErrorManager', function() {
+define('ErrorManagerTests', ['Argos/ErrorManager'], function(ErrorManager) {
+return describe('Argos.ErrorManager', function() {
 
     it('Can set undefined properties to undefined string', function() {
         var obj = {

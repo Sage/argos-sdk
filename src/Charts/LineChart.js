@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Charts/LineChart', [
+define('Argos/Charts/LineChart', [
     'dojo/_base/declare',
     'dojo/window',
     'dojo/dom-geometry',
@@ -28,7 +28,7 @@ define('Sage/Platform/Mobile/Charts/LineChart', [
     _Chart,
     LinesPlot
 ) {
-    return declare('Sage.Platform.Mobile.Charts.LineChart', [_Chart], {
+    return declare('Argos.Charts.LineChart', [_Chart], {
         legend: true,
         xAxis: {
             minorTicks: false

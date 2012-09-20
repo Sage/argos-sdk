@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Fields/EditorField', [
+define('Argos/Fields/EditorField', [
     'dojo/_base/declare',
     'dojo/_base/event',
     'dojo/_base/lang',
@@ -29,7 +29,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
     scene
 ) {
 
-    return declare('Sage.Platform.Mobile.Fields.EditorField', [_Field, _TemplatedWidgetMixin], {
+    return declare('Argos.Fields.EditorField', [_Field, _TemplatedWidgetMixin], {
         attributeMap: {
             inputValue: {
                 node: 'inputNode',
@@ -120,7 +120,7 @@ define('Sage/Platform/Mobile/Fields/EditorField', [
         complete: function(view, item) {
             var success = true;
 
-            if (view instanceof Sage.Platform.Mobile.Edit)
+            if (view instanceof Argos.Edit)
             {
                 view.hideValidationSummary();
 

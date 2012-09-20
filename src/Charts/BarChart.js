@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Charts/BarChart', [
+define('Argos/Charts/BarChart', [
     'dojo/_base/declare',
     'dojo/window',
     'dojo/dom-geometry',
@@ -27,7 +27,7 @@ define('Sage/Platform/Mobile/Charts/BarChart', [
     _Chart,
     Bars
 ) {
-    return declare('Sage.Platform.Mobile.Charts.BarChart', [_Chart], {
+    return declare('Argos.Charts.BarChart', [_Chart], {
         xAxis: {
             fixLower: 'major',
             fixUpper: 'major',

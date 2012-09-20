@@ -1,5 +1,5 @@
-define('FormatTests', ['Sage/Platform/Mobile/Format'], function(format) {
-return describe('Sage.Platform.Mobile.Format', function() {
+define('FormatTests', ['Argos/Format'], function(format) {
+return describe('Argos.Format', function() {
 
     it('Can tell if empty string is empty', function() {
         var testStr = '';
