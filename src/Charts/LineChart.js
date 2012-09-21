@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Charts/LineChart', [
+define('argos/Charts/LineChart', [
     'dojo/_base/declare',
     'dojo/window',
     'dojo/dom-geometry',
@@ -28,7 +28,7 @@ define('Argos/Charts/LineChart', [
     _Chart,
     LinesPlot
 ) {
-    return declare('Argos.Charts.LineChart', [_Chart], {
+    return declare('argos.Charts.LineChart', [_Chart], {
         legend: true,
         xAxis: {
             minorTicks: false

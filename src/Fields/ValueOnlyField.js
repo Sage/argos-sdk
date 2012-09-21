@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Fields/ValueOnlyField', [
+define('argos/Fields/ValueOnlyField', [
     'dojo/_base/declare',
     './_Field'
 ], function(
@@ -21,7 +21,7 @@ define('Argos/Fields/ValueOnlyField', [
     _Field
 ) {
     /* todo: figure out a way to not do any rendering for this field. */
-    return declare('Argos.Fields.ValueOnlyField', [_Field], {
+    return declare('argos.Fields.ValueOnlyField', [_Field], {
         rowTemplate: new Simplate([
             '<div style="display: none;" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/CustomizationSet', [
+define('argos/CustomizationSet', [
     'dojo/_base/declare',
     'dojo/_base/lang'
 ], function(
@@ -27,7 +27,7 @@ define('Argos/CustomizationSet', [
             return expression;
     };
 
-    return declare('Argos.CustomizationSet', null, {
+    return declare('argos.CustomizationSet', null, {
         _compiled: null,
         _compiledFrom: null,
         _customizations: null,

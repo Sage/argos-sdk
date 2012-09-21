@@ -31,7 +31,7 @@
  * @extends _UiComponent
  * @requires utility
  */
-define('Argos/ScrollContainer', [
+define('argos/ScrollContainer', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/dom-class',
@@ -55,7 +55,7 @@ define('Argos/ScrollContainer', [
     };
 
     /* todo: going to need some way to temporarily turn off the iScroll container when view is not visible, i.e. resize events. */
-    return declare('Argos.ScrollContainer', [_WidgetBase, _UiComponent], {
+    return declare('argos.ScrollContainer', [_WidgetBase, _UiComponent], {
         /**
          * @property {String}
          * CSS class string to be added to the container node

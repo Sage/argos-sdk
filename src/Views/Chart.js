@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-define('Argos/Views/Chart', [
+define('argos/Views/Chart', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/dom-construct',
-    // 'Argos/ChartManager', // todo: fix
-    'Argos/View',
-    'Argos/Charts/ColumnChart',
-    'Argos/Charts/PieChart',
-    'Argos/Charts/LineChart',
-    'Argos/Charts/BarChart',
-    'Argos/Charts/AreaChart'
+    // 'argos/ChartManager', // todo: fix
+    '../View',
+    '../Charts/ColumnChart',
+    '../Charts/PieChart',
+    '../Charts/LineChart',
+    '../Charts/BarChart',
+    '../Charts/AreaChart'
 ], function(
     declare,
     lang,
@@ -40,7 +40,7 @@ define('Argos/Views/Chart', [
         return 'chart-'+count;
     }
 
-    return declare('Argos.Views.Chart', [View], {
+    return declare('argos.Views.Chart', [View], {
         // Localization
         titleText: 'Chart',
 

@@ -1,4 +1,4 @@
-define('Argos/_MessageMapMixin', [
+define('argos/_MessageMapMixin', [
     'dojo/_base/declare',
     './Message'
 ], function(
@@ -8,7 +8,7 @@ define('Argos/_MessageMapMixin', [
     /**
      * Allows a widget to map messages to actions by defining an message map.
      */
-    return declare('Argos._MessageMapMixin', null, {
+    return declare('argos._MessageMapMixin', null, {
         messages: null,
 
         startup: function() {

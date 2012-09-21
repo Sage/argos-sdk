@@ -1,4 +1,4 @@
-define('Argos/Store/SData', [
+define('argos/Store/SData', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -37,7 +37,7 @@ define('Argos/Store/SData', [
             return result;
         };
 
-    return declare('Argos.Store.SData', null, {
+    return declare('argos.Store.SData', null, {
         doDateConversion: false,
 
         /* todo: is this the appropriate name for the expansion scope? */

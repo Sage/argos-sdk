@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Fields/CollectionEntryField', [
+define('argos/Fields/CollectionEntryField', [
     'dojo/_base/declare',
     'dojo/_base/event',
     'dojo/_base/lang',
@@ -50,7 +50,7 @@ define('Argos/Fields/CollectionEntryField', [
      */
 
     /* todo: this will be importing a number of ideas from List/Edit; find a way to re-use */
-    return declare('Argos.Fields.CollectionEntryField', [_Field, _UiComponent, _EventMapMixin, _CompositeMixin], {
+    return declare('argos.Fields.CollectionEntryField', [_Field, _UiComponent, _EventMapMixin, _CompositeMixin], {
         events: {
             'click': true
         },

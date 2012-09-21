@@ -1,4 +1,4 @@
-define('FieldManagerTests', ['dojo/_base/lang','Argos/FieldManager'], function(lang, FieldManager) {
+define('FieldManagerTests', ['dojo/_base/lang','argos/FieldManager'], function(lang, FieldManager) {
 return describe('Argos.FieldManager', function() {
 
     it('Can register an item', function() {

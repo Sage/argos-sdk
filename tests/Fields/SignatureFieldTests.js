@@ -1,4 +1,4 @@
-define('Fields/SignatureFieldTests', ['Argos/Fields/SignatureField'], function(Signature) {
+define('Fields/SignatureFieldTests', ['argos/Fields/SignatureField'], function(Signature) {
 return describe('Argos.Fields.SignatureField', function() {
 
     it('Can clear value', function() {

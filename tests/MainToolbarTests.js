@@ -1,4 +1,4 @@
-define('MainToolbarTests', ['dojo/query', 'dojo/dom-construct', 'dojo/dom-class', 'Argos/MainToolbar'], function(query, domConstruct, domClass, MainToolbar) {
+define('MainToolbarTests', ['dojo/query', 'dojo/dom-construct', 'dojo/dom-class', 'argos/MainToolbar'], function(query, domConstruct, domClass, MainToolbar) {
 return describe('Argos.MainToolbar', function() {
 
     it('Can clear right toolbar items', function() {

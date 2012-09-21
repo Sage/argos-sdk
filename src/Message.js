@@ -1,4 +1,4 @@
-define('Argos/Message', [
+define('argos/Message', [
     'dojo/_base/lang',
     'dojo/_base/array'
 ], function(
@@ -7,7 +7,7 @@ define('Argos/Message', [
 ) {
     /* async point to point messaging */
     /* for everything else, use pub-sub */
-    return lang.setObject('Argos.Message', {
+    return lang.setObject('argos.Message', {
         queues: null,
         channels: null,
         send: function(channel, message) {

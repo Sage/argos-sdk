@@ -57,7 +57,7 @@
         },
         {
           "text": "main.js",
-          "path": "../loader"
+          "path": "../src"
         },
         {
           "text": "_CommandMixin.js",
@@ -85,6 +85,10 @@
         },
         {
           "text": "TitleBar.js",
+          "path": "../src"
+        },
+        {
+          "text": "ActionBar.js",
           "path": "../src"
         },
         {
@@ -124,7 +128,7 @@
           "path": "../src"
         },
         {
-          "text": "Calendar.js",
+          "text": "CalendarWidget.js",
           "path": "../src"
         },
           {
@@ -305,6 +309,14 @@
         },
         {
           "text": "Signature.js",
+          "path": "../src/Views"
+        },
+        {
+          "text": "DateTimePicker.js",
+          "path": "../src/Views"
+        },
+        {
+          "text": "Calender.js",
           "path": "../src/Views"
         },
         {

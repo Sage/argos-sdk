@@ -1,4 +1,4 @@
-define('Argos/_EventMapMixin', [
+define('argos/_EventMapMixin', [
     'dojo/on',
     'dojo/_base/declare',
     'dojo/_base/array',
@@ -18,7 +18,7 @@ define('Argos/_EventMapMixin', [
     /**
      * Allows a widget to map events to actions by defining an event map.
      */
-    return declare('Argos._EventMapMixin', null, {
+    return declare('argos._EventMapMixin', null, {
         /**
          * Can be in the form:
          *   * `'<event>': '<action>'`

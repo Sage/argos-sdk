@@ -1,4 +1,4 @@
-define('Argos/_UiComponent', [
+define('argos/_UiComponent', [
     'require',
     'dojo/_base/declare',
     'dojo/_base/array',
@@ -23,7 +23,7 @@ define('Argos/_UiComponent', [
     _Container,
     _Component
 ) {
-    var _UiComponent = declare('Argos._UiComponent', [_Component], {
+    var _UiComponent = declare('argos._UiComponent', [_Component], {
         _startupChildComponent: function(instance) {
             if (instance.isInstanceOf(_WidgetBase) && instance._started) return;
 
@@ -106,7 +106,7 @@ define('Argos/_UiComponent', [
         }
     });
 
-    var DomContentComponent = declare('Argos.DomContentComponent', [_UiComponent], {
+    var DomContentComponent = declare('argos.DomContentComponent', [_UiComponent], {
         domNode: null,
         constructor: function(props, node) {
             lang.mixin(this, props);
@@ -132,7 +132,7 @@ define('Argos/_UiComponent', [
     /**
      * A lightweight widget-like component.
      */
-    var Control = declare('Argos.Control', [Stateful, _UiComponent], {
+    var Control = declare('argos.Control', [Stateful, _UiComponent], {
         attributeMap: {},
         tag: null,
         attrs: null,

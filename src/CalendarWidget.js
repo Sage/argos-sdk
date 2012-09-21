@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/CalendarWidget', [
+define('argos/CalendarWidget', [
     'dojo/_base/declare',
     'dojo/_base/connect',
     'dojo/_base/event',
@@ -50,7 +50,7 @@ define('Argos/CalendarWidget', [
     scene
 ) {
 
-    return declare('Argos.CalendarWidget', [_WidgetBase, _UiComponent, _CommandMixin, _EventMapMixin], {
+    return declare('argos.CalendarWidget', [_WidgetBase, _UiComponent, _CommandMixin, _EventMapMixin], {
         events: {
             'click': true
         },

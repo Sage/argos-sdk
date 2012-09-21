@@ -13,16 +13,50 @@
  * limitations under the License.
  */
 
-define('Argos/Fields/TextAreaField', [
+/**
+ * The TextAreaField extends the base TextField by changing the input element to
+ * an `<textarea>` element with a configurable amount of visible rows.
+ *
+ * ###Example:
+ *     {
+ *         name: 'Description',
+ *         property: 'Description',
+ *         label: this.descriptionText,
+ *         type: 'textarea',
+ *         rows: 6
+ *     }
+ *
+ * @alternateClassName TextAreaField
+ * @extends TextField
+ */
+define('argos/Fields/TextAreaField', [
     'dojo/_base/declare',
     './TextField'
 ], function(
     declare,
     TextField
 ) {
-    return declare('Argos.Fields.TextAreaField', [TextField], {
+    return declare('argos.Fields.TextAreaField', [TextField], {
+        /**
+         * @cfg {Number}
+         * Number of rows to show visually, does not constrain input.
+         */
         rows: 4,
+
+        /**
+         * @property {Boolean}
+         * Overrides default to hide the clear button.
+         */
         enableClearButton: false,
+
+        /**
+         * @property {Simplate}
+         * Simplate that defines the fields HTML Markup
+         *
+         * * `$` => Field instance
+         * * `$$` => Owner View instance
+         *
+         */
         widgetTemplate: new Simplate([
             '<textarea data-dojo-attach-point="inputNode" name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %}></textarea>'
         ])

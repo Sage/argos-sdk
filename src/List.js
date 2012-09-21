@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/List', [
+define('argos/List', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -57,7 +57,7 @@ define('Argos/List', [
     customizations
 ) {
 
-    var SelectionModel = declare('Argos.SelectionModel', null, {
+    var SelectionModel = declare('argos.SelectionModel', null, {
         count: 0,
         selections: null,
         clearAsDeselect: true,
@@ -136,7 +136,7 @@ define('Argos/List', [
         }
     });
 
-    var ConfigurableSelectionModel = declare('Argos.ConfigurableSelectionModel', [SelectionModel], {
+    var ConfigurableSelectionModel = declare('argos.ConfigurableSelectionModel', [SelectionModel], {
         singleSelection: false,
         useSingleSelection: function(val) {
             if (this.singleSelection != !!val) //false != undefined = true, false != !!undefined = false
@@ -155,7 +155,7 @@ define('Argos/List', [
         }
     });
 
-    var List = declare('Argos.List', [View], {
+    var List = declare('argos.List', [View], {
         events: {
             'click': true
         },
@@ -293,17 +293,17 @@ define('Argos/List', [
         /**
          * The view to show, either an id or an instance, if there is no {@link #insertView} specified, when
          * the {@link #navigateToInsertView} action is invoked.
-         * @type {?(String|Argos.View)}
+         * @type {?(String|argos.View)}
          */
         editView: null,
         /**
          * The view to show, either an id or an instance, when the {@link #navigateToInsertView} action is invoked.
-         * @type {?(String|Argos.View)}
+         * @type {?(String|argos.View)}
          */
         insertView: null,
         /**
          * The view to show, either an id or an instance, when the {@link #navigateToContextView} action is invoked.
-         * @type {?(String|Argos.View)}
+         * @type {?(String|argos.View)}
          */
         contextView: false,
         /**

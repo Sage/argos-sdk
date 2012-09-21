@@ -13,34 +13,70 @@
  * limitations under the License.
  */
 
-define('Argos/Fields/FieldRegistry', [
+define('argos/Fields/FieldRegistry', [
     'dojo/_base/lang',
     'require'
 ], function(
     lang,
     require
 ) {
-    var FieldRegistry = lang.setObject('Argos.Fields.FieldRegistry', {
+    /**
+     * Field Registry is a map of field types to their constructors that enables the Edit View layouts to
+     * simply define `type: 'myFieldType'`.
+     * @alternateClassName FieldRegistry
+     * @singleton
+     */
+    var FieldRegistry = lang.setObject('argos.Fields.FieldRegistry', {
+        /**
+         * @property {Object}
+         * Collection of field type names (keys) and their respective constructor functions (values).
+         */
         fromType: {},
+        /**
+         * @property {Function}
+         * Default field constructor to use if the requested field type name is not registered and no fallback
+         * constructor is provided.
+         */
         defaultType: null,
+        /**
+         * Returns a field constructor for the given type name.
+         *
+         * If name is not found a fallback constructor may be provided, if not the default constructor will be returned.
+         *
+         * @param {String/Object} props Name of the field type to return. If an object is given the name will be
+         * extracted from it's object.type.
+         * @param {Function} fallback A fallback field constructor if the field type name is not found.
+         * @return {Function} Constructor for the field type name.
+         */
         getFieldFor: function(props, fallback) {
             var name = typeof props == 'string'
                 ? props
                 : props['type'];
             return this.fromType[name] || ((fallback !== false) && this.defaultType);
         },
+        /**
+         * Registers a given unique type name with a field constructor.
+         *
+         * If the type is provided as an object it is treated as a map of multiple type names and constructors and is
+         * merged in.
+         *
+         * Edit Views layout objects will use this register when defining `type` of a field:
+         *
+         *     {
+         *         name: '',
+         *         property: '',
+         *         label: '',
+         *         type: 'fieldType' // this is used with the register to access the constructor
+         *     }
+         *
+         * @param {String/Object} type Unique name of the field to register.
+         * @param {Function} ctor Constructor of the field being registered.
+         */
         register: function(type, ctor) {
             if (lang.isObject(type))
-            {
-                for (var fromType in type)
-                {
-                    this.fromType[fromType] = type[fromType];
-                }
-            }
+                lang.mixin(this.fromType, type);
             else if (lang.isString(type) && ctor)
-            {
                 this.fromType[type] = ctor;
-            }
         }
     });
 

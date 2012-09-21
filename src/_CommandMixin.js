@@ -1,4 +1,4 @@
-define('Argos/_CommandMixin', [
+define('argos/_CommandMixin', [
     'dojo/_base/declare',
     'dojo/dom-attr',
     'dojo/topic',
@@ -12,7 +12,7 @@ define('Argos/_CommandMixin', [
     scene
 ) {
     /* todo: convert toolbar to use this */
-    return declare('Argos._CommandMixin', null, {
+    return declare('argos._CommandMixin', null, {
         _commandsByName: null,
 
         context: null,

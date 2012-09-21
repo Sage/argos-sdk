@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Views/Signature', [
+define('argos/Views/Signature', [
     'dojo/_base/declare',
     'dojo/_base/json',
     'dojo/query',
@@ -33,7 +33,7 @@ define('Argos/Views/Signature', [
     View
 ) {
 
-    return declare('Argos.Views.Signature', [View], {
+    return declare('argos.Views.Signature', [View], {
         // Localization
         titleText: 'Signature',
         clearCanvasText: 'Erase',

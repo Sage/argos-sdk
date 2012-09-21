@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/TitleBar', [
+define('argos/TitleBar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/query',
@@ -36,7 +36,7 @@ define('Argos/TitleBar', [
     domAttr,
     Toolbar
 ) {
-    return declare('Argos.TitleBar', [Toolbar], {
+    return declare('argos.TitleBar', [Toolbar], {
         position: 'top',
         components: [
             {tag: 'h1', attrs: {'class':'toolbar-title'}, components: [

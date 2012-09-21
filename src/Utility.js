@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Utility', [
+define('argos/Utility', [
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/_base/json'
@@ -201,7 +201,7 @@ define('Argos/Utility', [
         };
 
 
-    return lang.setObject('Argos.Utility', {
+    return lang.setObject('argos.Utility', {
         getValue: getValue,
         setValue: setValue,
         contains: contains,

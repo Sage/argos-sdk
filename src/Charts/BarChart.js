@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Charts/BarChart', [
+define('argos/Charts/BarChart', [
     'dojo/_base/declare',
     'dojo/window',
     'dojo/dom-geometry',
@@ -27,7 +27,7 @@ define('Argos/Charts/BarChart', [
     _Chart,
     Bars
 ) {
-    return declare('Argos.Charts.BarChart', [_Chart], {
+    return declare('argos.Charts.BarChart', [_Chart], {
         xAxis: {
             fixLower: 'major',
             fixUpper: 'major',

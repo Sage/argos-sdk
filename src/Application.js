@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Application', [
+define('argos/Application', [
     'dojo/_base/json',
     'dojo/_base/array',
     'dojo/_base/connect',
@@ -81,7 +81,7 @@ define('Argos/Application', [
         'mergeConfiguration': mergeConfiguration
     });
 
-    return declare('Argos.Application', [_Component], {
+    return declare('argos.Application', [_Component], {
         _started: false,
         _signals: null,
         _connections: null,

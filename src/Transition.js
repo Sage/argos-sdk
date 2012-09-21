@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Transition', [
+define('argos/Transition', [
     'dojo/_base/lang',
     'dojo/_base/Deferred',
     'dojo/dom-class',
@@ -116,7 +116,7 @@ define('Argos/Transition', [
     var slideAnimationTransition = singleAxisAnimationTransition('fx-slide-r-in', 'fx-slide-r-out', 'fx-slide-l-in', 'fx-slide-l-out');
     var zoomAnimationTransition = singleAxisAnimationTransition('', 'fx-zoom-out', '', '');
 
-    return lang.setObject('Argos.Transition', {
+    return lang.setObject('argos.Transition', {
         START: 0,
         END: 1,
         basic: basic,

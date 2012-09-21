@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Charts/ColumnChart', [
+define('argos/Charts/ColumnChart', [
     'dojo/_base/declare',
     'dojo/dom-geometry',
     './_Chart',
@@ -26,7 +26,7 @@ define('Argos/Charts/ColumnChart', [
     _Chart,
     Columns
 ) {
-    return declare('Argos.Charts.ColumnChart', [_Chart], {
+    return declare('argos.Charts.ColumnChart', [_Chart], {
         plotType: Columns,
 
         plotOptions: {

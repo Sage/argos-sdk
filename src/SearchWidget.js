@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/SearchWidget', [
+define('argos/SearchWidget', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/event',
@@ -32,7 +32,7 @@ define('Argos/SearchWidget', [
     _WidgetBase,
     _TemplatedWidgetMixin
 ) {
-    return declare('Argos.SearchWidget', [_WidgetBase, _TemplatedWidgetMixin], {
+    return declare('argos.SearchWidget', [_WidgetBase, _TemplatedWidgetMixin], {
         _setLabelAttr: {node: 'labelNode', type: 'innerHTML'},
         _setQueryValueAttr: { node: 'queryNode', type: 'attribute', attribute: 'value' },
         widgetTemplate: new Simplate([

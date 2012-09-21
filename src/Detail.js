@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Detail', [
+define('argos/Detail', [
     'dojo',
     'dojo/_base/declare',
     'dojo/_base/connect',
@@ -61,7 +61,7 @@ define('Argos/Detail', [
             return data['valueTemplate'].apply(data.value, container);
         };
 
-    var Detail = declare('Argos.Detail', [View], {
+    var Detail = declare('argos.Detail', [View], {
         events: {
             'click': true
         },

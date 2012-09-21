@@ -13,7 +13,14 @@
  * limitations under the License.
  */
 
-define('Argos/Fields/_Field', [
+/**
+ * Field is the base class for all field controls. It describes all the functions a field should support giving no implementation itself, merely a shell. The one function that `_Field` does provide that most fields leave untouched is `validate`.
+ *
+ * All fields are dijit Widgets meaning it goes through the same lifecycle and has all the Widget functionality.
+ *
+ * @alternateClassName _Field
+ */
+define('argos/Fields/_Field', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/string',
@@ -24,47 +31,191 @@ define('Argos/Fields/_Field', [
     string,
     _WidgetBase
 ) {
-    return declare('Argos.Fields._Field', [_WidgetBase], {
+    return declare('argos.Fields._Field', [_WidgetBase], {
+        /**
+         * @property {View}
+         * View that controls the field.
+         */
         owner: false,
+
+        /**
+         * @cfg {String}
+         * If defined it will use the applyTo string when getting and setting properties from
+         * the SData object instead of the `property` property.
+         */
         applyTo: false,
+
+        /**
+         * @cfg {Boolean}
+         * Signifies that the field should always be included when the form calls {@link Edit#getValues getValues}.
+         */
         alwaysUseValue: false,
+
+        /**
+         * @property {Boolean}
+         * Indicates the disabled state
+         */
         disabled: false,
+
+        /**
+         * @property {Boolean}
+         * Indicates the visibility state
+         */
         hidden: false,
+
+        /**
+         * @cfg {String/Number/Object}
+         * This applies a default value when inserting a new record, the default value
+         * is applied after the template entry but before the context and changes are applied.
+         *
+         * Note the word `default` must be in quotes as default is a reserved word in javascript.
+         */
+        'default': null,
+
+        /**
+         * @cfg {String}
+         * The unique (within the current form) name of the field
+         */
+        name: null,
+
+        /**
+         * @cfg {String}
+         * The text that will, by default, show to the left of a field.
+         */
+        label: null,
+
+        /**
+         * @cfg {String}
+         * The SData property that the field will be bound to.
+         */
+        property: null,
+
+        /**
+         * @cfg {String}
+         * The registered name of the field that gets mapped in {@link FieldManager FieldManager} when
+         * the field is constructed
+         */
+        type: null,
+
+        /**
+         * @property {HTMLElement}
+         * The parent container element of the field.
+         */
+        containerNode: null,
+
+        /**
+         * Inserts the field into the given DOM node using dijit Widget `placeAt(node)` and saves
+         * a reference to it to `this.containerNode`.
+         * @param {HTMLElement} node Target node to insert the field into
+         */
         renderTo: function(node) {
             this.containerNode = node; // todo: should node actually be containerNode instead of last rendered node?
             this.placeAt(node);
         },
+
+        /**
+         * Determines if the fields' value has changed from the original value. Each field type
+         * should override this function and provide one tailored to its datatype.
+         * @template
+         * @return {Boolean} True if the value has been modified (dirty).
+         */
         isDirty: function() {
             return true;
         },
+
+        /**
+         * Sets disabled to false and fires {@link #onEnable onEnable}.
+         */
         enable: function() {
             this.disabled = false;
             this.onEnable(this);
         },
+
+        /**
+         * Sets disabled to true and fires {@link #onDisable onDisable}.
+         */
         disable: function() {
             this.disabled = true;
             this.onDisable(this);
         },
+
+        /**
+         * Returns the disabled state
+         * @return {Boolean}
+         */
         isDisabled: function() {
             return this.disabled;
         },
+
+        /**
+         * Sets hidden to false and fires {@link #onShow onShow}.
+         */
         show: function() {
             this.hidden = false;
             this.onShow(this);
         },
+
+        /**
+         * Sets hidden to true and fires {@link #onHide onHide}.
+         */
         hide: function() {
             this.hidden = true;
             this.onHide(this);
         },
+
+        /**
+         * Returns the hidden state
+         * @return {Boolean}
+         */
         isHidden: function() {
             return this.hidden;
         },
+
+        /**
+         * Each field type will need to implement this function to return the value of the field.
+         * @template
+         */
         getValue: function() {
         },
+
+        /**
+         * Each field type will need to implement this function to set the value and represent the change visually.
+         * @param {String/Boolean/Number/Object} val The value to set
+         * @param {Boolean} initial If true the value is meant to be the default/original/clean value.
+         * @template
+         */
         setValue: function(val, initial) {
-        },        
+        },
+
+        /**
+         * Each field type will need to implement this function to clear the value and visually.
+         * @template
+         */
         clearValue: function() {
         },
+
+        /**
+         * The validate function determines if there is any errors - meaning it will return false for a "Error free" field.
+         *
+         * ###Basic Flow:
+         *
+         * * loops over each `validator` defined on the field
+         *
+         * * Evaluate the result
+         *    * If the validator is a RegExp, use return `!regExp.test(value)`
+         *    * If the validator is a function, call and return the result of the function passing the value, _Field instance, and the `owner` property.
+         *    * If the validator is an object and has a `test` key, follow the RegExp path.
+         *    * If the validator is an object and has a `fn` key, follow the function path.
+         *
+         * * If the result is true and the validator is an object with a `message` key:
+         *   * If message is a function, call and return the result of the function passing the value, _Field instance and the `owner` property.
+         *   * Otherwise, assume it is a string format and call dojo's `string.substitute` using the message as the format, `${0}` as the value, `${1}` as the fields name, `${2}` as the fields label property.
+         *   * Save the result of the function or string substitution as the result itself.
+         *
+         * * Return the result.
+         * @param value Value of the field, if not passed then {@link #getValue getValue} is used.
+         * @return {Boolean/Object} False signifies that everything is okay and the field is valid, `true` or a `string message` indicates that it failed.
+         */
         validate: function(value) {
             if (typeof this.validator === 'undefined')
                 return false;
@@ -109,14 +260,40 @@ define('Argos/Fields/_Field', [
             }
             return false;
         },
+
+        /**
+         * Event that fires when the field is enabled, may be used to listen to
+         * @param {_Field} field The field itself
+         */
         onEnable: function(field) {
         },
+
+        /**
+         * Event that fires when the field is disabled, may be used to listen to
+         * @param {_Field} field The field itself
+         * @template
+         */
         onDisable: function(field) {
         },
+
+        /**
+         * Event that fires when the field is shown, may be used to listen to
+         * @param {_Field} field The field itself
+         */
         onShow: function(field) {
         },
+
+        /**
+         * Event that fires when the field is hidden, may be used to listen to
+         * @param {_Field} field The field itself
+         */
         onHide: function(field) {
         },
+
+        /**
+         * Event that fires when the field is changed, may be used to listen to
+         * @param {_Field} field The field itself
+         */
         onChange: function(value, field) {
         }
     });

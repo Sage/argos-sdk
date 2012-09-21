@@ -1,4 +1,4 @@
-define('Fields/PhoneFieldTests', ['Argos/Fields/PhoneField'], function(PhoneField) {
+define('Fields/PhoneFieldTests', ['argos/Fields/PhoneField'], function(PhoneField) {
 return describe('Argos.Fields.PhoneField', function() {
 
     it('Can call format value on blur', function() {

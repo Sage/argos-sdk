@@ -1,4 +1,4 @@
-define('Argos/_TemplatedContentMixin', [
+define('argos/_TemplatedContentMixin', [
     'dojo/_base/declare',
     'dojo/query',
     'dojo/parser',
@@ -11,7 +11,7 @@ define('Argos/_TemplatedContentMixin', [
     registry,
     domConstruct
 ) {
-    return declare('Argos._TemplatedContentMixin', null, {
+    return declare('argos._TemplatedContentMixin', null, {
         contentTemplate: null,
         buildRendering: function() {
             this.inherited();

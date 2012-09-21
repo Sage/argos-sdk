@@ -1,4 +1,4 @@
-define('Argos/_SDataEditMixin', [
+define('argos/_SDataEditMixin', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/string',
@@ -18,7 +18,7 @@ define('Argos/_SDataEditMixin', [
     /**
      * SData enablement for the Detail view.
      */
-    return declare('Argos._SDataEditMixin', [_SDataDetailMixin], {
+    return declare('argos._SDataEditMixin', [_SDataDetailMixin], {
         _buildRefreshMessage: function(item, result) {
             var message = this.inherited(arguments);
 

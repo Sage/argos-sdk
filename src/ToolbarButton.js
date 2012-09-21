@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/ToolbarButton', [
+define('argos/ToolbarButton', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/dom-class',
@@ -26,7 +26,7 @@ define('Argos/ToolbarButton', [
     domAttr,
     Control
 ) {
-    return declare('Argos.ToolbarButton', [Control], {
+    return declare('argos.ToolbarButton', [Control], {
         tag: 'button',
         attrs: {
             'data-action': 'invoke'

@@ -1,4 +1,4 @@
-define('ConvertTests', ['Argos/Convert'], function(convert) {
+define('ConvertTests', ['argos/Convert'], function(convert) {
 return describe('Argos.Convert', function() {
 
     it('Can convert non-true string to boolean (false)', function() {

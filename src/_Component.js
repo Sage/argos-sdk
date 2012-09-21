@@ -1,4 +1,4 @@
-define('Argos/_Component', [
+define('argos/_Component', [
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
@@ -23,7 +23,7 @@ define('Argos/_Component', [
         return map;
     };
 
-    var _Component = declare('Argos._Component', null, {
+    var _Component = declare('argos._Component', null, {
         _components: null,
         /**
          * Contains information about `this` component.

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Layout', [
+define('argos/Layout', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/window',
@@ -40,7 +40,7 @@ define('Argos/Layout', [
     _UiComponent,
     Pane
 ) {
-    return declare('Argos.Layout', [FixedSplitter, _UiComponent], {
+    return declare('argos.Layout', [FixedSplitter, _UiComponent], {
         components: [
             {name: 'navigation', type: Pane, attachPoint: 'panes.navigation', props:{'class':'layout-left', tier: false}},
             {name: 'list', type: Pane, attachPoint: 'panes.list', props:{'class':'layout-center', tier: 0}},

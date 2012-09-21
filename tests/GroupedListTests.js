@@ -1,4 +1,4 @@
-define('GroupedListTests', ['dojo/query','dojo/dom-class','Argos/GroupedList'], function(query, domClass, GroupedList) {
+define('GroupedListTests', ['dojo/query','dojo/dom-class','argos/GroupedList'], function(query, domClass, GroupedList) {
 return describe('Argos.GroupedList', function() {
 
     var list = new GroupedList();

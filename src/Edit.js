@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Edit', [
+define('argos/Edit', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/connect',
@@ -63,7 +63,7 @@ define('Argos/Edit', [
     scene
 ) {
 
-    return declare('Argos.Edit', [View], {
+    return declare('argos.Edit', [View], {
         events: {
             'click': true
         },

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Charts/AreaChart', [
+define('argos/Charts/AreaChart', [
     'dojo/_base/declare',
     'dojo/dom-attr',
     'dojo/dom-class',
@@ -28,7 +28,7 @@ define('Argos/Charts/AreaChart', [
     _Chart,
     Areas
 ) {
-    return declare('Argos.Charts.AreaChart', [_Chart], {
+    return declare('argos.Charts.AreaChart', [_Chart], {
         xAxis: {
             fixLower: 'major',
             fixUpper: 'major',

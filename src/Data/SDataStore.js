@@ -1,4 +1,4 @@
-define('Argos/Data/SDataStore', [
+define('argos/Data/SDataStore', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',

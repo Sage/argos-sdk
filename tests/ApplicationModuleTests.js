@@ -1,4 +1,4 @@
-define('ApplicationModuleTests', ['Argos/ApplicationModule'], function(ApplicationModule) {
+define('ApplicationModuleTests', ['argos/ApplicationModule'], function(ApplicationModule) {
 return describe('Argos.ApplicationModule', function() {
 
     it('Can register a view to the set application', function() {

@@ -1,4 +1,4 @@
-define('Argos/_SDataListMixin', [
+define('argos/_SDataListMixin', [
     'dojo/_base/declare',
     './Store/SData',
     './Utility'
@@ -10,7 +10,7 @@ define('Argos/_SDataListMixin', [
     /**
      * SData enablement for the List view.
      */
-    return declare('Argos._SDataListMixin', null, {
+    return declare('argos._SDataListMixin', null, {
         /**
          * @cfg {String} resourceKind
          * The SData resource kind the view is responsible for.  This will be used as the default resource kind

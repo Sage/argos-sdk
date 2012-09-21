@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-define('Argos/ApplicationModule', [
+define('argos/ApplicationModule', [
     'dojo/_base/array',
     'dojo/_base/connect',
     'dojo/_base/declare',
     'dojo/_base/lang',
-    'Argos/Application'
+    './Application'
 ], function(
     array,
     connect,
@@ -26,7 +26,7 @@ define('Argos/ApplicationModule', [
     lang
 ) {
 
-    return declare('Argos.ApplicationModule', null, {
+    return declare('argos.ApplicationModule', null, {
         _signals: null,
         application: null,
         constructor: function(options) {

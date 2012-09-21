@@ -1,4 +1,4 @@
-define('Fields/TextAreaFieldTests', ['dojo/query','Argos/Fields/TextAreaField'], function(query, TextArea) {
+define('Fields/TextAreaFieldTests', ['dojo/query','argos/Fields/TextAreaField'], function(query, TextArea) {
 return describe('Argos.Fields.TextArea', function() {
 
     it('Can default to 4 rows', function() {

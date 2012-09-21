@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Control', [
+define('argos/Control', [
     './_UiComponent'
 ], function(
     _UiComponent

@@ -1,4 +1,4 @@
-define('UtilityTests', ['dojo/_base/lang', 'Argos/Utility'], function(lang, utility) {
+define('UtilityTests', ['dojo/_base/lang', 'argos/Utility'], function(lang, utility) {
 return describe('Argos.Utility', function() {
 
     it('Can get single level property of object', function() {

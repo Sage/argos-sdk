@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Toolbar', [
+define('argos/Toolbar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -42,7 +42,7 @@ define('Argos/Toolbar', [
     utility,
     scene
 ) {
-    return declare('Argos.Toolbar', [_WidgetBase, _UiComponent, _CommandSupportMixin, _EventMapMixin], {
+    return declare('argos.Toolbar', [_WidgetBase, _UiComponent, _CommandSupportMixin, _EventMapMixin], {
         events: {
             'click': true
         },

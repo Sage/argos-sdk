@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/View', [
+define('argos/View', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -36,7 +36,7 @@ define('Argos/View', [
     application,
     customizations
 ) {
-    return declare('Argos.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
+    return declare('argos.View', [_WidgetBase, _UiComponent, _EventMapMixin], {
         baseClass: 'view',
         title: null,
         tools: null,

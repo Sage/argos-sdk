@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/ErrorManager', [
+define('argos/ErrorManager', [
     'dojo/_base/json',
     'dojo/_base/lang',
     'dojo/_base/connect',
@@ -37,7 +37,7 @@ define('Argos/ErrorManager', [
 
     }
 
-    return lang.setObject('Argos.ErrorManager', {
+    return lang.setObject('argos.ErrorManager', {
         /**
          * Total amount of errors to keep
          */

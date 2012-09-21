@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-define('Argos/PersistentStorage', [
+define('argos/PersistentStorage', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/json',
-    'Argos/Convert',
-    'Argos/Utility'
+    './Convert',
+    './Utility'
 ], function(
     declare,
     lang,
@@ -28,7 +28,7 @@ define('Argos/PersistentStorage', [
 ) {
     var sosCache = {};
 
-    return declare('Argos.PersistentStorage', null, {
+    return declare('argos.PersistentStorage', null, {
 
         name: false,
         singleObjectStore: false,

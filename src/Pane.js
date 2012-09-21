@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Pane', [
+define('argos/Pane', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -42,7 +42,7 @@ define('Argos/Pane', [
     TitleBar,
     transition
 ) {
-    return declare('Argos.Pane', [FixedSplitterPane, _UiComponent], {
+    return declare('argos.Pane', [FixedSplitterPane, _UiComponent], {
         components: [
             {name: 'top', type: TitleBar, attachEvent: 'onPositionChange:_onToolbarPositionChange', props: {managed: true, visible: false}},
             {name: 'container', tag: 'div', attrs: {'class': 'view-container'}, attachPoint: 'viewContainerNode'}

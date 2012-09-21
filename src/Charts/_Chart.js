@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Charts/_Chart', [
+define('argos/Charts/_Chart', [
     'dojo/_base/Deferred',
     'dijit/_WidgetBase',
     '../_TemplatedWidgetMixin',
@@ -47,7 +47,7 @@ define('Argos/Charts/_Chart', [
     Grid
 ) {
 
-    return declare('Argos.Charts._Chart', [_WidgetBase, _TemplatedWidgetMixin], {
+    return declare('argos.Charts._Chart', [_WidgetBase, _TemplatedWidgetMixin], {
         widgetTemplate: new Simplate([
             '<div class="chart-content {%: $.cls %}">',
                 '<div class="chart" data-dojo-attach-point="chartNode"></div>',

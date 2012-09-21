@@ -1,4 +1,4 @@
-define('FormatTests', ['Argos/Format'], function(format) {
+define('FormatTests', ['argos/Format'], function(format) {
 return describe('Argos.Format', function() {
 
     it('Can tell if empty string is empty', function() {

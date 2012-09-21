@@ -1,7 +1,7 @@
 define('ToolbarTests', [
     'dojo/dom-style',
     'dojo/dom-class',
-    'Argos/Toolbar'
+    'argos/Toolbar'
 ], function(
     domStyle,
     domClass,

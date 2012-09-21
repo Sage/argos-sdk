@@ -1,4 +1,4 @@
-define('Argos/_TemplatedWidgetMixin', [
+define('argos/_TemplatedWidgetMixin', [
     'dojo/_base/declare',
     'dojo/dom-construct',
     'dijit/_TemplatedMixin'
@@ -7,7 +7,7 @@ define('Argos/_TemplatedWidgetMixin', [
     domConstruct,
     _TemplatedMixin
 ) {
-    return declare('Argos._TemplatedWidgetMixin', null, {
+    return declare('argos._TemplatedWidgetMixin', null, {
         widgetTemplate: null,
         constructor: function(){
             this._attachPoints = [];

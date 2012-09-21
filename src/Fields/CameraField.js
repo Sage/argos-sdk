@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Argos/Fields/CameraField', [
+define('argos/Fields/CameraField', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/config',
@@ -33,7 +33,7 @@ define('Argos/Fields/CameraField', [
     _EventMapMixin
 ) {
 
-    return declare('Argos.Fields.CameraField', [_Field, _EventMapMixin, _TemplatedWidgetMixin], {
+    return declare('argos.Fields.CameraField', [_Field, _EventMapMixin, _TemplatedWidgetMixin], {
         events: {
             'click': '_onClick'
         },

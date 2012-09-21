@@ -1,4 +1,4 @@
-define('SearchWidgetTests', ['dojo/query','dojo/dom-class','Argos/SearchWidget'], function(query, domClass, SearchWidget) {
+define('SearchWidgetTests', ['dojo/query','dojo/dom-class','argos/SearchWidget'], function(query, domClass, SearchWidget) {
     return describe('Argos.SearchWidget', function() {
 
         it('Can remove active class on clear', function() {

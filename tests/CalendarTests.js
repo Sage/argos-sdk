@@ -1,4 +1,4 @@
-define('CalendarTests', ['dojo/dom-attr','dojo/dom-class','Argos/Calendar'], function(domAttr, domClass, Calendar) {
+define('CalendarTests', ['dojo/dom-attr','dojo/dom-class','argos/Calendar'], function(domAttr, domClass, Calendar) {
 return describe('Argos.Calendar', function() {
 
     var calendar = new Calendar();

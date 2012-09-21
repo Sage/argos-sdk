@@ -1,4 +1,4 @@
-define('ErrorManagerTests', ['Argos/ErrorManager'], function(ErrorManager) {
+define('ErrorManagerTests', ['argos/ErrorManager'], function(ErrorManager) {
 return describe('Argos.ErrorManager', function() {
 
     it('Can set undefined properties to undefined string', function() {
