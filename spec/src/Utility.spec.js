@@ -145,7 +145,7 @@ return describe('argos.Utility', function() {
      * utility.expand
      */
     it('Can expand a function, returning its result', function() {
-        
+
     });
 
 
