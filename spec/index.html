@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>Argos-sdk Test Runner</title>
+    <title>argos-sdk Test Runner</title>
     <!-- jasmine -->
     <link rel="stylesheet" type="text/css" href="../libraries/jasmine/jasmine.css">
     <script type="text/javascript" src="../libraries/jasmine/jasmine.js"></script>
@@ -20,14 +20,13 @@
         updateBackButtonText: false
     };
     </script>
-    <script type="text/javascript" src="../libraries/reui/reui.js"></script>
 
     <!-- SData Client Library -->
     <script type="text/javascript" src="../libraries/sdata/sdata-client-dependencies-debug.js"></script>
     <script type="text/javascript" src="../libraries/sdata/sdata-client-debug.js"></script>
 
-    <!-- DateJS -->
-    <script type="text/javascript" src="../libraries/datejs/build/date.js"></script>
+    <!-- Moment.js -->
+    <script type="text/javascript" src="../../argos-sdk/libraries/moment/min/moment.min.js"></script>
 
     <!-- Simplate -->
     <script type="text/javascript" src="../libraries/Simplate.js"></script>
@@ -41,13 +40,21 @@
         { name: 'dojo', location: '../libraries/dojo/dojo' },
         { name: 'dijit', location: '../libraries/dojo/dijit' },
         { name: 'dojox', location: '../libraries/dojo/dojox' },
-        { name: 'Argos', location: '../src' }
+        { name: 'argos', location: '../src' },
+        { name: 'spec', location: 'src' }
     ]});
     </script>
 </head>
 <body>
 <script type="text/javascript">
     var Resources = {};
+    require(['argos/Application'], function(application) {
+        var instance = new application();
+        instance.activate();
+        //instance.startup();
+        //instance.run();
+    });
+
     require([
         'dojo/_base/kernel',
         'dojo/_base/lang',
@@ -55,22 +62,25 @@
         'dojo/_base/xhr',
         'dojo/DeferredList',
 
-        'ApplicationModuleTests',
-        'CalendarTests',
-        'ConvertTests',
-        'ErrorManagerTests',
-        'FieldManagerTests',
-        'FormatTests',
-        'GroupedListTests',
-        'MainToolbarTests',
-        'SearchWidgetTests',
-        'ToolbarTests',
-        'UtilityTests',
+//        'spec/_SDataListMixin.spec',
+        'spec/ApplicationModule.spec',
+        'spec/Convert.spec',
+        'spec/ErrorManager.spec',
+        'spec/Format.spec',
+        'spec/GroupedList.spec',
+        'spec/List.spec',
+        'spec/TitleBar.spec',
+        'spec/SearchWidget.spec',
+        'spec/Toolbar.spec',
+        'spec/Utility.spec',
 
-        'Fields/PhoneFieldTests',
-        'Fields/SignatureFieldTests',
-        'Fields/TextAreaFieldTests',
-        'Fields/TextFieldTests'
+        'spec/Fields/FieldRegistry.spec',
+        'spec/Fields/PhoneField.spec',
+        'spec/Fields/SignatureField.spec',
+        'spec/Fields/TextAreaField.spec',
+        'spec/Fields/TextField.spec',
+
+        'spec/Views/DateTimePicker.spec'
 
     ], function (dojo, lang, array, xhr, DeferredList) {
 
@@ -84,10 +94,9 @@
             }
         });
 
-
         var wait = [],
             preload = [
-                'feeds/GroupListFeed.json' // if running this test through IIS, be sure to have the appropriate mime type, 'application/json', set for '.json'.
+                'MockData/GroupListFeed.json' // if running this test through IIS, be sure to have the appropriate mime type, 'application/json', set for '.json'.
             ];
 
         array.forEach(preload, function(item) {

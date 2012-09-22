@@ -1,4 +1,4 @@
-define('ToolbarTests', [
+define('spec/Toolbar', [
     'dojo/dom-style',
     'dojo/dom-class',
     'argos/Toolbar'
@@ -7,7 +7,7 @@ define('ToolbarTests', [
     domClass,
     Toolbar
 ) {
-return describe('Argos.Toolbar', function() {
+return describe('argos.Toolbar', function() {
 
     // mock of App
     window.App = {};

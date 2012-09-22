@@ -375,6 +375,7 @@ define('argos/List', [
          * @type {String}
          */
         requestErrorText: 'A server error occurred while requesting data.',
+        items: {},
         customizationSet: 'list',
         actionsNode: null,
         _selectionModel: null,

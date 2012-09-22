@@ -89,7 +89,7 @@ define('argos/_SDataListMixin', [
             }
         },
         formatSearchQuery: function(query) {
-            return false;
+            return query;
         },
         formatHashTagQuery: function(query) {
             var layout = this.get('hashTags') || [],

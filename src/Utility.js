@@ -79,11 +79,47 @@ define('argos/Utility', [
                 current[path[0]] = val;
             return o;
         },
+        /**
+         * Determines if the given testNode is a child (recursive) of the given rootNode.
+         * @params {HTMLElement} rootNode Parent, or root, node to search
+         * @params {HTMLElement} testNode Node to search for within the rootNode
+         * @returns {Boolean}
+         */
         contains = function(rootNode, testNode) {
             return rootNode.contains
                 ? rootNode != testNode && rootNode.contains(testNode)
                 : !!(rootNode.compareDocumentPosition(testNode) & 16);
         },
+        /**
+         * Similar to dojo.hitch, bindDelegate allows you to alter the meaning of `this` and pass
+         * additional parameters.
+         *
+         * This is a complicated subject but a brief overview is:
+         *
+         *     var foo = {
+         *         bar: function() { console.log(this, arguments); }
+         *     };
+         *
+         *     var fizz = {
+         *         bang: foo.bar.bindDelegate(foo, 'bang');
+         *     };
+         *
+         *     fizz.bang('shoot');
+         *
+         *     // console outputs: foo Object, ['shoot', 'bang']
+         *
+         * The two differences between bindDelegate and dojo.hitch are:
+         *
+         * 1. bindDelegate "appends" the arguments - which is why `bang` came after `shoot` in the arguments
+         *
+         * 2. bindDelegate is applied directly to the Function prototype (no need to wrap).
+         *
+         * BindDelegate is important because it allows context changing between modules, as `this` within
+         * a module should refer to the module itself - bindDelegate enables this dynamic shifting.
+         *
+         * @params {Object} scope The new `this` value in which to call the function, providing a new context.
+         * @returns {Function} Altered function that when called alter the `this` context and append params.
+         */
         bindDelegate = function(scope) {
             var fn = this;
 

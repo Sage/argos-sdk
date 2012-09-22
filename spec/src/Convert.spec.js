@@ -1,5 +1,5 @@
-define('ConvertTests', ['argos/Convert'], function(convert) {
-return describe('Argos.Convert', function() {
+define('spec/Convert.spec', ['argos/Convert'], function(convert) {
+return describe('argos.Convert', function() {
 
     it('Can convert non-true string to boolean (false)', function() {
         var testStr = 'test';
@@ -10,7 +10,7 @@ return describe('Argos.Convert', function() {
         expect(convert.toBoolean(testStr)).toEqual(false);
     });
     it('Can convert undefined object property to boolean (false)', function() {
-        var testStr = Sage.Testing;
+        var testStr = Sage;
         expect(convert.toBoolean(testStr)).toEqual(false);
     });
     it('Can convert null to boolean (false)', function() {

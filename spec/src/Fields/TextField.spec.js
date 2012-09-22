@@ -1,22 +1,22 @@
-define('Fields/TextFieldTests', ['dojo/query','dojo/dom-attr','dojo/dom-class','argos/Fields/TextField'], function(query, domAttr, domClass, TextField) {
-return describe('Argos.Fields.TextField', function() {
+define('spec/Fields/TextField.spec', ['dojo/query','dojo/dom-attr','dojo/dom-class','argos/Fields/TextField'], function(query, domAttr, domClass, TextField) {
+return describe('argos.Fields.TextField', function() {
 
-    it('Can bind onkeypress on init when validInputOnly is true', function() {
+    it('Can bind onkeypress on startup when validInputOnly is true', function() {
         var field = new TextField();
 
         var previousConnects = field._connects.length;
 
         field.validInputOnly = true;
-        field.init();
+        field.startup();
 
         expect(field._connects.length).toEqual(previousConnects + 1);
     });
-    it('Can not bind onkeypress on init when validInputOnly is false', function() {
+    it('Can not bind onkeypress on startup when validInputOnly is false', function() {
         var field = new TextField();
 
         var previousConnects = field._connects.length;
 
-        field.init();
+        field.startup();
 
         expect(field._connects.length).toEqual(previousConnects);
     });

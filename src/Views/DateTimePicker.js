@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('Sage/Platform/Mobile/Views/DateTimePicker', [
+define('argos/Views/DateTimePicker', [
     'dojo/_base/declare',
     'dojo/string',
     'dojo/dom-attr',
@@ -35,7 +35,7 @@ define('Sage/Platform/Mobile/Views/DateTimePicker', [
     var pad = function(n) { return n < 10 ? '0' + n : n; };
     var uCase = function (str) { return str.charAt(0).toUpperCase() + str.substring(1); };
 
-    return declare('Sage.Platform.Mobile.Views.DateTimePicker', [View, _TemplatedWidgetMixin], {
+    return declare('argos.Views.DateTimePicker', [View, _TemplatedWidgetMixin], {
         // Localization
         titleText: 'Date',
         amText: 'AM',

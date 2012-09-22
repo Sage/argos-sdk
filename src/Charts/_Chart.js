@@ -13,6 +13,14 @@
  * limitations under the License.
  */
 
+/**
+ * _Chart provides a base widget for all charts that incorporates the workflow and presentation needed
+ * to work in the mobile environment. Further extensions should inherit chart and pull in the required
+ * module for that chart type and adjust any options.
+ *
+ * @alernateClassName _Chart
+ * @mixins _TemplatedWidgetMixin
+ */
 define('argos/Charts/_Chart', [
     'dojo/_base/Deferred',
     'dijit/_WidgetBase',
