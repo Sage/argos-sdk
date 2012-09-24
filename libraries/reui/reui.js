@@ -539,6 +539,9 @@ ReUI = {};
 
             if (!page) return;
 
+            if (context.hash === formatHashForPage(page, o))
+                return;
+
             context.transitioning = true;
            
             if (o.track !== false)
