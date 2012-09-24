@@ -147,7 +147,7 @@ ReUI = {};
         {
             var data = extractInfoFromHash(link.hash),
                 page = data && D.get(data.page);
-            if (page)
+            if (page && R.legacyMode)
             {
                 D.select(link);
                     
@@ -258,7 +258,7 @@ ReUI = {};
 
         D.clearTimer(context.check);
 
-        scrollTo(0, 1);
+        // scrollTo(0, 1);
 
         D.addClass(R.rootEl, 'transition');
 
@@ -304,14 +304,27 @@ ReUI = {};
     };
 
     var extractInfoFromHash = function(hash) {
-        if (hash && hash.indexOf(R.hashPrefix) === 0)
+        if (hash)
         {
-            var segments = hash.substr(R.hashPrefix.length).split(';');
-            return {
-                hash: hash,
-                page: segments[0],
-                tag: segments.length <= 2 ? segments[1] : segments.slice(1)
-            };
+            if (hash.indexOf(R.hashPrefix) === 0)
+                var segments = hash.substr(R.hashPrefix.length).split(';');
+                return {
+                    hash: hash,
+                    page: segments[0],
+                    tag: segments.length <= 2 ? segments[1] : segments.slice(1)
+                };
+        }
+        else
+        {   // no hash? IE9 can lose it on history.back()
+            var position,
+                el = R.getCurrentPage() || R.getCurrentDialog();
+            if (el && el.id)
+                for (position = context.history.length - 1; position > 0; position--)
+                    if (context.history[position].hash.match(el.id))
+                        break;
+
+                return context.history[position - 1];
+
         }
 
         return false;
@@ -331,15 +344,12 @@ ReUI = {};
     };                   
 
     var checkOrientationAndLocation = function() {
-        if (context.hasOrientationEvent !== true)
+        if ((window.innerHeight != context.height) || (window.innerWidth != context.width))
         {
-            if ((window.innerHeight != context.height) || (window.innerWidth != context.width))
-            {
-                context.height = window.innerHeight;
-                context.width = window.innerWidth;
+            context.height = window.innerHeight;
+            context.width = window.innerWidth;
 
-                setOrientation(context.height < context.width ? 'landscape' : 'portrait');
-            }
+            setOrientation(context.height < context.width ? 'landscape' : 'portrait');
         }
 
         if (context.transitioning) return;
@@ -362,27 +372,17 @@ ReUI = {};
             info = info || extractInfoFromHash(location.hash);
             page = info && D.get(info.page);
 
-            // more often than not, data will only be needed when moving to a previous view (and restoring it's state).
+            // more often than not, data will only be needed when moving to a previous view (and restoring its state).
             
             if (page)
                 R.show(page, {external: true, reverse: reverse, tag: info && info.tag, data: info && info.data});
         }         
     };
 
-    var orientationChanged = function() {
-        switch (window.orientation) 
-        {                
-            case 90:
-            case -90:
-                setOrientation('landscape');
-                break;
-            default:
-                setOrientation('portrait');
-                break;
-        }
-    };
-
     var setOrientation = function(value) {
+        var currentOrient = R.rootEl.getAttribute('orient');
+        if (value === currentOrient) return;
+
         R.rootEl.setAttribute('orient', value);
 
         if (value == 'portrait') 
@@ -401,7 +401,7 @@ ReUI = {};
             D.removeClass(R.rootEl, 'landscape');
         }
 
-        D.wait(scrollTo, 100, 0, 1); 
+        // D.wait(scrollTo, 100, 0, 1); 
     };
 
     var context = {
@@ -413,8 +413,7 @@ ReUI = {};
         width: 0,
         height: 0,
         check: 0,
-        hasOrientationEvent: false, 
-        history: []      
+        history: []
     };
 
     var config = window['reConfig'] || {};
@@ -486,15 +485,6 @@ ReUI = {};
                 }
             }
             
-            if (typeof window.onorientationchange === 'object')
-            {
-                window.onorientationchange = orientationChanged;
-
-                context.hasOrientationEvent = true;    
-                
-                D.wait(orientationChanged, 0);
-            }
-
             if (R.showInitialPage)
             {
                 D.wait(checkOrientationAndLocation, 0);
@@ -549,7 +539,8 @@ ReUI = {};
 
             if (!page) return;
 
-            if (D.isSelected(page)) return;
+            if (context.hash === formatHashForPage(page, o))
+                return;
 
             context.transitioning = true;
            
@@ -643,7 +634,7 @@ ReUI = {};
 
                 D.dispatch(page, 'focus', false);
 
-                if (from)
+                if (from && !D.isSelected(page))
                 {
                     if (o.reverse) D.dispatch(context.page, 'unload', false);
 
@@ -913,4 +904,3 @@ ReUI = {};
         }, 0);     
     });
 })();
-
