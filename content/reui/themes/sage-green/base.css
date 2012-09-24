@@ -480,7 +480,7 @@ img
 }
 
 .list-search input
-{    
+{
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     height: 32px;
@@ -491,12 +491,8 @@ img
 {    
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
-    position: absolute;
     display: inline-block;    
     height: 32px;
-    width: 64px;
-    right: 6px;
-    top: 6px;
     border: solid 1px black;
 }
 
