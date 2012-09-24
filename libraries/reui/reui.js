@@ -539,8 +539,6 @@ ReUI = {};
 
             if (!page) return;
 
-            if (D.isSelected(page)) return;
-
             context.transitioning = true;
            
             if (o.track !== false)
@@ -633,7 +631,7 @@ ReUI = {};
 
                 D.dispatch(page, 'focus', false);
 
-                if (from)
+                if (from && !D.isSelected(page))
                 {
                     if (o.reverse) D.dispatch(context.page, 'unload', false);
 
