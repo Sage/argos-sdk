@@ -1,5 +1,5 @@
-define('spec/Convert.spec', ['argos/Convert'], function(convert) {
-return describe('argos.Convert', function() {
+define('spec/convert.spec', ['argos/convert'], function(convert) {
+return describe('argos.convert', function() {
 
     it('Can convert non-true string to boolean (false)', function() {
         var testStr = 'test';

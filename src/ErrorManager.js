@@ -39,6 +39,7 @@ define('argos/ErrorManager', [
 
     return lang.setObject('argos.ErrorManager', {
         /**
+         * @cfg {Number}
          * Total amount of errors to keep
          */
         errorCacheSizeMax: 10,
@@ -64,6 +65,7 @@ define('argos/ErrorManager', [
 
         /**
          * Ensures there is at least 1 open spot for a new error by checking against errorCacheSizeMax
+         * and removing as needed.
          */
         checkCacheSize: function() {
             var errLength = errors.length,

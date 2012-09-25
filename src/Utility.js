@@ -13,7 +13,12 @@
  * limitations under the License.
  */
 
-define('argos/Utility', [
+/**
+ * Utility provides functions that are more javascript enhancers than application related code.
+ * @alternateClassName utility
+ * @singleton
+ */
+define('argos/utility', [
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/_base/json'
@@ -23,7 +28,21 @@ define('argos/Utility', [
     json
 ) {
     var nameToPathCache = {};
-    var nameToPath = function(name) {
+
+    return lang.setObject('argos.utility', {
+        /**
+         * Takes an javascript dot-notated string path and converts it into a reversed array separate parts:
+         *
+         *     'test.case' => ['case', 'test']
+         *     'test[2]' => [2, 'test']
+         *     'test.case[2].item.props[4]' => [4, 'props', 'item', 2, 'case', 'test']
+         *
+         * Also features a small in-memory cache of names to paths for improved performance.
+         *
+         * @param {String} name Dot-notated string path to split
+         * @return {String[]} The name split into each javascript accessible part
+         */
+        nameToPath: function(name) {
             if (typeof name !== 'string' || name === '.' || name === '') return []; // '', for compatibility
             if (nameToPathCache[name]) return nameToPathCache[name];
             var parts = name.split('.');
@@ -46,8 +65,32 @@ define('argos/Utility', [
             }
             return (nameToPathCache[name] = path.reverse());
         },
-        getValue = function(o, name, defaultValue) {
-            var path = nameToPath(name).slice(0);
+
+        /**
+         * Retrieves a value from a given object and a given property "path" of that object. If the
+         * property is undefined, optionally return the provided defaultValue or null if no default is
+         * provided.
+         *
+         * Example:
+         *
+         *     var myObj = { test: { case: 'one' } };
+         *     utility.getValue(myObj, 'test.case', 'none');
+         *     // returns 'one'
+         *
+         *     var myObj2 = { test: null };
+         *     utility.getValue(myObj2, 'test.case', 'none');
+         *     // returns 'none'
+         *
+         * Similar to {@link #setValue setValue}, this provides the benefit of avoiding the accessing
+         * and undefined property error for long path names.
+         *
+         * @param {Object} o Object in which to retrieve the value from
+         * @param {String} name Dot notation string of the property path
+         * @param {Mixed} [defaultValue=null] Fallback value if the property is undefined
+         * @return {Mixed}
+         */
+        getValue: function(o, name, defaultValue) {
+            var path = this.nameToPath(name).slice(0);
             var current = o;
             while (current && path.length > 0)
             {
@@ -59,9 +102,30 @@ define('argos/Utility', [
             }
             return current;
         },
-        setValue = function(o, name, val) {
+
+        /**
+         * Given an object and a "path" to the its property, sets the provided value:
+         *
+         * Example:
+         *
+         *     var myObj = { test: { case: 'one' } };
+         *     utility.setValue(myObj, 'test.case', 'two');
+         *
+         * That doesn't seem like much, but consider the case of not having the object made beforehand:
+         *
+         *     var myObj = {};
+         *     utility.setValue(myObj, 'test.case', 'two');
+         *
+         * You get the same result -- no more "accessing undefined property" errors.
+         *
+         * @param {Object} o Object in which to look for a property.
+         * @param {String} name Dot-notated path name to the property of the passed object.
+         * @param {Mixed} val Value to set the property to
+         * @return {Object} Returns the object passed in (for chaining).
+         */
+        setValue: function(o, name, val) {
             var current = o;
-            var path = nameToPath(name).slice(0);
+            var path = this.nameToPath(name).slice(0);
             while ((typeof current !== "undefined") && path.length > 1)
             {
                 var key = path.pop();
@@ -79,17 +143,40 @@ define('argos/Utility', [
                 current[path[0]] = val;
             return o;
         },
+
+        /**
+         * Clones a given object or array and returns it.
+         * @private
+         * @param {Object/Array} item Object or Array to be cloned
+         * @returns {Object/Array}
+         */
+        _clone: function(item) {
+            if (lang.isArray(item))
+            {
+                return item.slice(0);
+            }
+            else if (lang.isObject(item))
+            {
+                var clone = {};
+                for (var prop in item) clone[prop] = item[prop];
+                return clone;
+            }
+
+            return item;
+        },
+
         /**
          * Determines if the given testNode is a child (recursive) of the given rootNode.
-         * @params {HTMLElement} rootNode Parent, or root, node to search
-         * @params {HTMLElement} testNode Node to search for within the rootNode
-         * @returns {Boolean}
+         * @param {HTMLElement} rootNode Parent, or root, node to search
+         * @param {HTMLElement} testNode Node to search for within the rootNode
+         * @return {Boolean}
          */
-        contains = function(rootNode, testNode) {
+        contains: function(rootNode, testNode) {
             return rootNode.contains
                 ? rootNode != testNode && rootNode.contains(testNode)
                 : !!(rootNode.compareDocumentPosition(testNode) & 16);
         },
+
         /**
          * Similar to dojo.hitch, bindDelegate allows you to alter the meaning of `this` and pass
          * additional parameters.
@@ -117,10 +204,10 @@ define('argos/Utility', [
          * BindDelegate is important because it allows context changing between modules, as `this` within
          * a module should refer to the module itself - bindDelegate enables this dynamic shifting.
          *
-         * @params {Object} scope The new `this` value in which to call the function, providing a new context.
-         * @returns {Function} Altered function that when called alter the `this` context and append params.
+         * @param {Object} scope The new `this` value in which to call the function, providing a new context.
+         * @return {Function} Altered function that when called alter the `this` context and append params.
          */
-        bindDelegate = function(scope) {
+        bindDelegate: function(scope) {
             var fn = this;
 
             if (arguments.length == 1) return function() {
@@ -133,14 +220,15 @@ define('argos/Utility', [
                 return fn.apply(scope || this, called.concat(optional));
             };
         },
+
         /**
          * If given expression is a function it is called with the given scope and returned,
          * else the expression is just returned.
-         * @params {Object} scope Scope to call the function in (`this` definition)
-         * @params {Function/String} expression Value to expand
-         * @returns {Function/String}
+         * @param {Object} scope Scope to call the function in (`this` definition)
+         * @param {Function/String/Number/Object} expression Value to expand
+         * @return {Function/String/Number/Object}
          */
-        expand = function(scope, expression) {
+        expand: function(scope, expression) {
             if (typeof expression === 'function')
             {
                 return expression.apply(scope, Array.prototype.slice.call(arguments, 2));
@@ -150,21 +238,19 @@ define('argos/Utility', [
                 return expression;
             }
         },
-        _clone = function(item) {
-            if (lang.isArray(item))
-            {
-                return item.slice(0);
-            }
-            else if (lang.isObject(item))
-            {
-                var clone = {};
-                for (var prop in item) clone[prop] = item[prop];
-                return clone;
-            }
 
-            return item;
-        },
-        expandSafe = function(scope, expression) {
+        /**
+         * Similar to {@link #expand expand} in that if the given expression is a function it is
+         * called with the given scope and the result returned, else the expression itself is returned.
+         *
+         * The key difference is in the non-function cases the returned expression is cloned,
+         * providing a copy of the expression instead of a pointer back to the original.
+         *
+         * @param {Object} scope Scope to call the function in (`this` definition)
+         * @param {Function/String/Number/Object} expression Value to expand
+         * @return {Function/String/Number/Object}
+         */
+        expandSafe: function(scope, expression) {
             var result = typeof expression === 'function'
                 ? expression.apply(scope, Array.prototype.slice.call(arguments, 2))
                 : expression;
@@ -173,21 +259,23 @@ define('argos/Utility', [
             {
                 if (lang.isArray(result))
                 {
-                    return result.map ? result.map(_clone) : array.map(result, _clone);
+                    return result.map ? result.map(this._clone) : array.map(result, this._clone);
                 }
                 else
                 {
-                    return _clone(result);
+                    return this._clone(result);
                 }
             }
 
             return result;
         },
+
         /**
-         * Sanitizes an Object so that JSON.stringify will work without errors by discarding non-stringable keys
-         * @param obj Object that can be JSON.stringified
+         * Sanitizes an Object so that JSON.stringify will work without errors by discarding non-stringable keys.
+         * @param {Object} obj Object to be cleansed of non-stringify friendly keys/values.
+         * @return {Object} Object ready to be JSON.stringified.
          */
-        sanitizeForJson = function(obj) {
+        sanitizeForJson: function(obj) {
             var type;
             for (var key in obj)
             {
@@ -234,16 +322,6 @@ define('argos/Utility', [
                 }
             }
             return obj;
-        };
-
-
-    return lang.setObject('argos.Utility', {
-        getValue: getValue,
-        setValue: setValue,
-        contains: contains,
-        bindDelegate: bindDelegate,
-        expand: expand,
-        expandSafe: expandSafe,
-        sanitizeForJson: sanitizeForJson
+        }
     });
 });

@@ -40,7 +40,7 @@
       "isDebug": true,
       "fileIncludes": [
         {
-          "text": "Utility.js",
+          "text": "utility.js",
           "path": "../src"
         },
         {
@@ -132,7 +132,7 @@
           "path": "../src"
         },
           {
-            "text": "Convert.js",
+            "text": "convert.js",
             "path": "../src"
           },
           {
@@ -188,7 +188,7 @@
           "path": "../src/Data"
         },
         {
-          "text": "Format.js",
+          "text": "format.js",
           "path": "../src"
         },
         {

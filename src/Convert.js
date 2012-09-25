@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('argos/Convert', [
+define('argos/convert', [
     'dojo/_base/lang'
 ], function(
     lang
@@ -23,7 +23,7 @@ define('argos/Convert', [
         jsonDate = /\/Date\((-?\d+)(?:(-|\+)(\d{2})(\d{2}))?\)\//,
         pad = function(n) { return n < 10 ? '0' + n : n };
 
-    return lang.setObject('argos.Convert', {
+    return lang.setObject('argos.convert', {
         toBoolean: function(value) {
             return trueRE.test(value);
         },

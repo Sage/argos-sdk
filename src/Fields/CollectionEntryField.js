@@ -99,7 +99,7 @@ define('argos/Fields/CollectionEntryField', [
         /**
          * If an aggregate function is defined it use the result with the
          * summaryRowTemplate and append the final HTML as the last row
-         * @params Array - an array of each collection entry fields getValue()
+         * @param Array - an array of each collection entry fields getValue()
          * @return Object - to be passed as $ to summaryRowTemplate
          */
         aggregate: null,

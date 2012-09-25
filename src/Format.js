@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-define('argos/Format', [
+define('argos/format', [
     'dojo/_base/json',
     'dojo/_base/lang',
     'dojo/dom-construct',
@@ -68,7 +68,7 @@ define('argos/Format', [
             .replace(/&quot;/g, '"');
     }
 
-    return lang.setObject('argos.Format', {
+    return lang.setObject('argos.format', {
         yesText: 'Yes',
         noText: 'No',
         trueText: 'T',
@@ -110,7 +110,7 @@ define('argos/Format', [
                 if (utc)
                     date = date.add({minutes: date.zone()});
 
-                return date.format(fmt || argos.Format.shortDateFormatText);
+                return date.format(fmt || argos.format.shortDateFormatText);
             }
 
             return val;
@@ -132,15 +132,15 @@ define('argos/Format', [
             if (typeof val === 'string') val = /^true$/i.test(val);
 
             return val
-                ? argos.Format.yesText || 'Yes'
-                : argos.Format.noText || 'No';
+                ? argos.format.yesText || 'Yes'
+                : argos.format.noText || 'No';
         },
         bool: function(val) {
             if (typeof val === 'string') val = /^true$/i.test(val);
 
             return val
-                ? argos.Format.trueText || 'T'
-                : argos.Format.falseText || 'F';
+                ? argos.format.trueText || 'T'
+                : argos.format.falseText || 'F';
         },
         nl2br: function(val) {
             if (typeof val !== 'string') return val;
@@ -148,18 +148,18 @@ define('argos/Format', [
             return val.replace(/\n/g, '<br />');
         },
         timespan: function(val) {
-            var v = argos.Format.fixed(val);
+            var v = argos.format.fixed(val);
             if (isNaN(v) || !v) return '';
 
             var hrs = Math.floor(v / 60);
             var mins  = v % 60;
 
             if (hrs)
-                hrs = hrs > 1 ? string.substitute('${0} ${1}', [hrs, (argos.Format.hoursText || 'hours')])
-                              : string.substitute('${0} ${1}', [hrs, (argos.Format.hourText || 'hour')]);
+                hrs = hrs > 1 ? string.substitute('${0} ${1}', [hrs, (argos.format.hoursText || 'hours')])
+                              : string.substitute('${0} ${1}', [hrs, (argos.format.hourText || 'hour')]);
             if (mins)
-                mins = mins > 1 ? string.substitute('${0} ${1}', [mins, (argos.Format.minutesText || 'minutes')])
-                                : string.substitute('${0} ${1}', [mins, (argos.Format.minuteText || 'minute')]);
+                mins = mins > 1 ? string.substitute('${0} ${1}', [mins, (argos.format.minutesText || 'minutes')])
+                                : string.substitute('${0} ${1}', [mins, (argos.format.minuteText || 'minute')]);
 
             return (hrs && mins) ? hrs +" "+ mins
                                  : hrs === 0 ? mins : hrs;
@@ -212,7 +212,7 @@ define('argos/Format', [
                 canvasNode.height / size.height
             );
 
-            argos.Format.canvasDraw(vector, canvasNode, options);
+            argos.format.canvasDraw(vector, canvasNode, options);
 
             img = canvasNode.toDataURL('image/png');
             if (img.indexOf("data:image/png") != 0)

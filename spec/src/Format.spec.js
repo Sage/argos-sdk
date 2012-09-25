@@ -1,5 +1,5 @@
-define('spec/Format.spec', ['argos/Format'], function(format) {
-return describe('argos.Format', function() {
+define('spec/format.spec', ['argos/format'], function(format) {
+return describe('argos.format', function() {
 
     it('Can tell if empty string is empty', function() {
         var testStr = '';

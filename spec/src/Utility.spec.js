@@ -1,13 +1,13 @@
-define('spec/Utility.spec', [
+define('spec/utility.spec', [
     'dojo/_base/lang',
     'dojo/dom-construct',
-    'argos/Utility'
+    'argos/utility'
 ], function(
     lang,
     domConstruct,
     utility
 ) {
-return describe('argos.Utility', function() {
+return describe('argos.utility', function() {
 
     /**
      * utility.getValue
@@ -145,10 +145,144 @@ return describe('argos.Utility', function() {
      * utility.expand
      */
     it('Can expand a function, returning its result', function() {
-
+        var func = function() { return 'success'; };
+        expect(utility.expand(this, func)).toEqual('success');
+    });
+    it('Can expand a non-function (string), by immediately returning itself', function() {
+        var str = 'success';
+        expect(utility.expand(this, str)).toEqual(str);
+    });
+    it('Can expand a non-function (object), by immediately returning itself', function() {
+        var obj = {test: 'success'};
+        expect(utility.expand(this, obj)).toEqual(obj);
     });
 
+    /**
+     * utility.expandSafe
+     */
+    it('Can expand a function, returning its result', function() {
+        var func = function() { return 'success'; };
+        expect(utility.expandSafe(this, func)).toEqual('success');
+    });
+    it('Can expand a non-function (string), by returning a cloned copy', function() {
+        var str = 'success';
+        var result = utility.expandSafe(this, str);
+        expect(result).toEqual(str);
+    });
+    it('Can expand a non-function (obj), by return a cloned copy (altering original)', function() {
+        var obj = {test: 'success'};
+        var result = utility.expandSafe(this, obj);
 
+        obj.test = 'failure';
+
+        // verify it no longer matches original since the original was modified
+        expect(result).not.toBe(obj);
+
+        // verify it matches the first original defined state (ie, make sure it was cloned)
+        expect(result.test).toEqual('success');
+    });
+
+    /**
+     * utility.sanitizeForJson
+     */
+    it('Can sanitize a valid json object, (no modifications)', function() {
+        var json = {
+            test: 'success'
+        };
+        var expected = {
+            test: 'success'
+        };
+        expect(utility.sanitizeForJson(json)).toEqual(expected);
+    });
+    it('Can sanitize a valid json object, (no modifications), with array', function() {
+        var json = {
+            test: [ {ele: 0}, {ele: 1}, {ele: 2} ]
+        };
+        var expected = {
+            test: [ {ele: 0}, {ele: 1}, {ele: 2} ]
+        };
+        expect(utility.sanitizeForJson(json)).toEqual(expected);
+    });
+    it('Can sanitize a valid json object, removing functions', function() {
+        var json = {
+            test: 'success',
+            func: function() {}
+        };
+        var expected = {
+            test: 'success'
+        };
+        expect(utility.sanitizeForJson(json)).toEqual(expected);
+    });
+    it('Can sanitize a valid json object, setting undefined to string "undefined"', function() {
+        var json = {
+            test: 'success',
+            undef: undefined
+        };
+        var expected = {
+            test: 'success',
+            undef: 'undefined'
+        };
+        expect(utility.sanitizeForJson(json)).toEqual(expected);
+    });
+    it('Can sanitize a valid json object, setting null to string "null"', function() {
+        var json = {
+            test: 'success',
+            nll: null
+        };
+        var expected = {
+            test: 'success',
+            nll: 'null'
+        };
+        expect(utility.sanitizeForJson(json)).toEqual(expected);
+    });
+    it('Can sanitize a valid json object, setting the key "scope" to string "null"', function() {
+        var json = {
+            test: 'success',
+            scope: {}
+        };
+        var expected = {
+            test: 'success',
+            scope: 'null'
+        };
+        expect(utility.sanitizeForJson(json)).toEqual(expected);
+    });
+    it('Can sanitize a valid json object, expanding json strings back to obj form', function() {
+        var json = {
+            test: 'success',
+            expand: '{"inner": "success"}'
+        };
+        var expected = {
+            test: 'success',
+            expand: {
+                inner: 'success'
+            }
+        };
+        expect(utility.sanitizeForJson(json)).toEqual(expected);
+    });
+
+    /**
+     * utility.nameToPath
+     */
+    it('Can convert a single layer deep (no splitting) name to a dot-notated path', function() {
+        var name = 'test';
+        var path = ['test'];
+        expect(utility.nameToPath(name)).toEqual(path);
+    });
+    it('Can convert a two layer deep name via dot to a dot-notated path', function() {
+        var name = 'test.case';
+        var path = ['case', 'test'];
+        expect(utility.nameToPath(name)).toEqual(path);
+    });
+    it('Can convert a two layer deep name via array number to a dot-notated path', function() {
+        var name = 'test[0]';
+        var path = [0, 'test'];
+        expect(utility.nameToPath(name)).toEqual(path);
+    });
+    it('Can convert a multi layer deep name via array numbers and dots to a dot-notated path', function() {
+        var name = 'test.case[0].items[4]';
+        var path = [4, 'items', 0, 'case', 'test'];
+        expect(utility.nameToPath(name)).toEqual(path);
+    });
 
 });
 });
