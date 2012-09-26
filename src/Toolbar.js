@@ -13,6 +13,18 @@
  * limitations under the License.
  */
 
+/**
+ * Toolbar is a base toolbar class that provides basic rendering of the bar, adding toolbar items and
+ * binding their invokacations.
+ *
+ * Inherits dijit _WidgetBase.
+ *
+ * @alternateClassName Toolbar
+ * @extends _UiComponent
+ * @mixins _CommandMixin
+ * @mixins _EventMapMixin
+ * @requires ToolbarButton
+ */
 define('argos/Toolbar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -24,9 +36,7 @@ define('argos/Toolbar', [
     './_EventMapMixin',
     './_UiComponent',
     './_CommandMixin',
-    './ToolbarButton',
-    './Utility',
-    'argos!scene'
+    './ToolbarButton'
 ], function(
     declare,
     lang,
@@ -38,9 +48,7 @@ define('argos/Toolbar', [
     _EventMapMixin,
     _UiComponent,
     _CommandSupportMixin,
-    ToolbarButton,
-    utility,
-    scene
+    ToolbarButton
 ) {
     return declare('argos.Toolbar', [_WidgetBase, _UiComponent, _CommandSupportMixin, _EventMapMixin], {
         events: {
@@ -52,6 +60,11 @@ define('argos/Toolbar', [
         items: null,
         context: null,
         visible: true,
+
+        /**
+         * @property {Boolean}
+         * Enabled state of toolbar
+         */
         enabled: true,
 
         _items: null,

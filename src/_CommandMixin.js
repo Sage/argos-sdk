@@ -2,7 +2,7 @@ define('argos/_CommandMixin', [
     'dojo/_base/declare',
     'dojo/dom-attr',
     'dojo/topic',
-    './Utility',
+    './utility',
     'argos!scene'
 ], function(
     declare,

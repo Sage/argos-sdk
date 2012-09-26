@@ -225,18 +225,14 @@ define('argos/utility', [
          * If given expression is a function it is called with the given scope and returned,
          * else the expression is just returned.
          * @param {Object} scope Scope to call the function in (`this` definition)
-         * @param {Function/String/Number/Object} expression Value to expand
-         * @return {Function/String/Number/Object}
+         * @param {Mixed} expression Value to expand
+         * @return {Mixed}
          */
         expand: function(scope, expression) {
             if (typeof expression === 'function')
-            {
                 return expression.apply(scope, Array.prototype.slice.call(arguments, 2));
-            }
             else
-            {
                 return expression;
-            }
         },
 
         /**

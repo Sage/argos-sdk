@@ -6,8 +6,8 @@ define('argos/Store/SData', [
     'dojo/store/util/QueryResults',
     'dojo/string',
     'dojo/_base/json',
-    '../Convert',
-    '../Utility'
+    '../convert',
+    '../utility'
 ], function (
     declare,
     lang,

@@ -17,8 +17,8 @@ define('argos/PersistentStorage', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/json',
-    './Convert',
-    './Utility'
+    './convert',
+    './utility'
 ], function(
     declare,
     lang,

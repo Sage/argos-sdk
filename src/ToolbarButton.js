@@ -12,7 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ * Defines a basic toolbar button control
+ * @alternateClassName ToolbarButton
+ * @extends Control
+ */
 define('argos/ToolbarButton', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -85,6 +89,8 @@ define('argos/ToolbarButton', [
         _getVisibleAttr: function() {
             return this.visible;
         },
-        update: function(context) {}
+        update: function(context) {
+
+        }
     });
 });

@@ -33,8 +33,8 @@ define('argos/Edit', [
     './Data/SDataStore',
     './ErrorManager',
     './Fields/FieldRegistry',
-    './Convert',
-    './Utility',
+    './convert',
+    './utility',
     'argos!customizations',
     'argos!scene'
 ], function(

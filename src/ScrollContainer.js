@@ -27,7 +27,6 @@
  *     ]}
  *
  * @alternateClassName ScrollContainer
- * @mixins _WidgetBase
  * @extends _UiComponent
  * @requires utility
  */
@@ -37,7 +36,7 @@ define('argos/ScrollContainer', [
     'dojo/dom-class',
     'dijit/_WidgetBase',
     './_UiComponent',
-    './Utility'
+    './utility'
 ], function(
     declare,
     lang,

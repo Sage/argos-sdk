@@ -24,7 +24,7 @@ define('argos/Fields/_CompositeMixin', [
     'dojo/query',
     'dojo/NodeList-manipulate',
     './FieldRegistry',
-    '../Utility'
+    '../utility'
 ], function(
     declare,
     event,

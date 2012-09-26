@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * TitleBar is designed to handle the top application bar with markup and logic to set
+ * a title and position toolbar items to the left or right
+ * @alternateClassName TitleBar
+ * @extends Toolbar
+ */
 define('argos/TitleBar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -46,6 +52,10 @@ define('argos/TitleBar', [
         _setTitleAttr: {node: 'titleNode', type: 'innerHTML'},
 
         _count: null,
+        /**
+         * @property {Number}
+         * Current number of toolbar items set
+         */
         _size: 0,
         constructor: function() {
             this._count = {left: 0, right: 0};

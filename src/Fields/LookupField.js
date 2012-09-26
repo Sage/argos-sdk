@@ -47,7 +47,7 @@ define('argos/Fields/LookupField', [
     '../_TemplatedWidgetMixin',
     '../_MessageMapMixin',
     './_Field',
-    '../Utility',
+    '../utility',
     'argos!scene'
 ], function(
     array,

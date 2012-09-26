@@ -28,7 +28,7 @@ define('argos/CalendarWidget', [
     './_EventMapMixin',
     './_UiComponent',
     './ScrollContainer',
-    './Utility',
+    './utility',
     'argos!scene',
     'dojo/NodeList-dom'
 ], function (

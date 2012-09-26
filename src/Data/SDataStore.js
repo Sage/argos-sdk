@@ -4,8 +4,8 @@ define('argos/Data/SDataStore', [
     'dojo/_base/array',
     'dojo/string',
     'dojo/json',
-    '../Convert',
-    '../Utility'
+    '../convert',
+    '../utility'
 ], function (
     declare,
     lang,

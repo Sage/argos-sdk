@@ -1,7 +1,7 @@
 define('argos/_SDataListMixin', [
     'dojo/_base/declare',
     './Store/SData',
-    './Utility'
+    './utility'
 ], function(
     declare,
     SData,

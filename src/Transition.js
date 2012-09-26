@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/**
+ * Container for all the defined transition effects and their definitions.
+ * @alternateClassName Transition
+ */
 define('argos/Transition', [
     'dojo/_base/lang',
     'dojo/_base/Deferred',

@@ -18,7 +18,7 @@ define('argos/format', [
     'dojo/_base/lang',
     'dojo/dom-construct',
     'dojo/string',
-    './Convert'
+    './convert'
 ], function(
     json,
     lang,

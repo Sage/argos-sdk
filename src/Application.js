@@ -22,7 +22,7 @@ define('argos/Application', [
     'dojo/_base/window',
     'dojo/has',
     'dojo/string',
-    './Utility',
+    './utility',
     './_Component',
     './Scene',
     './CustomizationSet'

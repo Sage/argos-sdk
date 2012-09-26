@@ -18,7 +18,7 @@ define('argos/ErrorManager', [
     'dojo/_base/lang',
     'dojo/_base/connect',
     'dojo/string',
-    './Utility'
+    './utility'
 ], function(
     json,
     lang,
