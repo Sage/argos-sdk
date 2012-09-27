@@ -1,0 +1,14 @@
+{
+    "--title": "Sage Argos 2.0",
+    "--footer": "Argos is maintained by Sage",
+    "--categories": "docs-categories.json",
+    "--guides": "../../masters/argos/guides-source/docs-guides.json",
+    "--welcome": "../../masters/argos/welcome.html",
+    "--warnings": ["-all"],
+    "--ignore-global": true,
+    "-o": "docs",
+    "--": [
+        "src",
+        "libraries/Simplate.js"
+    ]
+}
