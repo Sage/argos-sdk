@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * ColumnChart
+ * @alternateClassName ColumnChart
+ * @extends _Chart
+ */
 define('argos/Charts/ColumnChart', [
     'dojo/_base/declare',
     'dojo/dom-geometry',

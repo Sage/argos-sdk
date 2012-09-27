@@ -1,3 +1,18 @@
+/* Copyright (c) 2010, Sage Software, Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 define('argos/_UiComponent', [
     'require',
     'dojo/_base/declare',
@@ -23,6 +38,11 @@ define('argos/_UiComponent', [
     _Container,
     _Component
 ) {
+    /**
+     * _UiComponent
+     * @alternateClassName _UiComponent
+     * @extends _Component
+     */
     var _UiComponent = declare('argos._UiComponent', [_Component], {
         _startupChildComponent: function(instance) {
             if (instance.isInstanceOf(_WidgetBase) && instance._started) return;
@@ -106,6 +126,11 @@ define('argos/_UiComponent', [
         }
     });
 
+    /**
+     * DomContentComponent
+     * @alternateClassName DomContentComponent
+     * @extends _UiComponent
+     */
     var DomContentComponent = declare('argos.DomContentComponent', [_UiComponent], {
         domNode: null,
         constructor: function(props, node) {
@@ -131,6 +156,8 @@ define('argos/_UiComponent', [
 
     /**
      * A lightweight widget-like component.
+     * @alertnateClassName Control
+     * @extends _UiComponent
      */
     var Control = declare('argos.Control', [Stateful, _UiComponent], {
         attributeMap: {},

@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * Calendar
+ * @alternateClassName Calendar
+ * @extends View
+ * @requires CalendarWidget
+ */
 define('Sage/Platform/Mobile/Views/Calendar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -24,8 +30,7 @@ define('Sage/Platform/Mobile/Views/Calendar', [
     'dojo/dom-style',
     'dojo/string',
     '../View',
-    '../CalendarWidget',
-    'argos!scene'
+    '../CalendarWidget'
 ], function(
     declare,
     lang,
@@ -37,8 +42,7 @@ define('Sage/Platform/Mobile/Views/Calendar', [
     domStyle,
     string,
     View,
-    CalendarWidget,
-    scene
+    CalendarWidget
 ) {
     return declare('Sage.Platform.Mobile.Views.Calendar', [View], {
         events: {

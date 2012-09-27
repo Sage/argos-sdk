@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * You may think of ApplicationModule as "loader" or initializer.
+ *
+ * @alternateClassName ApplicationModule
+ * @requires App
+ */
 define('argos/ApplicationModule', [
     'dojo/_base/array',
     'dojo/_base/connect',
@@ -28,12 +34,24 @@ define('argos/ApplicationModule', [
 
     return declare('argos.ApplicationModule', null, {
         _signals: null,
+        /**
+         * @property {Object}
+         * The {@link App App} instance for the application
+         */
         application: null,
+        /**
+         * Mixes in the passed options object into itself
+         * @param {Object} options Properties to be mixed in
+         */
         constructor: function(options) {
             this._signals = [];
 
             lang.mixin(this, options);
         },
+        /**
+         * Destroy loops and removes all `_signals`s.
+         * Also calls {@link #uninitialize uninitialize}
+         */
         destroy: function() {
             array.forEach(this._signals, function(signal) {
                 signal.remove();
@@ -43,9 +61,17 @@ define('argos/ApplicationModule', [
 
             this.uninitialize();
         },
+        /**
+         * Performs any additional destruction requirements
+         * @template
+         */
         uninitialize: function() {
 
         },
+        /**
+         * 1. {@link #loadCustomizations loadCustomizations}
+         * 1. {@link #loadViews loadViews}
+         */
         startup: function() {
             this.loadCustomizations(this.application); /* todo: potentially replace application with customization set */
             this.loadViews(this.application && this.application.scene);
@@ -53,11 +79,20 @@ define('argos/ApplicationModule', [
         setApplication: function(application) {
             this.application = application;
         },
+        /**
+         * This function should be overriden in the app and be used to register all customizations.
+         * @template
+         */
         loadCustomizations: function(customizationSet) {
         },
+        /**
+         * This function should be overriden in the app and be used to register all views.
+         * @template
+         */
         loadViews: function(scene) {
         },
         /**
+         * Legacy support for registering views. Now should be done through {@link scene scene}.
          * @deprecated
          * @param view
          */
@@ -67,6 +102,7 @@ define('argos/ApplicationModule', [
                 scene.registerView(view.id, view);
         },
         /**
+         * Legacy support for registering customizations. Now should be done through {@link scene scene}.
          * @deprecated
          * @param set
          * @param id

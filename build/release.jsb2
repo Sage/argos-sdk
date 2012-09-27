@@ -300,10 +300,6 @@
           "path": "../src"
         },
         {
-          "text": "PersistentStorage.js",
-          "path": "../src"
-        },
-        {
           "text": "Chart.js",
           "path": "../src/Views"
         },

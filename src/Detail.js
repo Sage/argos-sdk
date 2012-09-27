@@ -13,6 +13,21 @@
  * limitations under the License.
  */
 
+/**
+ * A Detail View represents a single record and should display all the info the user may need about the entry.
+ *
+ * A Detail entry is identified by its key ($key) which is how it requests the data via the SData endpoint.
+ *
+ * @alternateClassName Detail
+ * @extends View
+ * @requires format
+ * @requires utility
+ * @requires ErrorManager
+ * @requires ScrollContainer
+ * @requires TitleBar
+ * @requires CustomizationSet
+ * @requires scene
+ */
 define('argos/Detail', [
     'dojo',
     'dojo/_base/declare',
@@ -61,7 +76,7 @@ define('argos/Detail', [
             return data['valueTemplate'].apply(data.value, container);
         };
 
-    var Detail = declare('argos.Detail', [View], {
+    return declare('argos.Detail', [View], {
         events: {
             'click': true
         },
@@ -75,13 +90,30 @@ define('argos/Detail', [
         ],
         baseClass: 'view detail',
         _setDetailContentAttr: {node: 'contentNode', type: 'innerHTML'},
+        /**
+         * @property {Simplate}
+         * HTML shown when no data is available.
+         */
         emptyTemplate: new Simplate([
         ]),
+        /**
+         * @property {Simplate}
+         * HTML shown when data is being loaded.
+         *
+         * `$` => the view instance
+         */
         loadingTemplate: new Simplate([
             '<div class="loading-indicator">',
             '<div>{%: $.loadingText %}</div>',
             '</div>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that defines a layout section including the collapsible header
+         *
+         * `$` => the layout section object
+         * `$$` => the view instance
+         */
         sectionTemplate: new Simplate([
             '{% if ($.title !== false) { %}',
             '<h2 data-action="toggleCollapse" class="{% if ($.collapsed) { %}is-collapsed{% } %}">',
@@ -95,10 +127,24 @@ define('argos/Detail', [
             '<div class="{%= $.cls %}"></div>',
             '{% } %}'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that is used for the inside (data) of the property row in the detail layout.
+         *
+         * * `$` => detail layout row
+         * * `$$` => view instance
+         */
         propertyItemTemplate: new Simplate([
             '<label>{%: $.label %}</label>',
             '<span>{%= $.formatted %}</span>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that is used for the inside (data) of the related row in the detail layout.
+         *
+         * * `$` => detail layout row
+         * * `$$` => view instance
+         */
         relatedItemTemplate: new Simplate([
             '{% if ($.key) { %}',
             '<label>{%: $.label %}</label>',
@@ -114,6 +160,13 @@ define('argos/Detail', [
             '</a>',
             '{% } %}'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that is used for the inside (data) of the action row in the detail layout.
+         *
+         * * `$` => detail layout row
+         * * `$$` => view instance
+         */
         actionItemTemplate: new Simplate([
             '<a data-action="{%= $.action %}" {% if ($.disabled) { %}data-disable-action="true"{% } %} class="{% if ($.disabled) { %}disabled{% } %}">',
             '{% if ($.icon) { %}',
@@ -123,34 +176,109 @@ define('argos/Detail', [
             '<span>{%= $.formatted %}</span>',
             '</a>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that is used for the container of the property row in the detail layout.
+         * Uses the rows itemTemplate for actual data.
+         *
+         * * `$` => detail layout row
+         * * `$$` => view instance
+         */
         standardRowTemplate: new Simplate([
             '<div class="row {%= $.cls %}" data-property="{%= $.property || $.name %}">',
             '{%! $.itemTemplate %}',
             '</div>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that is used for the container of the related/action rows in the detail layout.
+         * Uses the rows itemTemplate for actual data.
+         *
+         * * `$` => detail layout row
+         * * `$$` => view instance
+         */
         listRowTemplate: new Simplate([
             '<li class="row {%= $.cls %}" data-property="{%= $.property || $.name %}">',
             '{%! $.itemTemplate %}',
             '</li>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that is shown when not available
+         *
+         * `$` => the view instance
+         */
         notAvailableTemplate: new Simplate([
             '<div class="not-available">{%: $.notAvailableText %}</div>'
         ]),
         tier: 1,
         store: null,
+        /**
+         * @property {Object}
+         * The layout definition that constructs the detail view with sections and rows
+         */
         layout: null,
+        /**
+         * @cfg {String/Object}
+         * May be used for verifying the view is accessible
+         */
         security: false,
+        /**
+         * @property {String}
+         * The customization identifier for this class. When a customization is registered it is passed
+         * a path/identifier which is then matched to this property.
+         */
         customizationSet: 'detail',
+        /**
+         * @property {String}
+         * @deprecated
+         */
         editText: 'Edit',
+        /**
+         * @cfg {String}
+         * Default title text shown in the top toolbar, note by default this is overwritten with the passed navigation
+         * options title/descriptor.
+         */
         titleText: 'Detail',
+        /**
+         * @property {String}
+         * Helper string for a basic section header text
+         */
         detailsText: 'Details',
+        /**
+         * @property {String}
+         * ARIA label text for a collapsible section header
+         */
         toggleCollapseText: 'toggle collapse',
+        /**
+         * @property {String}
+         * Text shown while loading and used in loadingTemplate
+         */
         loadingText: 'loading...',
+        /**
+         * @property {String}
+         * Text shown when a server error occurs
+         */
         requestErrorText: 'A server error occurred while requesting data.',
+        /**
+         * @property {String}
+         * Text used in the notAvailableTemplate
+         */
         notAvailableText: 'The requested entry is not available.',
+        /**
+         * @cfg {String}
+         * The view id to be taken to when the Edit button is pressed in the toolbar
+         */
         editView: false,
+        /**
+         * @property {Object[]}
+         * Store for mapping layout options to an index on the HTML node
+         */
         _navigationOptions: null,
 
+        /**
+         * Subscribes to the global `/app/refresh` event and clears the view.
+         */
         onStartup: function() {
             this.inherited(arguments);
 
@@ -165,6 +293,12 @@ define('argos/Detail', [
         _getStoreAttr: function() {
             return this.store || (this.store = this.createStore());
         },
+        /**
+         * Sets and returns the toolbar item layout definition, this method should be overriden in the view
+         * so that you may define the views toolbar items.
+         * @return {Object} this.tools
+         * @template
+         */
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'top': [{
@@ -175,6 +309,11 @@ define('argos/Detail', [
                 }]
             });
         },
+        /**
+         * Handler for the global `/app/refresh` event. Sets `refreshRequired` to true if the key matches.
+         * @param {Object} options The object published by the event.
+         * @private
+         */
         _onRefresh: function(o) {
             /* todo: change to be something non-sdata specific */
             var descriptor = o.data && o.data['$descriptor'];
@@ -190,20 +329,40 @@ define('argos/Detail', [
                 }
             }
         },
+        /**
+         * Applies the entries property to a format string
+         * @param {Object} entry Data entry
+         * @param {String} fmt Where expression to be formatted, `${0}` will be the extracted property.
+         * @param {String} property Property name to extract from the entry, may be a path: `Address.City`.
+         * @return {String}
+         */
         formatRelatedQuery: function(entry, fmt, property) {
             property = property || '$key';
             return string.substitute(fmt, [utility.getValue(entry, property)]);
         },
+        /**
+         * Toggles the collapsed state of the section.
+         * @param {Event} evt Mouse event.
+         * @param {HTMLElement} node Node that initiated the event.
+         */
         toggleCollapse: function(evt, node) {
             if (node) domClass.toggle(node, 'is-collapsed');
 
             this.onContentChange();
         },
+        /**
+         * Navigates to the defined `this.editView` passing the current `this.entry` as default data.
+         */
         navigateToEditView: function() {
             scene().showView(this.editView, {
                 item: this.item
             });
         },
+        /**
+         * Navigates to a given view id passing the options retrieved using the slot index to `this._navigationOptions`.
+         * @param {Event} evt Mouse event.
+         * @param {HTMLElement} node Node that initiated the event.
+         */
         navigateToRelatedView: function(evt, node) {
             var view = domAttr.get(node, 'data-view'),
                 slot = domAttr.get(node, 'data-context'),
@@ -294,6 +453,39 @@ define('argos/Detail', [
         _applyStateToGetOptions: function(getOptions) {
 
         },
+        /**
+         * Sets and returns the Detail view layout by following a standard for section and rows:
+         *
+         * The `this.layout` itself is an array of section objects where a section object is defined as such:
+         *
+         *     {
+         *        name: 'String', // Required. unique name for identification/customization purposes
+         *        title: 'String', // Required. Text shown in the section header
+         *        list: boolean, // Optional. Default false. Controls if the group container for child rows should be a div (false) or ul (true)
+         *        children: [], // Array of child row objects
+         *     }
+         *
+         * A child row object has:
+         *
+         *     {
+         *        name: 'String', // Required. unique name for identification/customization purposes
+         *        property: 'String', // Optional. The SData property of the current entity to bind to
+         *        label: 'String', // Optional. Text shown in the label to the left of the property
+         *        onCreate: function(), // Optional. You may pass a function to be called when the row is added to the DOM
+         *        include: boolean, // Optional. If false the row will not be included in the layout
+         *        exclude: boolean, // Optional. If true the row will not be included in the layout
+         *        template: Simplate, // Optional. Override the HTML Simplate used for rendering the value (not the row) where `$` is the row object
+         *        tpl: Simplate, // Optional. Same as template.
+         *        renderer: function(), // Optional. Pass a function that receives the current value and returns a value to be rendered
+         *        encode: boolean, // Optional. If true it will encode HTML entities
+         *        cls: 'String', // Optional. Additional CSS class string to be added to the row div
+         *        use: Simplate, // Optional. Override the HTML Simplate used for rendering the row (not value)
+         *        provider: function(entry, propertyName), // Optional. Function that accepts the SData entry and the property name and returns the extracted value. By default simply extracts directly.
+         *        value: Any // Optional. Provide a value directly instead of binding to SData
+         *     }
+         *
+         * @return {Object[]} Detail layout definition
+         */
         createLayout: function() {
             return this.layout || [];
         },
@@ -417,6 +609,12 @@ define('argos/Detail', [
                     row['onCreate'].call(this, row, node, value, item);
             }
         },
+        /**
+         * Processes the given layout definition using the SData entry response by rendering and inserting the HTML nodes and
+         * firing any onCreate events defined.
+         * @param {Object[]} layout Layout definition
+         * @param {Object} item Item from store
+         */
         _processLayout: function(layout, item) {
             var rows = typeof layout['children'] === 'function'
                     ? layout['children'].call(this, layout, this._processLayoutRowValue(layout, item), item)
@@ -467,6 +665,11 @@ define('argos/Detail', [
                 this._processLayout(current, item);
             }
         },
+        /**
+         * Determines if the view should be refresh by inspecting and comparing the passed navigation option key with current key.
+         * @param {Object} options Passed navigation options.
+         * @return {Boolean} True if the view should be refreshed, false if not.
+         */
         refreshRequiredFor: function(options) {
             if (this.options)
             {
@@ -480,15 +683,29 @@ define('argos/Detail', [
             else
                 return this.inherited(arguments);
         },
+        /**
+         * Extends the {@link View#activate parent implementation} to set the nav options title
+         * attribute to the descriptor
+         * @param tag
+         * @param data
+         */
         activate: function(options) {
             if (options && options.descriptor)
                 options.title = options.title || options.descriptor;
 
             this.inherited(arguments);
         },
+        /**
+         * Returns the view key
+         * @return {String} View key
+         */
         getTag: function() {
             return this.options && this.options.key;
         },
+        /**
+         * Extends the {@link View#getContext parent implementation} to also set the resourceKind, label and id
+         * @return {Object} View context object
+         */
         getContext: function() {
             var options = this.options,
                 id = options.id || options.key;
@@ -499,6 +716,10 @@ define('argos/Detail', [
                 id: id
             });
         },
+        /**
+         * Extends the {@link View#beforeTransitionTo parent implementation} to also clear the view if `refreshRequired` is true
+         * @return {Object} View context object
+         */
         beforeTransitionTo: function() {
             this.inherited(arguments);
 
@@ -507,6 +728,10 @@ define('argos/Detail', [
                 this.clear();
             }
         },
+        /**
+         * If a security breach is detected it sets the content to the notAvailableTemplate, otherwise it calls
+         * {@link #_requestData _requestData} which starts the process sequence.
+         */
         load: function() {
             this.inherited(arguments);
 
@@ -522,6 +747,9 @@ define('argos/Detail', [
         transitionTo: function() {
             this.inherited(arguments);
         },
+        /**
+         * Clears the view by replacing the content with the empty template and emptying the stored row contexts.
+         */
         clear: function() {
             this._navigationOptions = [];
 
@@ -530,6 +758,4 @@ define('argos/Detail', [
             domClass.add(this.domNode, 'is-loading');
         }
     });
-
-    return Detail;
 });

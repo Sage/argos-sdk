@@ -13,6 +13,14 @@
  * limitations under the License.
  */
 
+/**
+ * Scene is the mastermind controller of the layout. It handles registration, showing, accessing and state history of
+ * views.
+ * @alternateClassName scene
+ * @extends _Component
+ * @requires Layout
+ * @requires View
+ */
 define('argos/Scene', [
     'require',
     'dojo/_base/array',

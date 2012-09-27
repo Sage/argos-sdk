@@ -13,6 +13,18 @@
  * limitations under the License.
  */
 
+/**
+ * A List View is a view used to display a collection of items in an easy to skim list. The List View also has a
+ * selection model built in for selecting rows from the list and may be used in a number of different manners.
+ * @extends View
+ * @alternateClassName List
+ * @requires ErrorManager
+ * @requires ScrollContainer
+ * @requires SearchWidget
+ * @requires TitleBar
+ * @requires scene
+ * @requires CustomizationSet
+ */
 define('argos/List', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -57,28 +69,88 @@ define('argos/List', [
     customizations
 ) {
 
+    /**
+     * SelectionModel provides a simple in-memory store for data that fires events
+     * when a item is selected (added) or deselected (removed)
+     * @alternateClassName SelectionModel
+     */
     var SelectionModel = declare('argos.SelectionModel', null, {
+        /**
+         * @property {Number}
+         * Number of selections
+         */
         count: 0,
+        /**
+         * @property {Object}
+         * Collection of selections where the key is the selections key
+         */
         selections: null,
+        /**
+         * @cfg {Boolean}
+         * Flag that determines how to clear:
+         *
+         * True: Deselect is called on every item, firing onDeselect for each and firing onClear at the end
+         *
+         * False: Collection is immediately wiped and only onClear is fired
+         *
+         */
         clearAsDeselect: true,
+        /**
+         * @property {Boolean}
+         * Flag that control the firing of action events: onSelect, onDeselect, onClear
+         */
         _fireEvents: true,
+        /**
+         * Initializes the selections to be empty and mixes the passed object overriding any default properties.
+         * @param {Object} options The object to be mixed in.
+         */
         constructor: function(options) {
             this.selections = {};
             
             lang.mixin(this, options);
         },
+        /**
+         * Prevents the firing of action events: onSelect, onDeselect, onClear
+         */
         suspendEvents: function() {
             this._fireEvents = false;
         },
+        /**
+         * Enables the firing of action events:  onSelect, onDeselect, onClear
+         */
         resumeEvents: function() {
             this._fireEvents = true;
         },
+        /**
+         * Event that happens when an item is selected/added. A View should `connect` this function to a handler.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item stored
+         * @param tag
+         * @param self
+         */
         onSelect: function(key, data, tag, self) {
         },
+        /**
+         * Event that happens when an item is deselected/removed. A View should `connect` this function to a handler.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item removed
+         * @param tag
+         * @param self
+         */
         onDeselect: function(key, data, tag, self) {
         },
+        /**
+         * Event that happens when the store is cleared
+         * @param self
+         */
         onClear: function(self) {
         },
+        /**
+         * Adds an item to the `selections` if it is not already stored.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item being selected
+         * @param tag
+         */
         select: function(key, data, tag) {
             if (!this.selections.hasOwnProperty(key))
             {
@@ -87,12 +159,23 @@ define('argos/List', [
                 if (this._fireEvents) this.onSelect(key, data, tag, this);
             }
         },
+        /**
+         * Adds an item to the `selections` if it is not already stored, if it is
+         * stored, then it deselects (removes) the item.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item being selected
+         * @param tag
+         */
         toggle: function(key, data, tag) {
             if (this.isSelected(key))
                 this.deselect(key);
             else
                 this.select(key, data, tag);
         },
+        /**
+         * Removes an item from the store
+         * @param {String} key Unique identifier string that was given when the item was added
+         */
         deselect: function(key) {
             if (this.selections.hasOwnProperty(key))
             {
@@ -105,6 +188,9 @@ define('argos/List', [
                     this.onDeselect(key, selection.data, selection.tag, this);
             }
         },
+        /**
+         * Removes all items from the store
+         */
         clear: function() {
             if (this.clearAsDeselect)
             {
@@ -118,15 +204,32 @@ define('argos/List', [
 
             if (this._fireEvents) this.onClear(this);
         },
+        /**
+         * Determines if the given key is in the selections collection.
+         * @param {String} key Unique identifier string that was given when the item was added
+         * @return {Boolean} True if the item is in the store.
+         */
         isSelected: function(key) {
             return !!this.selections[key];
         },
+        /**
+         * Returns the number of items in the store
+         * @return {Number} Current count of items
+         */
         getSelectionCount: function() {
             return this.count;
         },
+        /**
+         * Returns all items in the store
+         * @return {Object} The entire selection collection
+         */
         getSelections: function() {
             return this.selections;
         },
+        /**
+         * Returns a list of unique identifier keys used in the selection collection
+         * @return {String[]} All keys in the store
+         */
         getSelectedKeys: function() {
             var keys = [];
             for (var key in this.selections)
@@ -136,8 +239,26 @@ define('argos/List', [
         }
     });
 
+    /**
+     * The ConfigurableSelectionModel adds the logic to the SelectionModel to only have one item selected at a time via the `singleSelection` flag.
+     * @alternateClassName ConfigurableSelectionModel
+     * @extends SelectionModel
+     */
     var ConfigurableSelectionModel = declare('argos.ConfigurableSelectionModel', [SelectionModel], {
+        /**
+         * @cfg {Boolean}
+         * Flag that controls if only one item is selectable at a time. Meaning if this is true
+         * then when a selection is made it first {@link SelectionModel#clear clears} the store.
+         */
         singleSelection: false,
+        /**
+         * This function is called in Lists {@link List#beforeTransitionTo beforeTransitionTo} and
+         * it is always passed the Lists navigation options `singleSelect`.
+         *
+         * It then sets the flag `singleSelection` to the value if the passed value.
+         *
+         * @param {Boolean} val The state that `singleSelection` should be in.
+         */
         useSingleSelection: function(val) {
             if (this.singleSelection != !!val) //false != undefined = true, false != !!undefined = false
             {
@@ -145,6 +266,13 @@ define('argos/List', [
                 this.clear();
             }
         },
+        /**
+         * Extends the base {@link SelectionModel#select select} by first clearing out the entire
+         * store if `singleSelection` is true and there are items already in the store.
+         * @param {String} key Unique identifier string
+         * @param {Object} data The item being selected
+         * @param tag
+         */
         select: function(key, data, tag) {
             if (this.singleSelection)
             {
@@ -155,7 +283,7 @@ define('argos/List', [
         }
     });
 
-    var List = declare('argos.List', [View], {
+    return declare('argos.List', [View], {
         events: {
             'click': true
         },
@@ -177,14 +305,35 @@ define('argos/List', [
             ]}
         ],
         baseClass: 'view list has-search-header',
+        /**
+         * @property {HTMLElement}
+         * Attach point for the main view content
+         */
         contentNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the remaining items content
+         */
         remainingContentNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the empty, or no selection, container
+         */
         emptySelectionNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the remaining items container
+         */
         remainingNode: null,
+        /**
+         * @property {HTMLElement}
+         * Attach point for the request more items container
+         */
         moreNode: null,
         _setListContentAttr: {node: 'contentNode', type: 'innerHTML'},
         _setRemainingContentAttr: {node: 'remainingContentNode', type: 'innerHTML'},
         /**
+         * @property {Simplate}
          * The template used to render the loading message when the view is requesting more data.
          *
          * The default template uses the following properties:
@@ -197,6 +346,7 @@ define('argos/List', [
             '<li class="loading-indicator"><div>{%: $.loadingText %}</div></li>'
         ]),
         /**
+         * @property {Simplate}
          * The template used to render a row in the view.  This template includes {@link #itemTemplate}.
          */
         rowTemplate: new Simplate([
@@ -208,16 +358,19 @@ define('argos/List', [
             '</li>'
         ]),
         /**
+         * @cfg {Simplate}
          * The template used to render the content of a row.  This template is not directly rendered, but is
          * included in {@link #rowTemplate}.
          *
          * This property should be overridden in the derived class.
+         * @template
          */
         itemTemplate: new Simplate([
             '<h3>{%: $.$descriptor %}</h3>',
             '<h4>{%: $.$key %}</h4>'
         ]),
         /**
+         * @property {Simplate}
          * The template used to render a message if there is no data available.
          * The default template uses the following properties:
          *
@@ -231,14 +384,17 @@ define('argos/List', [
             '</li>'
         ]),
         /**
-         * The template used to render a single action item (button)
-         * The default template uses the following properties
+         * @property {Simplate}
+         * The template used to render a list action item.
+         * The default template uses the following properties:
          *
          *      name                description
          *      ----------------------------------------------------------------
-         *      title               Used for the ARIA label
-         *      icon                Path to the icon to use for the action item
-         *      label               Text shown beneath the icon
+         *      actionIndex         The correlating index number of the action collection
+         *      title               Text used for ARIA-labeling
+         *      icon                Relative path to the icon to use
+         *      id                  Unique name of action, also used for alt image text
+         *      label               Text added below the icon
          */
         listActionItemTemplate: new Simplate([
             '<button data-action="invokeActionItem" data-id="{%= $.actionIndex %}" aria-label="{%: $.title || $.id %}">',
@@ -251,59 +407,93 @@ define('argos/List', [
          * The id for the view, and it's main DOM element.
          */
         id: 'generic_list',
-        /**
-         * The property containing the key for the items in the data store.
-         */
         tier: 0,
         store: null,
         /**
-         * The page size (defaults to 20).
-         * @type {Number}
+         * @cfg {String}
+         * The SData resource kind the view is responsible for.  This will be used as the default resource kind
+         * for all SData requests.
+         */
+        resourceKind: null,
+        /**
+         * @cfg {String[]}
+         * A list of fields to be selected in an SData request.
+         */
+        querySelect: null,
+        /**
+         * @cfg {String[]}
+         * Optional list of child properties to be included in an SData request.
+         */
+        queryInclude: null,
+        /**
+         * @cfg {String}
+         * The default order by expression for an SData request.
+         */
+        queryOrderBy: null,
+        /**
+         * @cfg {String/Function}
+         * The default where expression for an SData request.
+         */
+        queryWhere: null,
+        /**
+         * @cfg {String/Function}
+         * The default resource property for an SData request.
+         */
+        resourceProperty: null,
+        /**
+         * @cfg {String/Function}
+         * The default resource predicate for an SData request.
+         */
+        resourcePredicate: null,
+        /**
+         * @cfg {Number}
+         * The number of items to request per SData payload.
          */
         pageSize: 20,
         /**
-         * True if search is enabled (defaults to true).
+         * @cfg {Boolean}
+         * Controls the addition of a search widget.
          */
         enableSearch: true,
         /**
-         * True to hide the search bar (defaults to false).
-         * @type {Boolean}
+         * @cfg {Boolean}
+         * Controls the visibility of the search widget.
          */
         hideSearch: false,
         /**
-         * True to enable action based panel (defaults to false).
-         * @type {Boolean}
+         * @cfg {Boolean}
+         * Flag that determines if the list actions panel should be in use.
          */
         enableActions: false,
         /**
-         * True to allow selection in the view (defaults to false).
-         * @type {Boolean}
+         * @cfg {Boolean}
+         * True to allow selections via the SelectionModel in the view.
          */
         allowSelection: false,
         /**
-         * True to clear the selection when the view is shown (defaults to true).
-         * @type {Boolean}
+         * @cfg {Boolean}
+         * True to clear the selection model when the view is shown.
          */
         autoClearSelection: true,
         /**
+         * @cfg {String}
          * The id of the detail view to show when a row is clicked.
-         * @type {?String}
          */
         detailView: null,
         /**
-         * The view to show, either an id or an instance, if there is no {@link #insertView} specified, when
-         * the {@link #navigateToInsertView} action is invoked.
-         * @type {?(String|argos.View)}
+         * @cfg {String}
+         * The view id to show if there is no `insertView` specified, when
+         * the {@link #navigateToInsertView navigateToInsertView} action is invoked.
          */
         editView: null,
         /**
-         * The view to show, either an id or an instance, when the {@link #navigateToInsertView} action is invoked.
-         * @type {?(String|argos.View)}
+         * @cfg {String}
+         * The view id to show when the {@link #navigateToInsertView} action is invoked.
          */
         insertView: null,
         /**
-         * The view to show, either an id or an instance, when the {@link #navigateToContextView} action is invoked.
-         * @type {?(String|argos.View)}
+         * @cfg {String}
+         * The view id to show when the {@link #navigateToContextView navigateToContextView} action is invoked.
          */
         contextView: false,
         /**
@@ -311,9 +501,9 @@ define('argos/List', [
          */
         hashTags: null,
         /**
+         * @cfg {Object}
          * A dictionary of hash tag search queries.  The key is the hash tag, without the symbol, and the value is
          * either a query string, or a function that returns a query string.
-         * @type {?Object}
          */
         hashTagQueries: null,
         /**
@@ -328,58 +518,76 @@ define('argos/List', [
          */
         hashTagSearchRE: /(?:#|;|,|\.)(\w+)/g,
         /**
+         * @property {String}
          * The text displayed in the more button.
-         * @type {String}
          */
         moreText: 'Retrieve More Records',
         /**
+         * @property {String}
          * The text displayed in the emptySelection button.
-         * @type {String}
          */
         emptySelectionText: 'None',
         /**
+         * @cfg {String}
          * The text displayed as the default title.
-         * @type {String}
          */
         titleText: 'List',
         /**
+         * @property {String}
          * The format string for the text displayed for the remaining record count.  This is used in a {@link String#format} call.
-         * @type {String}
          */
         remainingText: '${0} records remaining',
         /**
+         * @property {String}
          * The text displayed on the cancel button.
-         * @type {String}
          * @deprecated
          */
         cancelText: 'Cancel',
         /**
+         * @property {String}
          * The text displayed on the insert button.
-         * @type {String}
          * @deprecated
          */
         insertText: 'New',
         /**
+         * @property {String}
          * The text displayed when no records are available.
-         * @type {String}
          */
         noDataText: 'no records',
         /**
+         * @property {String}
          * The text displayed when data is being requested.
-         * @type {String}
          */
         loadingText: 'Loading...',
         searchText: 'Search',
         /**
+         * @property {String}
          * The text displayed when a data request fails.
-         * @type {String}
          */
         requestErrorText: 'A server error occurred while requesting data.',
         items: {},
+        /**
+         * @property {String}
+         * The customization identifier for this class. When a customization is registered it is passed
+         * a path/identifier which is then matched to this property.
+         */
         customizationSet: 'list',
         actionsNode: null,
+        /**
+         * @property {Object}
+         * The selection model for the view
+         */
         _selectionModel: null,
+        /**
+         * @property {Object}
+         * The selection model event connections
+         */
         _selectionConnects: null,
+        /**
+         * Setter method for the selection model, also binds the various selection model select events
+         * to the respective List event handler for each.
+         * @param {SelectionModel} selectionModel The selection model instance to save to the view
+         */
         _setSelectionModelAttr: function(selectionModel) {
             if (this._selectionConnects) array.forEach(this._selectionConnects, this.disconnect, this);
 
@@ -395,9 +603,17 @@ define('argos/List', [
                 );
             }
         },
+        /**
+         * Getter nmethod for the selection model
+         * @return {SelectionModel}
+         */
         _getSelectionModelAttr: function() {
             return this._selectionModel;
         },
+        /**
+         * Setups the View including: selection model, search widget, bind to the global refresh publish event, and
+         * create actions.
+         */
         onStartup: function() {
             this.inherited(arguments);
 
@@ -416,6 +632,9 @@ define('argos/List', [
 
             this.clear(true);
         },
+        /**
+         * Destroys the search widget and store, and disconnect selection events before destroying the view.
+         */
         onDestroy: function() {
             this.inherited(arguments);
 
@@ -432,6 +651,12 @@ define('argos/List', [
         _getStoreAttr: function() {
             return this.store || (this.store = this.createStore());
         },
+        /**
+         * Sets and returns the toolbar item layout definition, this method should be overriden in the view
+         * so that you may define the views toolbar items.
+         * @return {Object} this.tools
+         * @template
+         */
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'top': [{
@@ -441,9 +666,21 @@ define('argos/List', [
                 }]
             });
         },
+        /**
+         * Sets and returns the list-action actions layout definition, this method should be overriden in the view
+         * so that you may define the action items for that view.
+         * @return {Object} this.actions
+         * @template
+         */
         createActionLayout: function() {
             return this.actions || {};
         },
+        /**
+         * Creates the action bar and adds it to the DOM. Note that it replaces `this.actions` with the passed
+         * param as the passed param should be the result of the customization mixin and `this.actions` needs to be the
+         * final actions state.
+         * @param {Object[]} actions
+         */
         createActions: function(actions) {
             for (var i = 0; i < actions.length; i++)
             {
@@ -460,6 +697,17 @@ define('argos/List', [
 
             this.actions = actions;
         },
+        /**
+         * This is the data-action handler for list-actions, it will locate the action instance viw the data-id attribute
+         * and invoke either the `fn` with `scope` or the named `action` on the current view.
+         *
+         * The resulting function being called will be passed not only the action item definition but also
+         * the first (only) selection from the lists selection model.
+         *
+         * @param {Object} parameters Collection of data- attributes already gathered from the node
+         * @param {Event} evt The click/tap event
+         * @param {HTMLElement} node The node that invoked the action
+         */
         invokeActionItem: function(evt, node) {
             var index = domAttr.get(node, 'data-id'),
                 action = this.actions[index],
@@ -479,6 +727,11 @@ define('argos/List', [
             else if (action['action'] && this[action['action']])
                     this[action['action']].call(action['scope'] || this, action, selection);
         },
+        /**
+         * Called when showing the action bar for a newly selected row, it sets the disabled state for each action
+         * item using the currently selected row as context by passing the action instance the selected row to the
+         * action items `enabled` property.
+         */
         checkActionState: function() {
             var selectedItems = this.get('selectionModel').getSelections(),
                 selection = null;
@@ -504,6 +757,16 @@ define('argos/List', [
             }
 
         },
+        /**
+         * Handler for showing the list-action panel/bar - it needs to do several things:
+         *
+         * 1. Check each item for context-enabledment
+         * 1. Move the action panel to the current row and show it
+         * 1. Adjust the scrolling if needed (if selected row is at bottom of screen, the action-bar shows off screen
+         * which is bad)
+         *
+         * @param {HTMLElement} rowNode The currently selected row node
+         */
         showActionPanel: function(rowNode) {
             this.checkActionState();
 
@@ -513,6 +776,12 @@ define('argos/List', [
             if (this.actionsNode.offsetTop + this.actionsNode.clientHeight + 48 > document.documentElement.clientHeight)
                 this.actionsNode.scrollIntoView(false);
         },
+        /**
+         * Sets the `this.options.source` to passed param after adding the views resourceKind. This function is used so
+         * that when the next view queries the navigation context we can include the passed param as a data point.
+         *
+         * @param {Object} source The object to set as the options.source.
+         */
         setSource: function(source) {
             lang.mixin(source, {
                 resourceKind: this.resourceKind
@@ -520,15 +789,35 @@ define('argos/List', [
 
             this.options.source = source;
         },
+        /**
+         * Hides the passed list-action row/panel by removing the selected styling
+         * @param {HTMLElement} rowNode The currently selected row.
+         */
         hideActionPanel: function(rowNode) {
             domClass.remove(rowNode, 'list-action-selected');
         },
+        /**
+         * Determines if the view is a navigatible view or a selection view by returning `this.selectionOnly` or the
+         * navigation `this.options.selectionOnly`.
+         * @return {Boolean}
+         */
         isNavigationDisabled: function() {
             return ((this.options && this.options.selectionOnly) || (this.selectionOnly));
         },
+        /**
+         * Determines if the selections are disabled by checking the `allowSelection` and `enableActions`
+         * @return {Boolean}
+         */
         isSelectionDisabled: function() {
             return !((this.options && this.options.selectionOnly) || this.enableActions || this.allowSelection);
         },
+        /**
+         * Handler for when the selection model adds an item. Adds the selected state to the row or shows the list
+         * actions panel.
+         * @param {String} key The extracted key from the selected row.
+         * @param {Object} data The actual row's matching data point
+         * @param {String/HTMLElement} tag An indentifier, may be the actual row node or some other id.
+         */
         _onSelectionModelSelect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
             if (!node) return;
@@ -541,6 +830,13 @@ define('argos/List', [
 
             domClass.add(node, 'list-item-selected');
         },
+        /**
+         * Handler for when the selection model removes an item. Removes the selected state to the row or hides the list
+         * actions panel.
+         * @param {String} key The extracted key from the de-selected row.
+         * @param {Object} data The actual row's matching data point
+         * @param {String/HTMLElement} tag An indentifier, may be the actual row node or some other id.
+         */
         _onSelectionModelDeselect: function(key, data, tag) {
             var node = dom.byId(tag) || query('li[data-key="'+key+'"]', this.domNode)[0];
             if (!node) return;
@@ -553,8 +849,15 @@ define('argos/List', [
 
             domClass.remove(node, 'list-item-selected');
         },
+        /**
+         * Handler for when the selection model clears the selections.
+         */
         _onSelectionModelClear: function() {
         },
+        /**
+         * Attempts to activate entries passed in `this.options.previousSelections` where previousSelections is an array
+         * of data-keys or data-descriptors to search the list rows for.
+         */
         _loadPreviousSelections: function() {
             var previousSelections = this.options && this.options.previousSelections;
             if (previousSelections)
@@ -568,12 +871,25 @@ define('argos/List', [
                 }
             }
         },
+        /**
+         * Handler for the global `/app/refresh` event. Sets `refreshRequired` to true if the resourceKind matches.
+         * @param {Object} options The object published by the event.
+         */
         _onRefresh: function(options) {
             if (this.resourceKind && options.resourceKind === this.resourceKind)
             {
                 this.refreshRequired = true;
             }
         },
+        /**
+         * Handler for the select or action node data-action. Finds the nearest node with the data-key attribute and
+         * toggles it in the views selection model.
+         *
+         * If singleSelectAction is defined, invoke the singleSelectionAction.
+         *
+         * @param {Event} evt The click/tap event.
+         * @param {HTMLElement} node The element that initiated the event.
+         */
         selectEntry: function(evt, node) {
             var row = query(node).closest('[data-key]')[0],
                 key = row ? row.getAttribute('data-key') : false;
@@ -584,6 +900,17 @@ define('argos/List', [
             if (this.options.singleSelect && this.options.singleSelectAction && !this.enableActions)
                 this.invokeSingleSelectAction();
         },
+        /**
+         * Handler for each row.
+         *
+         * If a selection model is defined and navigation is disabled then toggle the entry/row
+         * in the model and if singleSelectionAction is true invoke the singleSelectAction.
+         *
+         * Else navigate to the detail view for the extracted data-key.
+         *
+         * @param {Event} evt The click/tap event.
+         * @param {HTMLElement} node The element that initiated the event.
+         */
         activateEntry: function(evt, node) {
             var descriptor = node && node.getAttribute('data-descriptor'),
                 key = node && node.getAttribute('data-key');
@@ -604,6 +931,10 @@ define('argos/List', [
                 }
             }
         },
+        /**
+         * Invokes the corresponding top toolbar tool using `this.options.singleSelectAction` as the name.
+         * If autoClearSelection is true, clear the selection model.
+         */
         invokeSingleSelectAction: function() {
             topic.publish('/app/toolbar/invoke', this.options.singleSelectAction);
 
@@ -633,12 +964,29 @@ define('argos/List', [
 
             return (this.hashTags = layout);
         },
+        /**
+         * Called to transform a textual query into an SData query compatible search expression.
+         *
+         * Views should override this function to provide their own formatting tailored to their entity.
+         *
+         * @param {String} searchQuery User inputted text from the search widget.
+         * @return {String/Boolean} An SData query compatible search expression.
+         * @template
+         */
         formatSearchQuery: function(query) {
             return false;
         },
         formatHashTagQuery: function(query) {
             return false;
         },
+        /**
+         * Handler for the search widgets search.
+         *
+         * Prepares the view by clearing it and setting `this.query` to the given search expression. Then calls
+         * {@link #requestData requestData} which start the request process.
+         *
+         * @param {String} expression String expression as returned from the search widget
+         */
         _onSearchQuery: function(query) {
             if (query)
             {
@@ -665,6 +1013,15 @@ define('argos/List', [
         createStore: function() {
             return null;
         },
+        /**
+         * Helper method for list actions. Takes a view id, data point and where format string, sets the nav options
+         * `where` to the formatted expression using the data point and shows the given view id with that option.
+         * @param {Object} action Action instance, not used.
+         * @param {Object} selection Data entry for the selection.
+         * @param {String} viewId View id to be shown
+         * @param {String} whereQueryFmt Where expression format string to be passed. `${0}` will be the `$key`
+         * property of the passed selection data.
+         */
         navigateToRelatedView:  function(action, selection, viewId, whereQueryFmt) {
             var options = {};
 
@@ -673,17 +1030,33 @@ define('argos/List', [
 
             scene().showView(viewId, options);
         },
+        /**
+         * Navigates to the defined `this.detailView` passing the params as navigation options.
+         * @param {String} key Key of the entry to be shown in detail
+         * @param {String} descriptor Description of the entry, will be used as the top toolbar title text.
+         */
         navigateToDetailView: function(key, descriptor) {
             scene().showView(this.detailView, {
                 descriptor: descriptor,
                 key: key
             });
         },
+        /**
+         * Helper method for list-actions. Navigates to the defined `this.editView` passing the given selections `$key`
+         * property in the navigation options (which is then requested and result used as default data).
+         * @param {Object} action Action instance, not used.
+         * @param {Object} selection Data entry for the selection.
+         */
         navigateToEditView: function(action, selection) {
             scene().showView(this.editView || this.insertView, {
                 key: selection.data['$key']
             });
         },
+        /**
+         * Navigates to the defined `this.insertView`, or `this.editView` passing the current views id as the `returnTo`
+         * option and setting `insert` to true.
+         * @param {HTMLElement} el Node that initiated the event.
+         */
         navigateToInsertView: function() {
             scene().showView(this.insertView || this.editView, {
                 returnTo: this.id,
@@ -695,6 +1068,13 @@ define('argos/List', [
         _processItem: function(item) {
             return item;
         },
+        /**
+         * Processes the items array from the store and renders out the feed entries.
+         *
+         * Saves each entry to the `this.items` collection using the entries `$key` as the key.
+         *
+         * @param {Object[]} items Items to process
+         */
         _processData: function(items) {
             var store = this.get('store'),
                 count = items.length;
@@ -796,6 +1176,10 @@ define('argos/List', [
         _applyStateToQueryOptions: function(queryOptions) {
 
         },
+        /**
+         * Handler for the none/no selection button is pressed. Used in selection views when not selecting is an option.
+         * Invokes the `this.options.singleSelectAction` tool.
+         */
         emptySelection: function() {
             /// <summary>
             ///     Called when the emptySelection/None button is clicked.
@@ -805,6 +1189,11 @@ define('argos/List', [
             if (App.bars['tbar'])
                 App.bars['tbar'].invokeTool({tool: this.options.singleSelectAction}); // invoke action of tool
         },
+        /**
+         * Determines if the view should be refresh by inspecting and comparing the passed navigation options with current values.
+         * @param {Object} options Passed navigation options.
+         * @return {Boolean} True if the view should be refreshed, false if not.
+         */
         refreshRequiredFor: function(options) {
             if (this.options)
             {
@@ -821,11 +1210,20 @@ define('argos/List', [
             else
                 return this.inherited(arguments);
         },
+        /**
+         * Returns the current views context by expanding upon the {@link View#getContext parent implementation} to include
+         * the views resourceKind.
+         * @return {Object} context.
+         */
         getContext: function() {
             return lang.mixin(this.inherited(arguments), {
                 resourceKind: this.resourceKind
             });
         },
+        /**
+         * Extends the {@link View#beforeTransitionTo parent implementation} by also toggling the visibility of the views
+         * components and clearing the view and selection model as needed.
+         */
         beforeTransitionTo: function() {
             this.inherited(arguments);
 
@@ -855,6 +1253,10 @@ define('argos/List', [
                     this._selectionModel.clear();
             }
         },
+        /**
+         * Extends the {@link View#transitionTo parent implementation} to also configure the search widget and
+         * load previous selections into the selection model.
+         */
         transitionTo: function() {
             if (this._selectionModel) this._loadPreviousSelections();
 
@@ -869,8 +1271,14 @@ define('argos/List', [
             this._requestData();
         },
         /**
+         * Clears the view by:
          *
-         * @param [all]
+         *  * clearing the selection model, but without it invoking the event handlers;
+         *  * clears the views data such as `this.entries` and `this.feed`;
+         *  * clears the search width if passed true; and
+         *  * applies the default template.
+         *
+         * @param {Boolean} all If true, also clear the search widget.
          */
         clear: function(all) {
             if (this._selectionModel)
@@ -897,6 +1305,4 @@ define('argos/List', [
             domClass.add(this.domNode, 'is-loading');
         }
     });
-
-    return List;
 });

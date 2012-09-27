@@ -13,6 +13,14 @@
  * limitations under the License.
  */
 
+/**
+ * CollectionEntryField
+ * @alternateClassName CollectionEntryField
+ * @extends _Field
+ * @extends _UiComponent
+ * @mixins _EventMapMixin
+ * @mixins _CompositeMixin
+ */
 define('argos/Fields/CollectionEntryField', [
     'dojo/_base/declare',
     'dojo/_base/event',
@@ -25,8 +33,7 @@ define('argos/Fields/CollectionEntryField', [
     '../_UiComponent',
     '../_EventMapMixin',
     './_Field',
-    './_CompositeMixin',
-    'argos!scene'
+    './_CompositeMixin'
 ], function(
     declare,
     event,
@@ -39,8 +46,7 @@ define('argos/Fields/CollectionEntryField', [
     _UiComponent,
     _EventMapMixin,
     _Field,
-    _CompositeMixin,
-    scene
+    _CompositeMixin
 ) {
 
     /*

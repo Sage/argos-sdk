@@ -13,6 +13,18 @@
  * limitations under the License.
  */
 
+/**
+ * Application is a nexus that provides many routing and global application services that may be used
+ * from anywhere within the app.
+ *
+ * It provides a shortcut alias to `window.App` (`App`) with the most common usage being `App.getView(id)`.
+ *
+ * @alternateClassName App
+ * @extends _Component
+ * @requires utility
+ * @requires scene
+ * @requires CustomizationSet
+ */
 define('argos/Application', [
     'dojo/_base/json',
     'dojo/_base/array',
@@ -82,8 +94,16 @@ define('argos/Application', [
     });
 
     return declare('argos.Application', [_Component], {
+        /**
+         * @property {Boolean}
+         * Signifies the App has been initialized
+         */
         _started: false,
         _signals: null,
+        /**
+         * @property {Object[]}
+         * Array of all connections for App
+         */
         _connections: null,
         _modules: null,
 
@@ -96,6 +116,10 @@ define('argos/Application', [
         context: null,
         scene: null,
 
+        /**
+         * All options are mixed into App itself
+         * @param {Object} options
+         */
         constructor: function(options) {
             this._signals = [];
             this._modules = [];
@@ -105,6 +129,10 @@ define('argos/Application', [
 
             lang.mixin(this, options);
         },
+        /**
+         * Loops through and disconnects connections and unsubscribes subscriptions.
+         * Also calls {@link #uninitialize uninitialize}.
+         */
         destroy: function() {
             array.forEach(this._signals, function(signal) {
                 signal.remove();
@@ -126,9 +154,15 @@ define('argos/Application', [
 
             this.inherited(arguments);
         },
+        /**
+         * Shelled function that is called from {@link #destroy destroy}, may be used to release any further handles.
+         */
         uninitialize: function() {
 
         },
+        /**
+         * If caching is enable and App is {@link #isOnline online} the empties the SData cache via {@link #_clearSDataRequestCache _clearSDataRequestCache}.
+         */
         _startupCaching: function() {
             if (this.enableCaching)
             {
@@ -139,6 +173,9 @@ define('argos/Application', [
         _startupEvents: function() {
             this._signals.push(connect.connect(window, 'resize', this, this.onResize));
         },
+        /**
+         * Establishes various connections to events.
+         */
         _startupConnections: function() {
             for (var name in this.connections)
                 if (this.connections.hasOwnProperty(name)) this.registerConnection(name, this.connections[name]);
@@ -146,6 +183,9 @@ define('argos/Application', [
             /* todo: should we be mixing this in? */
             delete this.connections;
         },
+        /**
+         * Loops through modules and calls their `init()` function.
+         */
         _startupModules: function() {
             array.forEach(this.modules, function(module) {
                 this._modules.push(module);
@@ -157,9 +197,15 @@ define('argos/Application', [
             /* todo: should we be mixing this in? */
             delete this.modules;
         },
+        /**
+         * Sets the global variable `App` to this instance.
+         */
         activate: function() {
             win.global.App = this;
         },
+        /**
+         * Initializes this application by calling all the startup functions of Application.
+         */
         startup: function() {
             if (this._started) return;
 
@@ -174,9 +220,16 @@ define('argos/Application', [
         run: function() {
 
         },
+        /**
+         * Returns if an internet connection is available.
+         * @return {Boolean}
+         */
         isOnline: function() {
             return window.navigator.onLine;
         },
+        /**
+         * Removes all keys from localStorage that start with `sdata.cache`.
+         */
         _clearSDataRequestCache: function() {
             var check = function(k) {
                 return /^sdata\.cache/i.test(k);
@@ -193,9 +246,20 @@ define('argos/Application', [
                 }
             }
         },
+        /**
+         * Creates a cache key based on the URL of the request
+         * @param {Object} request Sage.SData.Client.SDataBaseRequest
+         * @return {String} Key to be used for localStorage cache
+         */
         _createCacheKey: function(request) {
             return 'sdata.cache[' + request.build() + ']';
         },
+        /**
+         * If the app is {@link #isOnline offline} and cache is allowed this function will attempt to load the passed
+         * request from localStorage by {@link #_createCacheKey creating} a key from the requested URL.
+         * @param request Sage.SData.Client.SDataBaseRequest
+         * @param o XHR object with namely the `result` property
+         */
         _loadSDataRequest: function(request, o) {
             /// <param name="request" type="Sage.SData.Client.SDataBaseRequest" />
             // todo: find a better way of indicating that a request can prefer cache
@@ -211,6 +275,12 @@ define('argos/Application', [
                 }
             }
         },
+        /**
+         * Attempts to store all GET request results into localStorage
+         * @param request SData request
+         * @param o XHR object
+         * @param feed The data from the request to store
+         */
         _cacheSDataRequest: function(request, o, feed) {
             /* todo: decide how to handle PUT/POST/DELETE */
             if (window.localStorage)
@@ -224,6 +294,12 @@ define('argos/Application', [
                 }
             }
         },
+        /**
+         * Optional creates, then registers an Sage.SData.Client.SDataService and adds the result to `App.services`.
+         * @param {String} name Unique identifier for the service.
+         * @param {Object} service May be a SDataService instance or constructor parameters to create a new SDataService instance.
+         * @param {Object} options Optional settings for the registered service.
+         */
         registerConnection: function(name, definition, options) {
             options = options || {};
 
@@ -244,6 +320,10 @@ define('argos/Application', [
 
             return this;
         },
+        /**
+         * Determines the the specified service name is found in the Apps service object.
+         * @param {String} name Name of the SDataService to detect
+         */
         hasConnection: function(name) {
             return !!this._connections[name];
         },
@@ -268,12 +348,21 @@ define('argos/Application', [
 
             return null;
         },
+        /**
+         * Returns the defined security for a specific view
+         * @param {String} key Id of the registered view to query.
+         * @param access
+         * @return {Object}
+         */
         getViewSecurity: function(key, access) {
             return null;
             // todo: implement
             //var view = this.getView(key);
             //return (view && view.getSecurity(access));
         },
+        /**
+         * Resize handle, publishes the global event `/app/resize` which views may subscribe to.
+         */
         onResize: function() {
             if (this.resizeTimer) clearTimeout(this.resizeTimer);
 
@@ -353,6 +442,14 @@ define('argos/Application', [
 
             view.activate(tag, data);
         },
+        /**
+         * Searches view history state by passing a predicate function that should return true
+         * when a match is found.
+         * @param {Function} predicate Function that is called in the provided scope with the current history iteration. It should return true if the history item is the desired context.
+         * @param {Number} depth
+         * @param {Object} scope
+         * @return {Object/Boolean} context History data context if found, false if not.
+         */
         queryNavigationContext: function(predicate, depth, scope) {
             if (typeof depth !== 'number')
             {
@@ -372,6 +469,13 @@ define('argos/Application', [
             }
             return false;
         },
+        /**
+         * Shortcut method to {@link #queryNavigationContext queryNavigationContext} that matches the specified resourceKind provided
+         * @param {String/String[]} kind The resourceKind(s) the history item must match
+         * @param {Function} predicate Optional. If provided it will be called on matches so you may do an secondary check of the item - returning true for good items.
+         * @param {Object} scope Scope the predicate should be called in.
+         * @return {Object} context History data context if found, false if not.
+         */
         isNavigationFromResourceKind: function(kind, predicate, scope) {
             var lookup = {};
             if (lang.isArray(kind))
@@ -396,7 +500,25 @@ define('argos/Application', [
             });
         },
         /**
-         * legacy: registerCustomization(set, id, spec);
+         * Registers a customization to a target path.
+         *
+         * A Customization Spec is a special object with the following keys:
+         *
+         * * `at`: `function(item)` - passes the current item in the list, the function should return true if this is the item being modified (or is at where you want to insert something).
+         * * `at`: `{Number}` - May optionally define the index of the item instead of a function.
+         * * `type`: `{String}` - enum of `insert`, `modify`, `replace` or `remove` that indicates the type of customization.
+         * * `where`: `{String}` - enum of `before` or `after` only needed when type is `insert`.
+         * * `value`: `{Object}` - the entire object to create (insert or replace) or the values to overwrite (modify), not needed for remove.
+         * * `value`: `{Object[]}` - if inserting you may pass an array of items to create.
+         *
+         * Note: This also accepts the legacy signature:
+         * `registerCustomization(path, id, spec)`
+         * Where the path is `list/tools` and `id` is the view id
+         *
+         * All customizations are registered to `this.customizations[path]`.
+         *
+         * @param {String} path The customization set such as `list/tools#account_list` or `detail#contact_detail`. First half being the type of customization and the second the view id.
+         * @param {Object} spec The customization specification
          */
         registerCustomization: function(path, spec) {
             if (arguments.length > 2)
@@ -413,8 +535,13 @@ define('argos/Application', [
             this.customizations.register(path, spec);
         },
         /**
-         * legacy: getCustomizationsFor(set, id);
-         * { action: 'remove|modify|insert|replace', at: (index|fn), or: (fn), where: 'before|after', value: {} }
+         * Returns the customizations registered for the provided path.
+         *
+         * Note: This also accepts the legacy signature:
+         * `getCustomizationsFor(set, id)`
+         * Where the path is `list/tools` and `id` is the view id
+         *
+         * @param {String} path The customization set such as `list/tools#account_list` or `detail#contact_detail`. First half being the type of customization and the second the view id.
          */
         getCustomizationsFor: function(path, specific) {
             /* @deprecated */

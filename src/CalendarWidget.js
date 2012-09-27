@@ -13,6 +13,16 @@
  * limitations under the License.
  */
 
+/**
+ * CalendarWidget
+ * @alternateClassName CalendarWidet
+ * @extends _UiComponent
+ * @mixins _CommandMixin
+ * @mixins _EventMapMixin
+ * @requires ScrollContainer
+ * @requires utility
+ * @requires scene
+ */
 define('argos/CalendarWidget', [
     'dojo/_base/declare',
     'dojo/_base/connect',

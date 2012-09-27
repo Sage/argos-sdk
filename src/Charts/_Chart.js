@@ -20,6 +20,7 @@
  *
  * @alernateClassName _Chart
  * @mixins _TemplatedWidgetMixin
+ * @requires App
  */
 define('argos/Charts/_Chart', [
     'dojo/_base/Deferred',

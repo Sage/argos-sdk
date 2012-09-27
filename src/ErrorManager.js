@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * ErrorManager is a singleton that parses and stores SData error responses into localStorage.
+ * @alternateClassName ErrorManager
+ * @requires utility
+ * @singleton
+ */
 define('argos/ErrorManager', [
     'dojo/_base/json',
     'dojo/_base/lang',
@@ -77,9 +83,9 @@ define('argos/ErrorManager', [
 
         /**
          * Retrieve a error item that has the specified key|value pair
-         * @param key Property of error item to check, such as errorDate or url
-         * @param value Value of the key to match against
-         * @return errorItem Returns the first error item in the match set or null if none found
+         * @param {String} key Property of error item to check, such as errorDate or url
+         * @param {Number/String} value Value of the key to match against
+         * @return {Object} Returns the first error item in the match set or null if none found
          */
         getError: function(key, value) {
             var errorList = this.getAllErrors();
@@ -93,20 +99,35 @@ define('argos/ErrorManager', [
             return null;
         },
 
+        /**
+         * Returns a copy of all errors.
+         * @return {Object[]} Array of error objects.
+         */
         getAllErrors: function() {
             return lang.clone(errors);
         },
 
+        /**
+         * Removes the specified index from the error list.
+         * @param {Number} index Index of error to remove.
+         * @param {Number} amount Number of errors to remove from indexed point, if not provided defaults to 1.
+         */
         removeError: function(index, amount) {
             errors.splice(index, amount || 1);
         },
 
+        /**
+         * Publishes the `/app/refresh` event to notify that an error has been added
+         */
         onErrorAdd: function() {
             connect.publish('/app/refresh', [{
                 resourceKind: 'errorlogs'
             }]);
         },
 
+        /**
+         * Attempts to save all errors into localStorage under the `errorlog` key.
+         */
         save: function() {
             try
             {

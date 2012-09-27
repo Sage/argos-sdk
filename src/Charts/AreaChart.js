@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * AreaChart
+ * @alternateClassName AreaChart
+ * @extends _Chart
+ */
 define('argos/Charts/AreaChart', [
     'dojo/_base/declare',
     'dojo/dom-attr',

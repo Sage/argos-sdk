@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * Layout
+ * @alternateClassName Layout
+ * @extends _UiComponent
+ * @requires Pane
+ */
 define('argos/Layout', [
     'dojo/_base/declare',
     'dojo/_base/lang',

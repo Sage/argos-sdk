@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * BarChart
+ * @alternateClassName BarChart
+ * @extends _Chart
+ */
 define('argos/Charts/BarChart', [
     'dojo/_base/declare',
     'dojo/window',

@@ -13,6 +13,14 @@
  * limitations under the License.
  */
 
+/**
+ * Pane
+ * @alternateClassName Pane
+ * @extends _UiComponent
+ * @requires ToolBar
+ * @requires TitleBar
+ * @requires Transition
+ */
 define('argos/Pane', [
     'dojo/_base/declare',
     'dojo/_base/lang',

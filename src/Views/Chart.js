@@ -13,6 +13,16 @@
  * limitations under the License.
  */
 
+/**
+ * Chart View
+ * @alternateClassName ChartView
+ * @extends View
+ * @requires ColumnChart
+ * @requires PieChart
+ * @requires LineChart
+ * @requires BarChart
+ * @requires AreaChart
+ */
 define('argos/Views/Chart', [
     'dojo/_base/declare',
     'dojo/_base/lang',

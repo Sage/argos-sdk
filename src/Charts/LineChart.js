@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * LineChart
+ * @alternateClassName LineChart
+ * @extends _Chart
+ */
 define('argos/Charts/LineChart', [
     'dojo/_base/declare',
     'dojo/window',

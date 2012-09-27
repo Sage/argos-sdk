@@ -13,6 +13,16 @@
  * limitations under the License.
  */
 
+/**
+ * Signature View is a view tailored to present an HTML5 canvas that has signature-recording capabilities.
+ *
+ * It goes hand-in-hand with {@link SignatureField SignatureField}
+ *
+ * @alternateClassName SignatureView
+ * @extends View
+ * @requires format
+ * @requires ScrollContainer
+ */
 define('argos/Views/Signature', [
     'dojo/_base/declare',
     'dojo/_base/json',

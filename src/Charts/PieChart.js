@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * PieChart
+ * @alternateClassName PieChart
+ * @extends _Chart
+ */
 define('argos/Charts/PieChart', [
     'dojo/_base/declare',
     'dojo/dom-geometry',

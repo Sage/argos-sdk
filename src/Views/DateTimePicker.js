@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * DateTimePicker View.
+ * @alternateClassName DateTimePicker
+ * @extends View
+ * @mixins _TemplatedWidgetMixin
+ */
 define('argos/Views/DateTimePicker', [
     'dojo/_base/declare',
     'dojo/string',

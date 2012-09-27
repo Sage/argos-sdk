@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/**
+ * _CompositeMixin
+ * @alternateClassName _CompositeMixin
+ * @requires utility
+ * @requires FieldRegistry
+ */
 define('argos/Fields/_CompositeMixin', [
     'dojo/_base/declare',
     'dojo/_base/event',

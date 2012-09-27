@@ -12,7 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ * An Edit View is a dual purpose view - used for both Creating and Updating records. It is comprised
+ * of a layout similar to Detail rows but are instead Edit fields.
+ *
+ * A unique part of the Edit view is it's lifecycle in comparison to Detail. The Detail view is torn
+ * down and rebuilt with every record. With Edit the form is emptied (HTML left in-tact) and new values
+ * are applied to the fields.
+ *
+ * Since Edit Views are typically the "last" view (you always come from a List or Detail view) it warrants
+ * special attention to the navigation options that are passed, as they greatly control how the Edit view
+ * functions and operates.
+ *
+ * @alternateClassName Edit
+ * @extends View
+ * @requires ScrollContainer
+ * @requires TitleBar
+ * @requires ErrorManager
+ * @requires FieldRegistry
+ * @requires convert
+ * @requires utility
+ * @requires CustomizationSet
+ * @requires scene
+ */
 define('argos/Edit', [
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -30,7 +52,6 @@ define('argos/Edit', [
     './View',
     './ScrollContainer',
     './TitleBar',
-    './Data/SDataStore',
     './ErrorManager',
     './Fields/FieldRegistry',
     './convert',
@@ -54,7 +75,6 @@ define('argos/Edit', [
     View,
     ScrollContainer,
     TitleBar,
-    SDataStore,
     ErrorManager,
     FieldRegistry,
     convert,
@@ -83,12 +103,26 @@ define('argos/Edit', [
         baseClass: 'view edit',
         _setValidationContentAttr: {node: 'validationContentNode', type: 'innerHTML'},
 
+        /**
+         * @property {Simplate}
+         * HTML shown when data is being loaded.
+         *
+         * * `$` => validation error object
+         * * `$$` => field instance that the error is on
+         */
         validationSummaryItemTemplate: new Simplate([
             '<li data-field="{%= $.name %}">',
             '<h3>{%: $.message %}</h3>',
             '<h4>{%: $$.label %}</h4>',
             '</li>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML that defines a section of layout
+         *
+         * `$` => the layout section being rendered
+         * `$$` => the view instance
+         */
         sectionTemplate: new Simplate([
             '{% if ($.title !== false) { %}',
             '<h2 data-action="toggleCollapse" class="{% if ($.collapsed) { %}is-collapsed{% } %}">',
@@ -99,31 +133,107 @@ define('argos/Edit', [
             '<fieldset class="{%= $.cls %}">',
             '</fieldset>'
         ]),
+        /**
+         * @property {Simplate}
+         * HTML created for each field row.
+         *
+         * * `$` => the field row object defined in {@link #createLayout createLayout}.
+         * * `$$` => the view instance
+         */
         rowTemplate: new Simplate([
             '<div class="row row-edit {%= $.containerClass || $.cls %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '</div>'
         ]),
+        /**
+         * @cfg {String}
+         * The unique identifier of the view
+         */
         id: 'generic_edit',
         tier: 1,
         store: null,
+        /**
+         * @property {Object}
+         * The layout definition that constructs the detail view with sections and rows
+         */
         layout: null,
+        /**
+         * @cfg {String/Object}
+         * May be used for verifying the view is accessible for creating entries
+         */
         insertSecurity: false,
+        /**
+         * @cfg {String/Object}
+         * May be used for verifying the view is accessible for editing entries
+         */
         updateSecurity: false,
+        /**
+         * @property {String}
+         * The customization identifier for this class. When a customization is registered it is passed
+         * a path/identifier which is then matched to this property.
+         */
         customizationSet: 'edit',
+        /**
+         * @property {Object}
+         * Collection of the fields in the layout where the key is the `name` of the field.
+         */
+        fields: null,
 
+        /**
+         * @property {String}
+         * ARIA label text in the default "save" toolbar button
+         */
         saveText: 'Save',
+        /**
+         * @property {String}
+         * ARIA label text in the default "cancel" toolbar button
+         */
         cancelText: 'Cancel',
+        /**
+         * @cfg {String}
+         * Default title text shown in the top toolbar
+         */
         titleText: 'Edit',
+        /**
+         * @property {String}
+         * ARIA label text for a collapsible section header
+         */
         toggleCollapseText: 'toggle collapse',
+        /**
+         * @cfg {String}
+         * The text placed in the header when there are validation errors
+         */
         validationSummaryText: 'Validation Summary',
+        /**
+         * @property {String}
+         * Default text used in the section header
+         */
         detailsText: 'Details',
+        /**
+         * @property {String}
+         * Text shown while the view is loading.
+         */
         loadingText: 'loading...',
+        /**
+         * @property {String}
+         * Text alerted to user when any server error occurs.
+         */
         requestErrorText: 'A server error occurred while requesting data.',
 
+        /**
+         * Extends constructor to initialze `this.fields` to {}
+         * @param o
+         */
         constructor: function(o) {
             this.fields = {};
         },
+        /**
+         * When the app is started this fires, the Edit view renders its layout immediately, then
+         * renders each field instance and calls their `startup()`.
+         *
+         * On refresh it will clear the values, but leave the layout intact.
+         *
+         */
         onStartup: function() {
             this.inherited(arguments);
 
@@ -159,6 +269,15 @@ define('argos/Edit', [
                 delete this.fields;
             }
         },
+        /**
+         * Sets and returns the toolbar item layout definition, this method should be overriden in the view
+         * so that you may define the views toolbar items.
+         *
+         * By default it adds a save button bound to `this.save()` and cancel that fires `ReUI.back()`
+         *
+         * @return {Object} this.tools
+         * @template
+         */
         createToolLayout: function() {
             return this.tools || (this.tools = {
                 'top': [{
@@ -179,18 +298,51 @@ define('argos/Edit', [
         _getStoreAttr: function() {
             return this.store || (this.store = this.createStore());
         },
+        /**
+         * Handler for a fields on show event.
+         *
+         * Removes the row-hidden css class.
+         *
+         * @param {_Field} field Field instance that is being shown
+         */
         _onShowField: function(field) {
             domClass.remove(field.containerNode, 'row-hidden');
         },
+        /**
+         * Handler for a fields on hide event.
+         *
+         * Adds the row-hidden css class.
+         *
+         * @param {_Field} field Field instance that is being hidden
+         */
         _onHideField: function(field) {
             domClass.add(field.containerNode, 'row-hidden');
         },
+        /**
+         * Handler for a fields on enable event.
+         *
+         * Removes the row-disabled css class.
+         *
+         * @param {_Field} field Field instance that is being enabled
+         */
         _onEnableField: function(field) {
             domClass.remove(field.containerNode, 'row-disabled');
         },
+        /**
+         * Handler for a fields on disable event.
+         *
+         * Adds the row-disabled css class.
+         *
+         * @param {_Field} field Field instance that is being disabled
+         */
         _onDisableField: function(field) {
             domClass.add(field.containerNode, 'row-disabled');
         },
+        /**
+         * Toggles the collapsed state of the section.
+         * @param {Event} evt Mouse event.
+         * @param {HTMLElement} node Node that initiated the event.
+         */
         toggleCollapse: function(evt, node) {
             if (node) domClass.toggle(node, 'is-collapsed');
 
@@ -273,6 +425,33 @@ define('argos/Edit', [
 
             return getResults;
         },
+        /**
+         * Sets and returns the Edit view layout by following a standard for section and field:
+         *
+         * The `this.layout` itself is an array of section objects where a section object is defined as such:
+         *
+         *     {
+         *        name: 'String', // Required. unique name for identification/customization purposes
+         *        title: 'String', // Required. Text shown in the section header
+         *        children: [], // Array of child row objects
+         *     }
+         *
+         * A child row object has:
+         *
+         *     {
+         *        name: 'String', // Required. unique name for identification/customization purposes
+         *        property: 'String', // Optional. The SData property of the current entity to bind to
+         *        label: 'String', // Optional. Text shown in the label to the left of the property
+         *        type: 'String', // Required. The field type as registered with the FieldManager.
+         *        // Examples of type: 'text', 'decimal', 'date', 'lookup', 'select', 'duration'
+         *        'default': value // Optional. If defined the value will be set as the default "unmodified" value (not dirty).
+         *     }
+         *
+         * All further properties are set by their respective type, please see the individual field for
+         * its configurable options.
+         *
+         * @return {Object[]} Edit layout definition
+         */
         createLayout: function() {
             return this.layout || [];
         },
@@ -369,6 +548,20 @@ define('argos/Edit', [
         createItemTemplate: function() {
             return {};
         },
+        /**
+         * ApplyContext is called during {@link #processTemplateEntry processTemplateEntry} and is
+         * intended as a hook for when you are inserting a new entry (not editing) and wish to apply
+         * values from context, ie, from a view in the history.
+         *
+         * The cycle of a template values is (first to last, last being the one that overwrites all)
+         *
+         * 1\. Set the values of the template SData response
+         * 2\. Set any field defaults (the fields `default` property)
+         * 3\. ApplyContext is called
+         * 4\. If `this.options.entry` is defined, apply those values
+         *
+         * @param templateEntry
+         */
         applyContext: function(templateEntry) {
         },
         applyDefaultValues: function(fields){
@@ -385,12 +578,25 @@ define('argos/Edit', [
                 field.setValue(utility.expand(this, defaultValue, field));
             }
         },
+        /**
+         * Loops all fields and calls its `clearValue()`.
+         */
         clearValues: function() {
             for (var name in this.fields)
             {
                 this.fields[name].clearValue();
             }
         },
+        /**
+         * Sets the given values by looping the fields and checking if the field property matches
+         * a key in the passed values object (after considering a fields `applyTo`).
+         *
+         * The value set is then passed the initial state, true for default/unmodified/clean and false
+         * for dirty or altered.
+         *
+         * @param {Object} values SData entry, or collection of key/values where key matches a fields property attribute
+         * @param {Boolean} initial Initial state of the value, true for clean, false for dirty
+         */
         setValues: function(values, initial) {
             var noValue = {},
                 field,
@@ -416,6 +622,15 @@ define('argos/Edit', [
                 if (value !== noValue) field.setValue(value, initial);
             }
         },
+        /**
+         * Retrieves the value from every field, skipping the ones excluded, and merges them into a
+         * single payload with the key being the fields `property` attribute, taking into consideration `applyTo` if defined.
+         *
+         * If all is passed as true, it also grabs hidden and unmodified (clean) values.
+         *
+         * @param {Boolean} all True to also include hidden and unmodified values.
+         * @return {Object} A single object payload with all the values.
+         */
         getValues: function(all) {
             var o = {},
                 empty = true,
@@ -462,6 +677,11 @@ define('argos/Edit', [
             }
             return empty ? false : o;
         },
+        /**
+         * Loops and gathers the validation errors returned from each field and adds them to the
+         * validation summary area. If no errors, removes the validation summary.
+         * @return {Boolean/Object[]} Returns the array of errors if present or false for no errors.
+         */
         validate: function() {
             var errors = [];
 
@@ -490,6 +710,11 @@ define('argos/Edit', [
                 ? errors
                 : false;
         },
+        /**
+         * Gathers the values for the entry to send back and returns the appropriate payload for
+         * creating or updating.
+         * @return {Object} Entry/payload
+         */
         createItem: function() {
             var values = this.getValues();
 
@@ -497,15 +722,32 @@ define('argos/Edit', [
                 ? this.createItemForUpdate(values)
                 : this.createItemForInsert(values);
         },
+        /**
+         * Takes the values object and adds the needed propertiers for updating.
+         * @param {Object} values
+         * @return {Object} Object with properties for updating
+         */
         createItemForUpdate: function(values) {
             return values;
         },
+        /**
+         * Takes the values object and adds the needed propertiers for creating/inserting.
+         * @param {Object} values
+         * @return {Object} Object with properties for inserting
+         */
         createItemForInsert: function(values) {
             return values;
         },
+        /**
+         * Determines if the form is currently busy/disabled
+         * @return {Boolean}
+         */
         isFormDisabled: function() {
             return this.busy;
         },
+        /**
+         * Disables the form by setting busy to true and disabling the toolbar.
+         */
         disable: function() {
             this.busy = true;
 
@@ -513,6 +755,9 @@ define('argos/Edit', [
 
             domClass.add(this.domNode, 'is-busy');
         },
+        /**
+         * Enables the form by setting busy to false and enabling the toolbar
+         */
         enable: function() {
             this.busy = false;
 
@@ -520,6 +765,10 @@ define('argos/Edit', [
 
             domClass.remove(this.domNode, 'is-busy');
         },
+        /**
+         * Called by `save()` when performing an insert (create).
+         * Gathers the values, creates the payload for insert, updates the store.
+         */
         insert: function() {
             var values = this.getValues();
             if (values)
@@ -593,6 +842,10 @@ define('argos/Edit', [
             };
             ErrorManager.addError(this.requestErrorText, errorItem);
         },
+        /**
+         * Called by save() when performing an update (edit).
+         * Gathers the values, creates the payload for update, and alters the store.
+         */
         update: function() {
             var values = this.getValues();
             if (values)
@@ -671,6 +924,10 @@ define('argos/Edit', [
                 scene().back();
             }
         },
+        /**
+         * Creates the markup by applying the `validationSummaryItemTemplate` to each item in `this.errors`
+         * then sets the combined result into the summary validation node and sets the styling to visible
+         */
         showValidationSummary: function() {
             var content = [];                        
 
@@ -683,10 +940,20 @@ define('argos/Edit', [
 
             this.onContentChange();
         },
+        /**
+         * Removes the summary validation visible styling and empties its contents of error markup
+         */
         hideValidationSummary: function() {
             domClass.remove(this.domNode, 'has-error');
             this.set('validationContent', '');
         },
+        /**
+         * Handler for the save toolbar action.
+         *
+         * First validates the forms, showing errors and stoping saving if found.
+         * Then calls either {@link #insert insert} or {@link #update update} based upon `this.inserting`.
+         *
+         */
         save: function() {
             if (this.isFormDisabled())  return;
 
@@ -703,8 +970,12 @@ define('argos/Edit', [
             else
                 this.update();
         },
-        /* todo: move SData options into mixin */
+        /**
+         * Extends the getContext function to also include the `resourceKind` of the view, `insert`
+         * state and `key` of the entry (false if inserting)
+         */
         getContext: function() {
+            /* todo: move SData options into mixin */
             var store = this.get('store'),
                 options = this.options,
                 id = options.insert ? false : store && store.getIdentity(options.item || options.entry);
@@ -714,6 +985,10 @@ define('argos/Edit', [
                 id: id
             });
         },
+        /**
+         * Wrapper for detecting security for update mode or insert mode
+         * @param {String} access Can be either "update" or "insert"
+         */
         getSecurity: function(access) {
             var lookup = {
                 'update': this.updateSecurity,
@@ -728,6 +1003,9 @@ define('argos/Edit', [
             /* if we are not activating previous options, force a refresh of the view */
             if (!previous) this.refreshRequired = true;
         },
+        /**
+         * Extends beforeTransitionTo to add the loading styling if refresh is needed
+         */
         beforeTransitionTo: function() {
             if (this.refreshRequired)
             {
@@ -739,6 +1017,11 @@ define('argos/Edit', [
 
             this.inherited(arguments);
         },
+        /**
+         * Extends refreshRequiredFor to return false if we already have the key the options is passing
+         * @param {Object} options Navigation options from previous view
+         * @return {Boolean}
+         */
         refreshRequiredFor: function(options) {
             if (this.options)
             {
@@ -760,6 +1043,19 @@ define('argos/Edit', [
             else
                 return this.inherited(arguments);
         },
+        /**
+         * Load first clears out any variables set to previous data such as `this.entry` and `this.changing`.
+         *
+         * The mode of the Edit view is set and determined via `this.options.insert`, and the views values are cleared.
+         *
+         * Lastly it makes the appropiate data request:
+         *
+         * 1\. If we are inserting and passed a `template`, process the template. No request.
+         * 2\. If we are inserting and not passed a `template`, request a template.
+         * 3\. If we are not inserting and passed an `entry`, process the `entry` and process `changes`.
+         * 4\. If we are not inserting and not passed an `entry`, but were passed a `key`, request the keys detail and use that as an entry.
+         *
+         */
         load: function() {
             this.inherited(arguments);
 

@@ -13,6 +13,11 @@
  * limitations under the License.
  */
 
+/**
+ * Collection of outside handlers such as making calls, sending emails and opening maps.
+ * @alternateClassName environment
+ * @singleton
+ */
 define('argos/Environment', [
     'dojo/_base/lang',
     'dojo/_base/window',

@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+/**
+ * CustomizationSet
+ * @alertnateClassName CustomizationSet
+ */
 define('argos/CustomizationSet', [
     'dojo/_base/declare',
     'dojo/_base/lang'
