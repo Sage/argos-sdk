@@ -1028,6 +1028,12 @@ define('argos/List', [
             if (whereQueryFmt && selection)
                 options['where'] = string.substitute(whereQueryFmt, [selection.data['$key']]);
 
+            this.setSource({
+                entry: selection.data,
+                descriptor: selection.data['$descriptor'],
+                key: selection.data['$key']
+            });
+
             scene().showView(viewId, options);
         },
         /**
