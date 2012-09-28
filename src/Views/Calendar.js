@@ -19,7 +19,7 @@
  * @extends View
  * @requires CalendarWidget
  */
-define('Sage/Platform/Mobile/Views/Calendar', [
+define('argos/Calendar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/connect',
@@ -44,7 +44,7 @@ define('Sage/Platform/Mobile/Views/Calendar', [
     View,
     CalendarWidget
 ) {
-    return declare('Sage.Platform.Mobile.Views.Calendar', [View], {
+    return declare('argos.Views.Calendar', [View], {
         events: {
             'click': true
         },

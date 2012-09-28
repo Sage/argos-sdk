@@ -3,46 +3,92 @@
         "name": "Argos SDK",
         "groups": [
             {
-                "name": "Base",
+                "name": "Core",
                 "classes": [
-                    "Sage.Platform.Mobile.Application",
-                    "Sage.Platform.Mobile.ApplicationModule",
-                    "Sage.Platform.Mobile.Calendar",
-                    "Sage.Platform.Mobile.ErrorManager",
-                    "Sage.Platform.Mobile.Format",
-                    "Sage.Platform.Mobile.MainToolbar",
-                    "Sage.Platform.Mobile.PersistentStorage",
-                    "Sage.Platform.Mobile.SearchWidget",
-                    "Sage.Platform.Mobile.SelectionModel",
-                    "Sage.Platform.Mobile.Toolbar",
-                    "Sage.Platform.Mobile.Utility"
+                    "argos.Application",
+                    "argos.ApplicationModule",
+                    "argos._Component",
+                    "argos._UiComponent",
+                    "argos.Scene",
+                    "argos.Message",
+                    "argos.CustomizationSet",
+                    "argos.SelectionModel",
+                    "argos.ConfigurableSelectionModel",
+                    "argos.Transition"
                 ]
             },
             {
                 "name": "Views",
                 "classes": [
-                    "Sage.Platform.Mobile.View",
-                    "Sage.Platform.Mobile.List",
-                    "Sage.Platform.Mobile.GroupedList",
-                    "Sage.Platform.Mobile.Detail",
-                    "Sage.Platform.Mobile.Edit",
-                    "Sage.Platform.Mobile.Views.*"
-                ]
-            },
-            {
-                "name": "Fields",
-                "classes": [
-                    "Sage.Platform.Mobile.FieldManager",
-                    "Sage.Platform.Mobile.Fields.*"
+                    "argos.View",
+                    "argos.List",
+                    "argos.GroupedList",
+                    "argos.Detail",
+                    "argos.Edit",
+                    "argos.Views.*"
                 ]
             },
             {
                 "name": "Mixins",
                 "classes": [
-                    "Sage.Platform.Mobile._ActionMixin",
-                    "Sage.Platform.Mobile._CustomizationMixin",
-                    "Sage.Platform.Mobile._ServiceMixin",
-                    "Sage.Platform.Mobile._Templated"
+                    "argos._CommandMixin",
+                    "argos._EventMapMixin",
+                    "argos._MessageMapMixin",
+                    "argos._SDataDetailMixin",
+                    "argos._SDataEditMixin",
+                    "argos._SDataListMixin",
+                    "argos._TemplatedContentMixin",
+                    "argos._TemplatedWidgetMixin"
+                ]
+            },
+            {
+                "name": "Toolbars",
+                "classes": [
+                    "argos.Toolbar",
+                    "argos.ToolbarButton",
+                    "argos.TitleBar",
+                    "argos.ActionBar"
+                ]
+            },
+            {
+                "name": "Components and Widgets",
+                "classes": [
+                    "argos.Control",
+                    "argos.DomContentComponent",
+                    "argos.Layout",
+                    "argos.Pane",
+                    "argos.CalendarWidget",
+                    "argos.SearchWidget",
+                    "argos.ScrollContainer"
+                ]
+            },
+            {
+                "name": "Fields",
+                "classes": [
+                    "argos.Fields.*"
+                ]
+            },
+            {
+                "name": "Charts",
+                "classes": [
+                    "argos.Charts.*"
+                ]
+            },
+            {
+                "name": "Data Stores",
+                "classes": [
+                    "argos.Store.*"
+                ]
+            },
+            {
+                "name": "Utilities",
+                "classes": [
+                    "argos.convert",
+                    "argos.ErrorManager",
+                    "argos.format",
+                    "argos.main",
+                    "argos.utility",
+                    "argos.environment"
                 ]
             }
         ]

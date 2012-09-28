@@ -15,7 +15,7 @@
 
 /**
  * CustomizationSet
- * @alertnateClassName CustomizationSet
+ * @alernateClassName CustomizationSet
  */
 define('argos/CustomizationSet', [
     'dojo/_base/declare',

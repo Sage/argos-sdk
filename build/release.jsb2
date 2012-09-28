@@ -184,10 +184,6 @@
           "path": "../src/Charts"
         },
         {
-          "text": "SDataStore.js",
-          "path": "../src/Data"
-        },
-        {
           "text": "format.js",
           "path": "../src"
         },
