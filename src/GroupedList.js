@@ -56,6 +56,7 @@ define('Sage/Platform/Mobile/GroupedList', [
             '{%! $.emptySelectionTemplate %}',
             '<div class="group-content" data-dojo-attach-point="contentNode"></div>',
             '{%! $.moreTemplate %}',
+            '{%! $.listActionTemplate %}',
             '</div>'
         ]),
         /**
