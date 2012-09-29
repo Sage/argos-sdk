@@ -1187,6 +1187,12 @@ define('Sage/Platform/Mobile/List', [
                     where: string.substitute(whereQueryFmt, [selection.data['$key']])
                 };
 
+            this.setSource({
+                entry: selection.data,
+                descriptor: selection.data['$descriptor'],
+                key: selection.data['$key']
+            });
+
             if (view && options)
                 view.show(options);
         },
