@@ -11,16 +11,6 @@
     <!-- JSON -->
     <script type="text/javascript" src="../libraries/json2.js"></script>
 
-    <!-- ReUI -->
-    <script type="text/javascript">
-    reConfig = {
-        autoInit: false,
-        legacyMode: false,
-        showInitialPage: false,
-        updateBackButtonText: false
-    };
-    </script>
-
     <!-- SData Client Library -->
     <script type="text/javascript" src="../libraries/sdata/sdata-client-dependencies-debug.js"></script>
     <script type="text/javascript" src="../libraries/sdata/sdata-client-debug.js"></script>
@@ -63,10 +53,11 @@
         'dojo/DeferredList',
 
 //        'spec/_SDataListMixin.spec',
+        'spec/_OfflineCache.spec',
         'spec/ApplicationModule.spec',
         'spec/convert.spec',
         'spec/ErrorManager.spec',
-        'spec/format.spec',
+//        'spec/format.spec',
         'spec/GroupedList.spec',
         'spec/List.spec',
         'spec/TitleBar.spec',

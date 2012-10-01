@@ -18,7 +18,7 @@
  * @alternateClassName _OfflineCache
  * @singleton
  */
-define('argos/environment', [
+define('argos/_OfflineCache', [
     'dojo/_base/lang',
     'dojo/string'
 ], function(
@@ -67,16 +67,10 @@ define('argos/environment', [
         },
 
         /**
-         * Creates the WebSQL database
+         * Opens the intitial SQL database and sets up the initial schema
          */
         createSQLDatabase: function() {
-            this._database = openDatabase('argos', this.version, this.descriptionText, 5242880, this.onCreateSQLSuccess.bindDelegate(this))
-        },
-
-        /**
-         * Handler for when the SQL database is first created
-         */
-        onCreateSQLSuccess: function() {
+            this._database = openDatabase('argos', this.version, this.descriptionText, 5242880);
             // todo: determine what sort of meta data might be needed
             this._database.transaction(function(transaction) {
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS meta (id INTEGER PRIMARY KEY ASC, dateStamp DATETIME)');
@@ -87,7 +81,6 @@ define('argos/environment', [
          * Creates the IndexedDB database
          */
         createIDBDatabase: function() {
-
         },
 
 
@@ -95,6 +88,63 @@ define('argos/environment', [
          * Empties the database of all data
          */
         clear: function() {
+            switch(this._databaseType)
+            {
+                case 'sql': this.clearSQLDatabase(); break;
+                case 'indexeddb': this.clearIDBDatabase(); break;
+                default: return false;
+            }
+        },
+        clearSQLDatabase: function() {
+            var db = this._database;
+            db.transaction(function(transaction) {
+                transaction.executeSql("SELECT tbl_name FROM sqlite_master WHERE type='table';", [], function(tx, results) {
+                    var names = [];
+
+                    for (var i = 0; i < results.rows.length; i++)
+                    {
+                        var item = results.rows.item(i);
+                        if (item['tbl_name'] !== '__WebKitDatabaseInfoTable__')
+                            names.push(item['tbl_name']);
+                    }
+
+                    db.transaction(function(deleteTransaction) {
+                        deleteTransaction.executeSql('DROP TABLE ' + names.join('; '));
+                    });
+                });
+            });
+        },
+        clearIDBDatabase: function() {
+
+        },
+
+        /**
+         * Empties the database of a particular "set": SQL = table, IDB = document
+         * @param {String} setName
+         */
+        clearSet: function(setName) {
+            switch(this._databaseType)
+            {
+                case 'sql': this.clearSQLTable(setName); break;
+                case 'indexeddb': this.clearIDBDocument(setName); break;
+                default: return false;
+            }
+        },
+        clearSQLTable: function(tableName) {
+            this._database.transaction(function(transaction) {
+                transaction.executeSql('DROP TABLE ' + tableName);
+            });
+        },
+        clearIDBDocument: function(docName) {
+
+        },
+
+
+        /**
+         * Deletes the specified key
+         * @param key
+         */
+        clearItem: function(key) {
 
         }
     });
