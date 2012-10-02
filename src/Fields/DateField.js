@@ -38,7 +38,7 @@ define('argos/Fields/DateField', [
     'dojo/string',
     'dojo/dom-class',
     '../_TemplatedWidgetMixin',
-    '../Format',
+    '../format',
     './EditorField'
 ], function(
     declare,
