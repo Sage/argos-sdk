@@ -492,6 +492,16 @@ define('argos/Scene', [
         getView: function(id) {
             return this._instancedViews[id];
         },
+        navigateUp: function() {
+            // scan this._state back until change of hash in tier: 0
+            var count = 1,
+                currentHash = this._state[this._state.length - 1][0].hash;
+
+            while (currentHash == this._state[this._state.length - count][0].hash)
+                count += 1;
+
+            this.back(count - 1);
+        },
         /* todo: this should return a deferred */
         back: function(count, navigation) {
             if (typeof count !== 'number')

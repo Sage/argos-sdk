@@ -663,6 +663,10 @@ define('argos/List', [
                     id: 'new',
                     action: 'navigateToInsertView',
                     security: App.getViewSecurity(this.insertView, 'insert')
+                },{
+                    id: 'up',
+                    action: 'navigateUp',
+                    place: 'left'
                 }]
             });
         },
@@ -1068,6 +1072,9 @@ define('argos/List', [
                 returnTo: this.id,
                 insert: true
             });
+        },
+        navigateUp: function() {
+            scene().navigateUp();
         },
         onContentChange: function() {
         },
