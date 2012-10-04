@@ -259,6 +259,25 @@ return describe('argos.utility', function() {
         };
         expect(utility.sanitizeForJson(json)).toEqual(expected);
     });
+    it('Can sanitize a valid json object with arrays, expanding json strings back to obj form', function() {
+        var json = {
+            test: 'success',
+            expand: '{"inner":["success","success2",{"inner2":"success3"}]}'
+        };
+        var expected = {
+            test: 'success',
+            expand: {
+                inner: [
+                    'success',
+                    'success2',
+                    {
+                        "inner2": "success3"
+                    }
+                ]
+            }
+        };
+        expect(utility.sanitizeForJson(json)).toEqual(expected);
+    });
 
     /**
      * utility.nameToPath

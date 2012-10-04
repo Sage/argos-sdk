@@ -311,7 +311,9 @@ define('argos/utility', [
                         try
                         {
                             obj[key] = json.fromJson(obj[key]);
-                            obj[key] = this.sanitizeForJson(obj[key]);
+
+                            if (typeof obj[key] === 'object')
+                                obj[key] = this.sanitizeForJson(obj[key]);
                         }
                         catch(e){}
                         break;
