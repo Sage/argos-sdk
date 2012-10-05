@@ -60,8 +60,8 @@ define('argos/_OfflineCache', [
         startup: function() {
             switch(this._databaseType)
             {
-                case 'sql': this.createSQLDatabase(); break;
-                case 'indexeddb': this.createIDBDatabase(); break;
+                case 'sql': this._createSQLDatabase(); break;
+                case 'indexeddb': this._createIDBDatabase(); break;
                 default: return false;
             }
         },
@@ -69,7 +69,7 @@ define('argos/_OfflineCache', [
         /**
          * Opens the intitial SQL database and sets up the initial schema
          */
-        createSQLDatabase: function() {
+        _createSQLDatabase: function() {
             this._database = openDatabase('argos', this.version, this.descriptionText, 5242880);
             // todo: determine what sort of meta data might be needed
             this._database.transaction(function(transaction) {
@@ -80,8 +80,39 @@ define('argos/_OfflineCache', [
         /**
          * Creates the IndexedDB database
          */
-        createIDBDatabase: function() {
+        _createIDBDatabase: function() {
         },
+
+        /**
+         * Stores the given entry under the designated resourceKind store
+         * @param {String} resourceKind
+         * @param {Object} entry
+         * @param {Function?} callback Optional.
+         * @param {Object?} scope Optional.
+         */
+        setItem: function(resourceKind, entry, callback, scope) {
+            switch(this._databaseType)
+            {
+                case 'sql': this._setSQLItem(resourceKind, entry, callback, scope); break;
+                case 'indexeddb': this._setIDBItem(resourceKind, entry, callback, scope); break;
+                default: return false;
+            }
+        },
+        _setSQLItem: function(resourceKind, entry, callback, scope) {
+            // split entry into [{resourceKind}, {resourceKind_relatedKind}, {_otherKind}]
+
+            // loop entries, check if that resourceKind table exists
+            // if not, create it
+            // todo: decide if setItem for both entry/feed or setItem and setItems needed
+            // update if entry exist, create if not
+            // continue for each resourcekind
+
+            // on final success (use dojo.Deferred), do callback with the scope
+        },
+        _setIDBItem: function(resourceKind, entry, callback, scope) {
+
+        },
+
 
 
         /**
@@ -90,12 +121,12 @@ define('argos/_OfflineCache', [
         clear: function() {
             switch(this._databaseType)
             {
-                case 'sql': this.clearSQLDatabase(); break;
-                case 'indexeddb': this.clearIDBDatabase(); break;
+                case 'sql': this._clearSQLDatabase(); break;
+                case 'indexeddb': this._clearIDBDatabase(); break;
                 default: return false;
             }
         },
-        clearSQLDatabase: function() {
+        _clearSQLDatabase: function() {
             var db = this._database;
             db.transaction(function(transaction) {
                 transaction.executeSql("SELECT tbl_name FROM sqlite_master WHERE type='table';", [], function(tx, results) {
@@ -114,7 +145,7 @@ define('argos/_OfflineCache', [
                 });
             });
         },
-        clearIDBDatabase: function() {
+        _clearIDBDatabase: function() {
 
         },
 
@@ -125,17 +156,17 @@ define('argos/_OfflineCache', [
         clearSet: function(setName) {
             switch(this._databaseType)
             {
-                case 'sql': this.clearSQLTable(setName); break;
-                case 'indexeddb': this.clearIDBDocument(setName); break;
+                case 'sql': this._clearSQLTable(setName); break;
+                case 'indexeddb': this._clearIDBDocument(setName); break;
                 default: return false;
             }
         },
-        clearSQLTable: function(tableName) {
+        _clearSQLTable: function(tableName) {
             this._database.transaction(function(transaction) {
                 transaction.executeSql('DROP TABLE ' + tableName);
             });
         },
-        clearIDBDocument: function(docName) {
+        _clearIDBDocument: function(docName) {
 
         },
 
