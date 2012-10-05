@@ -658,17 +658,24 @@ define('argos/List', [
          * @template
          */
         createToolLayout: function() {
-            return this.tools || (this.tools = {
-                'top': [{
-                    id: 'new',
-                    action: 'navigateToInsertView',
-                    security: App.getViewSecurity(this.insertView, 'insert')
-                },{
-                    id: 'up',
-                    action: 'navigateUp',
-                    place: 'left'
-                }]
-            });
+            if (!this.tools) {
+                this.tools = {
+                    'top': [{
+                        id: 'new',
+                        action: 'navigateToInsertView',
+                        security: App.getViewSecurity(this.insertView, 'insert')
+                    }]
+                };
+
+                if (1 < scene().layout.tiers)
+                    this.tools.top.push({
+                        id: 'up',
+                        action: 'navigateUp',
+                        place: 'left'
+                    });
+            }
+
+            return this.tools;
         },
         /**
          * Sets and returns the list-action actions layout definition, this method should be overriden in the view
