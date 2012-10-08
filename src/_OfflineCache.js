@@ -54,6 +54,8 @@ define('argos/_OfflineCache', [
          */
         _database: null,
 
+        _tables: {},
+
         /**
          * Creates the database based on the detected type
          */
@@ -64,6 +66,9 @@ define('argos/_OfflineCache', [
                 case 'indexeddb': this._createIDBDatabase(); break;
                 default: return false;
             }
+
+            // todo: load table names into _tables
+
         },
 
         /**
@@ -71,10 +76,12 @@ define('argos/_OfflineCache', [
          */
         _createSQLDatabase: function() {
             this._database = openDatabase('argos', this.version, this.descriptionText, 5242880);
+
             // todo: determine what sort of meta data might be needed
             this._database.transaction(function(transaction) {
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS meta (id INTEGER PRIMARY KEY ASC, dateStamp DATETIME)');
             });
+            this._tables['meta'] =  true;
         },
 
         /**
@@ -101,6 +108,7 @@ define('argos/_OfflineCache', [
         _setSQLItem: function(resourceKind, entry, callback, scope) {
             // split entry into [{resourceKind}, {resourceKind_relatedKind}, {_otherKind}]
             var document = this.splitResources(resourceKind, entry);
+            this.processRelated(document);
 
             // loop entries, check if that resourceKind table exists
             // if not, create it
@@ -145,13 +153,39 @@ define('argos/_OfflineCache', [
                         delete entry[prop]; // should never be receiving functions
                         break;
                     case 'object':
-                        doc.related.push(this.splitResources(prop, entry[prop]));
+                        var relatedEntityName = entityName + '_' + prop;
+                        doc.related.push(this.splitResources(relatedEntityName, entry[prop]));
                         delete entry[prop];
                         break;
                 }
             }
 
             return doc;
+        },
+        /**
+         *
+         * @param {Object} doc
+         */
+        processRelated: function(doc) {
+            for (var i = 0; i < doc.related.length; i++)
+            {
+                var related = doc.related[i];
+
+                if (this.tableExists(related['entityName']))
+                {
+
+                }
+
+
+            }
+        },
+        /**
+         *
+         * @param {String} tableName
+         * @return {Boolean}
+         */
+        tableExists: function(tableName) {
+            return !!this._tables[tableName];
         },
 
 
