@@ -244,10 +244,6 @@
           "path": "../src/Fields"
         },
         {
-          "text": "NoteField.js",
-          "path": "../src/Fields"
-        },
-        {
           "text": "PhoneField.js",
           "path": "../src/Fields"
         },
@@ -308,7 +304,7 @@
           "path": "../src/Views"
         },
         {
-          "text": "Calender.js",
+          "text": "Calendar.js",
           "path": "../src/Views"
         },
         {
