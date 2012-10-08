@@ -182,8 +182,9 @@ define('argos/format', [
             if (date)
             {
                 date = moment(date);
+
                 if (utc)
-                    date = date.add({minutes: date.zone()});
+                    date.subtract('minutes', date.zone());
 
                 return date.format(fmt || argos.format.shortDateFormatText);
             }
