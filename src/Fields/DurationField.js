@@ -43,7 +43,7 @@ define('argos/Fields/DurationField', [
     'dojo/_base/declare',
     'dojo/string',
     'dojo/dom-class',
-    '../Format',
+    '../format',
     './LookupField'
 ], function(
     declare,

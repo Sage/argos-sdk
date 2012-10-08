@@ -100,6 +100,7 @@ define('argos/_OfflineCache', [
         },
         _setSQLItem: function(resourceKind, entry, callback, scope) {
             // split entry into [{resourceKind}, {resourceKind_relatedKind}, {_otherKind}]
+            var document = this.splitResources(resourceKind, entry);
 
             // loop entries, check if that resourceKind table exists
             // if not, create it
@@ -111,6 +112,46 @@ define('argos/_OfflineCache', [
         },
         _setIDBItem: function(resourceKind, entry, callback, scope) {
 
+        },
+
+        /**
+         * Takes a javascript object and splits the inner objects into an array recursively.
+         *
+         * The structure returned is:
+         *
+         *     {
+         *         entityName: 'Kind',
+         *         entry: {Only the properties at that level},
+         *         resources: [{result of inner objects, also splitted using this function}, {}, {}]
+         *     }
+         *
+         *
+         * @param {String} entityName The name of the entity (eg, Contact, Activity, etc) being stored
+         * @param {Object} entry Item to be split
+         * @return {Object}
+         */
+        splitResources: function(entityName, entry) {
+            var doc = {
+                entityName: entityName,
+                entry: entry,
+                related: []
+            };
+
+            for (var prop in entry)
+            {
+                switch(typeof entry[prop])
+                {
+                    case 'function':
+                        delete entry[prop]; // should never be receiving functions
+                        break;
+                    case 'object':
+                        doc.related.push(this.splitResources(prop, entry[prop]));
+                        delete entry[prop];
+                        break;
+                }
+            }
+
+            return doc;
         },
 
 

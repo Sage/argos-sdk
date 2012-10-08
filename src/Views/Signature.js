@@ -29,7 +29,7 @@ define('argos/Views/Signature', [
     'dojo/query',
     'dojo/dom-geometry',
     'dojo/window',
-    '../Format',
+    '../format',
     '../ScrollContainer',
     '../View'
 ], function(

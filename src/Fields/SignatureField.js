@@ -35,7 +35,7 @@ define('argos/Fields/SignatureField', [
     'dojo/_base/lang',
     'dojo/_base/json',
     'dojo/dom-attr',
-    '../Format',
+    '../format',
     './EditorField'
 ], function(
     declare,
