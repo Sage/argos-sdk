@@ -20,10 +20,10 @@
  */
 define('argos/_OfflineCache', [
     'dojo/_base/lang',
-    'dojo/string'
+    './utility'
 ], function(
     lang,
-    string
+    utility
 ) {
     window.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
     var dbType = (!!window.openDatabase && 'sql') || (!!window.indexedDB && 'indexeddb');
@@ -68,7 +68,6 @@ define('argos/_OfflineCache', [
             }
 
             // todo: load table names into _tables
-
         },
 
         /**
@@ -169,12 +168,19 @@ define('argos/_OfflineCache', [
         processRelated: function(doc) {
             for (var i = 0; i < doc.related.length; i++)
             {
-                var related = doc.related[i];
+                var related = doc.related[i],
+                    tableName = related['entityName'],
+                    key = utility.uuid();
 
-                if (this.tableExists(related['entityName']))
+                if (!this.tableExists(tableName))
                 {
-
+                    // todo: get column types
+                    // todo: create table
                 }
+
+                doc['entry'][tableName] = key;
+
+
 
 
             }

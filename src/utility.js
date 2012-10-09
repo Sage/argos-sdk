@@ -318,6 +318,38 @@ define('argos/utility', [
                 }
             }
             return obj;
+        },
+        /**
+         * Generates an RFC4122 v4 compliant ID, two implementations one using the browsers builtin
+         * crytpo function for valid random numbers and the fail-safe using Math.random infused with
+         * the datetime in ms.
+         * @return {String}
+         */
+        uuid: function() {
+            var uuid;
+            if (lang.exists('window.crypto.getRandomValues'))
+            {
+                var buffer = new Uint16Array(8);
+                window.crypto.getRandomValues(buffer);
+                var S4 = function(num) {
+                    var ret = num.toString(16);
+                    while(ret.length < 4){
+                        ret = "0"+ret;
+                    }
+                    return ret;
+                };
+                uuid = (S4(buffer[0])+S4(buffer[1])+"-"+S4(buffer[2])+"-"+S4(buffer[3])+"-"+S4(buffer[4])+"-"+S4(buffer[5])+S4(buffer[6])+S4(buffer[7]));
+            }
+            else
+            {
+                var milli = new Date().getTime();
+                uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = (milli + Math.random()*16)%16 | 0;
+                    milli = Math.floor(d/16);
+                    return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+                });
+            }
+            return uuid;
         }
     });
 });
