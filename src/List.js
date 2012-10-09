@@ -1081,7 +1081,7 @@ define('argos/List', [
             });
         },
         navigateUp: function() {
-            scene().navigateUp();
+            scene().navigateUp(this.tier);
         },
         onContentChange: function() {
         },
