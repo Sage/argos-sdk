@@ -161,6 +161,7 @@ define('argos/_OfflineCache', [
 
             return doc;
         },
+
         /**
          *
          * @param {Object} doc
@@ -185,6 +186,7 @@ define('argos/_OfflineCache', [
 
             }
         },
+
         /**
          *
          * @param {String} tableName
@@ -192,6 +194,15 @@ define('argos/_OfflineCache', [
          */
         tableExists: function(tableName) {
             return !!this._tables[tableName];
+        },
+
+        /**
+         * Creates a column string that can be used when creating a WebSQL table
+         * @param {Object} entry
+         * @return {String}
+         */
+        createColumnString: function(entry) {
+
         },
 
 
