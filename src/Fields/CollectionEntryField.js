@@ -192,6 +192,9 @@ define('argos/Fields/CollectionEntryField', [
         formatDeletedValue: function(item) {
             return null;
         },
+        formatAddedValue: function(item) {
+            return item;
+        },
         getValue: function() {
             var original = this.originalValue,
                 current = this.currentValue,
@@ -336,7 +339,7 @@ define('argos/Fields/CollectionEntryField', [
             if (this.validateForAdd && this.validationResult !== false) return;
 
             var index = ++this.currentIndex,
-                item = this._getCompositeValue();
+                item = this.formatAddedValue(this._getCompositeValue());
 
             this.currentValue[index] = item;
 
