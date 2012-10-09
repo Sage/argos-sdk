@@ -127,10 +127,6 @@
           "text": "_TemplatedWidgetMixin.js",
           "path": "../src"
         },
-        {
-          "text": "CalendarWidget.js",
-          "path": "../src"
-        },
           {
             "text": "convert.js",
             "path": "../src"
@@ -189,6 +185,10 @@
         },
         {
           "text": "ScrollContainer.js",
+          "path": "../src"
+        },
+        {
+          "text": "CalendarWidget.js",
           "path": "../src"
         },
         {
@@ -276,7 +276,7 @@
           "path": "../src"
         },
         {
-          "text": "Environment.js",
+          "text": "environment.js",
           "path": "../src"
         },
         {

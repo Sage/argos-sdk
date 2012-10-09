@@ -19,7 +19,7 @@
  * @extends View
  * @requires CalendarWidget
  */
-define('argos/Calendar', [
+define('argos/Views/Calendar', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/connect',
