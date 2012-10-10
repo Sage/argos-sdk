@@ -467,6 +467,11 @@ define('argos/List', [
         enableActions: false,
         /**
          * @cfg {Boolean}
+         * Controls the availability of the navigateUp button on top toolbar.
+        */
+        enableNavigateUp: true,
+        /**
+         * @cfg {Boolean}
          * True to allow selections via the SelectionModel in the view.
          */
         allowSelection: false,
@@ -657,17 +662,22 @@ define('argos/List', [
          * @return {Object} this.tools
          * @template
          */
-        createToolLayout: function() {
+        createToolLayout: function(tools) {
             if (!this.tools) {
-                this.tools = {
-                    'top': [{
-                        id: 'new',
-                        action: 'navigateToInsertView',
-                        security: App.getViewSecurity(this.insertView, 'insert')
-                    }]
-                };
+                if (tools && 'object' == typeof tools) {
+                    this.tools = tools
 
-                if (1 < scene().layout.tiers)
+                } else {
+                    this.tools = {
+                        'top': [{
+                            id: 'new',
+                            action: 'navigateToInsertView',
+                            security: App.getViewSecurity(this.insertView, 'insert')
+                        }]
+                    };
+                }
+
+                if (1 < scene().layout.tiers && this.tier < (scene().layout.tiers - 1) && true === this.enableNavigateUp)
                     this.tools.top.push({
                         id: 'up',
                         action: 'navigateUp',
