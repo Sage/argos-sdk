@@ -464,7 +464,7 @@ define('argos/Application', [
             {
                 var set = list[i];
                 for (var k = 0; k < set.length; k++)
-                    if (predicate.call(scope || this, list[i][k].context))
+                    if (list[i][k] && predicate.call(scope || this, list[i][k].context))
                         return list[i][k].context;
             }
             return false;
