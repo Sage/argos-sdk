@@ -20,9 +20,11 @@
  */
 define('argos/_OfflineCache', [
     'dojo/_base/lang',
+    'dojo/string',
     './utility'
 ], function(
     lang,
+    string,
     utility
 ) {
     window.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
@@ -49,12 +51,27 @@ define('argos/_OfflineCache', [
         version: '1.0',
 
         /**
+         * @cfg {String}
+         * Unique identifier that should be present in every item being stored and on each related item
+         * if an entry has related objects attached.
+         */
+        keyProperty: '$key',
+
+        /**
          * @property {Object}
          * The database instance
          */
         _database: null,
 
         _tables: {},
+        _keys: {},
+
+        typeResolves: {
+            'string': 'TEXT',
+            'number': 'REAL',
+            'date': 'INTEGER',
+            'boolean': 'INTEGER'
+        },
 
         /**
          * Creates the database based on the detected type
@@ -99,15 +116,20 @@ define('argos/_OfflineCache', [
         setItem: function(resourceKind, entry, callback, scope) {
             switch(this._databaseType)
             {
-                case 'sql': this._setSQLItem(resourceKind, entry, callback, scope); break;
-                case 'indexeddb': this._setIDBItem(resourceKind, entry, callback, scope); break;
+                case 'sql': this._setSQLEntry(resourceKind, entry, callback, scope); break;
+                case 'indexeddb': this._setIDBEntry(resourceKind, entry, callback, scope); break;
                 default: return false;
             }
         },
-        _setSQLItem: function(resourceKind, entry, callback, scope) {
+        _setSQLEntry: function(resourceKind, entry, callback, scope) {
             // split entry into [{resourceKind}, {resourceKind_relatedKind}, {_otherKind}]
-            var document = this.splitResources(resourceKind, entry);
-            this.processRelated(document);
+            var doc = this.splitResources(resourceKind, entry);
+            doc = this.processRelated(doc);
+
+            var key = doc.entry[this.keyProperty] || utility.uuid();
+
+            this._processSQLEntry(doc, key);
+
 
             // loop entries, check if that resourceKind table exists
             // if not, create it
@@ -117,7 +139,7 @@ define('argos/_OfflineCache', [
 
             // on final success (use dojo.Deferred), do callback with the scope
         },
-        _setIDBItem: function(resourceKind, entry, callback, scope) {
+        _setIDBEntry: function(resourceKind, entry, callback, scope) {
 
         },
 
@@ -152,7 +174,10 @@ define('argos/_OfflineCache', [
                         delete entry[prop]; // should never be receiving functions
                         break;
                     case 'object':
-                        var relatedEntityName = entityName + '_' + prop;
+                        if (entry[prop] instanceof Date)
+                            break;
+
+                        var relatedEntityName = entityName + '.' + prop;
                         doc.related.push(this.splitResources(relatedEntityName, entry[prop]));
                         delete entry[prop];
                         break;
@@ -163,28 +188,109 @@ define('argos/_OfflineCache', [
         },
 
         /**
-         *
+         * Creates, inserts or updates the related entities while updating the parent document with
+         * the foreign key.
          * @param {Object} doc
          */
         processRelated: function(doc) {
             for (var i = 0; i < doc.related.length; i++)
             {
-                var related = doc.related[i],
-                    tableName = related['entityName'],
-                    key = utility.uuid();
+                var related = this.processRelated(doc.related[i]),
+                    key = related.entry[this.keyProperty] || utility.uuid();
 
-                if (!this.tableExists(tableName))
-                {
-                    // todo: get column types
-                    // todo: create table
-                }
+                this._processSQLEntry(related, key);
 
-                doc['entry'][tableName] = key;
-
-
-
-
+                doc['entry'][related.entityName] = key;
             }
+
+            return doc;
+        },
+        /**
+         * Takes a doc entry and creates the table if needed then inserts or updates the item
+         * @param {Object} doc
+         */
+        _processSQLEntry: function(doc, key) {
+            var tableName = doc.entityName,
+                definition = this.createColumnDefinition(doc.entry, key);
+
+            if (!this.tableExists(tableName))
+            {
+                this._createSQLTable(tableName, definition.createString);
+                // todo: add tableName to meta tableNames table
+            }
+
+            this._setSQLItem(tableName, definition);
+        },
+
+        /**
+         * Executes a CREATE TABLE sql call with the given column definition string
+         * @param {String} name
+         * @param {String} columns
+         */
+        _createSQLTable: function(name, columns) {
+            var createTableQuery = string.substitute('CREATE TABLE IF NOT EXISTS [${0}](${1})', [
+                name,
+                columns
+            ]);
+            this.executeSQLTransaction(createTableQuery, [], null, null);
+        },
+
+        /**
+         * Determines if the item being stored should be an INSERT or UPDATE and calls the correct handler
+         * @param tableName
+         * @param columnDefinition
+         */
+        _setSQLItem: function(tableName, columnDefinition) {
+            if (this._keys[columnDefinition.key])
+                this._updateSQLItem(tableName, columnDefinition);
+            else
+                this._insertSQLItem(tableName, columnDefinition);
+        },
+        /**
+         * Executes an INSERT sql statement with the give table and column definition object that contains
+         * the col headers and values
+         * @param {String} tableName
+         * @param {Object} columnDefinition
+         */
+        _insertSQLItem: function(tableName, columnDefinition) {
+            var insertQuery = string.substitute('INSERT INTO [${0}](${1}) VALUES (${2})', [
+                tableName,
+                columnDefinition.columnNames,
+                Array(columnDefinition.columnNames.length + 1).join('?,').slice(0, -1)
+            ]);
+            this.executeSQLTransaction(insertQuery, columnDefinition.values, null, null);
+
+            // todo: add item key to meta keys table
+        },
+
+        /**
+         * Executes an UPDATE sql statement with the give table and column definition object that contains
+         * the col headers and values
+         * @param {String} tableName
+         * @param {Object} columnDefinition
+         */
+        _updateSQLItem: function(tableName, columnDefinition) {
+            var updateQuery = string.substitute('UPDATE [${0}] SET ${1} WHERE "${2}"="${3}"', [
+                tableName,
+                columnDefinition.updateString,
+                this.keyProperty,
+                columnDefinition.key
+            ]);
+            this.executeSQLTransaction(updateQuery, [], null, null);
+        },
+
+        /**
+         * Executes the given SQL query with the passes params. The appropriate callback will be
+         * called on return.
+         * @param query
+         * @param args
+         * @param success
+         * @param failure
+         */
+        executeSQLTransaction: function(query, args, success, failure) {
+            this._database.transaction(function(transaction) {
+                transaction.executeSql(query, args, success, failure);
+            });
         },
 
         /**
@@ -199,10 +305,78 @@ define('argos/_OfflineCache', [
         /**
          * Creates a column string that can be used when creating a WebSQL table
          * @param {Object} entry
+         * @param {String} key
+         * @return {Object}
+         */
+        createColumnDefinition: function(entry, key) {
+            var identifier = this.keyProperty || '__ID',
+                definition = {
+                    key: key,
+                    createString: ['"'+identifier+'" TEXT PRIMARY KEY'],
+                    updateString: [],
+                    columnNames: ['"'+identifier+'"'],
+                    values: [key]
+                };
+
+            for (var prop in entry)
+            {
+                if (prop == this.keyProperty)
+                    continue;
+
+                var value = this.formatValueByType(entry[prop]),
+                    type = this.resolveType(entry[prop]),
+                    escapedProp = '"' + prop + '"';
+
+                definition.createString.push(escapedProp + ' ' + type);
+                definition.updateString.push(escapedProp + ' = ' + value);
+                definition.columnNames.push(escapedProp);
+                definition.values.push(value);
+            }
+            definition.createString = definition.createString.join(', ');
+            definition.updateString = definition.updateString.join(', ');
+
+            return definition;
+        },
+        /**
+         * Resolves a javascript type into the correct sqllite type
+         * @param value
          * @return {String}
          */
-        createColumnString: function(entry) {
+        resolveType: function(value) {
+            var type = typeof value;
 
+            if (type == 'object' && value instanceof Date)
+                type = 'date';
+
+            type = this.typeResolves[type];
+
+            return type;
+        },
+        /**
+         * Converts the given value into the appropriate sqllite value.
+         *
+         * * Date objects get converted to milliseconds from 1970
+         * * Boolean values get converted to 1/0 for true/false
+         *
+         * @param value
+         */
+        formatValueByType: function(value) {
+            var formatted;
+
+            switch(typeof value)
+            {
+                case "object":
+                    if (value instanceof Date)
+                        formatted = value.getTime();
+                    break;
+                case "boolean":
+                    formatted = (value) ? 1 : 0;
+                    break;
+                default:
+                    formatted = value;
+            }
+
+            return formatted;
         },
 
 
@@ -254,9 +428,9 @@ define('argos/_OfflineCache', [
             }
         },
         _clearSQLTable: function(tableName) {
-            this._database.transaction(function(transaction) {
-                transaction.executeSql('DROP TABLE ' + tableName);
-            });
+            var clearQuery = string.substitute('DROP TABLE [${0}]', [tableName]);
+
+            this.executeSQLTransaction(clearQuery, [], null, null);
         },
         _clearIDBDocument: function(docName) {
 
