@@ -123,21 +123,13 @@ define('argos/_OfflineCache', [
         },
         _setSQLEntry: function(resourceKind, entry, callback, scope) {
             // split entry into [{resourceKind}, {resourceKind_relatedKind}, {_otherKind}]
-            var doc = this.splitResources(resourceKind, entry);
-            doc = this.processRelated(doc);
+            var doc = this._splitSQLResources(resourceKind, entry);
+            doc = this._processSQLRelated(doc);
 
             var key = doc.entry[this.keyProperty] || utility.uuid();
 
+            //todo: pass callback/scope to final execution
             this._processSQLEntry(doc, key);
-
-
-            // loop entries, check if that resourceKind table exists
-            // if not, create it
-            // todo: decide if setItem for both entry/feed or setItem and setItems needed
-            // update if entry exist, create if not
-            // continue for each resourcekind
-
-            // on final success (use dojo.Deferred), do callback with the scope
         },
         _setIDBEntry: function(resourceKind, entry, callback, scope) {
 
@@ -159,7 +151,7 @@ define('argos/_OfflineCache', [
          * @param {Object} entry Item to be split
          * @return {Object}
          */
-        splitResources: function(entityName, entry) {
+        _splitSQLResources: function(entityName, entry) {
             var doc = {
                 entityName: entityName,
                 entry: entry,
@@ -178,7 +170,7 @@ define('argos/_OfflineCache', [
                             break;
 
                         var relatedEntityName = entityName + '.' + prop;
-                        doc.related.push(this.splitResources(relatedEntityName, entry[prop]));
+                        doc.related.push(this._splitSQLResources(relatedEntityName, entry[prop]));
                         delete entry[prop];
                         break;
                 }
@@ -192,10 +184,10 @@ define('argos/_OfflineCache', [
          * the foreign key.
          * @param {Object} doc
          */
-        processRelated: function(doc) {
+        _processSQLRelated: function(doc) {
             for (var i = 0; i < doc.related.length; i++)
             {
-                var related = this.processRelated(doc.related[i]),
+                var related = this._processSQLRelated(doc.related[i]),
                     key = related.entry[this.keyProperty] || utility.uuid();
 
                 this._processSQLEntry(related, key);
@@ -211,7 +203,7 @@ define('argos/_OfflineCache', [
          */
         _processSQLEntry: function(doc, key) {
             var tableName = doc.entityName,
-                definition = this.createColumnDefinition(doc.entry, key);
+                definition = this._createSQLColumnDefinition(doc.entry, key);
 
             if (!this.tableExists(tableName))
             {
@@ -308,7 +300,7 @@ define('argos/_OfflineCache', [
          * @param {String} key
          * @return {Object}
          */
-        createColumnDefinition: function(entry, key) {
+        _createSQLColumnDefinition: function(entry, key) {
             var identifier = this.keyProperty || '__ID',
                 definition = {
                     key: key,
@@ -323,8 +315,8 @@ define('argos/_OfflineCache', [
                 if (prop == this.keyProperty)
                     continue;
 
-                var value = this.formatValueByType(entry[prop]),
-                    type = this.resolveType(entry[prop]),
+                var value = this.formatSQLValueByType(entry[prop]),
+                    type = this.resolveSQLType(entry[prop]),
                     escapedProp = '"' + prop + '"';
 
                 definition.createString.push(escapedProp + ' ' + type);
@@ -342,7 +334,7 @@ define('argos/_OfflineCache', [
          * @param value
          * @return {String}
          */
-        resolveType: function(value) {
+        resolveSQLType: function(value) {
             var type = typeof value;
 
             if (type == 'object' && value instanceof Date)
@@ -360,7 +352,7 @@ define('argos/_OfflineCache', [
          *
          * @param value
          */
-        formatValueByType: function(value) {
+        formatSQLValueByType: function(value) {
             var formatted;
 
             switch(typeof value)

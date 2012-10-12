@@ -60,7 +60,7 @@ return describe('argos._OfflineCache', function() {
             ]
         };
 
-        expect(cache.splitResources(entityName, entry)).toEqual(expected);
+        expect(cache._splitSQLResources(entityName, entry)).toEqual(expected);
     });
     it('Can split a doubly nested related entity into the proper related structure', function() {
         var entityName = 'Test';
@@ -103,7 +103,7 @@ return describe('argos._OfflineCache', function() {
             ]
         };
 
-        expect(cache.splitResources(entityName, entry)).toEqual(expected);
+        expect(cache._splitSQLResources(entityName, entry)).toEqual(expected);
     });
     it('Can split sibling nested related entities into the proper related structure', function() {
         var entityName = 'Test';
@@ -145,7 +145,7 @@ return describe('argos._OfflineCache', function() {
             ]
         };
 
-        expect(cache.splitResources(entityName, entry)).toEqual(expected);
+        expect(cache._splitSQLResources(entityName, entry)).toEqual(expected);
     });
 
     /**
@@ -155,31 +155,31 @@ return describe('argos._OfflineCache', function() {
         var value = 'Test';
         var expected = 'Test';
 
-        expect(cache.formatValueByType(value)).toEqual(expected);
+        expect(cache.formatSQLValueByType(value)).toEqual(expected);
     });
     it('Can format a number value for sqllite by returning it directly (no modification)', function() {
         var value = 5;
         var expected = 5;
 
-        expect(cache.formatValueByType(value)).toEqual(expected);
+        expect(cache.formatSQLValueByType(value)).toEqual(expected);
     });
     it('Can format a true boolean value for sqllite by returning 1 for true', function() {
         var value = true;
         var expected = 1;
 
-        expect(cache.formatValueByType(value)).toEqual(expected);
+        expect(cache.formatSQLValueByType(value)).toEqual(expected);
     });
     it('Can format a false boolean value for sqllite by returning 0 for false', function() {
         var value = false;
         var expected = 0;
 
-        expect(cache.formatValueByType(value)).toEqual(expected);
+        expect(cache.formatSQLValueByType(value)).toEqual(expected);
     });
     it('Can format a date value for sqllite by returning the # of ms since 1970 (unix epoch)', function() {
         var value = new Date(1349980826209); // 2012-11-10 18:40:26 UTC (-00:00)
         var expected = 1349980826209;
 
-        expect(cache.formatValueByType(value)).toEqual(expected);
+        expect(cache.formatSQLValueByType(value)).toEqual(expected);
     });
 
     /**
@@ -188,22 +188,22 @@ return describe('argos._OfflineCache', function() {
     it('Can resolve a string to the sqllite type "TEXT', function() {
         var value = 'Test';
         var sqlType = 'TEXT';
-        expect(cache.resolveType(value)).toEqual(sqlType);
+        expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
     it('Can resolve a number to the sqllite type "REAL', function() {
         var value = 5;
         var sqlType = 'REAL';
-        expect(cache.resolveType(value)).toEqual(sqlType);
+        expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
     it('Can resolve a boolean to the sqllite type "INTEGER', function() {
         var value = true;
         var sqlType = 'INTEGER';
-        expect(cache.resolveType(value)).toEqual(sqlType);
+        expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
     it('Can resolve a date to the sqllite type "INTEGER', function() {
         var value = true;
         var sqlType = 'INTEGER';
-        expect(cache.resolveType(value)).toEqual(sqlType);
+        expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
 
     /**
@@ -220,7 +220,7 @@ return describe('argos._OfflineCache', function() {
             columnNames: ['"$key"', '"value"'],
             values: ['001', 'Test']
         };
-        expect(cache.createColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
     });
     it('Can create websql column definition for a single number', function() {
         var entry = { value: 5 };
@@ -233,7 +233,7 @@ return describe('argos._OfflineCache', function() {
             columnNames: ['"$key"', '"value"'],
             values: ['001', 5]
         };
-        expect(cache.createColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
     });
     it('Can create websql column definition for a single boolean', function() {
         var entry = { value: true };
@@ -246,7 +246,7 @@ return describe('argos._OfflineCache', function() {
             columnNames: ['"$key"', '"value"'],
             values: ['001', 1]
         };
-        expect(cache.createColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
     });
     it('Can create websql column definition for a single date', function() {
         var entry = { value: new Date(1349980826209) };
@@ -259,7 +259,7 @@ return describe('argos._OfflineCache', function() {
             columnNames: ['"$key"', '"value"'],
             values: ['001', 1349980826209]
         };
-        expect(cache.createColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
     });
     it('Can create websql column definition for a multiple mixed entry', function() {
         var entry = {
@@ -277,7 +277,7 @@ return describe('argos._OfflineCache', function() {
             columnNames: ['"$key"', '"value"', '"count"', '"success"', '"stamp"'],
             values: ['001', 'Testing', 3, 1, 1349980826209]
         };
-        expect(cache.createColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
     });
 
 
