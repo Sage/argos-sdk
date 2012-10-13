@@ -20,10 +20,14 @@
  */
 define('argos/_OfflineCache', [
     'dojo/_base/lang',
+    'dojo/_base/array',
+    'dojo/_base/json',
     'dojo/string',
     './utility'
 ], function(
     lang,
+    array,
+    json,
     string,
     utility
 ) {
@@ -70,7 +74,8 @@ define('argos/_OfflineCache', [
             'string': 'TEXT',
             'number': 'REAL',
             'date': 'INTEGER',
-            'boolean': 'INTEGER'
+            'boolean': 'INTEGER',
+            'array': 'TEXT'
         },
 
         /**
@@ -79,12 +84,18 @@ define('argos/_OfflineCache', [
         startup: function() {
             switch(this._databaseType)
             {
-                case 'sql': this._createSQLDatabase(); break;
-                case 'indexeddb': this._createIDBDatabase(); break;
-                default: return false;
-            }
+                case 'sql':
+                    this._createSQLDatabase();
+                    this._loadSQLMetaTables();
+                    break;
 
-            // todo: load table names into _tables
+                case 'indexeddb':
+                    this._createIDBDatabase();
+                    break;
+
+                default:
+                    return false;
+            }
         },
 
         /**
@@ -97,7 +108,51 @@ define('argos/_OfflineCache', [
             this._database.transaction(function(transaction) {
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS meta (id INTEGER PRIMARY KEY ASC, dateStamp DATETIME)');
             });
-            this._tables['meta'] =  true;
+            this._database.transaction(function(transaction) {
+                transaction.executeSql('CREATE TABLE IF NOT EXISTS _keys (Key TEXT PRIMARY KEY, TableName TEXT, LastUpdated INTEGER, New INTEGER, Stamp INTEGER)');
+            });
+            this._database.transaction(function(transaction) {
+                transaction.executeSql('CREATE TABLE IF NOT EXISTS _tables (TableName TEXT PRIMARY KEY, Definition TEXT)');
+            });
+        },
+        _addSQLMetaKey: function(key, tableName, initial) {
+            var stamp = new Date().getTime();
+
+            this._keys[key] = {
+                TableName: tableName,
+                Modified: false,
+                New: initial,
+                LastUpdated: stamp
+            };
+
+            var insertQuery = 'INSERT INTO [_keys](Key, TableName, LastUpdated, New, Stamp) VALUES (?,?,?,?,?)';
+            this.executeSQLTransaction(insertQuery, [key, tableName, 0, initial ? 1 : 0, stamp], null, null);
+        },
+        _updateSQLMetaKey: function(key, initial) {
+            var stamp = new Date().getTime(),
+                modified = initial ? 0 : 1;
+
+            this._keys[key].Modified = modified;
+            this._keys[key].LastUpdated = stamp;
+
+            var updateQuery = string.substitute('UPDATE [_keys] SET Modified = ${0}, LastUpdated = ${1} WHERE Key = ${2}', [
+                modified,
+                stamp,
+                key
+            ]);
+            this.executeSQLTransaction(updateQuery, [], null, null);
+        },
+        _addSQLMetaTableNames: function(tableName, columnDefinition) {
+            this._tables[name] = columnDefinition;
+
+            var insertQuery = 'INSERT INTO [_tables](TableName, Definition) VALUES (?,?)';
+            this.executeSQLTransaction(insertQuery, [tableName, json.toJson(columnDefinition)], null, null);
+        },
+        _updateSQLMetaTableNames: function(tableName, columnDefinition) {
+            this._tables[name] = columnDefinition;
+
+            var insertQuery = 'INSERT INTO [_tables](TableName, Definition) VALUES (?,?)';
+            this.executeSQLTransaction(insertQuery, [tableName, json.toJson(columnDefinition)], null, null);
         },
 
         /**
@@ -106,30 +161,59 @@ define('argos/_OfflineCache', [
         _createIDBDatabase: function() {
         },
 
+        _loadSQLMetaTables: function() {
+            this.executeSQLTransaction('SELECT * FROM [_keys]', [], this._onLoadSQLMetaKeysSuccess, null);
+            this.executeSQLTransaction('SELECT * FROM [_tables]', [], this._onLoadSQLMetaTablesSuccess, null);
+        },
+        _onLoadSQLMetaKeysSuccess: function(transaction, result) {
+            if (result.rows.length === 0)
+                return;
+
+            for (var i = 0; i < result.rows.length; i++)
+            {
+                var item = result.rows.item(i),
+                    key = item['Key'];
+                delete item['Key'];
+
+                this._keys[key] = lang.clone(item);
+            }
+        },
+        _onLoadSQLMetaTablesSuccess: function(transaction, result) {
+            if (result.rows.length === 0)
+                return;
+
+            for (var i = 0; i < result.rows.length; i++)
+            {
+                var item = result.rows.item(i);
+
+                this._tables[item['TableName']] = json.fromJson(item['Definition']);
+            }
+        },
+
         /**
          * Stores the given entry under the designated resourceKind store
          * @param {String} resourceKind
          * @param {Object} entry
+         * @param {Boolean} initial Determines if it should be marked as initial data (not modified)
          * @param {Function?} callback Optional.
          * @param {Object?} scope Optional.
          */
-        setItem: function(resourceKind, entry, callback, scope) {
+        setItem: function(resourceKind, entry, initial, callback, scope) {
             switch(this._databaseType)
             {
-                case 'sql': this._setSQLEntry(resourceKind, entry, callback, scope); break;
-                case 'indexeddb': this._setIDBEntry(resourceKind, entry, callback, scope); break;
+                case 'sql': this._setSQLEntry(resourceKind, entry, initial, callback, scope); break;
+                case 'indexeddb': this._setIDBEntry(resourceKind, entry, initial, callback, scope); break;
                 default: return false;
             }
         },
-        _setSQLEntry: function(resourceKind, entry, callback, scope) {
-            // split entry into [{resourceKind}, {resourceKind_relatedKind}, {_otherKind}]
+        _setSQLEntry: function(resourceKind, entry, initial, callback, scope) {
             var doc = this._splitSQLResources(resourceKind, entry);
             doc = this._processSQLRelated(doc);
 
             var key = doc.entry[this.keyProperty] || utility.uuid();
 
             //todo: pass callback/scope to final execution
-            this._processSQLEntry(doc, key);
+            this._processSQLEntry(doc, key, initial);
         },
         _setIDBEntry: function(resourceKind, entry, callback, scope) {
 
@@ -168,6 +252,8 @@ define('argos/_OfflineCache', [
                     case 'object':
                         if (entry[prop] instanceof Date)
                             break;
+                        if (lang.isArray(entry[prop]))
+                            break;
 
                         var relatedEntityName = entityName + '.' + prop;
                         doc.related.push(this._splitSQLResources(relatedEntityName, entry[prop]));
@@ -201,30 +287,69 @@ define('argos/_OfflineCache', [
          * Takes a doc entry and creates the table if needed then inserts or updates the item
          * @param {Object} doc
          */
-        _processSQLEntry: function(doc, key) {
+        _processSQLEntry: function(doc, key, initial) {
             var tableName = doc.entityName,
-                definition = this._createSQLColumnDefinition(doc.entry, key);
+                columnDefinition = this._createSQLColumnDefinition(doc.entry, key);
 
             if (!this.tableExists(tableName))
             {
-                this._createSQLTable(tableName, definition.createString);
-                // todo: add tableName to meta tableNames table
+                this._createSQLTable(tableName, columnDefinition);
+            }
+            else
+            {
+                // todo: check table structure, performing ALTERs as needed
+                var alterations = this._getSQLColumnAlterations(tableName, columnDefinition);
+                for (var i = 0; i < alterations.length; i++)
+                    this._alterSQLTable(tableName, alterations[i]);
             }
 
-            this._setSQLItem(tableName, definition);
+            this._setSQLItem(tableName, columnDefinition, initial);
+        },
+
+        _getSQLColumnAlterations: function(tableName, newDefinition) {
+            var oldDefinition = this._getSQLTableDefinition(tableName),
+                alterations = [];
+
+            for (var i = 0; i < newDefinition.columnNames.length; i++)
+            {
+                var prop = newDefinition.columnNames[i];
+
+                if (array.indexOf(oldDefinition.columnNames, prop) === -1)
+                {
+                    var type = this.resolveSQLType(newDefinition.values[i]);
+                    alterations.push(string.substitute('ADD COLUMN ${0} ${1}', [
+                        prop,
+                        type
+                    ]));
+                }
+            }
+
+            return alterations;
+        },
+        _alterSQLTable: function(tableName, alteration) {
+            var alterQuery = string.substitute('ALTER TABLE [${0}] ${1}', [
+                tableName,
+                alteration
+            ]);
+            this.executeSQLTransaction(alterQuery, [], null, null);
+        },
+        _getSQLTableDefinition: function(tableName) {
+            return this._tables[tableName];
         },
 
         /**
-         * Executes a CREATE TABLE sql call with the given column definition string
+         * Executes a CREATE TABLE sql call with the given column definition
          * @param {String} name
-         * @param {String} columns
+         * @param {Object} columnDefinition
          */
-        _createSQLTable: function(name, columns) {
+        _createSQLTable: function(name, columnDefinition) {
             var createTableQuery = string.substitute('CREATE TABLE IF NOT EXISTS [${0}](${1})', [
                 name,
-                columns
+                columnDefinition.createString
             ]);
             this.executeSQLTransaction(createTableQuery, [], null, null);
+
+            this._addSQLMetaTableNames(name, columnDefinition);
         },
 
         /**
@@ -232,11 +357,11 @@ define('argos/_OfflineCache', [
          * @param tableName
          * @param columnDefinition
          */
-        _setSQLItem: function(tableName, columnDefinition) {
+        _setSQLItem: function(tableName, columnDefinition, initial) {
             if (this._keys[columnDefinition.key])
-                this._updateSQLItem(tableName, columnDefinition);
+                this._updateSQLItem(tableName, columnDefinition, initial);
             else
-                this._insertSQLItem(tableName, columnDefinition);
+                this._insertSQLItem(tableName, columnDefinition, initial);
         },
         /**
          * Executes an INSERT sql statement with the give table and column definition object that contains
@@ -244,15 +369,15 @@ define('argos/_OfflineCache', [
          * @param {String} tableName
          * @param {Object} columnDefinition
          */
-        _insertSQLItem: function(tableName, columnDefinition) {
+        _insertSQLItem: function(tableName, columnDefinition, initial) {
             var insertQuery = string.substitute('INSERT INTO [${0}](${1}) VALUES (${2})', [
                 tableName,
-                columnDefinition.columnNames,
+                columnDefinition.columnNames.join(','),
                 Array(columnDefinition.columnNames.length + 1).join('?,').slice(0, -1)
             ]);
             this.executeSQLTransaction(insertQuery, columnDefinition.values, null, null);
 
-            // todo: add item key to meta keys table
+            this._addSQLMetaKey(columnDefinition.key, tableName, initial);
         },
 
         /**
@@ -261,7 +386,7 @@ define('argos/_OfflineCache', [
          * @param {String} tableName
          * @param {Object} columnDefinition
          */
-        _updateSQLItem: function(tableName, columnDefinition) {
+        _updateSQLItem: function(tableName, columnDefinition, initial) {
             var updateQuery = string.substitute('UPDATE [${0}] SET ${1} WHERE "${2}"="${3}"', [
                 tableName,
                 columnDefinition.updateString,
@@ -269,6 +394,8 @@ define('argos/_OfflineCache', [
                 columnDefinition.key
             ]);
             this.executeSQLTransaction(updateQuery, [], null, null);
+
+            this._updateSQLMetaKey(columnDefinition.key, initial);
         },
 
         /**
@@ -280,6 +407,7 @@ define('argos/_OfflineCache', [
          * @param failure
          */
         executeSQLTransaction: function(query, args, success, failure) {
+            console.log('EXECUTING: ', query, args);
             this._database.transaction(function(transaction) {
                 transaction.executeSql(query, args, success, failure);
             });
@@ -337,8 +465,11 @@ define('argos/_OfflineCache', [
         resolveSQLType: function(value) {
             var type = typeof value;
 
-            if (type == 'object' && value instanceof Date)
+            if (type === 'object' && value instanceof Date)
                 type = 'date';
+
+            if (lang.isArray(value))
+                type = 'array';
 
             type = this.typeResolves[type];
 
@@ -360,10 +491,16 @@ define('argos/_OfflineCache', [
                 case "object":
                     if (value instanceof Date)
                         formatted = value.getTime();
+
+                    if (lang.isArray(value))
+                        formatted = json.toJson(value);
+
                     break;
+
                 case "boolean":
                     formatted = (value) ? 1 : 0;
                     break;
+
                 default:
                     formatted = value;
             }

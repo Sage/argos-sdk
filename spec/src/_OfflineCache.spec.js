@@ -149,7 +149,7 @@ return describe('argos._OfflineCache', function() {
     });
 
     /**
-     * _OfflineCache.formatValueByType
+     * _OfflineCache.formatSQLValueByType
      */
     it('Can format a string value for sqllite by returning it directly (no modification)', function() {
         var value = 'Test';
@@ -181,9 +181,16 @@ return describe('argos._OfflineCache', function() {
 
         expect(cache.formatSQLValueByType(value)).toEqual(expected);
     });
+    it('Can format an array value for sqllite by json stringifying it', function() {
+        var value = ["Chicken", "Turkey", "Pasta", 10, true];
+        var expected = '["Chicken","Turkey","Pasta",10,true]';
+
+        expect(cache.formatSQLValueByType(value)).toEqual(expected);
+    });
+
 
     /**
-     * _OfflineCache.resolveType
+     * _OfflineCache.resolveSQLType
      */
     it('Can resolve a string to the sqllite type "TEXT', function() {
         var value = 'Test';
@@ -195,14 +202,19 @@ return describe('argos._OfflineCache', function() {
         var sqlType = 'REAL';
         expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
-    it('Can resolve a boolean to the sqllite type "INTEGER', function() {
+    it('Can resolve a boolean to the sqllite type "INTEGER"', function() {
         var value = true;
         var sqlType = 'INTEGER';
         expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
-    it('Can resolve a date to the sqllite type "INTEGER', function() {
-        var value = true;
+    it('Can resolve a date to the sqllite type "INTEGER"', function() {
+        var value = new Date(1349980826209);
         var sqlType = 'INTEGER';
+        expect(cache.resolveSQLType(value)).toEqual(sqlType);
+    });
+    it('Can resolve an array to the sqllite type TEXT', function() {
+        var value = [true, "2", 3];
+        var sqlType = 'TEXT';
         expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
 
