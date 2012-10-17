@@ -21,12 +21,14 @@
 define('argos/_OfflineCache', [
     'dojo/_base/lang',
     'dojo/_base/array',
+    'dojo/_base/Deferred',
     'dojo/_base/json',
     'dojo/string',
     './utility'
 ], function(
     lang,
     array,
+    Deferred,
     json,
     string,
     utility
@@ -69,6 +71,9 @@ define('argos/_OfflineCache', [
 
         _tables: {},
         _keys: {},
+
+        _currentTransactions: [],
+        _currentEntry: {},
 
         typeResolves: {
             'string': 'TEXT',
@@ -162,8 +167,8 @@ define('argos/_OfflineCache', [
         },
 
         _loadSQLMetaTables: function() {
-            this.executeSQLTransaction('SELECT * FROM [_keys]', [], this._onLoadSQLMetaKeysSuccess, null);
-            this.executeSQLTransaction('SELECT * FROM [_tables]', [], this._onLoadSQLMetaTablesSuccess, null);
+            this.executeSQLTransaction('SELECT * FROM [_keys]', [], this._onLoadSQLMetaKeysSuccess.bindDelegate(this), null);
+            this.executeSQLTransaction('SELECT * FROM [_tables]', [], this._onLoadSQLMetaTablesSuccess.bindDelegate(this), null);
         },
         _onLoadSQLMetaKeysSuccess: function(transaction, result) {
             if (result.rows.length === 0)
@@ -190,6 +195,109 @@ define('argos/_OfflineCache', [
             }
         },
 
+        getItem: function(resourceKind, key, callback, scope) {
+            switch(this._databaseType)
+            {
+                case 'sql': this._getSQLEntry(resourceKind, key, callback, scope); break;
+                case 'indexeddb': this._getIDBEntry(resourceKind, key, callback, scope); break;
+                default: return false;
+            }
+        },
+        _getSQLEntry: function(resourceKind, key, callback, scope) {
+            var tableName = this._keys[key]['TableName'],
+                getQuery = string.substitute('SELECT * FROM [${0}] where "${1}" = ${2}', [
+                    tableName,
+                    this.keyProperty,
+                    key
+                ]);
+            this.executeSQLTransaction(getQuery, [], this._onGetSQLEntrySuccess.bindDelegate(this, tableName, callback, scope), null);
+        },
+        _getIDBEntry: function(resourceKind, key, callback, scope) {
+
+        },
+
+        _onGetSQLEntrySuccess: function(transaction, result, tableName, callback, scope) {
+            if (result.rows.length == 0)
+                return null;
+
+            var entry = result.rows.item(0),
+                currentTransactions = [];
+
+            this._setCurrentEntryPart(tableName, entry);
+
+            for (var prop in entry)
+            {
+                if (prop.indexOf('.') !== -1)
+                {
+                    console.log(prop);
+                    var deferred = new Deferred();
+
+                    var o = {
+                        index: currentTransactions.length,
+                        entityName: prop,
+                        key: entry[prop],
+                        deferred: deferred
+                    };
+                    currentTransactions.push(o);
+                }
+            }
+
+            var transactionLength = currentTransactions.length;
+            for (var i = 0; i < transactionLength; i++)
+            {
+                var related = currentTransactions[i];
+                Deferred.when(related.deferred, this._checkTransactions.bindDelegate(this));
+                this._onGetInnerSQLEntry(related);
+            }
+            this._currentTransactions.push.apply(this._currentTransactions, currentTransactions);
+
+            if (callback)
+                callback.call(scope || this, transaction, result);
+        },
+        _checkTransactions: function(index) {
+            this._currentTransactions.splice(index, 1);
+
+            if (this._currentTransactions.length === 0)
+            {
+                //todo: call original callback...
+                console.log('FINISHED::::', this._currentEntry);
+            }
+        },
+        _setCurrentEntryPart: function(part, entry) {
+            var targetPath = (part.indexOf('.') !== -1)
+                ? part.split('.').slice(1).join('.')
+                : null;
+
+            if (targetPath)
+            {
+                lang.setObject(targetPath, entry, this._currentEntry);
+
+
+
+                if (targetPath.indexOf('.') !== -1)
+                {
+
+                }
+                else
+                {
+                    console.log('deleteing...', part, this._currentEntry);
+                    delete this._currentEntry[part];
+                }
+
+
+            }
+            else
+            {
+                this._currentEntry = entry;
+            }
+        },
+        _onGetInnerSQLEntry: function(o) {
+            this._getSQLEntry(o.entityName, o.key, this._onGetInnerSQLEntrySuccess.bindDelegate(this, o));
+        },
+        _onGetInnerSQLEntrySuccess: function(transaction, result, o) {
+            o.deferred.resolve(o.index);
+        },
+
         /**
          * Stores the given entry under the designated resourceKind store
          * @param {String} resourceKind
@@ -208,14 +316,14 @@ define('argos/_OfflineCache', [
         },
         _setSQLEntry: function(resourceKind, entry, initial, callback, scope) {
             var doc = this._splitSQLResources(resourceKind, entry);
-            doc = this._processSQLRelated(doc);
+            doc = this._processSQLRelated(doc, initial);
 
-            var key = doc.entry[this.keyProperty] || utility.uuid();
+            var key = doc.entry[this.keyProperty].toString() || utility.uuid();
 
             //todo: pass callback/scope to final execution
             this._processSQLEntry(doc, key, initial);
         },
-        _setIDBEntry: function(resourceKind, entry, callback, scope) {
+        _setIDBEntry: function(resourceKind, entry, initial, callback, scope) {
 
         },
 
@@ -269,14 +377,15 @@ define('argos/_OfflineCache', [
          * Creates, inserts or updates the related entities while updating the parent document with
          * the foreign key.
          * @param {Object} doc
+         * @param {Boolean} initial
          */
-        _processSQLRelated: function(doc) {
+        _processSQLRelated: function(doc, initial) {
             for (var i = 0; i < doc.related.length; i++)
             {
-                var related = this._processSQLRelated(doc.related[i]),
-                    key = related.entry[this.keyProperty] || utility.uuid();
+                var related = this._processSQLRelated(doc.related[i], initial),
+                    key = related.entry[this.keyProperty].toString() || utility.uuid();
 
-                this._processSQLEntry(related, key);
+                this._processSQLEntry(related, key, initial);
 
                 doc['entry'][related.entityName] = key;
             }
@@ -286,6 +395,8 @@ define('argos/_OfflineCache', [
         /**
          * Takes a doc entry and creates the table if needed then inserts or updates the item
          * @param {Object} doc
+         * @param {String} key
+         * @param {Boolean} initial
          */
         _processSQLEntry: function(doc, key, initial) {
             var tableName = doc.entityName,
@@ -297,7 +408,6 @@ define('argos/_OfflineCache', [
             }
             else
             {
-                // todo: check table structure, performing ALTERs as needed
                 var alterations = this._getSQLColumnAlterations(tableName, columnDefinition);
                 for (var i = 0; i < alterations.length; i++)
                     this._alterSQLTable(tableName, alterations[i]);
@@ -356,6 +466,7 @@ define('argos/_OfflineCache', [
          * Determines if the item being stored should be an INSERT or UPDATE and calls the correct handler
          * @param tableName
          * @param columnDefinition
+         * @param initial
          */
         _setSQLItem: function(tableName, columnDefinition, initial) {
             if (this._keys[columnDefinition.key])
@@ -368,6 +479,7 @@ define('argos/_OfflineCache', [
          * the col headers and values
          * @param {String} tableName
          * @param {Object} columnDefinition
+         * @param initial
          */
         _insertSQLItem: function(tableName, columnDefinition, initial) {
             var insertQuery = string.substitute('INSERT INTO [${0}](${1}) VALUES (${2})', [
@@ -385,6 +497,7 @@ define('argos/_OfflineCache', [
          * the col headers and values
          * @param {String} tableName
          * @param {Object} columnDefinition
+         * @param initial
          */
         _updateSQLItem: function(tableName, columnDefinition, initial) {
             var updateQuery = string.substitute('UPDATE [${0}] SET ${1} WHERE "${2}"="${3}"', [
