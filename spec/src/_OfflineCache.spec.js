@@ -192,29 +192,29 @@ return describe('argos._OfflineCache', function() {
     /**
      * _OfflineCache.resolveSQLType
      */
-    it('Can resolve a string to the sqllite type "TEXT', function() {
+    it('Can resolve a string to the sqllite type "TEXT"', function() {
         var value = 'Test';
-        var sqlType = 'TEXT';
+        var sqlType = {original: 'string', sql: 'TEXT'};
         expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
-    it('Can resolve a number to the sqllite type "REAL', function() {
+    it('Can resolve a number to the sqllite type "REAL"', function() {
         var value = 5;
-        var sqlType = 'REAL';
+        var sqlType = {original: 'number', sql: 'REAL'};
         expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
     it('Can resolve a boolean to the sqllite type "INTEGER"', function() {
         var value = true;
-        var sqlType = 'INTEGER';
+        var sqlType = {original: 'boolean', sql: 'INTEGER'};
         expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
     it('Can resolve a date to the sqllite type "INTEGER"', function() {
         var value = new Date(1349980826209);
-        var sqlType = 'INTEGER';
+        var sqlType = {original: 'date', sql: 'INTEGER'};
         expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
     it('Can resolve an array to the sqllite type TEXT', function() {
         var value = [true, "2", 3];
-        var sqlType = 'TEXT';
+        var sqlType = {original: 'array', sql: 'TEXT'};
         expect(cache.resolveSQLType(value)).toEqual(sqlType);
     });
 
@@ -230,6 +230,7 @@ return describe('argos._OfflineCache', function() {
             createString: '"$key" TEXT PRIMARY KEY, "value" TEXT',
             updateString: '"value" = Test',
             columnNames: ['"$key"', '"value"'],
+            columnTypes: ['string', 'string'],
             values: ['001', 'Test']
         };
         expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
@@ -243,6 +244,7 @@ return describe('argos._OfflineCache', function() {
             createString: '"$key" TEXT PRIMARY KEY, "value" REAL',
             updateString: '"value" = 5',
             columnNames: ['"$key"', '"value"'],
+            columnTypes: ['string', 'number'],
             values: ['001', 5]
         };
         expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
@@ -256,6 +258,7 @@ return describe('argos._OfflineCache', function() {
             createString: '"$key" TEXT PRIMARY KEY, "value" INTEGER',
             updateString: '"value" = 1',
             columnNames: ['"$key"', '"value"'],
+            columnTypes: ['string', 'boolean'],
             values: ['001', 1]
         };
         expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
@@ -269,6 +272,7 @@ return describe('argos._OfflineCache', function() {
             createString: '"$key" TEXT PRIMARY KEY, "value" INTEGER',
             updateString: '"value" = 1349980826209',
             columnNames: ['"$key"', '"value"'],
+            columnTypes: ['string', 'date'],
             values: ['001', 1349980826209]
         };
         expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
@@ -287,6 +291,7 @@ return describe('argos._OfflineCache', function() {
             createString: '"$key" TEXT PRIMARY KEY, "value" TEXT, "count" REAL, "success" INTEGER, "stamp" INTEGER',
             updateString: '"value" = Testing, "count" = 3, "success" = 1, "stamp" = 1349980826209',
             columnNames: ['"$key"', '"value"', '"count"', '"success"', '"stamp"'],
+            columnTypes: ['string', 'string', 'number', 'boolean', 'date'],
             values: ['001', 'Testing', 3, 1, 1349980826209]
         };
         expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);

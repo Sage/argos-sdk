@@ -148,13 +148,13 @@ define('argos/_OfflineCache', [
             this.executeSQLTransaction(updateQuery, [], null, null);
         },
         _addSQLMetaTableNames: function(tableName, columnDefinition) {
-            this._tables[name] = columnDefinition;
+            this._tables[tableName] = columnDefinition;
 
             var insertQuery = 'INSERT INTO [_tables](TableName, Definition) VALUES (?,?)';
             this.executeSQLTransaction(insertQuery, [tableName, json.toJson(columnDefinition)], null, null);
         },
         _updateSQLMetaTableNames: function(tableName, columnDefinition) {
-            this._tables[name] = columnDefinition;
+            this._tables[tableName] = columnDefinition;
 
             var insertQuery = 'INSERT INTO [_tables](TableName, Definition) VALUES (?,?)';
             this.executeSQLTransaction(insertQuery, [tableName, json.toJson(columnDefinition)], null, null);
@@ -220,7 +220,7 @@ define('argos/_OfflineCache', [
             if (result.rows.length == 0)
                 return null;
 
-            var entry = result.rows.item(0),
+            var entry = lang.clone(result.rows.item(0)),
                 currentTransactions = [];
 
             this._setCurrentEntryPart(tableName, entry);
@@ -229,7 +229,6 @@ define('argos/_OfflineCache', [
             {
                 if (prop.indexOf('.') !== -1)
                 {
-                    console.log(prop);
                     var deferred = new Deferred();
 
                     var o = {
@@ -264,19 +263,26 @@ define('argos/_OfflineCache', [
             }
         },
         _setCurrentEntryPart: function(part, entry) {
-            var targetPath = (part.indexOf('.') !== -1)
-                ? part.split('.').slice(1).join('.')
+            var unformattedEntry = this._revertSQLEntryFormat(part, entry);
+
+            var paths = part.indexOf('.') !== -1
+                ? part.split('.')
+                : [part];
+            var targetPath = (paths.length > 1)
+                ? paths.slice(1)
                 : null;
 
             if (targetPath)
             {
-                lang.setObject(targetPath, entry, this._currentEntry);
+                lang.setObject(targetPath.join('.'), unformattedEntry, this._currentEntry);
 
-
-
-                if (targetPath.indexOf('.') !== -1)
+                if (targetPath.length > 1)
                 {
+                    var rootPath = targetPath.slice(0,-1).join('.'), // go up one root
+                        root = lang.getObject(rootPath, false, this._currentEntry);
 
+                    console.log('deleteing...', part, root);
+                    delete root[part];
                 }
                 else
                 {
@@ -288,7 +294,7 @@ define('argos/_OfflineCache', [
             }
             else
             {
-                this._currentEntry = entry;
+                this._currentEntry = unformattedEntry;
             }
         },
         _onGetInnerSQLEntry: function(o) {
@@ -296,6 +302,42 @@ define('argos/_OfflineCache', [
         },
         _onGetInnerSQLEntrySuccess: function(transaction, result, o) {
             o.deferred.resolve(o.index);
+        },
+        _revertSQLEntryFormat: function(tableName, entry) {
+            var definition = this._getSQLTableDefinition(tableName);
+
+            for (var prop in entry)
+            {
+                var index = array.indexOf(definition.columnNames, '"'+prop+'"');
+                if (index === -1)
+                {
+                    console.warn('invalid column returned, deleteing', prop, entry);
+                    delete entry[prop];
+                    continue;
+                }
+
+                var type = definition.columnTypes[index];
+                console.log(type);
+                switch(type)
+                {
+                    case 'string':
+                        break;
+                    case 'number':
+                        break;
+                    case 'date':
+                            entry[prop] = new Date(entry[prop]);
+                        break;
+                    case 'boolean':
+                            entry[prop] = (entry[prop] === 1);
+                        break;
+                    case 'array':
+                            entry[prop] = json.fromJson(entry[prop]);
+                        break;
+                    default:
+                }
+            }
+
+            return entry;
         },
 
         /**
@@ -548,6 +590,7 @@ define('argos/_OfflineCache', [
                     createString: ['"'+identifier+'" TEXT PRIMARY KEY'],
                     updateString: [],
                     columnNames: ['"'+identifier+'"'],
+                    columnTypes: ['string'],
                     values: [key]
                 };
 
@@ -560,9 +603,10 @@ define('argos/_OfflineCache', [
                     type = this.resolveSQLType(entry[prop]),
                     escapedProp = '"' + prop + '"';
 
-                definition.createString.push(escapedProp + ' ' + type);
+                definition.createString.push(escapedProp + ' ' + type.sql);
                 definition.updateString.push(escapedProp + ' = ' + value);
                 definition.columnNames.push(escapedProp);
+                definition.columnTypes.push(type.original);
                 definition.values.push(value);
             }
             definition.createString = definition.createString.join(', ');
@@ -584,9 +628,9 @@ define('argos/_OfflineCache', [
             if (lang.isArray(value))
                 type = 'array';
 
-            type = this.typeResolves[type];
+            var sqlType = this.typeResolves[type];
 
-            return type;
+            return {original: type, sql: sqlType};
         },
         /**
          * Converts the given value into the appropriate sqllite value.
