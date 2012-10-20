@@ -14,19 +14,10 @@ return describe('argos._OfflineCache', function() {
     it('Can call create SQL database on startup when SQL is the detected type', function() {
         cache._databaseType = 'sql';
 
-        spyOn(cache, '_createSQLDatabase');
+        spyOn(cache, '_createSQLDatabase').andCallThrough();
 
         cache.startup();
         expect(cache._createSQLDatabase).toHaveBeenCalled();
-    });
-    it('Can successfully create a sql database (requires WebSQL compat browser)', function() {
-
-        cache.startup();
-        waitsFor(function() {
-            return cache._database !== null;
-        }, "Creating SQL database", 5000);
-
-        expect(cache._database).not.toBe(null);
     });
 
     /**
@@ -222,79 +213,84 @@ return describe('argos._OfflineCache', function() {
      * _OfflineCache.createColumnDefinition
      */
     it('Can create websql column definition for a single string', function() {
-        var entry = { value: 'Test' };
+        var doc = { entry: {value: 'Test'}, entityName: 'test' };
         var key = '001';
 
         var definition = {
             key: '001',
+            metaKey: 'test.001',
             createString: '"$key" TEXT PRIMARY KEY, "value" TEXT',
             updateString: '"value" = Test',
             columnNames: ['"$key"', '"value"'],
             columnTypes: ['string', 'string'],
             values: ['001', 'Test']
         };
-        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(doc, key)).toEqual(definition);
     });
     it('Can create websql column definition for a single number', function() {
-        var entry = { value: 5 };
+        var doc = { entry: {value: 5}, entityName: 'test' };
         var key = '001';
 
         var definition = {
             key: '001',
+            metaKey: 'test.001',
             createString: '"$key" TEXT PRIMARY KEY, "value" REAL',
             updateString: '"value" = 5',
             columnNames: ['"$key"', '"value"'],
             columnTypes: ['string', 'number'],
             values: ['001', 5]
         };
-        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(doc, key)).toEqual(definition);
     });
     it('Can create websql column definition for a single boolean', function() {
-        var entry = { value: true };
+        var doc = { entry: {value: true}, entityName: 'test' };
         var key = '001';
 
         var definition = {
             key: '001',
+            metaKey: 'test.001',
             createString: '"$key" TEXT PRIMARY KEY, "value" INTEGER',
             updateString: '"value" = 1',
             columnNames: ['"$key"', '"value"'],
             columnTypes: ['string', 'boolean'],
             values: ['001', 1]
         };
-        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(doc, key)).toEqual(definition);
     });
     it('Can create websql column definition for a single date', function() {
-        var entry = { value: new Date(1349980826209) };
+        var doc = { entry: {value: new Date(1349980826209)}, entityName: 'test' };
         var key = '001';
 
         var definition = {
             key: '001',
+            metaKey: 'test.001',
             createString: '"$key" TEXT PRIMARY KEY, "value" INTEGER',
             updateString: '"value" = 1349980826209',
             columnNames: ['"$key"', '"value"'],
             columnTypes: ['string', 'date'],
             values: ['001', 1349980826209]
         };
-        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(doc, key)).toEqual(definition);
     });
     it('Can create websql column definition for a multiple mixed entry', function() {
-        var entry = {
+        var doc = { entry: {
             value: 'Testing',
             count: 3,
             success: true,
             stamp: new Date(1349980826209)
-        };
+        }, entityName: 'test' };
         var key = '001';
 
         var definition = {
             key: '001',
+            metaKey: 'test.001',
             createString: '"$key" TEXT PRIMARY KEY, "value" TEXT, "count" REAL, "success" INTEGER, "stamp" INTEGER',
             updateString: '"value" = Testing, "count" = 3, "success" = 1, "stamp" = 1349980826209',
             columnNames: ['"$key"', '"value"', '"count"', '"success"', '"stamp"'],
             columnTypes: ['string', 'string', 'number', 'boolean', 'date'],
             values: ['001', 'Testing', 3, 1, 1349980826209]
         };
-        expect(cache._createSQLColumnDefinition(entry, key)).toEqual(definition);
+        expect(cache._createSQLColumnDefinition(doc, key)).toEqual(definition);
     });
 
 

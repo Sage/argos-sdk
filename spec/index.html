@@ -43,7 +43,6 @@
         instance.activate();
         //instance.startup();
         //instance.run();
-    });
 
     require([
         'dojo/_base/kernel',
@@ -57,7 +56,7 @@
         'spec/ApplicationModule.spec',
         'spec/convert.spec',
         'spec/ErrorManager.spec',
-//        'spec/format.spec',
+        'spec/format.spec',
         'spec/GroupedList.spec',
         'spec/List.spec',
         'spec/TitleBar.spec',
@@ -110,6 +109,7 @@
                 jasmine.getEnv().execute();
             });
     
+    });
     });
 </script>
 </body>

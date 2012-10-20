@@ -91,7 +91,6 @@ define('argos/_OfflineCache', [
             {
                 case 'sql':
                     this._createSQLDatabase();
-                    this._loadSQLMetaTables();
                     break;
 
                 case 'indexeddb':
@@ -107,7 +106,7 @@ define('argos/_OfflineCache', [
          * Opens the intitial SQL database and sets up the initial schema
          */
         _createSQLDatabase: function() {
-            this._database = openDatabase('argos', this.version, this.descriptionText, 5242880);
+            this._database = openDatabase('argos', this.version, this.descriptionText, 5242880, this._loadSQLMetaTables.bindDelegate(this));
 
             // todo: determine what sort of meta data might be needed
             this._database.transaction(function(transaction) {
@@ -120,19 +119,30 @@ define('argos/_OfflineCache', [
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS _tables (TableName TEXT PRIMARY KEY, Definition TEXT)');
             });
         },
-        _addSQLMetaKey: function(key, tableName, initial) {
+        /**
+         * Adds the given key to the _keys meta table (both in memory and in websql)
+         * @param {String} key
+         * @param {String} tableName
+         * @param {Boolean?} initial
+         */
+        _addSQLMetaKey: function(tableName, columnDefinition, initial) {
             var stamp = new Date().getTime();
 
-            this._keys[key] = {
+            this._keys[columnDefinition.metaKey] = {
                 TableName: tableName,
                 Modified: false,
-                New: initial,
+                New: !!initial,
                 LastUpdated: stamp
             };
 
             var insertQuery = 'INSERT INTO [_keys](Key, TableName, LastUpdated, New, Stamp) VALUES (?,?,?,?,?)';
-            this.executeSQLTransaction(insertQuery, [key, tableName, 0, initial ? 1 : 0, stamp], null, null);
+            this.executeSQLTransaction(insertQuery, [columnDefinition.metaKey, tableName, 0, initial ? 1 : 0, stamp], null, null);
         },
+        /**
+         * Updates the given key with a new timestamp and optionally the initial/modified property
+         * @param {String} key
+         * @param {Boolean?} initial
+         */
         _updateSQLMetaKey: function(key, initial) {
             var stamp = new Date().getTime(),
                 modified = initial ? 0 : 1;
@@ -147,12 +157,23 @@ define('argos/_OfflineCache', [
             ]);
             this.executeSQLTransaction(updateQuery, [], null, null);
         },
+        /**
+         * Adds a table and table definition to the meta _tables table, in memory and websql
+         * This is used to help reconstruct the object in retrieval.
+         * @param {String} tableName
+         * @param {Object} columnDefinition
+         */
         _addSQLMetaTableNames: function(tableName, columnDefinition) {
             this._tables[tableName] = columnDefinition;
 
             var insertQuery = 'INSERT INTO [_tables](TableName, Definition) VALUES (?,?)';
             this.executeSQLTransaction(insertQuery, [tableName, json.toJson(columnDefinition)], null, null);
         },
+        /**
+         * Updates a given table definition
+         * @param {String} tableName
+         * @param {Object} columnDefinition
+         */
         _updateSQLMetaTableNames: function(tableName, columnDefinition) {
             this._tables[tableName] = columnDefinition;
 
@@ -166,10 +187,19 @@ define('argos/_OfflineCache', [
         _createIDBDatabase: function() {
         },
 
+        /**
+         * Fires the sql select queries for meta data (key lookup, table definition, etc)
+         */
         _loadSQLMetaTables: function() {
             this.executeSQLTransaction('SELECT * FROM [_keys]', [], this._onLoadSQLMetaKeysSuccess.bindDelegate(this), null);
             this.executeSQLTransaction('SELECT * FROM [_tables]', [], this._onLoadSQLMetaTablesSuccess.bindDelegate(this), null);
         },
+        /**
+         * Success handler for loading the key meta data table. Loads the stored sql record into
+         * memory under `this._keys`
+         * @param transaction
+         * @param result
+         */
         _onLoadSQLMetaKeysSuccess: function(transaction, result) {
             if (result.rows.length === 0)
                 return;
@@ -183,6 +213,12 @@ define('argos/_OfflineCache', [
                 this._keys[key] = lang.clone(item);
             }
         },
+        /**
+         * Success handler for loading the tables meta data table. Loads the stored sql record into
+         * memory under `this._tables`
+         * @param transaction
+         * @param result
+         */
         _onLoadSQLMetaTablesSuccess: function(transaction, result) {
             if (result.rows.length === 0)
                 return;
@@ -195,6 +231,20 @@ define('argos/_OfflineCache', [
             }
         },
 
+        /**
+         * Retrieves an item from a given resource using the given key identifier
+         *
+         * Example
+         *
+         *     cache.getItem('accounts', '00001', this.onGetCacheSuccess, this);
+         *
+         * The success callback will be called in the given scope with the retrieved record.
+         *
+         * @param {String} resourceKind
+         * @param {String} key
+         * @param {Function} callback
+         * @param {Object} scope
+         */
         getItem: function(resourceKind, key, callback, scope) {
             switch(this._databaseType)
             {
@@ -203,8 +253,16 @@ define('argos/_OfflineCache', [
                 default: return false;
             }
         },
+        /**
+         * Get Item for SQL based cache. Utilizes `this._keys` to lookup table name.
+         * @param resourceKind
+         * @param key
+         * @param callback
+         * @param scope
+         */
         _getSQLEntry: function(resourceKind, key, callback, scope) {
-            var tableName = this._keys[key]['TableName'],
+            var metaKay = this.formatSQLMetaKey(resourceKind, key),
+                tableName = this._keys[metaKay]['TableName'],
                 getQuery = string.substitute('SELECT * FROM [${0}] where "${1}" = ${2}', [
                     tableName,
                     this.keyProperty,
@@ -250,6 +308,9 @@ define('argos/_OfflineCache', [
             }
             this._currentTransactions.push.apply(this._currentTransactions, currentTransactions);
 
+            if (transactionLength === 0)
+                this._checkTransactions();
+
             if (callback)
                 callback.call(scope || this, transaction, result);
         },
@@ -276,17 +337,16 @@ define('argos/_OfflineCache', [
             {
                 lang.setObject(targetPath.join('.'), unformattedEntry, this._currentEntry);
 
+                // remove the foriegn key property on the entry
                 if (targetPath.length > 1)
                 {
                     var rootPath = targetPath.slice(0,-1).join('.'), // go up one root
                         root = lang.getObject(rootPath, false, this._currentEntry);
 
-                    console.log('deleteing...', part, root);
                     delete root[part];
                 }
                 else
                 {
-                    console.log('deleteing...', part, this._currentEntry);
                     delete this._currentEntry[part];
                 }
 
@@ -298,11 +358,32 @@ define('argos/_OfflineCache', [
             }
         },
         _onGetInnerSQLEntry: function(o) {
-            this._getSQLEntry(o.entityName, o.key, this._onGetInnerSQLEntrySuccess.bindDelegate(this, o));
+            this._getSQLEntry(o.entityName, o.key, this._onGetInnerSQLEntrySuccess.bindDelegate(this, o), this);
         },
+        /**
+         * Handler for inner (entry within entry) get success.
+         *
+         * It resolves the deferred object that lets the Deferred.when() know this asynch process has
+         * finished.
+         *
+         * @param transaction
+         * @param result
+         * @param o
+         */
         _onGetInnerSQLEntrySuccess: function(transaction, result, o) {
             o.deferred.resolve(o.index);
         },
+        /**
+         * Takes a SQL-fied entry and reconverts the values back to Javascript ones.
+         *
+         * This utilizes the `this._tables` definition store for pulling the original javascript type
+         * from the column name (property name).
+         *
+         * This translates values like 0 to false, and 12378902123 (unix date) into js Dates.
+         *
+         * @param {String} tableName
+         * @param {Object} entry
+         */
         _revertSQLEntryFormat: function(tableName, entry) {
             var definition = this._getSQLTableDefinition(tableName);
 
@@ -311,13 +392,11 @@ define('argos/_OfflineCache', [
                 var index = array.indexOf(definition.columnNames, '"'+prop+'"');
                 if (index === -1)
                 {
-                    console.warn('invalid column returned, deleteing', prop, entry);
                     delete entry[prop];
                     continue;
                 }
 
                 var type = definition.columnTypes[index];
-                console.log(type);
                 switch(type)
                 {
                     case 'string':
@@ -363,7 +442,7 @@ define('argos/_OfflineCache', [
             var key = doc.entry[this.keyProperty].toString() || utility.uuid();
 
             //todo: pass callback/scope to final execution
-            this._processSQLEntry(doc, key, initial);
+            this._processSQLEntry(doc, key, initial, callback, scope);
         },
         _setIDBEntry: function(resourceKind, entry, initial, callback, scope) {
 
@@ -439,10 +518,12 @@ define('argos/_OfflineCache', [
          * @param {Object} doc
          * @param {String} key
          * @param {Boolean} initial
+         * @param {Function?} callback
+         * @param {Object?} scope
          */
-        _processSQLEntry: function(doc, key, initial) {
+        _processSQLEntry: function(doc, key, initial, callback, scope) {
             var tableName = doc.entityName,
-                columnDefinition = this._createSQLColumnDefinition(doc.entry, key);
+                columnDefinition = this._createSQLColumnDefinition(doc, key);
 
             if (!this.tableExists(tableName))
             {
@@ -511,7 +592,7 @@ define('argos/_OfflineCache', [
          * @param initial
          */
         _setSQLItem: function(tableName, columnDefinition, initial) {
-            if (this._keys[columnDefinition.key])
+            if (this._keys[columnDefinition.metaKey])
                 this._updateSQLItem(tableName, columnDefinition, initial);
             else
                 this._insertSQLItem(tableName, columnDefinition, initial);
@@ -531,7 +612,7 @@ define('argos/_OfflineCache', [
             ]);
             this.executeSQLTransaction(insertQuery, columnDefinition.values, null, null);
 
-            this._addSQLMetaKey(columnDefinition.key, tableName, initial);
+            this._addSQLMetaKey(tableName, columnDefinition, initial);
         },
 
         /**
@@ -550,7 +631,7 @@ define('argos/_OfflineCache', [
             ]);
             this.executeSQLTransaction(updateQuery, [], null, null);
 
-            this._updateSQLMetaKey(columnDefinition.key, initial);
+            this._updateSQLMetaKey(columnDefinition.metaKey, initial);
         },
 
         /**
@@ -577,16 +658,22 @@ define('argos/_OfflineCache', [
             return !!this._tables[tableName];
         },
 
+        formatSQLMetaKey: function(resourceKind, key) {
+            return resourceKind + '.' + key;
+        },
+
         /**
          * Creates a column string that can be used when creating a WebSQL table
-         * @param {Object} entry
+         * @param {Object} document
          * @param {String} key
          * @return {Object}
          */
-        _createSQLColumnDefinition: function(entry, key) {
-            var identifier = this.keyProperty || '__ID',
+        _createSQLColumnDefinition: function(document, key) {
+            var entry = document.entry,
+                identifier = this.keyProperty || '__ID',
                 definition = {
                     key: key,
+                    metaKey: this.formatSQLMetaKey(document.entityName, key),
                     createString: ['"'+identifier+'" TEXT PRIMARY KEY'],
                     updateString: [],
                     columnNames: ['"'+identifier+'"'],
