@@ -662,28 +662,35 @@ define('argos/List', [
          * @return {Object} this.tools
          * @template
          */
-        createToolLayout: function(tools) {
-            if (!this.tools) {
-                if (tools && 'object' == typeof tools) {
-                    this.tools = tools
+        createToolLayout: function() {
+            this.tools = this.tools || {
+                'top': [{
+                    id: 'new',
+                    action: 'navigateToInsertView',
+                    security: App.getViewSecurity(this.insertView, 'insert')
+                }]
+            };
 
-                } else {
-                    this.tools = {
-                        'top': [{
-                            id: 'new',
-                            action: 'navigateToInsertView',
-                            security: App.getViewSecurity(this.insertView, 'insert')
-                        }]
-                    };
+            var hasLeftSideTools,
+                numTiers = scene().layout.tiers;
+
+            if (this.tools.top) {
+                for (var i = 0; i < this.tools.top.length; i++)
+                {
+                    if (this.tools.top[i].place == 'left')
+                    {
+                        hasLeftSideTools = true;
+                        break;
+                    }
                 }
-
-                if (1 < scene().layout.tiers && this.tier < (scene().layout.tiers - 1) && true === this.enableNavigateUp)
+                if (!hasLeftSideTools && 1 < numTiers && this.tier < (numTiers - 1) && true === this.enableNavigateUp)
                     this.tools.top.push({
                         id: 'up',
                         action: 'navigateUp',
                         place: 'left'
                     });
             }
+
 
             return this.tools;
         },
