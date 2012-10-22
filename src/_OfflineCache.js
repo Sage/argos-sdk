@@ -73,7 +73,7 @@ define('argos/_OfflineCache', [
         _keys: {},
 
         _currentTransactions: [],
-        _currentEntry: {},
+        _currentEntry: [],
 
         typeResolves: {
             'string': 'TEXT',
@@ -253,6 +253,73 @@ define('argos/_OfflineCache', [
                 default: return false;
             }
         },
+
+        /**
+         * Retrieves a set of items from given a resource using the provided query
+         *
+         * Example:
+         *
+         *     cache.getItems('accounts', 'Status eq "Open"', this.onGetCacheSuccess, this);
+         *
+         * @param resourceKind
+         * @param query
+         * @param callback
+         * @param scope
+         */
+        getItems: function(resourceKind, query, callback, scope) {
+            switch(this._databaseType)
+            {
+                case 'sql': this._getSQLEntries(resourceKind, query, callback, scope); break;
+                case 'indexeddb': this._getIDBEntries(resourceKind, query, callback, scope); break;
+                default: return false;
+            }
+        },
+        _getSQLEntries: function(resourceKind, query, callback, scope) {
+            var sqlWhere = this.formatQueryToSQL(query),
+                getQuery = string.substitute('SELECT * FROM [${0}] ${1}', [
+                    resourceKind,
+                    sqlWhere
+                ]);
+            this.executeSQLTransaction(getQuery, [], this._onGetSQLEntriesSuccess.bindDelegate(this, resourceKind, callback, scope), null);
+        },
+        formatQueryToSQL: function(query) {
+            // todo: how to let this be customizable?
+            return query;
+        },
+        /**
+         * Success handler for getEntries (WebSQL based).
+         *
+         * While _onGetSQLEntrySuccess has the full logic to handle arrays of values we need this
+         * outside wrapper so that it checks all single entries have finished before returning the
+         * entire feed back.
+         *
+         * This is accomplished by adding another callback ontop the default callback to check the
+         * length of resolved entries (onGetSQLEntrySuccess has the Deferred logic) to the total
+         * number of entries.
+         *
+         * @param transaction
+         * @param result
+         * @param tableName
+         * @param callback
+         * @param scope
+         */
+        _onGetSQLEntriesSuccess: function(transaction, result, tableName, callback, scope) {
+            this._onGetSQLEntrySuccess(transaction, result, tableName, this._checkGetEntries.bindDelegate(this, result.rows.length, callback, scope), this);
+        },
+        _getIDBEntries: function(resourceKind, query, callback, scope) {
+
+        },
+
+        _checkGetEntries: function(currentEntry, entriesLength, callback, scope) {
+            if (currentEntry.length !== entriesLength)
+                return;
+
+            console.log('GET FEED FINISHED: ', currentEntry);
+
+            if (callback)
+                callback.call(scope || this, currentEntry);
+        },
+
         /**
          * Get Item for SQL based cache. Utilizes `this._keys` to lookup table name.
          * @param resourceKind
@@ -275,13 +342,21 @@ define('argos/_OfflineCache', [
         },
 
         _onGetSQLEntrySuccess: function(transaction, result, tableName, callback, scope) {
-            if (result.rows.length == 0)
-                return null;
+            var resultLength = result.rows.length;
 
-            var entry = lang.clone(result.rows.item(0)),
-                currentTransactions = [];
+            if (resultLength === 0)
+                this._checkTransactions(null, callback, scope);
 
-            this._setCurrentEntryPart(tableName, entry);
+            for (var i = 0; i < resultLength; i++)
+            {
+                var entry = lang.clone(result.rows.item(i));
+                this._extractInnerSQLEntry(tableName, entry, i, callback, scope);
+            }
+        },
+        _extractInnerSQLEntry: function(tableName, entry, index, callback, scope) {
+            var currentTransactions = [];
+
+            this._setCurrentEntryPart(tableName, entry, index);
 
             for (var prop in entry)
             {
@@ -303,27 +378,26 @@ define('argos/_OfflineCache', [
             for (var i = 0; i < transactionLength; i++)
             {
                 var related = currentTransactions[i];
-                Deferred.when(related.deferred, this._checkTransactions.bindDelegate(this));
+                Deferred.when(related.deferred, this._checkTransactions.bindDelegate(this, callback, scope));
                 this._onGetInnerSQLEntry(related);
             }
             this._currentTransactions.push.apply(this._currentTransactions, currentTransactions);
 
             if (transactionLength === 0)
-                this._checkTransactions();
-
-            if (callback)
-                callback.call(scope || this, transaction, result);
+                this._checkTransactions(null, callback, scope);
         },
-        _checkTransactions: function(index) {
-            this._currentTransactions.splice(index, 1);
+        _checkTransactions: function(index, callback, scope) {
+            if (!isNaN(index))
+                this._currentTransactions.splice(index, 1);
 
             if (this._currentTransactions.length === 0)
             {
-                //todo: call original callback...
-                console.log('FINISHED::::', this._currentEntry);
+                console.log('GET SINGLE FINISHED::::', this._currentEntry);
+                if (callback)
+                    callback.call(scope || this, this._currentEntry);
             }
         },
-        _setCurrentEntryPart: function(part, entry) {
+        _setCurrentEntryPart: function(part, entry, index) {
             var unformattedEntry = this._revertSQLEntryFormat(part, entry);
 
             var paths = part.indexOf('.') !== -1
@@ -333,28 +407,25 @@ define('argos/_OfflineCache', [
                 ? paths.slice(1)
                 : null;
 
-            if (targetPath)
+            if (!targetPath)
             {
-                lang.setObject(targetPath.join('.'), unformattedEntry, this._currentEntry);
+                this._currentEntry[index] = unformattedEntry;
+                return;
+            }
 
-                // remove the foriegn key property on the entry
-                if (targetPath.length > 1)
-                {
-                    var rootPath = targetPath.slice(0,-1).join('.'), // go up one root
-                        root = lang.getObject(rootPath, false, this._currentEntry);
+            lang.setObject(targetPath.join('.'), unformattedEntry, this._currentEntry[index]);
 
-                    delete root[part];
-                }
-                else
-                {
-                    delete this._currentEntry[part];
-                }
+            // remove the foriegn key property on the entry
+            if (targetPath.length > 1)
+            {
+                var rootPath = targetPath.slice(0,-1).join('.'), // go up one root
+                    root = lang.getObject(rootPath, false, this._currentEntry[index]);
 
-
+                delete root[part];
             }
             else
             {
-                this._currentEntry = unformattedEntry;
+                delete this._currentEntry[index][part];
             }
         },
         _onGetInnerSQLEntry: function(o) {
@@ -422,7 +493,7 @@ define('argos/_OfflineCache', [
         /**
          * Stores the given entry under the designated resourceKind store
          * @param {String} resourceKind
-         * @param {Object} entry
+         * @param {Object/Object[]} entry
          * @param {Boolean} initial Determines if it should be marked as initial data (not modified)
          * @param {Function?} callback Optional.
          * @param {Object?} scope Optional.
@@ -436,13 +507,18 @@ define('argos/_OfflineCache', [
             }
         },
         _setSQLEntry: function(resourceKind, entry, initial, callback, scope) {
-            var doc = this._splitSQLResources(resourceKind, entry);
-            doc = this._processSQLRelated(doc, initial);
+            var entries = (lang.isArray(entry)) ? entry : [entry];
 
-            var key = doc.entry[this.keyProperty].toString() || utility.uuid();
+            for (var i = 0; i < entries.length; i++)
+            {
+                var doc = this._splitSQLResources(resourceKind, entries[i]);
+                doc = this._processSQLRelated(doc, initial);
 
-            //todo: pass callback/scope to final execution
-            this._processSQLEntry(doc, key, initial, callback, scope);
+                var key = doc.entry[this.keyProperty].toString() || utility.uuid();
+
+                //todo: pass callback/scope to final execution
+                this._processSQLEntry(doc, key, initial, callback, scope);
+            }
         },
         _setIDBEntry: function(resourceKind, entry, initial, callback, scope) {
 
