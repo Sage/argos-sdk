@@ -248,7 +248,10 @@ define('argos/_OfflineCache', [
         getItem: function(resourceKind, key, callback, scope) {
             switch(this._databaseType)
             {
-                case 'sql': this._getSQLEntry(resourceKind, key, callback, scope); break;
+                case 'sql':
+                    this._clearSQLTemp();
+                    this._getSQLEntry(resourceKind, key, callback, scope);
+                    break;
                 case 'indexeddb': this._getIDBEntry(resourceKind, key, callback, scope); break;
                 default: return false;
             }
@@ -261,15 +264,18 @@ define('argos/_OfflineCache', [
          *
          *     cache.getItems('accounts', 'Status eq "Open"', this.onGetCacheSuccess, this);
          *
-         * @param resourceKind
-         * @param query
-         * @param callback
-         * @param scope
+         * @param {String} resourceKind
+         * @param {String?/Object?} query
+         * @param {Function} callback
+         * @param {Object} scope
          */
         getItems: function(resourceKind, query, callback, scope) {
             switch(this._databaseType)
             {
-                case 'sql': this._getSQLEntries(resourceKind, query, callback, scope); break;
+                case 'sql':
+                    this._clearSQLTemp();
+                    this._getSQLEntries(resourceKind, query || '', callback, scope);
+                    break;
                 case 'indexeddb': this._getIDBEntries(resourceKind, query, callback, scope); break;
                 default: return false;
             }
@@ -326,8 +332,9 @@ define('argos/_OfflineCache', [
          * @param key
          * @param callback
          * @param scope
+         * @param {Object?} o
          */
-        _getSQLEntry: function(resourceKind, key, callback, scope) {
+        _getSQLEntry: function(resourceKind, key, callback, scope, o) {
             var metaKay = this.formatSQLMetaKey(resourceKind, key),
                 tableName = this._keys[metaKay]['TableName'],
                 getQuery = string.substitute('SELECT * FROM [${0}] where "${1}" = ${2}', [
@@ -335,13 +342,20 @@ define('argos/_OfflineCache', [
                     this.keyProperty,
                     key
                 ]);
-            this.executeSQLTransaction(getQuery, [], this._onGetSQLEntrySuccess.bindDelegate(this, tableName, callback, scope), null);
+            this.executeSQLTransaction(getQuery, [], this._onGetSQLEntrySuccess.bindDelegate(this, tableName, callback, scope, o), null);
         },
         _getIDBEntry: function(resourceKind, key, callback, scope) {
 
         },
+        /**
+         * Clears the temp variables related to SQL queries
+         */
+        _clearSQLTemp: function() {
+            this._currentEntry = [];
+            this._currentTransactions = [];
+        },
 
-        _onGetSQLEntrySuccess: function(transaction, result, tableName, callback, scope) {
+        _onGetSQLEntrySuccess: function(transaction, result, tableName, callback, scope, o) {
             var resultLength = result.rows.length;
 
             if (resultLength === 0)
@@ -352,6 +366,9 @@ define('argos/_OfflineCache', [
                 var entry = lang.clone(result.rows.item(i));
                 this._extractInnerSQLEntry(tableName, entry, i, callback, scope);
             }
+
+            if (o && o.deferred)
+                callback.call(scope || this);
         },
         _extractInnerSQLEntry: function(tableName, entry, index, callback, scope) {
             var currentTransactions = [];
@@ -374,17 +391,18 @@ define('argos/_OfflineCache', [
                 }
             }
 
+            this._currentTransactions.push.apply(this._currentTransactions, currentTransactions);
             var transactionLength = currentTransactions.length;
             for (var i = 0; i < transactionLength; i++)
             {
                 var related = currentTransactions[i];
-                Deferred.when(related.deferred, this._checkTransactions.bindDelegate(this, callback, scope));
-                this._onGetInnerSQLEntry(related);
+                Deferred.when(related.deferred, this._checkTransactions.bindDelegate(this, i, callback, scope));
+                this._getSQLEntry(related.entityName, related.key, this._onGetInnerSQLEntrySuccess.bindDelegate(this, o, callback, scope), this, o);
             }
-            this._currentTransactions.push.apply(this._currentTransactions, currentTransactions);
-
+/*
             if (transactionLength === 0)
                 this._checkTransactions(null, callback, scope);
+                */
         },
         _checkTransactions: function(index, callback, scope) {
             if (!isNaN(index))
@@ -428,9 +446,6 @@ define('argos/_OfflineCache', [
                 delete this._currentEntry[index][part];
             }
         },
-        _onGetInnerSQLEntry: function(o) {
-            this._getSQLEntry(o.entityName, o.key, this._onGetInnerSQLEntrySuccess.bindDelegate(this, o), this);
-        },
         /**
          * Handler for inner (entry within entry) get success.
          *
@@ -441,7 +456,7 @@ define('argos/_OfflineCache', [
          * @param result
          * @param o
          */
-        _onGetInnerSQLEntrySuccess: function(transaction, result, o) {
+        _onGetInnerSQLEntrySuccess: function(o) {
             o.deferred.resolve(o.index);
         },
         /**
