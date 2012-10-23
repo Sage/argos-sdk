@@ -367,8 +367,10 @@ define('argos/_OfflineCache', [
                 this._extractInnerSQLEntry(tableName, entry, i, callback, scope);
             }
 
+            /*
             if (o && o.deferred)
                 callback.call(scope || this);
+                */
         },
         _extractInnerSQLEntry: function(tableName, entry, index, callback, scope) {
             var currentTransactions = [];
@@ -397,12 +399,11 @@ define('argos/_OfflineCache', [
             {
                 var related = currentTransactions[i];
                 Deferred.when(related.deferred, this._checkTransactions.bindDelegate(this, i, callback, scope));
-                this._getSQLEntry(related.entityName, related.key, this._onGetInnerSQLEntrySuccess.bindDelegate(this, o, callback, scope), this, o);
+                this._getInnerSQLEntry(related.entityName, related.key, callback, scope, o);
             }
-/*
+
             if (transactionLength === 0)
                 this._checkTransactions(null, callback, scope);
-                */
         },
         _checkTransactions: function(index, callback, scope) {
             if (!isNaN(index))
@@ -445,6 +446,13 @@ define('argos/_OfflineCache', [
             {
                 delete this._currentEntry[index][part];
             }
+        },
+
+        _getInnerSQLEntry: function(resourceKind, key, callback, scope, o) {
+            this._getSQLEntry(resourceKind, key, callback, scope, o);
+
+            if (o && o.deferred)
+                this._onGetInnerSQLEntrySuccess(o);
         },
         /**
          * Handler for inner (entry within entry) get success.
