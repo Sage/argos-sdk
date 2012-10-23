@@ -74,6 +74,7 @@ define('argos/_OfflineCache', [
 
         _currentTransactions: [],
         _currentEntry: [],
+        _finishedTransactions: [],
 
         typeResolves: {
             'string': 'TEXT',
@@ -359,21 +360,40 @@ define('argos/_OfflineCache', [
             var resultLength = result.rows.length;
 
             if (resultLength === 0)
-                this._checkTransactions(null, callback, scope);
+                this._finishedSingleTransaction(callback, scope);
 
             for (var i = 0; i < resultLength; i++)
             {
                 var entry = lang.clone(result.rows.item(i));
                 this._extractInnerSQLEntry(tableName, entry, i, callback, scope);
             }
-
-            /*
-            if (o && o.deferred)
-                callback.call(scope || this);
-                */
         },
+        /**
+         * Loops an SQL entry looking for further related entries denoted by a '.' in the column name
+         *
+         * Example: (resourceKind as contact)
+         *
+         *     {
+         *        "$key": '001',
+         *        "Name": 'Bob',
+         *        "contact.Account": '003' // <- inner relationship
+         *     }
+         *
+         * Any inner relations found will be queried, returned, and then update the single entry under
+         * `this._currentEntry[n]`.
+         *
+         * This happens recursively until it gets the inner-most entry that does not have any relations.
+         * When this happens {@link _finishedSingleTransaction _finishedSingleTransaction} is
+         * called that starts the callback chain.
+         *
+         * @param tableName
+         * @param entry
+         * @param index
+         * @param callback
+         * @param scope
+         */
         _extractInnerSQLEntry: function(tableName, entry, index, callback, scope) {
-            var currentTransactions = [];
+            var count = 0;
 
             this._setCurrentEntryPart(tableName, entry, index);
 
@@ -381,40 +401,24 @@ define('argos/_OfflineCache', [
             {
                 if (prop.indexOf('.') !== -1)
                 {
-                    var deferred = new Deferred();
-
                     var o = {
-                        index: currentTransactions.length,
+                        index: count,
                         entityName: prop,
-                        key: entry[prop],
-                        deferred: deferred
+                        key: entry[prop]
                     };
-                    currentTransactions.push(o);
+                    this._currentTransactions.push(o);
+                    this._getSQLEntry(o.entityName, o.key, callback, scope, o);
+                    count++;
                 }
             }
 
-            this._currentTransactions.push.apply(this._currentTransactions, currentTransactions);
-            var transactionLength = currentTransactions.length;
-            for (var i = 0; i < transactionLength; i++)
-            {
-                var related = currentTransactions[i];
-                Deferred.when(related.deferred, this._checkTransactions.bindDelegate(this, i, callback, scope));
-                this._getInnerSQLEntry(related.entityName, related.key, callback, scope, o);
-            }
-
-            if (transactionLength === 0)
-                this._checkTransactions(null, callback, scope);
+            if (count === 0)
+                this._finishedSingleTransaction(callback, scope);
         },
-        _checkTransactions: function(index, callback, scope) {
-            if (!isNaN(index))
-                this._currentTransactions.splice(index, 1);
-
-            if (this._currentTransactions.length === 0)
-            {
-                console.log('GET SINGLE FINISHED::::', this._currentEntry);
-                if (callback)
-                    callback.call(scope || this, this._currentEntry);
-            }
+        _finishedSingleTransaction: function(callback, scope) {
+            console.log('GET SINGLE FINISHED::::', this._currentEntry);
+            if (callback)
+                callback.call(scope || this, this._currentEntry);
         },
         _setCurrentEntryPart: function(part, entry, index) {
             var unformattedEntry = this._revertSQLEntryFormat(part, entry);
@@ -446,26 +450,6 @@ define('argos/_OfflineCache', [
             {
                 delete this._currentEntry[index][part];
             }
-        },
-
-        _getInnerSQLEntry: function(resourceKind, key, callback, scope, o) {
-            this._getSQLEntry(resourceKind, key, callback, scope, o);
-
-            if (o && o.deferred)
-                this._onGetInnerSQLEntrySuccess(o);
-        },
-        /**
-         * Handler for inner (entry within entry) get success.
-         *
-         * It resolves the deferred object that lets the Deferred.when() know this asynch process has
-         * finished.
-         *
-         * @param transaction
-         * @param result
-         * @param o
-         */
-        _onGetInnerSQLEntrySuccess: function(o) {
-            o.deferred.resolve(o.index);
         },
         /**
          * Takes a SQL-fied entry and reconverts the values back to Javascript ones.
