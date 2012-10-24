@@ -196,6 +196,10 @@
           "path": "../src"
         },
         {
+          "text": "Dialog.js",
+          "path": "../src"
+        },
+        {
           "text": "DomContentComponent.js",
           "path": "../src"
         },
