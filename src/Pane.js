@@ -199,7 +199,7 @@ define('argos/Pane', [
                 lang.hitch(this, this._progress, view, viewOptions, active)
             );
 
-            var fx = transition.findByName(transitionOptions.transition);
+            var fx = transition.findByName(transitionOptions && transitionOptions.transition);
 
             return fx(this.viewContainerNode || this.domNode, view, active === view ? null : active, transitionOptions, deferred);
         },

@@ -22,6 +22,7 @@
 define('argos/Layout', [
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/_base/array',
     'dojo/_base/window',
     'dojo/_base/Deferred',
     'dojo/DeferredList',
@@ -35,6 +36,7 @@ define('argos/Layout', [
 ], function(
     declare,
     lang,
+    array,
     win,
     Deferred,
     DeferredList,
@@ -74,6 +76,36 @@ define('argos/Layout', [
                 this.resize();
                 this._lastViewportHeight = window.innerHeight;
             }
+        },
+        layout: function(){
+            var sz = this.orientation == "H" ? "w" : "h";
+            var children = array.filter(this.domNode.childNodes, function(node){
+                return node.nodeType == 1 && domClass.contains(node, 'mblFixedSplitterPane');
+            });
+            var offset = 0;
+            for(var i = 0; i < children.length; i++){
+                domGeom.setMarginBox(children[i], this.orientation == "H" ? {l:offset} : {t:offset});
+                if(i < children.length - 1){
+                    offset += domGeom.getMarginBox(children[i])[sz];
+                }
+            }
+
+            var h;
+            if(this.orientation == "V"){
+                if(this.domNode.parentNode.tagName == "BODY"){
+                    if(array.filter(win.body().childNodes, function(node){ return node.nodeType == 1; }).length == 1){
+                        h = (win.global.innerHeight||win.doc.documentElement.clientHeight);
+                    }
+                }
+            }
+            var l = (h || domGeom.getMarginBox(this.domNode)[sz]) - offset;
+            var props = {};
+            props[sz] = l;
+            domGeom.setMarginBox(children[children.length - 1], props);
+
+            array.forEach(this.getChildren(), function(child){
+                if(child.resize){ child.resize(); }
+            });
         },
         hideNativeUrlBar: function() {
             if (!this.heightFixNode) this.heightFixNode = this._createHeightFixNode();

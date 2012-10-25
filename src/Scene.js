@@ -353,6 +353,7 @@ define('argos/Scene', [
                 /* the location is not a tracked pane, simply show the view */
                 if (this.layout.panes[at].tier === false)
                 {
+                    view.activate(options); /* activation required in order to build context (i.e. hash, etc.) */
                     deferred = this.layout.show(view, at);
                     deferred.then(
                         lang.hitch(this, this._onLayoutShowComplete),

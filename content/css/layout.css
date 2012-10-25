@@ -1689,20 +1689,38 @@ input::-webkit-inner-spin-button
 
 .dialog
 {
-    width: 80%;
-    height: 90%;
-    border-radius: 21px;
-    position: absolute;
     top: 0;
     left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.dialog > .toolbar
+{
+    z-index: 998;
+    width: 60%;
+    left: 20%;
+}
+
+.dialog > .view-container
+{
+    width: 60%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 20%;
     z-index: 999;
 }
+
 .dialog > iframe
 {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 998;
+    height: 100%;
+    width: 100%;
+    border: none;
+    z-index: 997;
     background: #000;
     opacity: .5;
 }
