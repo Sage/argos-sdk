@@ -467,11 +467,6 @@ define('argos/List', [
         enableActions: false,
         /**
          * @cfg {Boolean}
-         * Controls the availability of the navigateUp button on top toolbar.
-        */
-        enableNavigateUp: true,
-        /**
-         * @cfg {Boolean}
          * True to allow selections via the SelectionModel in the view.
          */
         allowSelection: false,
@@ -663,36 +658,13 @@ define('argos/List', [
          * @template
          */
         createToolLayout: function() {
-            this.tools = this.tools || {
+            return this.tools || (this.tools = {
                 'top': [{
                     id: 'new',
                     action: 'navigateToInsertView',
                     security: App.getViewSecurity(this.insertView, 'insert')
                 }]
-            };
-
-            var hasLeftSideTools,
-                numTiers = scene().layout.tiers;
-
-            if (this.tools.top) {
-                for (var i = 0; i < this.tools.top.length; i++)
-                {
-                    if (this.tools.top[i].place == 'left')
-                    {
-                        hasLeftSideTools = true;
-                        break;
-                    }
-                }
-                if (!hasLeftSideTools && 1 < numTiers && this.tier < (numTiers - 1) && true === this.enableNavigateUp)
-                    this.tools.top.push({
-                        id: 'up',
-                        action: 'navigateUp',
-                        place: 'left'
-                    });
-            }
-
-
-            return this.tools;
+            });
         },
         /**
          * Sets and returns the list-action actions layout definition, this method should be overriden in the view
@@ -1096,9 +1068,6 @@ define('argos/List', [
                 returnTo: this.id,
                 insert: true
             });
-        },
-        navigateUp: function() {
-            scene().navigateUp(this.tier);
         },
         onContentChange: function() {
         },
