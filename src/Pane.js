@@ -58,9 +58,11 @@ define('argos/Pane', [
         viewContainerNode: null,
         active: null,
         toolbars: null,
+        _signals: null,
 
         constructor: function() {
             this.toolbars = {};
+            this._signals = [];
         },
         _onToolbarPositionChange: function(position, previous) {
             if (previous) domClass.remove(this.domNode, 'has-toolbar-' + previous);
@@ -70,9 +72,18 @@ define('argos/Pane', [
         onStartup: function() {
             this.inherited(arguments);
 
+            this._signals.push(topic.subscribe('/app/layout/change', this.onPaneChange.bindDelegate(this)));
+            this._locateToolbars(this.getComponents());
+        },
+        _locateToolbars: function(components) {
             /* todo: use the same method as the view in order to discover toolbars */
-            array.forEach(this.getComponents(), function(component) {
-                if (component.isInstanceOf(Toolbar)) this.toolbars[component.getComponentName()] = component;
+            array.forEach(components, function(component) {
+                if (component.isInstanceOf(Toolbar))
+                    this.toolbars[component.getComponentName()] = component;
+
+                var childComponents = component.getComponents();
+                if (childComponents)
+                    this._locateToolbars(childComponents);
             }, this);
         },
         show: function(view, transitionOptions) {
@@ -244,6 +255,17 @@ define('argos/Pane', [
 
             return deferred;
             */
+        },
+        onPaneChange: function(o) {
+        },
+        onDestroy: function() {
+            this.inherited(arguments);
+
+            array.forEach(this._signals, function(signal) {
+                signal.remove();
+            });
+
+            delete this._signals;
         },
         resize: function() {
             // do not call base implementation (FixedSplitterPane)

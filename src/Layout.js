@@ -30,6 +30,7 @@ define('argos/Layout', [
     'dojo/dom-style',
     'dojo/dom-geometry',
     'dojo/dom-construct',
+    'dojo/topic',
     'dojox/mobile/FixedSplitter',
     './_UiComponent',
     './Pane'
@@ -44,6 +45,7 @@ define('argos/Layout', [
     domStyle,
     domGeom,
     domConstruct,
+    topic,
     FixedSplitter,
     _UiComponent,
     Pane
@@ -204,6 +206,10 @@ define('argos/Layout', [
 
                 if (item.view)
                 {
+                    topic.publish('/app/layout/change', {
+                        tier: tier,
+                        pane: this.panesByTier[tier]
+                    });
                     wait.push(this.panesByTier[tier].show(item.view, transitionOptions));
                 }
                 else
@@ -215,6 +221,12 @@ define('argos/Layout', [
             return new DeferredList(wait, false, true, true);
         },
         show: function(view, at, transitionOptions) {
+
+            topic.publish('/app/layout/change', {
+                tier: at,
+                pane: this.panes[at]
+            });
+
             var pane = this.panes[at];
             if (pane)
             {

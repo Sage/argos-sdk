@@ -1694,22 +1694,22 @@ input::-webkit-inner-spin-button
     bottom: 0;
     right: 0;
 }
-
-.dialog > .toolbar
+.dialog > .dialog-content
 {
-    z-index: 998;
-    width: 60%;
-    left: 20%;
-}
-
-.dialog > .view-container
-{
-    width: 60%;
-    height: 100%;
     position: absolute;
     top: 0;
-    left: 20%;
+    bottom: 0;
+    left: 25%;
     z-index: 999;
+    width: 50%;
+}
+
+.dialog > .dialog-content > .toolbar
+{
+}
+
+.dialog > .dialog-content > .view-container
+{
 }
 
 .dialog > iframe
