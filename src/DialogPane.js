@@ -44,26 +44,6 @@ define('argos/DialogPane', [
 ) {
     return declare('argos.DialogPane', [Pane], {
         /**
-         * @property {String}
-         * CSS classes added to the outmost dom node of the pane. `dialog` is required for the normal
-         * layout positioning.
-         */
-        baseClass: 'dialog is-hidden',
-
-        /**
-         * @property {Boolean}
-         * Required to be false. This prevents the pane from being tracked in history/navigation
-         */
-        tier: false,
-
-        /**
-         * @property {Boolean}
-         * Since DialogPane should auto-close when other Panes are shown this flag keeps the state if
-         * the DialogPane is currently active/shown.
-         */
-        isActive: false,
-
-        /**
          * @property {_Component[]}
          * Array of child {@link _Component components}, notably there is the iframe which is placed
          * behind the content to intercept clicks (to mimic a modal dialog).
@@ -81,6 +61,20 @@ define('argos/DialogPane', [
          * The dialog content node that houses the toolbar and view container
          */
         dialogContentNode: null,
+
+
+        /**
+         * @property {String}
+         * CSS classes added to the outmost dom node of the pane. `dialog` is required for the normal
+         * layout positioning.
+         */
+        baseClass: 'dialog is-hidden',
+
+        /**
+         * @property {Boolean}
+         * Required to be false. This prevents the pane from being tracked in history/navigation
+         */
+        tier: false,
 
 
         /**
@@ -111,7 +105,7 @@ define('argos/DialogPane', [
          * @return {Object} Deferred transition.
          */
         show: function() {
-            if (!this.isActive)
+            if (!this.active)
                 this.showDialog();
 
             return this.inherited(arguments);
@@ -121,7 +115,6 @@ define('argos/DialogPane', [
          * Makes the DialogPane visible and sets the appropiate flag.
          */
         showDialog: function() {
-            this.isActive = true;
             domClass.remove(this.domNode, 'is-hidden');
         },
 
@@ -129,7 +122,7 @@ define('argos/DialogPane', [
          * Makes the DialogPane hidden and sets the appropiate flag.
          */
         hideDialog: function() {
-            this.isActive = false;
+            this.active = null;
             domClass.add(this.domNode, 'is-hidden');
         },
 
@@ -140,7 +133,7 @@ define('argos/DialogPane', [
          * target pane instance a view is being put into.
          */
         onPaneChange: function(o) {
-            if (this.isActive && o.pane !== this)
+            if (this.active && o.pane !== this)
                 this.hideDialog();
 
             this.inherited(arguments);

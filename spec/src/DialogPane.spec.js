@@ -31,23 +31,23 @@ define('spec/DialogPane.spec', ['dojo/query','dojo/dom-class','argos/DialogPane'
         /**
          * show
          */
-        it('Can call showDialog when isActive is false and show is called', function() {
+        it('Can call showDialog when active is false and show is called', function() {
             var pane = new DialogPane();
 
             spyOn(pane, 'showDialog');
             spyOn(pane, '_transition'); // stops from going further
-            pane.isActive = false;
+            pane.active = null;
 
             pane.show({}, {});
 
             expect(pane.showDialog).toHaveBeenCalled();
         });
-        it('Does not call showDialog when isActive is true and show is called', function() {
+        it('Does not call showDialog when active is defined and show is called', function() {
             var pane = new DialogPane();
 
             spyOn(pane, 'showDialog');
             spyOn(pane, '_transition'); // stops from going further
-            pane.isActive = true;
+            pane.active = {};
 
             pane.show({}, {});
 
@@ -57,14 +57,6 @@ define('spec/DialogPane.spec', ['dojo/query','dojo/dom-class','argos/DialogPane'
         /**
          * showDialog
          */
-        it('Can set the isActive flag to true when showDialog is called', function() {
-            var pane = new DialogPane();
-            pane.isActive = false;
-
-            pane.showDialog();
-
-            expect(pane.isActive).toBe(true);
-        });
         it('Can remove the is-hidden class when showDialog is called', function() {
             var pane = new DialogPane();
             domClass.add(pane.domNode, 'is-hidden');
@@ -78,13 +70,13 @@ define('spec/DialogPane.spec', ['dojo/query','dojo/dom-class','argos/DialogPane'
         /**
          * hideDialog
          */
-        it('Can set the isActive flag to false when hideDialog is called', function() {
+        it('Can set active to null when hideDialog is called', function() {
             var pane = new DialogPane();
-            pane.isActive = true;
+            pane.active = {};
 
             pane.hideDialog();
 
-            expect(pane.isActive).toBe(false);
+            expect(pane.active).toBe(null);
         });
         it('Can add the is-hidden class when hideDialog is called', function() {
             var pane = new DialogPane();
@@ -100,7 +92,7 @@ define('spec/DialogPane.spec', ['dojo/query','dojo/dom-class','argos/DialogPane'
          */
         it('Can call hideDialog when a new view is being shown in a different Pane and the DialogPane is still active', function() {
             var pane = new DialogPane();
-            pane.isActive = true;
+            pane.active = {};
 
             spyOn(pane, 'hideDialog');
 
@@ -114,7 +106,7 @@ define('spec/DialogPane.spec', ['dojo/query','dojo/dom-class','argos/DialogPane'
         });
         it('Does not call hideDialog when a new view is being shown in a different Pane and the DialogPane is not active', function() {
             var pane = new DialogPane();
-            pane.isActive = false;
+            pane.active = null;
 
             spyOn(pane, 'hideDialog');
 
@@ -128,7 +120,7 @@ define('spec/DialogPane.spec', ['dojo/query','dojo/dom-class','argos/DialogPane'
         });
         it('Does not call hideDialog when a new view is being shown in the same DialogPane', function() {
             var pane = new DialogPane();
-            pane.isActive = false;
+            pane.active = {};
 
             spyOn(pane, 'hideDialog');
 

@@ -203,6 +203,7 @@ define('argos/Layout', [
             {
                 var item = viewSet[tier],
                     transitionOptions = this._createTransitionOptionsFor(item.view, item);
+                console.log(item, transitionOptions);
 
                 if (item.view)
                 {
