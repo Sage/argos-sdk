@@ -33,11 +33,13 @@
  */
 define('argos/DialogPane', [
     'dojo/_base/declare',
+    'dojo/_base/lang',
     'dojo/dom-class',
     './Pane',
     './TitleBar'
 ], function(
     declare,
+    lang,
     domClass,
     Pane,
     TitleBar
@@ -102,13 +104,22 @@ define('argos/DialogPane', [
         /**
          * Extends the parent implementation to call {@link #showDialog showDialog()} which handles the
          * visibility change.
+         * @param {Object} view
+         * @param {Object} transitionOptions
          * @return {Object} Deferred transition.
          */
-        show: function() {
+        show: function(view, transitionOptions) {
             if (!this.active)
+            {
                 this.showDialog();
+            }
 
-            return this.inherited(arguments);
+            // force basic transition
+            lang.mixin(transitionOptions || {}, {
+                transition: 'basic'
+            });
+
+            return this.inherited(arguments, [view, transitionOptions]);
         },
 
         /**

@@ -354,7 +354,7 @@ define('argos/Scene', [
                 if (this.layout.panes[at].tier === false)
                 {
                     view.activate(options); /* activation required in order to build context (i.e. hash, etc.) */
-                    deferred = this.layout.show(view, at);
+                    deferred = this.layout.show(view, at, navigation);
                     deferred.then(
                         lang.hitch(this, this._onLayoutShowComplete),
                         lang.hitch(this, this._onLayoutShowError)
