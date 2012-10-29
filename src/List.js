@@ -1192,8 +1192,7 @@ define('argos/List', [
             /// </summary>
             this._selectionModel.clear();
 
-            if (App.bars['tbar'])
-                App.bars['tbar'].invokeTool({tool: this.options.singleSelectAction}); // invoke action of tool
+            topic.publish('/app/toolbar/invoke', this.options.singleSelectAction);
         },
         /**
          * Determines if the view should be refresh by inspecting and comparing the passed navigation options with current values.
