@@ -16,6 +16,17 @@
 /**
  * Scene is the mastermind controller of the layout. It handles registration, showing, accessing and state history of
  * views.
+ *
+ * Note, when you require scene, you should do it in this manner:
+ *
+ *     define('myClass', ['argos!scene'], function(scene), {
+ *         myFunction: function() {
+ *             scene().showView('view_id'); // note scene()
+ *         }
+ *     });
+ *
+ * The more notable public functions of Scene are: registerView, showView, getView and back.
+ *
  * @alternateClassName scene
  * @extends _Component
  * @requires Layout
@@ -143,12 +154,24 @@ define('argos/Scene', [
 
             this._state = null;
         },
+
+        /**
+         * Registers multiple views from a given key/value hash
+         * @param {Object} definitions Key/value hash where the key is the unique view name and hash is the views component definition.
+         */
         registerViews: function(definitions) {
             for (var name in definitions)
             {
                 this.registerView(name, definitions[name]);
             }
         },
+
+        /**
+         * Registers a view with the given unique name and the provided component definition/view instance.
+         * @param {String} name Required unique name.
+         * @param {Object} definition The component definition of the view. If instead it is a view instance the
+         * instanced view will be directly added to `_instancedViews`.
+         */
         registerView: function(name, definition) {
             if (definition instanceof View)
             {
@@ -163,17 +186,53 @@ define('argos/Scene', [
 
             return this;
         },
+
+        /**
+         * Determines if the given named view is registered or instanced.
+         * @param {String} name Unique identifier of the view to search for
+         * @return {Boolean} True/false if the view has been registered.
+         */
         hasView: function(name) {
             return !!(this._instancedViews[name] || this._registeredViews[name]);
         },
+
+        /**
+         * Returns the component definition of the given named view.
+         * @param {String} name Unique identifier of the view to get the definition
+         * @return {Object} The component definition used to register the view
+         */
         getViewRegistration: function(name) {
             return this._registeredViews[name];
         },
+
         /* todo: add a method, restoreView(name), to restore a view to the most recent point in _state. will not show, only restore. */
         restoreView: function(name) {
         },
-        /* todo: this should return a deferred */
+
+        /**
+         * Starts the show process of a view.
+         *
+         * Examples:
+         *
+         *     // no options, defaults to tier that account_list defines
+         *     scene().showView('account_list');
+         *
+         *     // passes optional info to the view which may then be parsed and reacted to
+         *     scene().showView('calendar_daylist', {currentDate: new Date().getTime()});
+         *
+         *     // shows the view into the dialog Pane instead of determining by tier
+         *     scene().showView('login', null, 'dialog');
+         *
+         *     // alters how history is returned
+         *     scene().showView('note_edit', {insert: true}, null, {returnTo: -1});
+         *
+         * @param {String} name Unique name of the view to show, the name is the one the view was registered with.
+         * @param {Object?} options Optional. Object that contains the options the view being shown will recieve.
+         * @param {String?} at Optional. The name of the Pane to show the view, by default it will use the tier system.
+         * @param {Object?} navigation Optional. Transition/nav options that Scene/Layout/Pane may use to change the default navigations.
+         */
         showView: function(name, options, at, navigation) {
+            /* todo: this should return a deferred */
             /* todo: add a fix for when the same view is shown multiple times before completion, i.e. multiple click on initial show, due to lag */
 
             var instance = this._instancedViews[name];
@@ -490,11 +549,33 @@ define('argos/Scene', [
                 this._queue.push([name, instance, options, at, navigation]);
             }
         },
-        getView: function(id) {
-            return this._instancedViews[id];
+        /**
+         * Returns the view instance. Note that this creates a coupling that should normally be
+         * avoided except for scenarios that require this additional hook.
+         *
+         * An example usage would be attempting to pull extra context from a previous view but doesn't
+         * prevent manual entering.
+         *
+         * Example:
+         *
+         *    var view = scene().getView('account_detail');
+         *
+         * @param {String} name Unique identifier of the view to retrieve.
+         * @return {Object} Instance of the named view.
+         */
+        getView: function(name) {
+            return this._instancedViews[name];
         },
-        /* todo: this should return a deferred */
+
+        /**
+         * Goes back in the history. This magically handles the all the transitions,
+         * state session, (and will handle browser history)
+         * @param {Number} count Number of states to go back
+         * @param {Object} navigation Navigation/transition options
+         */
         back: function(count, navigation) {
+            /* todo: this should return a deferred */
+
             if (typeof count !== 'number')
             {
                 navigation = count;
@@ -502,7 +583,7 @@ define('argos/Scene', [
             }
 
             /* todo: let browser history handle this for us? use hashchange to do this? */
-            if ((this._state.length - count) <= 1) return;
+            if ((this._state.length - count) < 1) return;
 
             this._idle = false;
 
