@@ -14,7 +14,33 @@
  */
 
 /**
- * _CommandMixin
+ * CommandMixin provides a way to invoke javascript functions from HTML markup.
+ *
+ * The object/class that mixes this in sure bind the click event to `_CommandMixin.invoke` which will handle the rest.
+ *
+ * On the HTML side of things add `data-command="functionName"`.
+ *
+ * The CommandMixin will match the named function with the id (or name) stored in the
+ * `_commandsByName` hash. From there it will invoke the appropiate supported method:
+ *
+ * * fn: An inline function definition
+ * * show: Calls scene().showView with the given show string
+ * * action: Name of function in the given scope to call
+ * * publish: Calls topic.publish() with the publish string as the topic and `args` as the passed arguments
+ *
+ * Example:
+ *
+ * HTML
+ *     <div data-command="new"><img src="new.png"></div>
+ *
+ * javascript
+ *
+ *     this._commandsByName['new'] = {
+ *         action: 'navigateToInsertView'
+ *         scope: this
+ *     });
+ *
+ *
  * @alternateClassName _CommandMixin
  * @requires utility
  * @requires scene
@@ -34,6 +60,10 @@ define('argos/_CommandMixin', [
 ) {
     /* todo: convert toolbar to use this */
     return declare('argos._CommandMixin', null, {
+        /**
+         * @property {Object[]}
+         * Collection of command objects, where the key is the command name and value is the object.
+         */
         _commandsByName: null,
 
         context: null,
@@ -49,6 +79,12 @@ define('argos/_CommandMixin', [
         _setContextAttr: function(value) {
             this.context = value;
         },
+
+        /**
+         * Click handler, extracts the data-command from the clicked node and invokes the command by name
+         * @param evt
+         * @param node
+         */
         invoke: function(evt, node) {
             var name = typeof evt === 'string'
                     ? evt
@@ -56,6 +92,18 @@ define('argos/_CommandMixin', [
                 command = this._commandsByName[name];
             if (command) this._invokeCommand(command);
         },
+
+        /**
+         * Calls the appropriate function based on what the command object has.
+         *
+         * Order that it detects the function (first -> last):
+         *
+         *     fn, show, action, publish
+         *
+         * Note if the `commandObject.enabled` is false, or `.disabled` is true the invoke is cancelled.
+         *
+         * @param command
+         */
         _invokeCommand: function(command) {
             var context = this.get('context'),
                 scope = command.scope || context || command,

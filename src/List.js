@@ -1061,7 +1061,6 @@ define('argos/List', [
         /**
          * Navigates to the defined `this.insertView`, or `this.editView` passing the current views id as the `returnTo`
          * option and setting `insert` to true.
-         * @param {HTMLElement} el Node that initiated the event.
          */
         navigateToInsertView: function() {
             scene().showView(this.insertView || this.editView, {

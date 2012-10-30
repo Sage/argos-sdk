@@ -14,7 +14,15 @@
  */
 
 /**
- * Pane
+ * Panes are containers. You can think of them as iframes, or windows, or blocks but it all comes down
+ * to being a container.
+ *
+ * Panes, in this implementation, have two components:
+ *
+ * * toolbar - The top bar across the top of a Pane; and
+ * * container - where a view gets put into.
+ *
+ *
  * @alternateClassName Pane
  * @extends _UiComponent
  * @requires ToolBar

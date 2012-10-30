@@ -14,7 +14,19 @@
  */
 
 /**
- * Layout
+ * Layout, as the name implies, handles the physical laying out of Panes by utilizing dojox/mobile/FixedSplitted.
+ *
+ * Think of Scene as the topmost level as a pool or collection of views. Layout (which is the only
+ * component of Scene) organizes the app into distinct groups (tiers) and handles the identificaton
+ * of which view gets shown where.
+ *
+ * As an example: code calls `scene().showView('home')`. Scene does the lookup and gets the home view and
+ * passes control to Layout which looks at the home view see's that its tier 0 and shows it
+ * inside the Pane designed for tier 0 views.
+ *
+ * The components of layout (which should be Panes, or derivatives) that contain the class 'mblFixedSplitterPane'
+ * will have their width/height adjusted (based on orientation).
+ *
  * @alternateClassName Layout
  * @extends _UiComponent
  * @requires Pane
@@ -51,6 +63,17 @@ define('argos/Layout', [
     Pane
 ) {
     return declare('argos.Layout', [FixedSplitter, _UiComponent], {
+        /**
+         * @cfg {Object[]}
+         * Array of component definitions.
+         *
+         * In the special case of Layout each of the components should be some derivative of Pane.
+         *
+         * Also, if the domNode of the Pane includes the CSS class `mblFixedSplitterPane` then it
+         * will be styled (width/height) accordingly in regards to the other Panes (fitting them onto
+         * the screen).
+         *
+         */
         components: [
             {name: 'navigation', type: Pane, attachPoint: 'panes.navigation', props:{'class':'layout-left', tier: false}},
             {name: 'list', type: Pane, attachPoint: 'panes.list', props:{'class':'layout-center', tier: 0}},
@@ -60,6 +83,11 @@ define('argos/Layout', [
         _onCheckViewportHeightHandle: null,
         _lastViewportHeight: null,
 
+        /**
+         * @property {Object}
+         * This object will be populated by the resulting panes from the child components as noted by
+         * the `attachPoint: 'panes.list'`, `panes.detail` etc.
+         */
         panes: null,
         panesByTier: null,
         tiers: 2,

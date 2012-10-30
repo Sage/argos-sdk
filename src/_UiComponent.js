@@ -39,7 +39,28 @@ define('argos/_UiComponent', [
     _Component
 ) {
     /**
-     * _UiComponent
+     * A specialized Component that provides:
+     *
+     * 1. Adds the resulting content as HTML and is appended to the DOM during the `render()` stage.
+     * 1. Adds the following component definition properties:
+     *
+     *     {
+     *         tag: 'div', // makes this component a container node (using the node tag provided)
+     *         attrs: {}, // adds the given attributes to the tag node
+     *         content: 'markup', // instead of child components you can bypass it and do a
+     *            straight string markup for the content
+     *         domOnly: false // flag that denotes this should be treated as merely markup. If false it
+     *            will be treated as a Control/Widget with all the supporting features
+     *     }
+     *
+     * Note that if `type` is present then it will be considered a normal `_Component`. If
+     *
+     * Examples:
+     *
+     *     { name: 'content', tag: 'ul', attrs: {'class': 'list-content'}, attachPoint: 'contentNode' }
+     *
+     *     { name: 'more', content: Simplate.make('<button data-action="more">$.moreText</button>')}
+     *
      * @alternateClassName _UiComponent
      * @extends _Component
      */
@@ -127,11 +148,20 @@ define('argos/_UiComponent', [
     });
 
     /**
-     * DomContentComponent
+     * DomContentComponent is a component that is just a holder for a DOM Node. When retrieving
+     * the value, it merely returns the assigned node.
+     *
+     * Note that you cannot directly require DomContentComponent you should require UiComponent and
+     * set `domOnly` to true.
+     *
      * @alternateClassName DomContentComponent
      * @extends _UiComponent
      */
     var DomContentComponent = declare('argos.DomContentComponent', [_UiComponent], {
+        /**
+         * @property {HTMLElement}
+         * The assigned node of this component
+         */
         domNode: null,
         constructor: function(props, node) {
             lang.mixin(this, props);
@@ -149,13 +179,23 @@ define('argos/_UiComponent', [
 
             this.inherited(arguments);
         },
+        /**
+         * Returns the assigned dom node.
+         * @return {HTMLElement}
+         */
         getComponentValue: function() {
             return this.domNode;
         }
     });
 
     /**
-     * A lightweight widget-like component.
+     * A lightweight widget-like component that incorporates [dojo/Stateful](http://dojotoolkit.org/reference-guide/1.8/dojo/Stateful.html)
+     *
+     * It also selectively adds functionality from dijit/_WidgetBase, namely get/set and placeAt.
+     *
+     * Note that you cannot directly require Control you should require UiComponent and
+     * leave `domOnly` at false (the default).
+     *
      * @alertnateClassName Control
      * @extends _UiComponent
      */

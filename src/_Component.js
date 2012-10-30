@@ -39,23 +39,92 @@ define('argos/_Component', [
     };
 
     /**
-     * _Component
+     * Component is a building block for application pieces. It is an object based approach as opposed
+     * to the string approach taken by dojo dijits.
+     *
+     * Previously for a building block you may do something like:
+     *
+     *     widgetTemplate: '<div><div data-dojo-attach-point="searchNode"></div></div>'
+     *
+     * Then in code you would:
+     *
+     *     var searchWidget = new SearchWidget();
+     *     searchWidget.placeAt(this.searchNode);
+     *
+     * With a Component you simplify this process to:
+     *
+     *     components: [
+     *         { name: 'search', type: SearchWidget }
+     *     ]
+     *
+     * Note that it is not limited to rendering HTML, but it is a structuring system allowing you
+     * to build things out of other pieces in a hierachy.
+     *
+     *
+     * After a component has been built/startedup the child components (defined with components: [])
+     * are accesible from the `$` object with the key being the name of the child component and value
+     * the child component itself.
+     *
+     *     this.$.search.onSearch();
+     *
      * @alternateClassName _Component
      */
     var _Component = declare('argos._Component', null, {
         _components: null,
+
         /**
          * Contains information about `this` component.
          */
         _componentInfo: null,
         _componentRoot: null,
         _componentOwner: null,
+
         /**
          * Contains information about how, and where, all child components were attached.
          */
         _componentContext: null,
 
+        /**
+         * @property {Object}
+         * Key/Value map of the built/startedup child components where each key is the name of the
+         * child component and the value the child component itself.
+         */
         $: null,
+
+        /**
+         * @cfg {Object[]}
+         * Array of child objects that define the component structure.
+         *
+         * A component object definition:
+         *
+         *     {
+         *         name: 'string',
+         *         type: Function/String,
+         *         props: {},
+         *         attachEvent: 'Event:Handler,Event:Handler',
+         *         attachPoint: 'property',
+         *         subscribeEvent: 'Event:Handler,Event:Handler',
+         *         components: [{}, {}]
+         *     }
+         *
+         * *name*: Required. Must be unique within the component definition.
+         *
+         * *type*: If a function, it must be the constructor function of that class/object. If a string
+         * is given, it should be the dot-notation path to a constructor function.
+
+         * *props*: Property overrides that get mixed into the child component
+         *
+         * *attachEvent*: Comma separated dojo.connects child component events to the
+         * current component handlers
+         *
+         * *attachPoint*: Sets the child component to this named property on the current
+         * component - a shortcut to `this.$.name`. May be a dot-notated path for nested setting.
+         *
+         * *subscribeEvent*: Comma separated dojo.connects current component events to the child component handlers
+         *
+         * *components*: Array of further child component definitions
+         *
+         */
         components: null,
 
         constructor: function(props) {
@@ -146,6 +215,7 @@ define('argos/_Component', [
                 this._components.splice(slot, 1);
             }
         },
+
         /**
          * Attaches a child component into the component heirarchy.  The reason the top-down approach is used, instead of
          * a component attaching itself to the heirarchy, is due to the need to support "components" that
