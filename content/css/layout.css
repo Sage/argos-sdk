@@ -307,6 +307,13 @@ img
 /* view */
 .view
 {
+
+    /* todo: temporary fix for Chrome repaint issues */
+    /* todo: still an issue with fuzzy text in some scenarios */
+    -webkit-transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+
     display: none;
     position: absolute;
     top: 0;
