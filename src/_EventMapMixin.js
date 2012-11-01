@@ -14,7 +14,20 @@
  */
 
 /**
- * _EventMapMixin
+ * EventMapMixin allows a widget to map events to actions by defining an event map.
+ *
+ * EventMapMixin is really made of two parts: the event map to dojo/on connections and
+ * the handling of "dynamic events".
+ *
+ * The first part is fairly straight forward, see the `events` config for the variations.
+ *
+ * The second part comes into play when you set an event handler to `true`:
+ *
+ *     events: {'click': true}
+ *
+ * In which the HTMLElement that initiated the event will have it's `data-action` attribute extracted
+ * and called passing the original event and node as parameters.
+ *
  * @alternateClassName _EventMapMixin
  */
 define('argos/_EventMapMixin', [
@@ -34,11 +47,9 @@ define('argos/_EventMapMixin', [
         };
     };
 
-    /**
-     * Allows a widget to map events to actions by defining an event map.
-     */
     return declare('argos._EventMapMixin', null, {
         /**
+         * @cfg {String/Object}
          * Can be in the form:
          *   * `'<event>': '<action>'`
          *   * `'<selector>:<event>': '<action>'`

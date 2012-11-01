@@ -20,8 +20,11 @@
  * Panes, in this implementation, have two components:
  *
  * * toolbar - The top bar across the top of a Pane; and
- * * container - where a view gets put into.
+ * * container - Where a view gets put into.
  *
+ * Abstractly, the app is controlled by:
+ *
+ * Scene (views) -> Layout (organizes them together) <- Panes (containers)
  *
  * @alternateClassName Pane
  * @extends _UiComponent

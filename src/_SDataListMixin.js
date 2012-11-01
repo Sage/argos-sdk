@@ -14,7 +14,7 @@
  */
 
 /**
- * _SDataListMixin
+ * _SDataListMixin provides SData enablement for the List view.
  * @alternateClassName _SDataListMixin
  * @requires SData
  * @requires utility
@@ -28,9 +28,6 @@ define('argos/_SDataListMixin', [
     SData,
     utility
 ) {
-    /**
-     * SData enablement for the List view.
-     */
     return declare('argos._SDataListMixin', null, {
         /**
          * @cfg {String} resourceKind
