@@ -14,7 +14,8 @@
  */
 
 /**
- * _CompositeMixin
+ * _CompositeMixin provides a "mini Edit view" to a field, allowing the field to be made up of
+ * inner fields by describing its own layout.
  * @alternateClassName _CompositeMixin
  * @requires utility
  * @requires FieldRegistry
