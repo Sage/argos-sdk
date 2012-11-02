@@ -16,7 +16,7 @@
 /**
  * A Detail View represents a single record and should display all the info the user may need about the entry.
  *
- * A Detail entry is identified by its key ($key) which is how it requests the data via the SData endpoint.
+ * A Detail entry is identified by its key (default: `$key`) which is how it requests the entry.
  *
  * @alternateClassName Detail
  * @extends View
@@ -77,9 +77,18 @@ define('argos/Detail', [
         };
 
     return declare('argos.Detail', [View], {
+        /**
+         * @property {Object}
+         * Event map, see {@link _EventMapMixin#events _EventMapMixin.events}.
+         */
         events: {
             'click': true
         },
+        /**
+         * @property {Object[]}
+         * Definition of the view and it's child components, see {@link _Component#components _Component.components} for examples
+         * of the various component definition properties.
+         */
         components: [
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
@@ -88,6 +97,10 @@ define('argos/Detail', [
                 ]}
             ]}
         ],
+        /**
+         * @property {String}
+         * Root level CSS classes
+         */
         baseClass: 'view detail',
         _setDetailContentAttr: {node: 'contentNode', type: 'innerHTML'},
         /**
@@ -211,7 +224,15 @@ define('argos/Detail', [
         notAvailableTemplate: new Simplate([
             '<div class="not-available">{%: $.notAvailableText %}</div>'
         ]),
+        /**
+         * @property {Number/Boolean}
+         * Identifies which pane this view should be placed into and tracked with.
+         */
         tier: 1,
+        /**
+         * @property {Object}
+         * The dojo store this view will use for data exchange.
+         */
         store: null,
         /**
          * @property {Object}
@@ -310,8 +331,9 @@ define('argos/Detail', [
             });
         },
         /**
-         * Handler for the global `/app/refresh` event. Sets `refreshRequired` to true if the key matches.
-         * @param {Object} options The object published by the event.
+         * Handler for the global `/app/refresh` event. Sets `refr
+         * eshRequired` to true if the key matches.
+         * @param {Object} o The object published by the event.
          * @private
          */
         _onRefresh: function(o) {
@@ -373,14 +395,34 @@ define('argos/Detail', [
 
             scene().showView(view, options);
         },
+        /**
+         * CreateStore is the core of the data handling for Detail Views. By default it is empty but it should return
+         * a dojo store of your choosing. There are {@link _SDataDetailMixin Mixins} available for SData.
+         * @return {*}
+         */
         createStore: function() {
             return null;
         },
+        /**
+         * Required for binding to ScrollContainer which utilizes iScroll that requires to be refreshed when the
+         * content (therefor scrollable area) changes.
+         */
         onContentChange: function() {
         },
+        /**
+         * @template
+         * Optional processing of the returned entry before it gets processed into layout.
+         * @param {Object} item Entry from data store
+         * @return {Object} By default does not do any processing
+         */
         _processItem: function(item) {
             return item;
         },
+        /**
+         * Takes the entry from the data store, applies customization, applies any custom item process and then
+         * passes it to process layout.
+         * @param {Object} item Entry from data store
+         */
         _processData: function(item) {
             var customizationSet = customizations(),
                 layout = customizationSet.apply(customizationSet.toPath(this.customizationSet, null, this.id), this.createLayout());

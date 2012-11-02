@@ -14,7 +14,10 @@
  */
 
 /**
- * _SDataEditMixin
+ * _SDataEditMixin enables SData for the Edit view.
+ *
+ * Extends the SDataDetail Mixin by providing functions for $template requests.
+ *
  * @alternateClassName _SDataEditMixin
  * @extends _SDataDetailMixin
  * @requires SData
@@ -34,9 +37,6 @@ define('argos/_SDataEditMixin', [
     SData,
     _SDataDetailMixin
 ) {
-    /**
-     * SData enablement for the Detail view.
-     */
     return declare('argos._SDataEditMixin', [_SDataDetailMixin], {
         _buildRefreshMessage: function(item, result) {
             var message = this.inherited(arguments);

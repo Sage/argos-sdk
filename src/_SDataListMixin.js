@@ -14,7 +14,10 @@
  */
 
 /**
- * _SDataListMixin provides SData enablement for the List view.
+ * _SDataListMixin enables SData for the List view.
+ *
+ * Adds the SData store to the view and exposes the needed properties for creating a Feed request.
+ *
  * @alternateClassName _SDataListMixin
  * @requires SData
  * @requires utility
@@ -33,37 +36,36 @@ define('argos/_SDataListMixin', [
          * @cfg {String} resourceKind
          * The SData resource kind the view is responsible for.  This will be used as the default resource kind
          * for all SData requests.
-         * @type {String}
          */
         resourceKind: '',
         /**
+         * @cfg {String[]}
          * A list of fields to be selected in an SData request.
-         * @type {Array.<String>}
          */
         querySelect: null,
         /**
+         * @cfg {String[]?}
          * A list of child properties to be included in an SData request.
-         * @type {Array.<String>}
          */
         queryInclude: null,
         /**
+         * @cfg {String}
          * The default order by expression for an SData request.
-         * @type {String}
          */
         queryOrderBy: null,
         /**
+         * @cfg {String/Function}
          * The default where expression for an SData request.
-         * @type {String|Function}
          */
         queryWhere: null,
         /**
+         * @cfg {String?/Function?}
          * The default resource property for an SData request.
-         * @type {String|Function}
          */
         resourceProperty: null,
         /**
+         * @cfg {String?/Function?}
          * The default resource predicate for an SData request.
-         * @type {String|Function}
          */
         resourcePredicate: null,
         keyProperty: '$key',

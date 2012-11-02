@@ -14,8 +14,28 @@
  */
 
 /**
- * CustomizationSet
- * @alernateClassName CustomizationSet
+ * CustomizationSet is customization registry and engine rolled into one.
+ *
+ * There is a shortcut available when requiring CustomizationSet:
+ *
+ *     define('myClass', ['argos!customizations'], function(customizations) {
+ *         var myFunc = function() {
+ *             var customizationSet = customizations();
+ *             var customizedLayout = customizationSet.apply(customizationSet.toPath('root', 'sub', 'id', {original}));
+ *         }
+ *     });
+ *
+ * Basically CustomizationSet provides an interface to overriding only parts of a classes layout (or any piece of a class
+ * that is done in the layout manner: hashtags, tools, list-actions, etc).
+ *
+ * See {@link App#registerCustomization App.registerCustomization} for the current shortcut for registering a customization.
+ *
+ * The purpose of customizations is to provide third-parties the ability to change a base application without modifying
+ * the SDK or base app code. The customizations are side-loaded during application startup/load and are then applied
+ * when the view is shown/refreshed. This allows seamless upgrades/patches to the SDK/base app without destroying any
+ * alterations made.
+ *
+ * @alternateClassName CustomizationSet
  */
 define('argos/CustomizationSet', [
     'dojo/_base/declare',
@@ -42,6 +62,13 @@ define('argos/CustomizationSet', [
 
             lang.mixin(this, props);
         },
+        /**
+         * Takes a path id to the customization set and the original source layout and returns the customizations applied
+         * to the original.
+         * @param {String} path Use {@link #toPath toPath} to create a proper path string
+         * @param {Object} source
+         * @return {Object}
+         */
         apply: function(path, source) {
             var segments = path.split('#'),
                 customizationSet = segments[0],
@@ -84,6 +111,14 @@ define('argos/CustomizationSet', [
 
             return result;
         },
+        /**
+         * Constructs a customization path string but taking the set, subsit and id and joining them with the
+         * needed symbols.
+         * @param {String} customizationSet The root or set, typically 'list', 'detail' or 'edit'
+         * @param {String?} customizationSubSet Used for targetting subsets like 'tools', 'actions' or 'hashTagQueries'
+         * @param {String} id Id of the view to customize
+         * @return {String}
+         */
         toPath: function(customizationSet, customizationSubSet, id) {
             var qualifiedSet = customizationSubSet
                     ? customizationSet + '/' + customizationSubSet
@@ -94,6 +129,12 @@ define('argos/CustomizationSet', [
 
             return path;
         },
+        /**
+         * Adds the customization specification/definition to the given path. When a matching {@link #apply apply} is
+         * called this customization will be merged on top of the source/original object passed in apply.
+         * @param {String} path
+         * @param {Object} spec
+         */
         register: function(path, spec) {
             var container = this._customizations[path] || (this._customizations[path] = []);
             if (container) container.push(spec);

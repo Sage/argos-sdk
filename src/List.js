@@ -604,7 +604,7 @@ define('argos/List', [
             }
         },
         /**
-         * Getter nmethod for the selection model
+         * Getter method for the selection model
          * @return {SelectionModel}
          */
         _getSelectionModelAttr: function() {
@@ -628,7 +628,7 @@ define('argos/List', [
                 this.$.search.setLabel(this.searchText);
 
             var customizationSet = customizations();
-            this.createActions(customizationSet.apply(customizationSet.toPath('actions', null, this.id), this.createActionLayout()));
+            this.createActions(customizationSet.apply(customizationSet.toPath(this.customizationSet, 'actions', this.id), this.createActionLayout()));
 
             this.clear(true);
         },

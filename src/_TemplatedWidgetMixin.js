@@ -14,7 +14,9 @@
  */
 
 /**
- * _TemplatedWidgetMixin
+ * _TemplatedWidgetMixin provides the property `widgetTemplate` for constructing a widget instead of using the
+ * preferred {@link _Component Component} base system. Basically the difference is a widgetTemplate is merely a string
+ * whereas a Component is a javascript object with all the added benefits.
  * @alternateClassName _TemplatedWidgetMixin
  */
 define('argos/_TemplatedWidgetMixin', [
@@ -27,13 +29,18 @@ define('argos/_TemplatedWidgetMixin', [
     _TemplatedMixin
 ) {
     return declare('argos._TemplatedWidgetMixin', null, {
+        /**
+         * @cfg {String}
+         * HTML markup for the item, the outmost parent (if no single parent a div will be created) will be assigned
+         * to `this.domNode`.
+         */
         widgetTemplate: null,
         constructor: function(){
             this._attachPoints = [];
             this._attachEvents = [];
         },
         /**
-         * Processes `this.widgetTemplate` or `this.contentTemplate`
+         * Processes `this.widgetTemplate`
          */
         buildRendering: function() {
             var rendered = this.widgetTemplate.apply(this),

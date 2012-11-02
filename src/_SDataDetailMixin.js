@@ -14,7 +14,10 @@
  */
 
 /**
- * _SDataDetailMixin
+ * _SDataDetailMixin enables SData for the Detail view.
+ *
+ * Adds the SData store to the view and exposes the needed properties for creating a Entry request.
+ *
  * @alternateClassName _SDataDetailMixin
  * @requires SData
  */
@@ -25,35 +28,31 @@ define('argos/_SDataDetailMixin', [
     declare,
     SData
 ) {
-    /**
-     * SData enablement for the Detail view.
-     */
     return declare('argos._SDataDetailMixin', null, {
         /**
          * @cfg {String} resourceKind
          * The SData resource kind the view is responsible for.  This will be used as the default resource kind
          * for all SData requests.
-         * @type {String}
          */
         resourceKind: '',
         /**
+         * @cfg {String[]}
          * A list of fields to be selected in an SData request.
-         * @type {Array.<String>}
          */
         querySelect: null,
         /**
+         * @cfg {String[]?}
          * A list of child properties to be included in an SData request.
-         * @type {Array.<String>}
          */
         queryInclude: null,
         /**
+         * @cfg {String?/Function?}
          * The default resource property for an SData request.
-         * @type {String|Function}
          */
         resourceProperty: null,
         /**
+         * @cfg {String?/Function?}
          * The default resource predicate for an SData request.
-         * @type {String|Function}
          */
         resourcePredicate: null,
         keyProperty: '$key',

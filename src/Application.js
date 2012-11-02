@@ -17,7 +17,7 @@
  * Application is a nexus that provides many routing and global application services that may be used
  * from anywhere within the app.
  *
- * It provides a shortcut alias to `window.App` (`App`) with the most common usage being `App.getView(id)`.
+ * It is also accessible via an alias at `window.App` (`App`).
  *
  * @alternateClassName App
  * @extends _Component
@@ -297,7 +297,7 @@ define('argos/Application', [
         /**
          * Optional creates, then registers an Sage.SData.Client.SDataService and adds the result to `App.services`.
          * @param {String} name Unique identifier for the service.
-         * @param {Object} service May be a SDataService instance or constructor parameters to create a new SDataService instance.
+         * @param {Object} definition May be a SDataService instance or constructor parameters to create a new SDataService instance.
          * @param {Object} options Optional settings for the registered service.
          */
         registerConnection: function(name, definition, options) {
@@ -542,6 +542,7 @@ define('argos/Application', [
          * Where the path is `list/tools` and `id` is the view id
          *
          * @param {String} path The customization set such as `list/tools#account_list` or `detail#contact_detail`. First half being the type of customization and the second the view id.
+         * @param specific
          */
         getCustomizationsFor: function(path, specific) {
             /* @deprecated */

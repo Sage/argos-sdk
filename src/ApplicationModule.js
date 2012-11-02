@@ -104,14 +104,14 @@ define('argos/ApplicationModule', [
         /**
          * Legacy support for registering customizations. Now should be done through {@link scene scene}.
          * @deprecated
-         * @param set
+         * @param targetSet
          * @param id
          * @param spec
          */
-        registerCustomization: function(set, id, spec) {
+        registerCustomization: function(targetSet, id, spec) {
             var customizationSet = this.application;
             if (customizationSet)
-                customizationSet.registerCustomization(set, id, spec);
+                customizationSet.registerCustomization(targetSet, id, spec);
         }
     });
 });

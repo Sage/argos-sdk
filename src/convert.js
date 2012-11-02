@@ -37,6 +37,11 @@ define('argos/convert', [
         toBoolean: function(value) {
             return trueRE.test(value);
         },
+        /**
+         * Determines if the value is a javascript Date object.
+         * @param value
+         * @return {Boolean}
+         */
         isDate: function(value) {
             return value instanceof Date;
         },

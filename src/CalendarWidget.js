@@ -15,7 +15,7 @@
 
 /**
  * CalendarWidget
- * @alternateClassName CalendarWidet
+ * @alternateClassName CalendarWidget
  * @extends _UiComponent
  * @mixins _CommandMixin
  * @mixins _EventMapMixin
