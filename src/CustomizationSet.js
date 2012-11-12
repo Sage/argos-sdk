@@ -152,22 +152,16 @@ define('argos/CustomizationSet', [
         },
         compile: function(customizations, layout, parent) {
             var customizationCount = customizations.length,
-                layoutCount = layout.length,
-                applied = {},
-                output,
-                insertRowsBefore,
-                insertRowsAfter,
-                customization,
-                stop,
-                row;
+                applied = {};
 
             if (lang.isArray(layout))
             {
-                output = [];
+                var output = [],
+                    layoutCount = layout.length;
 
                 for (var i = 0; i < layoutCount; i++)
                 {
-                    row = layout[i];
+                    var row = layout[i];
 
                     /*** for compatibility ***/
                     /* will modify the underlying row */
@@ -175,15 +169,15 @@ define('argos/CustomizationSet', [
                         row['name'] = row['property'];
                     /*************************/
 
-                    insertRowsBefore = [];
-                    insertRowsAfter = [];
+                    var insertRowsBefore = [];
+                    var insertRowsAfter = [];
 
                     for (var j = 0; j < customizationCount; j++)
                     {
                         if (applied[j]) continue; // todo: allow a customization to be applied to a layout more than once?
 
-                        customization = customizations[j];
-                        stop = false;
+                        var customization = customizations[j],
+                            stop = false;
 
                         if (expand(customization.at, row, parent, i, layoutCount, customization))
                         {
@@ -254,6 +248,8 @@ define('argos/CustomizationSet', [
                         output.push(expand(customization.value, null));
                     }
                 }
+
+                return output;
             }
             else if (lang.isFunction(layout))
             {
@@ -261,16 +257,44 @@ define('argos/CustomizationSet', [
             }
             else if (lang.isObject(layout))
             {
-                output = {};
+                /*
+                    Transforms:
+                    {top: [{}, {}], bottom: [{}]}
+
+                    to:
+
+                    [
+                     {name: top, children: [{}, {}]},
+                     {name: bottom, children: [{}]}
+                    ]
+
+                    To allow customizations to register at the "root" level.
+                    In the above example it allows at: function(o) { return o.name == 'top'; }
+                 */
+
+                var objectLayout = [],
+                    output = {};
 
                 for (var name in layout)
+                {
                     if (lang.isArray(layout[name]))
-                        output[name] = this.compile(customizations, layout[name], name);
-                    else
-                        output[name] = layout[name];
-            }
+                    {
+                        objectLayout.push({
+                            name: name,
+                            children: layout[name]
+                        });
+                    }
+                }
+                var compiled = this.compile(customizations, objectLayout, 'root');
 
-            return output;
+                for (var i = 0; i < compiled.length; i++)
+                {
+                    var subObject = compiled[i];
+                    output[subObject.name] = subObject.children;
+                }
+
+                return output;
+            }
         }
     });
 });
