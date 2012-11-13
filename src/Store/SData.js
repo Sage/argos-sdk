@@ -101,16 +101,7 @@ define('argos/Store/SData', [
                 var contractName = utility.expand(this.scope || this, getOptions.contractName || this.contractName),
                     resourceKind = utility.expand(this.scope || this, getOptions.resourceKind || this.resourceKind),
                     resourceProperty = utility.expand(this.scope || this, getOptions.resourceProperty || this.resourceProperty),
-                    resourcePredicate = id
-                        ? typeof id === 'number'
-                            ? id
-                            : /\s+/.test(id) ? id : string.substitute("'${0}'", [id])
-                        : null;
-
-                    // todo: double quotes break some SData providers
-                    // resourcePredicate = id
-                    //    ? /(\s+)/.test(id) ? id : json.stringify(id) /* string keys are quoted, numeric keys are left alone */
-                    //    : utility.expand(this, getOptions.resourcePredicate || this.resourcePredicate);
+                    resourcePredicate = /\s+/.test(id) ? id : string.substitute("'${0}'", [id]);
 
                 if (resourceProperty)
                 {
