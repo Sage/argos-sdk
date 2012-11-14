@@ -16,10 +16,20 @@
 /**
  * _MessageMapMixin allows a widget to map messages to actions by defining an message map.
  *
- * Without going into too much detail MessageMapMixin adds the ability to create tunnels
- * between instances of views/fields/components.
+ * Without going into too much detail MessageMapMixin adds a "mail slot" pub-sub model.
  *
- * For example I have a field (with an id of `'Field1'`) that sets up a message map as:
+ * In a normal pub-sub model x publishes an event and y may listen and recieve that event. If there
+ * is no listeners that event dissapears.
+ *
+ * _MessageMapMixin is more like a mail slot, meaning when an event is published it stays in the
+ * slot until the listener claims the event. If the listener is "live" then this acts just the same
+ * way as pub-sub.
+ *
+ * The difference lies in publishing an event to a listener that is not started yet. When the
+ * listener calls its `startup()` it will then claim all the events in its "slot" and process them.
+ *
+ *
+ * Example: I have a field (with an id of `'Field1'`) that sets up a message map as:
  *
  *     messages: { 'onMessage': 'this._onGetMessage' }
  *
@@ -32,6 +42,9 @@
  *
  * This should be used with caution as it creates a coupling that is not normally desired (in regards
  * to testing and keeping a clear dependency graph).
+ *
+ * Also the `recieve` function by default maps the message name (second parameter) as a function and
+ * executes it - this can be overriden to perform any needed action upon recieval.
  *
  * @alternateClassName _MessageMapMixin
  * @requires Message
