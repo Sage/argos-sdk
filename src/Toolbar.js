@@ -176,8 +176,6 @@ define('argos/Toolbar', [
 
             var ctor = props.type || this.itemType;
 
-            delete props.type;
-
             return new ctor(props);
         },
         _place: function(item) {
