@@ -30,6 +30,7 @@ define('argos/Views/Signature', [
     'dojo/dom-geometry',
     'dojo/window',
     '../format',
+    '../ActionBar',
     '../ScrollContainer',
     '../View'
 ], function(
@@ -39,6 +40,7 @@ define('argos/Views/Signature', [
     domGeom,
     win,
     format,
+    ActionBar,
     ScrollContainer,
     View
 ) {
@@ -58,10 +60,7 @@ define('argos/Views/Signature', [
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
                 {name: 'scroll', tag: 'div', components: [
                     {name: 'canvas', tag: 'canvas', attrs: {'class': 'signature-canvas', width: 360, height: 120}, attachPoint: 'signatureNode', attachEvent: 'onmousedown:_penDown,onmousemove:_penMove,onmouseup:_penUp,ontouchstart:_penDown,ontouchmove:_penMove,ontouchend:_penUp'},
-                    {name: 'buttons', tag: 'div', attrs: {'class': 'signature-buttons'}, components: [
-                        {name: 'undo', content: Simplate.make('<button class="button" data-action="_undo"><span>{%: $.undoText %}</span></button>')},
-                        {name: 'clear', content: Simplate.make('<button class="button" data-action="clearValue"><span>{%: $.clearCanvasText %}</span></button>')}
-                    ]}
+                    {name: 'action', type: ActionBar, props: {managed: true}, attachPoint: 'toolbars.action'}
                 ]}
             ]}
         ],
@@ -87,6 +86,26 @@ define('argos/Views/Signature', [
         canvasNodeWidth: 360, // starting default size
         canvasNodeHeight: 120, // adjusted on show()
 
+        createToolLayout: function() {
+            return this.tools || (this.tools = {
+                'action': [
+                    {
+                        name: 'undo',
+                        baseClass: 'button action-button',
+                        label: this.undoText,
+                        action: '_undo',
+                        place: 'left'
+                    },
+                    {
+                        name: 'clear',
+                        baseClass: 'button action-button',
+                        label: this.clearCanvasText,
+                        action: 'clearValue',
+                        place: 'right'
+                    }
+                ]
+            });
+        },
         onStartup: function() {
             this.inherited(arguments);
 
@@ -181,12 +200,13 @@ define('argos/Views/Signature', [
             this.signatureNode.height = this.canvasNodeHeight;
         },
         calculateWidth: function() {
-            return Math.floor(win.getBox().w * 0.92);
+            return Math.floor(domGeom.getMarginBox(this.domNode).w * 0.92);
         },
         calculateHeight: function() {
-            return Math.min(Math.floor(this.canvasNodeWidth * 0.5),
-                            win.getBox().h - query('.toolbar')[0].offsetHeight - query('.toolbar-bottom')[0].offsetHeight
-                        );
+            var topToolbar = query('.toolbar', this.domNode),
+                topToolbarHeight = (topToolbar.length > 0) ? topToolbar[0].offsetHeight : 0;
+
+            return Math.min(Math.floor(this.canvasNodeWidth * 0.5), win.getBox().h - topToolbarHeight);
         },
         onResize: function (e) {
             var newScale,
