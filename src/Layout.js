@@ -107,6 +107,13 @@ define('argos/Layout', [
                 this._lastViewportHeight = window.innerHeight;
             }
         },
+        /**
+         * Overrides dojox.mobile.FixedSplitter to include test for non-layout panes.
+         * It only includes Panes in the splitter width calculations if the css class
+         * `mblFixedSplitterPane` is found on the child node.
+         *
+         * This enables Panes to be layered as needed.
+         */
         layout: function(){
             var sz = this.orientation == "H" ? "w" : "h";
             var children = array.filter(this.domNode.childNodes, function(node){

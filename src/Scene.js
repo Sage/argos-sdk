@@ -37,6 +37,7 @@ define('argos/Scene', [
     'dojo/_base/array',
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/_base/json',
     'dojo/_base/window',
     'dojo/topic',
     './_Component',
@@ -47,6 +48,7 @@ define('argos/Scene', [
     array,
     declare,
     lang,
+    json,
     win,
     topic,
     _Component,
@@ -95,6 +97,10 @@ define('argos/Scene', [
          * If truthy, the last view that was required.
          */
         _last: null,
+        _initialState: null,
+        _currentHash: null,
+        timer: null,
+        _timerRefresh: 100,
         components: [
             {type: Layout, attachPoint: 'layout'}
         ],
@@ -128,12 +134,68 @@ define('argos/Scene', [
 
             console.log(output.join(' => '));
         },
+        _saveState: function() {
+            try
+            {
+                if (window.localStorage)
+                    window.localStorage.setItem('argos-navigationState', json.toJson(this._state));
+            }
+            catch(e) { }
+
+            this._currentHash = location.hash = this._state.length - 1;
+        },
+        _getSavedState: function() {
+            try
+            {
+                if (window.localStorage)
+                {
+                    return window.localStorage.getItem('argos-navigationState') || this._state;
+                }
+            }
+            catch (e) { }
+
+            return [];
+        },
+        loadInitialState: function() {
+            var state = json.fromJson(this._initialState),
+                sets = state.length;
+
+            if (sets > 0)
+                this._restoreFromState(state);
+        },
+        clearSavedState: function() {
+            try
+            {
+                if (window.localStorage)
+                    window.localStorage.removeItem('argos-navigationState');
+            }
+            catch (e) { }
+
+            this._initialState = [];
+        },
+        _checkHash: function() {
+            var setIndex = parseInt(location.hash.substring(1), 10);
+
+            if (this._idle)
+            {
+                if (setIndex != this._currentHash && !isNaN(setIndex) && setIndex < this._state.length)
+                {
+                    var stateSet = this._state[setIndex];
+                    this._loadStateSet(stateSet, this._createViewSet(this._state[setIndex], {}));
+                }
+            }
+            this.timer = setTimeout(this._checkHash.bindDelegate(this), this._timerRefresh)
+        },
         onStartup: function() {
             this.inherited(arguments);
 
             this._signals.push(topic.subscribe('/app/scene/back', lang.hitch(this, this.back)));
 
             this.layout.placeAt(win.body());
+
+            this._initialState = this._getSavedState();
+
+            this.timer = setTimeout(this._checkHash.bindDelegate(this), 50);
         },
         onDestroy: function() {
             this.inherited(arguments);
@@ -484,6 +546,7 @@ define('argos/Scene', [
         _onLayoutApplyComplete: function(stateSet) {
             this._state.push(stateSet);
 
+            this._saveState();
             // console.log('current state: %o', this._state);
 
             this._processQueue();
@@ -519,6 +582,38 @@ define('argos/Scene', [
         },
         _loadView: function(name, options, definition, at, navigation) {
             require([definition.type], lang.hitch(this, this._onRequireComplete, name, options, definition, at, navigation));
+        },
+        _restoreFromState: function(state) {
+            var setCount = state.length;
+
+            this._idle = false;
+
+            for (var i = 0; i < (setCount - 1); i ++)
+                window.location.hash = i;
+
+            var latestStateSet = state[setCount -1],
+                latestViewSet = this._createViewSet(latestStateSet, {});
+            this._loadStateSet(latestStateSet, latestViewSet);
+        },
+        _loadStateSet: function(stateSet, viewSet) {
+            this._idle = false;
+
+            array.forEach(viewSet, function(item, index) {
+                if (item.view) item.view.activate(stateSet[index].context.options, true);
+            });
+
+            /* todo: trim state to item before match of `stateSet` */
+            this._trimStateTo(stateSet);
+
+            // console.log('view set to apply: %o', viewSet);
+
+            var deferred = this.layout.apply(viewSet);
+            deferred.then(
+                lang.hitch(this, this._onLayoutApplyComplete, stateSet),
+                lang.hitch(this, this._onLayoutApplyError, stateSet)
+            );
+
+            return deferred;
         },
         _onRequireComplete: function(name, options, definition, at, navigation, ctor) {
             console.log('require complete: %s', name);
