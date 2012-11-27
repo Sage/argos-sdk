@@ -195,7 +195,7 @@ define('argos/Scene', [
 
             this._initialState = this._getSavedState();
 
-            this.timer = setTimeout(this._checkHash.bindDelegate(this), 50);
+            this.timer = setTimeout(this._checkHash.bindDelegate(this), this._timerRefresh);
         },
         onDestroy: function() {
             this.inherited(arguments);
