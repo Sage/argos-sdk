@@ -32,6 +32,7 @@ define('argos/Application', [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/window',
+    'dojo/dom-class',
     'dojo/has',
     'dojo/string',
     './utility',
@@ -45,6 +46,7 @@ define('argos/Application', [
     declare,
     lang,
     win,
+    domClass,
     has,
     string,
     utility,
@@ -106,6 +108,7 @@ define('argos/Application', [
          */
         _connections: null,
         _modules: null,
+        _orientationTimer: null,
 
         components: [
             {type: Scene, attachPoint: 'scene'},
@@ -115,6 +118,7 @@ define('argos/Application', [
         enableCaching: false,
         context: null,
         scene: null,
+        orientation: null,
 
         /**
          * All options are mixed into App itself
@@ -215,6 +219,9 @@ define('argos/Application', [
             this._startupCaching();
             this._startupConnections();
             this._startupModules();
+
+            this._orientationTimer = setTimeout(this._checkOrientation.bindDelegate(this), 50);
+
             this._started = true;
         },
         run: function() {
@@ -226,6 +233,39 @@ define('argos/Application', [
          */
         isOnline: function() {
             return window.navigator.onLine;
+        },
+        _checkOrientation: function() {
+            var orientation = (window.innerHeight < window.innerWidth) ? 'landscape' : 'portrait';
+
+            if (orientation !== this.orientation)
+            {
+                var asTablet = has('tablet-format'),
+                    asRetina = has('retina');
+
+                this._setOrientation(orientation, asTablet, asRetina);
+            }
+
+            this._orientationTimer = setTimeout(this._checkOrientation.bindDelegate(this), 50);
+        },
+        _setOrientation: function(orientation, isTablet, isRetina) {
+            var body = win.body();
+
+            if (this.orientation)
+                domClass.remove(body, this.orientation);
+            domClass.add(body, orientation);
+            this.orientation = orientation;
+
+            if (typeof isTablet === 'boolean')
+                domClass.toggle(body, 'tablet', isTablet);
+
+            if (typeof isRetina === 'boolean')
+                domClass.toggle(body, 'retina', isRetina);
+
+            connect.publish('/app/orientation',[{
+                orientation: orientation,
+                tablet: isTablet,
+                retina: isRetina
+            }]);
         },
         /**
          * Removes all keys from localStorage that start with `sdata.cache`.
