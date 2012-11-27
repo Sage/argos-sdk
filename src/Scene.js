@@ -142,7 +142,7 @@ define('argos/Scene', [
             }
             catch(e) { }
 
-            this._currentHash = location.hash = this._state.length - 1;
+                this._currentHash = location.hash = (this._state.length - 1);
         },
         _getSavedState: function() {
             try
@@ -369,6 +369,7 @@ define('argos/Scene', [
                 this._state.splice(position, count - position);
 
                 /* todo: persist new state */
+                history.go(position - this._state.length - 1);
             }
             else if (navigation && typeof navigation.returnTo !== 'undefined')
             {
@@ -393,6 +394,7 @@ define('argos/Scene', [
 
                     console.log('finalized returnTo at %d', position);
                     this._state.splice(position, count - position);
+                    history.go(position - this._state.length - 1);
                 }
             }
         },
