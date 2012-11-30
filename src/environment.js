@@ -50,6 +50,7 @@ define('argos/environment', [
             }, 1000); // 1 sec delay for iPad iOS5 to actually save nav state to local storage
         },
         showMapForAddress: function(address) {
+            address = encodeURIComponent(address);
             setTimeout(function() {
                 var eventFire = function(node, eventType){
                     if (node.fireEvent)
