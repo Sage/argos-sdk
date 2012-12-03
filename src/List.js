@@ -21,6 +21,7 @@
  * @requires ErrorManager
  * @requires ScrollContainer
  * @requires SearchWidget
+ * @requires ListIndexWidget
  * @requires TitleBar
  * @requires scene
  * @requires CustomizationSet
@@ -43,6 +44,7 @@ define('argos/List', [
     './ErrorManager',
     './ScrollContainer',
     './SearchWidget',
+	'./ListIndexWidget',
     './TitleBar',
     'argos!scene',
     'argos!customizations'
@@ -64,6 +66,7 @@ define('argos/List', [
     ErrorManager,
     ScrollContainer,
     SearchWidget,
+	ListIndexWidget,
     TitleBar,
     scene,
     customizations
@@ -291,6 +294,7 @@ define('argos/List', [
             {name: 'search', type: SearchWidget, attachEvent: 'onQuery:_onSearchQuery,onClear:_onSearchClear'},
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
+				{name: 'indexWidget', type: ListIndexWidget},
                 {name: 'scroll', tag: 'div', components: [
                     {name: 'empty', tag: 'div', attrs: {'class': 'list-empty'}, attachPoint: 'emptySelectionNode', components: [
                         {name: 'emptyButton', content: Simplate.make('<button class="button" data-action="emptySelection"><span>{%: $.emptySelectionText %}</span></button>')}
@@ -462,6 +466,11 @@ define('argos/List', [
         hideSearch: false,
         /**
          * @cfg {Boolean}
+         * Flag that determines if the list index widget should be in use.
+         */
+		enableIndexWidget: false,
+        /**
+         * @cfg {Boolean}
          * Flag that determines if the list actions panel should be in use.
          */
         enableActions: false,
@@ -626,6 +635,9 @@ define('argos/List', [
 
             if (this.searchText && this.enableSearch)
                 this.$.search.setLabel(this.searchText);
+
+            if (this.enableIndexWidget)
+                this.$.indexWidget.startUp();
 
             var customizationSet = customizations();
             this.createActions(customizationSet.apply(customizationSet.toPath(this.customizationSet, 'actions', this.id), this.createActionLayout()));
