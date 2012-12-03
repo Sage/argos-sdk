@@ -59,6 +59,15 @@ define('argos/_SDataListMixin', [
          */
         queryWhere: null,
         /**
+         * @cfg {Object}
+         * Key/value map of additional query arguments to add to the request.
+         * Example:
+         *     queryArgs: { _filter: 'Active' }
+         *
+         *     /sdata/app/dynamic/-/resource?_filter=Active&where=""&format=json
+         */
+        queryArgs: null,
+        /**
          * @cfg {String?/Function?}
          * The default resource property for an SData request.
          */
@@ -80,6 +89,7 @@ define('argos/_SDataListMixin', [
                 include: this.queryInclude,
                 select: this.querySelect,
                 where: this.queryWhere,
+                queryArgs: this.queryArgs,
                 orderBy: this.queryOrderBy,
                 idProperty: this.keyProperty,
                 scope: this
@@ -106,6 +116,7 @@ define('argos/_SDataListMixin', [
                 if (options.resourceKind) queryOptions.resourceKind = options.resourceKind;
                 if (options.resourceProperty) queryOptions.resourceProperty = options.resourceProperty;
                 if (options.resourcePredicate) queryOptions.resourcePredicate = options.resourcePredicate;
+                if (options.queryArgs) queryOptions.queryArgs = options.queryArgs;
             }
         },
         formatSearchQuery: function(query) {
