@@ -77,7 +77,7 @@ define('argos/Fields/LookupField', [
          */
         widgetTemplate: new Simplate([
             '<button class="button simpleSubHeaderButton" aria-label="{%: $.lookupLabelText %}"><span aria-hidden="true">{%: $.lookupText %}</span></button>',
-            '<input data-dojo-attach-point="inputNode" type="text" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
+            '<input data-dojo-attach-point="inputNode" type="text" placeholder="{%: $.placeHolder %}" {% if ($.requireSelection) { %}readonly="readonly"{% } %} />'
         ]),
         _setInputValueAttr: { node: 'inputNode', type: 'attribute', attribute: 'value' },
         _setInputDisabledAttr: { node: 'inputNode', type: 'attribute', attribute: 'disabled' },
@@ -132,6 +132,11 @@ define('argos/Fields/LookupField', [
          * The default `valueTextProperty` if `valueTextProperty` is not defined.
          */
         textProperty: '$descriptor',
+        /**
+         * @cfg {String}
+         * Adds a watermark/placeholder into the input field when no value is set.
+         */
+        placeHolder: null,
         /**
          * @cfg {Simplate}
          * If provided the displayed textProperty is transformed with the given Simplate.
