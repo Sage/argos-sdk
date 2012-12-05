@@ -782,12 +782,14 @@ img
     top: 1em;
     right: 1em;
     width: 2em;
+    margin: auto;
     line-height: 2em;
     text-align: center;
     vertical-align: middle;
     font-size: 2em;
     font-weight: bold;
-    background-color: #ff0;
+    background-color: #b0afaf;
+    border: 1px #000 solid;
     opacity: 0.5;
 }
 .list-index .tooltip.hidden {

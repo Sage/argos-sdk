@@ -303,7 +303,7 @@ define('argos/List', [
                         {name: 'moreRemaining', tag: 'span', attrs: {'class': 'list-remaining'}, attachPoint: 'remainingContentNode'},
                         {name: 'moreButton', content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
                     ]},
-    				{name: 'indexWidget', type: ListIndexWidget},
+                    {name: 'indexWidget', type: ListIndexWidget, attachEvent: 'onQuery:_onSearchQuery'},
                     {name: 'list-actions', tag: 'li', attrs: {'class': 'actions-row'}, attachPoint: 'actionsNode'}
                 ]}
             ]}

@@ -54,17 +54,6 @@ define('argos/ListIndexWidget', [
 
         },
         /**
-         * This function is invoked from the search button and it:
-         *
-         * * Gathers the inputted search text; and
-         * * Fires the {@link #onQuery onQuery} event which {@link List#_onSearchQuery List} listens to by default.
-         */
-        search: function() {
-            var query = this.queryNode.value;
-
-            this.onQuery(query);
-        },
-        /**
          * Event that is fired on search, a View should bind this function to a listener.
          * @param {String} query Search text inputted
          */
@@ -116,11 +105,11 @@ define('argos/ListIndexWidget', [
             // FIX: restore scrolling of container if disabled
 
             // go on to perform action/search
-            alert('Index selected: ' + this.selection.value);
+            this.onQuery(this.selection.key);
         },
         showTip: function(yPos) {
             this.tooltipNode.innerHTML = this.selection.tooltip || this.selection.value || this.selection.key;
-            this.tooltipNode.style.top = yPos + 'px';
+            this.tooltipNode.style.top = (yPos - this.tooltipNode.offsetHeight / 2) + 'px';
             this.tooltipNode.style.right = this.indexWidgetNode.offsetWidth + 'px';
             domClass.remove(this.tooltipNode, 'hidden');
         }
