@@ -1,6 +1,7 @@
 define('argos/ListIndexWidget', [
     'dojo/_base/declare',
     'dojo/query',
+    'dojo/dom-class',
     'dojo/dom-geometry',
     'dojo/window',
     'dijit/_WidgetBase',
@@ -8,6 +9,7 @@ define('argos/ListIndexWidget', [
 ], function(
     declare,
     query,
+    domClass,
     domGeom,
     win,
     _WidgetBase,
@@ -17,8 +19,10 @@ define('argos/ListIndexWidget', [
 		// default properties
 		indexList: null, // should be a collection of key:value pairs
 		defaultList: 'A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z'.split(','),
+        selection: null,
 		width: 30, // pixels
 		height: 260, // will be dynamically adjusted by viewport
+        isPenDown: false,
 
         /**
          * @property {Simplate}
@@ -26,8 +30,8 @@ define('argos/ListIndexWidget', [
          */
         widgetTemplate: new Simplate([
             '<div class="list-index">',
-                '<ul class="index-widget" data-dojo-attach-point="indexWidgetNode">',
-                '</ul>',
+                '<div class="tooltip hidden" data-dojo-attach-point="tooltipNode"></div>',
+                '<ul class="index-widget" data-dojo-attach-point="indexWidgetNode" data-dojo-attach-event="onmousedown:_touchDown,onmousemove:_touchMove,onmouseup:_touchUp,ontouchstart:_touchDown,ontouchmove:_touchMove,ontouchend:_touchUp"></ul>',
             '</div>'
         ]),
 
@@ -38,14 +42,14 @@ define('argos/ListIndexWidget', [
         startUp: function() {
             // when no indexList of key/value pairs given, default to Alphabetical list
             if (!this.indexList) {
-                this.indexList = {};
+                this.indexList = [];
                 for (var i in this.defaultList)
-                    this.indexList[this.defaultList[i]] = this.defaultList[i];
+                    this.indexList.push({key: this.defaultList[i], value: this.defaultList[i]});
 
             }
             // populate and display index DOM structure
-            for (i in this.indexList) {
-                node = dojo.create('li', {"data-key": i, innerHTML: this.indexList[i]}, this.indexWidgetNode);
+            for (i = 0; i < this.indexList.length; i++) {
+                node = dojo.create('li', {innerHTML: this.indexList[i].value}, this.indexWidgetNode);
             }
 
         },
@@ -68,69 +72,57 @@ define('argos/ListIndexWidget', [
         },
         // _getCoords returns pointer pixel coordinates [x,y] relative to canvas object
         _getCoords: function (e) {
-            var offset = domGeom.position(this.listIndexNode, false);
+            var offset = domGeom.position(this.indexWidgetNode, false);
             return e.touches ?
-                [
-                    e.touches[0].pageX - offset.x,
-                    e.touches[0].pageY - offset.y
-                  ] :
-                [
-                    e.clientX - offset.x,
-                    e.clientY - offset.y
-                  ];
+                [ e.touches[0].pageX - offset.x,
+                  e.touches[0].pageY - offset.y ] :
+                [ e.clientX - offset.x,
+                  e.clientY - offset.y ];
+        },
+        _getSelection: function (e) {
+            e.preventDefault();
+            // determine and return index list item under coordinates
+            var yPos = this._getCoords(e)[1],
+                itemHeight = this.indexWidgetNode.offsetHeight / this.indexList.length,
+                index = Math.floor(yPos / itemHeight);
+            if (this.indexList[index] != this.selection) {
+                this.selection = this.indexList[index];
+                // provide feedback (update tooltip/popup content)
+                this.showTip(yPos);
+            }
         },
         _touchDown: function (e) {
             this.isPenDown = true;
-            this.lastpos = this._getCoords(e);
-            e.preventDefault();
+            this.selection = null;
+            this._getSelection(e);
+            // FIX: need to prevent scrolling of container
+
         },
         _touchMove: function (e) {
             if (!this.isPenDown) { return; }
-            this.pos = this._getCoords(e);
-            e.preventDefault();
-            this.lastpos = this.pos;
+            this._getSelection(e);
         },
         _touchUp: function (e) {
             e.preventDefault();
             this.isPenDown = false;
 
+            // hide tooltip
+            domClass.add(this.tooltipNode, 'hidden');
+
 			// if we know which letter had focus up to touchUp
 			// navigate/search for it
-        },
-        _sizeCanvas: function () {
-            this.canvasNodeWidth  = this.calculateWidth();
-            this.canvasNodeHeight = this.calculateHeight();
+            console.log('-- Final selection: ', this.selection);
 
-            this.signatureNode.width  = this.canvasNodeWidth;
-            this.signatureNode.height = this.canvasNodeHeight;
-        },
-        calculateWidth: function() {
-            return Math.floor(domGeom.getMarginBox(this.domNode).w * 0.92);
-        },
-        calculateHeight: function() {
-            var topToolbar = query('.toolbar', this.domNode),
-                topToolbarHeight = (topToolbar.length > 0) ? topToolbar[0].offsetHeight : 0;
+            // FIX: restore scrolling of container if disabled
 
-            return Math.min(Math.floor(this.canvasNodeWidth * 0.5), win.getBox().h - topToolbarHeight);
+            // go on to perform action/search
+            alert('Index selected: ' + this.selection.value);
         },
-        onResize: function (e) {
-            // will need to also scale font size
-            var newScale,
-                oldWidth  = this.canvasNodeWidth,
-                oldHeight = this.canvasNodeHeight;
-            this._sizeCanvas();
-
-            newScale = Math.min(
-                this.canvasNodeWidth  / oldWidth,
-                this.canvasNodeHeight / oldHeight
-            );
-
-            this.signature = this.rescale(newScale);
-            this.redraw(this.signature, this.signatureNode, this.config);
-        },
-        redraw: function (vector, canvas, options) {
-            format.canvasDraw(vector, canvas, options);
-            this.onContentChange();
+        showTip: function(yPos) {
+            this.tooltipNode.innerHTML = this.selection.tooltip || this.selection.value || this.selection.key;
+            this.tooltipNode.style.top = yPos + 'px';
+            this.tooltipNode.style.right = this.indexWidgetNode.offsetWidth + 'px';
+            domClass.remove(this.tooltipNode, 'hidden');
         }
     });
 });

@@ -765,6 +765,43 @@ img
     width: 100%;
 }
 
+/* list-index-widget */
+.list-index {
+    position: absolute;
+    width: auto;
+    top: 1em;
+    right: 2em;
+    z-index: 100;
+    padding: 0.5em 0;
+    background: #b0afaf;
+    opacity: 0.75;
+    border-radius: 13px;
+}
+.list-index .tooltip {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    width: 2em;
+    line-height: 2em;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 2em;
+    font-weight: bold;
+    background-color: #ff0;
+    opacity: 0.5;
+}
+.list-index .tooltip.hidden {
+    display: none;
+}
+ul.index-widget {
+    list-style: none;
+    padding: 0 0.5em;
+    margin: 0;
+    font-size: 9px;
+    text-align: center;
+    cursor: pointer;
+}
+
 /* detail */
 .detail-content > h2
 {

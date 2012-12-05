@@ -294,7 +294,6 @@ define('argos/List', [
             {name: 'search', type: SearchWidget, attachEvent: 'onQuery:_onSearchQuery,onClear:_onSearchClear'},
             {name: 'fix', content: '<a href="#" class="android-6059-fix">fix for android issue #6059</a>'},
             {name: 'scroller', type: ScrollContainer, subscribeEvent: 'onContentChange:onContentChange', components: [
-				{name: 'indexWidget', type: ListIndexWidget},
                 {name: 'scroll', tag: 'div', components: [
                     {name: 'empty', tag: 'div', attrs: {'class': 'list-empty'}, attachPoint: 'emptySelectionNode', components: [
                         {name: 'emptyButton', content: Simplate.make('<button class="button" data-action="emptySelection"><span>{%: $.emptySelectionText %}</span></button>')}
@@ -304,6 +303,7 @@ define('argos/List', [
                         {name: 'moreRemaining', tag: 'span', attrs: {'class': 'list-remaining'}, attachPoint: 'remainingContentNode'},
                         {name: 'moreButton', content: Simplate.make('<button class="button" data-action="more"><span>{%: $.moreText %}</span></button>')}
                     ]},
+    				{name: 'indexWidget', type: ListIndexWidget},
                     {name: 'list-actions', tag: 'li', attrs: {'class': 'actions-row'}, attachPoint: 'actionsNode'}
                 ]}
             ]}
