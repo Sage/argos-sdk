@@ -983,7 +983,7 @@ define('argos/List', [
          * Handler for the search widgets search.
          *
          * Prepares the view by clearing it and setting `this.query` to the given search expression. Then calls
-         * {@link #requestData requestData} which start the request process.
+         * {@link #_requestData _requestData} which start the request process.
          *
          * @param {String} expression String expression as returned from the search widget
          */
