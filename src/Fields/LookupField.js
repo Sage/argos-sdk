@@ -389,6 +389,9 @@ define('argos/Fields/LookupField', [
             options.dependentValue = dependentValue;
             options.title = this.title;
 
+            if (this.options)
+                lang.mixin(options, this.options);
+
             return options;
         },
         /**
