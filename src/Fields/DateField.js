@@ -81,7 +81,7 @@ define('argos/Fields/DateField', [
          */
         widgetTemplate: new Simplate([
             '<button data-dojo-attach-point="triggerNode" class="button whiteButton" aria-label="{%: $.lookupLabelText %}"><span>{%: $.lookupText %}</span></button>',
-            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange:_onChange" type="text" />'
+            '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onchange:_onChange" placeholder="{%: $.placeHolder %}" type="text" />'
         ]),
 
         /**
@@ -104,6 +104,12 @@ define('argos/Fields/DateField', [
          * where it controls the the conversion to/from UTC and setting the hour:min:sec to 00:00:05.
          */
         timeless: false,
+
+        /**
+         * @cfg {String}
+         * Used to place watermark/hint text into the text field until a real value is inserted
+         */
+        placeHolder: null,
 
         /**
          * Takes a date object and calls {@link format#date format.date} passing the current
