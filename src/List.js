@@ -1299,7 +1299,8 @@ define('argos/List', [
             {
                 this.query = false;
 
-                this.$.search.clear();
+                if (this.$.search)
+                    this.$.search.clear();
             }
 
             domClass.remove(this.domNode, 'has-more');
