@@ -181,7 +181,10 @@
             this.date = (this.options && this.options.date) || new Date();
             this.year = this.date.getFullYear();
             this.month = this.date.getMonth();
-
+            
+            if ((this.options && this.options.timeless) || this.timeless)
+                this.date = this.date.clone().add({minutes: this.date.getTimezoneOffset()});
+                
             this.hourField.dom.value = "" + pad(this.date.getHours() > 12 ? this.date.getHours() - 12 : (this.date.getHours() || 12));
             this.minuteField.dom.value = "" + pad(this.date.getMinutes());
             this.meridiemField.dom.setAttribute('toggled', this.date.getHours() < 12);
@@ -234,6 +237,9 @@
 
             result.setHours(hours);
             result.setMinutes(minutes);
+            
+            if ((this.options && this.options.timeless) || this.timeless)
+                result = result.clone().clearTime().add({minutes: -1*result.getTimezoneOffset(), seconds:5});            
 
             return result;
         },
