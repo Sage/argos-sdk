@@ -70,7 +70,7 @@ define('argos/CalendarWidget', [
             calendarContent: {node: 'contentNode', type: 'attribute', attribute: 'innerHTML'}
         },
         components: [
-            {name: 'dateHeader', tag: 'div', attrs:{'class': 'date-header'}, attachEvent:'onclick:pickDate', components: [
+            {name: 'dateHeader', tag: 'div', attrs:{'class': 'date-header'}, components: [
                 {name: 'prev', content: '<button class="button prev" data-action="prevMonth"><span>&lt;</span></button>'},
                 {name: 'next', content: '<button class="button next" data-action="nextMonth"><span>&gt;</span></button>'},
                 {name: 'yearHeader', tag: 'div', attrs: {'class': 'year'}, attachPoint: 'yearHeader'},
@@ -208,7 +208,7 @@ define('argos/CalendarWidget', [
             if (dayOfWeek === 0 || dayOfWeek === 6)
                 cls.push('is-weekend');
 
-            if (date.diff(moment(), 'days') === 0)
+            if (date.diff(moment().startOf('day'), 'days') === 0)
                 cls.push('is-today');
 
             return cls.join(' ');
@@ -251,7 +251,7 @@ define('argos/CalendarWidget', [
         },
 
         _selectDay: function(e, node) {
-            if (this.$.scroller._scroll.moved) return; // dont fire click if scrolling
+            if (this.$.scroller._scroll && this.$.scroller._scroll.moved) return; // dont fire click if scrolling
 
             if (this.selectedNode)
                 domClass.remove(this.selectedNode, 'is-selected');
