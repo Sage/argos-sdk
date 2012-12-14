@@ -102,7 +102,7 @@ define('argos/Store/SData', [
                 var contractName = utility.expand(this.scope || this, getOptions.contractName || this.contractName),
                     resourceKind = utility.expand(this.scope || this, getOptions.resourceKind || this.resourceKind),
                     resourceProperty = utility.expand(this.scope || this, getOptions.resourceProperty || this.resourceProperty),
-                    resourcePredicate = /\s+/.test(id) ? id : string.substitute("'${0}'", [id]);
+                    resourcePredicate = /\s+/.test(id) ? id : (id) ? string.substitute("'${0}'", [id]) : null;
 
                 if (resourceProperty)
                 {
