@@ -81,6 +81,12 @@ define('Sage/Platform/Mobile/Utility', [
             if (typeof path[0] !== "undefined")
                 current[path[0]] = val;
             return o;
+        },
+        expand: function(scope, expression) {
+            if (typeof expression === 'function')
+                return expression.apply(scope, Array.prototype.slice.call(arguments, 2));
+            else
+                return expression;
         }
     });
 });
