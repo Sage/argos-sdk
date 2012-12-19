@@ -1176,7 +1176,7 @@ define('argos/List', [
             return queryResults;
         },
         _buildQueryExpression: function() {
-            return lang.mixin(this.query || {}, this.options.query || this.options.where);
+            return lang.mixin(this.query || {}, this.options && (this.options.query || this.options.where));
         },
         _applyStateToQueryOptions: function(queryOptions) {
 
