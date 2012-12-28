@@ -45,7 +45,7 @@ define('argos/TitleBar', [
     return declare('argos.TitleBar', [Toolbar], {
         position: 'top',
         components: [
-            {tag: 'h1', attrs: {'class':'toolbar-title'}, components: [
+            {tag: 'h1', attrs: {'class':'toolbar-title'}, attachPoint: 'headerNode', components: [
                 {tag: 'span', attachPoint: 'titleNode'}
             ]}
         ],
@@ -62,8 +62,10 @@ define('argos/TitleBar', [
         },
         onCreate: function() {
             this.inherited(arguments);
-
-            domAttr.set(this.domNode, 'data-action', 'scroll');
+        },
+        onStartup: function() {
+            this.inherited(arguments);
+            domAttr.set(this.headerNode, 'data-action', 'scroll');
         },
         clear: function() {
             this._count = {left: 0, right: 0};
