@@ -77,6 +77,7 @@ define('argos/Store/SData', [
         resourceKind: null,
         resourceProperty: null,
         resourcePredicate: null,
+        applicationName: null,
         executeQueryAs: null,
         executeGetAs: null,
 
@@ -144,6 +145,7 @@ define('argos/Store/SData', [
                     resourceKind = utility.expand(this.scope || this, queryOptions.resourceKind || this.resourceKind),
                     resourceProperty = utility.expand(this.scope || this, queryOptions.resourceProperty || this.resourceProperty),
                     resourcePredicate = utility.expand(this.scope || this, queryOptions.resourcePredicate || this.resourcePredicate),
+                    applicationName = utility.expand(this.scope || this, queryOptions.applicationName || this.applicationName),
                     queryArgs = utility.expand(this.scope || this, queryOptions.queryArgs || this.queryArgs);
 
                 if (queryName)
@@ -166,6 +168,7 @@ define('argos/Store/SData', [
 
                 if (contractName) request.setContractName(contractName);
                 if (resourceKind) request.setResourceKind(resourceKind);
+                if (applicationName) request.setApplicationName(applicationName);
                 if (queryArgs)
                     for (var arg in queryArgs) request.setQueryArg(arg, queryArgs[arg]);
             }
