@@ -96,6 +96,10 @@
           "path": "../src"
         },
         {
+          "text": "SData.js",
+          "path": "../src/Store"
+        },
+        {
           "text": "_Field.js",
           "path": "../src/Fields"
         },
@@ -200,6 +204,16 @@
       "src": "../libraries/dojo/dojo",
       "dest": "content/dojo/dojo",
       "filters": "(dojo\\.js|acme\\.js)"
+    },
+    {
+      "src": "../libraries/dojo/dojo/cldr/nls",
+      "dest": "content/dojo/dojo/cldr/nls",
+      "filters": ".*js"
+    },
+    {
+      "src": "../libraries/dojo/dojox",
+      "dest": "content/dojo/dojox",
+      "filters": "((gfx|svg|shape|path)\\.js)"
     }
   ]
 }
