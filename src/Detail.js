@@ -360,7 +360,7 @@ define('argos/Detail', [
          */
         formatRelatedQuery: function(entry, fmt, property) {
             property = property || '$key';
-            return string.substitute(fmt, [utility.getValue(entry, property)]);
+            return string.substitute(fmt, [utility.getValue(entry, property, "")]);
         },
         /**
          * Toggles the collapsed state of the section.
