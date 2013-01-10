@@ -38,3 +38,5 @@ deploy/
 .idea/
 docs/
 *.patch
+
+*.swp
