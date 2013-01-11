@@ -187,7 +187,7 @@ define('argos/Store/SData', [
             {
                 if (typeof orderBy === 'string')
                 {
-                    request.setQueryArg('orderby', orderBy);
+                    request.setQueryArg('orderBy', orderBy);
                 }
                 else if (orderBy.length > 0)
                 {
@@ -199,7 +199,7 @@ define('argos/Store/SData', [
                             this.push(v.attribute);
                     }, order);
 
-                    request.setQueryArg('orderby', order.join(','));
+                    request.setQueryArg('orderBy', order.join(','));
                 }
             }
 
