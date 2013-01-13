@@ -83,6 +83,7 @@ define('argos/_SDataListMixin', [
             return new SData({
                 service: this.getConnection(),
                 contractName: this.contractName,
+                dataSet: this.dataSet,
                 resourceKind: this.resourceKind,
                 resourceProperty: this.resourceProperty,
                 resourcePredicate: this.resourcePredicate,

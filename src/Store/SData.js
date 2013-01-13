@@ -74,6 +74,7 @@ define('argos/Store/SData', [
         queryArgs: null,
         entityName: null,
         contractName: null,
+        dataSet: null,
         resourceKind: null,
         resourceProperty: null,
         resourcePredicate: null,
@@ -101,6 +102,7 @@ define('argos/Store/SData', [
                 id = id || utility.expand(this.scope || this, getOptions.resourcePredicate || this.resourcePredicate);
 
                 var contractName = utility.expand(this.scope || this, getOptions.contractName || this.contractName),
+                    dataSet = utility.expand(this.scope || this, getOptions.dataSet || this.dataSet),
                     resourceKind = utility.expand(this.scope || this, getOptions.resourceKind || this.resourceKind),
                     resourceProperty = utility.expand(this.scope || this, getOptions.resourceProperty || this.resourceProperty),
                     resourcePredicate = /\s+/.test(id) ? id : (id) ? string.substitute("'${0}'", [id]) : null;
@@ -118,6 +120,7 @@ define('argos/Store/SData', [
                 }
 
                 if (contractName) request.setContractName(contractName);
+                if (dataSet) request.setDataSet(dataSet);
                 if (resourceKind) request.setResourceKind(resourceKind);
             }
 
@@ -142,6 +145,7 @@ define('argos/Store/SData', [
             {
                 var queryName = utility.expand(this.scope || this, queryOptions.queryName || this.queryName),
                     contractName = utility.expand(this.scope || this, queryOptions.contractName || this.contractName),
+                    dataSet = utility.expand(this.scope || this, queryOptions.dataSet || this.dataSet),
                     resourceKind = utility.expand(this.scope || this, queryOptions.resourceKind || this.resourceKind),
                     resourceProperty = utility.expand(this.scope || this, queryOptions.resourceProperty || this.resourceProperty),
                     resourcePredicate = utility.expand(this.scope || this, queryOptions.resourcePredicate || this.resourcePredicate),
@@ -167,6 +171,7 @@ define('argos/Store/SData', [
                 }
 
                 if (contractName) request.setContractName(contractName);
+                if (dataSet) request.setDataSet(dataSet);
                 if (resourceKind) request.setResourceKind(resourceKind);
                 if (applicationName) request.setApplicationName(applicationName);
                 if (queryArgs)
