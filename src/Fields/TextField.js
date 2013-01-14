@@ -73,7 +73,7 @@ define('argos/Fields/TextField', [
         widgetTemplate: new Simplate([
             '<div>',
             '{% if ($.enableClearButton && !$.readonly) { %}',
-            '<button class="clear-button" data-dojo-attach-point="clearNode" data-dojo-attach-event="onclick:_onClearClick"></button>',
+            '<button class="clear-button" data-dojo-attach-point="clearNode" data-dojo-attach-event="onclick:_onClearClick" tabindex="-1"></button>',
             '{% } %}',
             '<input data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus, onmouseup: _onMouseUp" class="text-input" type="{%= $.inputType %}" placeholder="{%: $.placeHolder %}" name="{%= $.name %}" {% if ($.readonly) { %} readonly {% } %}>',
             '</div>'
