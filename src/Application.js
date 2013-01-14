@@ -55,7 +55,6 @@ define('argos/Application', [
     CustomizationSet
 ) {
 
-    has.add('tablet-format', Math.max(window.innerHeight, window.innerWidth) > 960);
     has.add('retina', window.devicePixelRatio == 2);
     
     lang.extend(Function, {
@@ -221,6 +220,7 @@ define('argos/Application', [
             this._startupModules();
 
             this._orientationTimer = setTimeout(this._checkOrientation.bindDelegate(this), 50);
+            this.isTablet = this.isTabletSized();
 
             this._started = true;
         },
@@ -239,15 +239,15 @@ define('argos/Application', [
 
             if (orientation !== this.orientation)
             {
-                var asTablet = has('tablet-format'),
-                    asRetina = has('retina');
-
-                this._setOrientation(orientation, asTablet, asRetina);
+                this._setOrientation(orientation, this.isTabletSized());
             }
 
             this._orientationTimer = setTimeout(this._checkOrientation.bindDelegate(this), 50);
         },
-        _setOrientation: function(orientation, isTablet, isRetina) {
+        isTabletSized: function() {
+            return Math.max(window.innerHeight, window.innerWidth) >= 960;
+        },
+        _setOrientation: function(orientation, isTablet) {
             var body = win.body();
 
             if (this.orientation)
@@ -255,16 +255,13 @@ define('argos/Application', [
             domClass.add(body, orientation);
             this.orientation = orientation;
 
+            this.isTablet = isTablet;
             if (typeof isTablet === 'boolean')
                 domClass.toggle(body, 'tablet', isTablet);
 
-            if (typeof isRetina === 'boolean')
-                domClass.toggle(body, 'retina', isRetina);
-
             connect.publish('/app/orientation',[{
                 orientation: orientation,
-                tablet: isTablet,
-                retina: isRetina
+                tablet: isTablet
             }]);
         },
         /**
@@ -405,6 +402,14 @@ define('argos/Application', [
          */
         onResize: function() {
             if (this.resizeTimer) clearTimeout(this.resizeTimer);
+
+            var isNowTablet = this.isTabletSized();
+            if (isNowTablet !== this.isTablet)
+            {
+                this.isTablet = isNowTablet;
+                domClass.toggle(win.body(), 'tablet', isNowTablet);
+            }
+
 
             this.resizeTimer = setTimeout(function(){
                 connect.publish('/app/resize',[]);

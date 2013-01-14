@@ -45,7 +45,8 @@ define('argos/Layout', [
     'dojo/topic',
     'dojox/mobile/FixedSplitter',
     './_UiComponent',
-    './Pane'
+    './Pane',
+    'argos!application'
 ], function(
     declare,
     lang,
@@ -60,7 +61,8 @@ define('argos/Layout', [
     topic,
     FixedSplitter,
     _UiComponent,
-    Pane
+    Pane,
+    application
 ) {
     return declare('argos.Layout', [FixedSplitter, _UiComponent], {
         /**
@@ -115,10 +117,25 @@ define('argos/Layout', [
          * This enables Panes to be layered as needed.
          */
         layout: function(){
-            var sz = this.orientation == "H" ? "w" : "h";
-            var children = array.filter(this.domNode.childNodes, function(node){
-                return node.nodeType == 1 && domClass.contains(node, 'mblFixedSplitterPane');
-            });
+            var sz = this.orientation == "H" ? "w" : "h",
+                isTablet = application().isTablet;
+
+            var children = [];
+            for (var paneId in this.panes)
+            {
+                var pane = this.panes[paneId];
+                if (isTablet)
+                {
+                    if (pane.tier !== false)
+                        children.push(pane.domNode);
+                }
+                else
+                {
+                    if (pane.root)
+                        children.push(pane.domNode);
+                }
+            }
+
             var offset = 0;
             for(var i = 0; i < children.length; i++){
                 domGeom.setMarginBox(children[i], this.orientation == "H" ? {l:offset} : {t:offset});

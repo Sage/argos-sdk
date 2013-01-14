@@ -68,6 +68,7 @@ define('argos/Pane', [
         ],
         viewContainerNode: null,
         active: null,
+        root: null,
         toolbars: null,
         _signals: null,
 
