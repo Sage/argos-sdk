@@ -17,12 +17,14 @@ define('argos/_Component', [
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
-    'dojo/_base/connect'
+    'dojo/_base/connect',
+    './utility'
 ], function(
     declare,
     array,
     lang,
-    connect
+    connect,
+    utility
 ) {
     var parse = function(value) {
         var segments = value.split(/\s*,\s*/),
@@ -137,7 +139,7 @@ define('argos/_Component', [
 
             if (props)
             {
-                if (props.components) this.components = props.components;
+                if (props.components) this.components = utility.expand(this, props.components);
 
                 /* todo: is there a better way to pass this around and still have creation in postscript? */
                 /* in case props aren't mixed in by default */
