@@ -333,7 +333,7 @@ define('argos/_Component', [
             if (!ctor) throw new Error('Invalid component type.');
 
             var props = lang.mixin({
-                components: definition.components,
+                components: utility.expand(this, definition.components),
                 _componentInfo: {
                     name: definition.name,
                     root: definition.root
@@ -362,6 +362,8 @@ define('argos/_Component', [
             return instance;
         },
         _createComponents: function(definitions, root, owner) {
+            definitions = utility.expand(owner, definitions);
+
             if (definitions)
             {
                 for (var i = 0; i < definitions.length; i++)
