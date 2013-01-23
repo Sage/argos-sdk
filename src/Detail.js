@@ -128,9 +128,10 @@ define('argos/Detail', [
          * `$$` => the view instance
          */
         sectionTemplate: new Simplate([
-            '{% if ($.title !== false) { %}',
+            '{% var title = $.title && argos.utility.expandSafe($$, $.title, $); %}',
+            '{% if (title !== false) { %}',
             '<h2 data-action="toggleCollapse" class="{% if ($.collapsed) { %}is-collapsed{% } %}">',
-                '<span>{%: ($.title) %}</span>',
+                '<span>{%: (title) %}</span>',
                 '<button class="collapsed-indicator" aria-label="{%: $$.toggleCollapseText %}"></button>',
             '</h2>',
             '{% } %}',
@@ -360,7 +361,7 @@ define('argos/Detail', [
          */
         formatRelatedQuery: function(entry, fmt, property) {
             property = property || '$key';
-            return string.substitute(fmt, [utility.getValue(entry, property, "")]);
+            return string.substitute(fmt, [utility.getValue(entry, property)]);
         },
         /**
          * Toggles the collapsed state of the section.
