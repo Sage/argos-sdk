@@ -49,6 +49,11 @@ define('argos/environment', [
                 window.location.href = mailtoUri;
             }, 1000); // 1 sec delay for iPad iOS5 to actually save nav state to local storage
         },
+        initiateText: function(number) {
+            setTimeout(function() {
+                window.location.href = string.substitute("sms:${0}", [number]);
+            }, 50);
+        },
         showMapForAddress: function(address) {
             address = encodeURIComponent(address);
             setTimeout(function() {
