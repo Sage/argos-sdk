@@ -55,6 +55,12 @@ define('argos/ToolbarButton', [
         name: null,
         label: null,
 
+        constructor: function(props) {
+            this.inherited(arguments);
+
+            if (props && props.cls)
+                this.baseClass += ' ' + props.cls;
+        },
         _setNameAttr: function(value) {
             this.name = value;
 

@@ -350,7 +350,7 @@ define('argos/List', [
          * The template used to render a row in the view.  This template includes {@link #itemTemplate}.
          */
         rowTemplate: new Simplate([
-            '<li data-action="activateEntry" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
+            '<li data-action="activateEntry" class="{%: $.cls %}" data-key="{%= $.$key %}" data-descriptor="{%: $.$descriptor %}">',
             '<button data-action="selectEntry" class="list-item-selector button">',
             '<img src="{%= $$.icon || $$.selectIcon %}" class="icon" />',
             '</button>',

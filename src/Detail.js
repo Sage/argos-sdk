@@ -332,8 +332,7 @@ define('argos/Detail', [
             });
         },
         /**
-         * Handler for the global `/app/refresh` event. Sets `refr
-         * eshRequired` to true if the key matches.
+         * Handler for the global `/app/refresh` event. Sets `refreshRequired` to true if the key matches.
          * @param {Object} o The object published by the event.
          * @private
          */
