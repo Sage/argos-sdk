@@ -26,6 +26,7 @@ define('argos/Views/DateTimePicker', [
     'dojo/dom-class',
     'dojo/dom-construct',
     'dojo/dom-style',
+    'moment',
     '../_TemplatedWidgetMixin',
     '../View'
 ], function(
@@ -35,6 +36,7 @@ define('argos/Views/DateTimePicker', [
     domClass,
     domConstruct,
     domStyle,
+    moment,
     _TemplatedWidgetMixin,
     View
 ) {

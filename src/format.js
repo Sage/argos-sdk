@@ -24,12 +24,14 @@ define('argos/format', [
     'dojo/_base/lang',
     'dojo/dom-construct',
     'dojo/string',
+    'moment',
     './convert'
 ], function(
     json,
     lang,
     domConstruct,
     string,
+    moment,
     convert
 ) {
 

@@ -37,6 +37,7 @@ define('argos/Fields/DateField', [
     'dojo/_base/declare',
     'dojo/string',
     'dojo/dom-class',
+    'moment',
     '../_TemplatedWidgetMixin',
     '../format',
     './EditorField'
@@ -44,6 +45,7 @@ define('argos/Fields/DateField', [
     declare,
     string,
     domClass,
+    moment,
     _TemplatedWidgetMixin,
     format,
     EditorField

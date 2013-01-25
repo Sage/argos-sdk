@@ -24,12 +24,14 @@ define('argos/ErrorManager', [
     'dojo/_base/lang',
     'dojo/_base/connect',
     'dojo/string',
+    'moment',
     './utility'
 ], function(
     json,
     lang,
     connect,
     string,
+    moment,
     utility
 ) {
     var errors = [];
