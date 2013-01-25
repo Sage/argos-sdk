@@ -211,6 +211,7 @@ define('argos/_UiComponent', [
 
         constructor: function(props) {
             this.params = props;
+            lang.mixin(this, props);
         },
 
         onCreate: function() {
@@ -218,6 +219,11 @@ define('argos/_UiComponent', [
             this.render();
 
             if (this.domNode) this._applyAttributes();
+        },
+        postscript: function() {
+            // todo: this does not call inherited due to changes in how Stateful behaves (_WidgetBase does not call inherited either).
+            this.onCreate();
+            this.initComponents();
         },
 
         render: function() {
@@ -257,6 +263,7 @@ define('argos/_UiComponent', [
 
         /* selective mixin from _WidgetBase */
         placeAt: _WidgetBase.prototype.placeAt,
+        getParent: _WidgetBase.prototype.getParent,
         set: _WidgetBase.prototype.set,
         get: _WidgetBase.prototype.get,
         _set: _WidgetBase.prototype._set,

@@ -1,4 +1,3 @@
-//>>built
 define("dojo/fx", [
 	"./_base/lang",
 	"./Evented",
@@ -11,31 +10,23 @@ define("dojo/fx", [
 	"./dom-geometry",
 	"./ready",
 	"require" // for context sensitive loading of Toggler
-], function(lang, Evented, dojo, arrayUtil, connect, baseFx, dom, domStyle, geom, ready, require) {
+], function(lang, Evented, dojo, arrayUtil, connect, baseFx, dom, domStyle, geom, ready, require){
 
 	// module:
 	//		dojo/fx
-	// summary:
-	//		TODOC
-
-
-	/*=====
-	dojo.fx = {
-		// summary: Effects library on top of Base animations
-	};
-	var coreFx = dojo.fx;
-	=====*/
 	
-// For back-compat, remove in 2.0.
-if(!dojo.isAsync){
-	ready(0, function(){
-		var requires = ["./fx/Toggler"];
-		require(requires);	// use indirection so modules not rolled into a build
-	});
-}
+	// For back-compat, remove in 2.0.
+	if(!dojo.isAsync){
+		ready(0, function(){
+			var requires = ["./fx/Toggler"];
+			require(requires);	// use indirection so modules not rolled into a build
+		});
+	}
 
-	var coreFx = {};
-	dojo.fx = baseFx;
+	var coreFx = dojo.fx = {
+		// summary:
+		//		Effects library on top of Base animations
+	};
 
 	var _baseObj = {
 			_fire: function(evt, args){
@@ -155,7 +146,7 @@ if(!dojo.isAsync){
 	});
 	lang.extend(_chain, _baseObj);
 
-	coreFx.chain = dojo.fx.chain = function(/*dojo.Animation[]*/ animations){
+	coreFx.chain = function(/*dojo/_base/fx.Animation[]*/ animations){
 		// summary:
 		//		Chain a list of `dojo.Animation`s to run in sequence
 		//
@@ -168,12 +159,12 @@ if(!dojo.isAsync){
 		//
 		// example:
 		//	Once `node` is faded out, fade in `otherNode`
-		//	|	dojo.fx.chain([
+		//	|	fx.chain([
 		//	|		dojo.fadeIn({ node:node }),
 		//	|		dojo.fadeOut({ node:otherNode })
 		//	|	]).play();
 		//
-		return new _chain(animations); // dojo.Animation
+		return new _chain(animations); // dojo/_base/fx.Animation
 	};
 
 	var _combine = function(animations){
@@ -248,7 +239,7 @@ if(!dojo.isAsync){
 	});
 	lang.extend(_combine, _baseObj);
 
-	coreFx.combine = dojo.fx.combine = function(/*dojo.Animation[]*/ animations){
+	coreFx.combine = function(/*dojo/_base/fx.Animation[]*/ animations){
 		// summary:
 		//		Combine a list of `dojo.Animation`s to run in parallel
 		//
@@ -259,14 +250,14 @@ if(!dojo.isAsync){
 		//
 		// example:
 		//	Fade out `node` while fading in `otherNode` simultaneously
-		//	|	dojo.fx.combine([
+		//	|	fx.combine([
 		//	|		dojo.fadeIn({ node:node }),
 		//	|		dojo.fadeOut({ node:otherNode })
 		//	|	]).play();
 		//
 		// example:
 		//	When the longest animation ends, execute a function:
-		//	|	var anim = dojo.fx.combine([
+		//	|	var anim = fx.combine([
 		//	|		dojo.fadeIn({ node: n, duration:700 }),
 		//	|		dojo.fadeOut({ node: otherNode, duration: 300 })
 		//	|	]);
@@ -275,10 +266,10 @@ if(!dojo.isAsync){
 		//	|	});
 		//	|	anim.play(); // play the animation
 		//
-		return new _combine(animations); // dojo.Animation
+		return new _combine(animations); // dojo/_base/fx.Animation
 	};
 
-	coreFx.wipeIn = dojo.fx.wipeIn = function(/*Object*/ args){
+	coreFx.wipeIn = function(/*Object*/ args){
 		// summary:
 		//		Expand a node to it's natural height.
 		//
@@ -293,7 +284,7 @@ if(!dojo.isAsync){
 		//		(such as easing: node: duration: and so on)
 		//
 		// example:
-		//	|	dojo.fx.wipeIn({
+		//	|	fx.wipeIn({
 		//	|		node:"someId"
 		//	|	}).play()
 		var node = args.node = dom.byId(args.node), s = node.style, o;
@@ -331,10 +322,10 @@ if(!dojo.isAsync){
 		connect.connect(anim, "onStop", fini);
 		connect.connect(anim, "onEnd", fini);
 
-		return anim; // dojo.Animation
+		return anim; // dojo/_base/fx.Animation
 	};
 
-	coreFx.wipeOut = dojo.fx.wipeOut = function(/*Object*/ args){
+	coreFx.wipeOut = function(/*Object*/ args){
 		// summary:
 		//		Shrink a node to nothing and hide it.
 		//
@@ -347,7 +338,7 @@ if(!dojo.isAsync){
 		//		(such as easing: node: duration: and so on)
 		//
 		// example:
-		//	|	dojo.fx.wipeOut({ node:"someId" }).play()
+		//	|	fx.wipeOut({ node:"someId" }).play()
 
 		var node = args.node = dom.byId(args.node), s = node.style, o;
 
@@ -372,10 +363,10 @@ if(!dojo.isAsync){
 		connect.connect(anim, "onStop", fini);
 		connect.connect(anim, "onEnd", fini);
 
-		return anim; // dojo.Animation
+		return anim; // dojo/_base/fx.Animation
 	};
 
-	coreFx.slideTo = dojo.fx.slideTo = function(/*Object*/ args){
+	coreFx.slideTo = function(/*Object*/ args){
 		// summary:
 		//		Slide a node to a new top/left position
 		//
@@ -421,9 +412,8 @@ if(!dojo.isAsync){
 		}, args));
 		connect.connect(anim, "beforeBegin", anim, init);
 
-		return anim; // dojo.Animation
+		return anim; // dojo/_base/fx.Animation
 	};
-	lang.mixin(dojo.fx, coreFx); // Add the core api's to the base fx api's for compat.
 
 	return coreFx;
 });

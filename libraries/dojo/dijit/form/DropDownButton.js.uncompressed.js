@@ -1,8 +1,8 @@
-//>>built
 require({cache:{
-'url:dijit/form/templates/DropDownButton.html':"<span class=\"dijit dijitReset dijitInline\"\n\t><span class='dijitReset dijitInline dijitButtonNode'\n\t\tdata-dojo-attach-event=\"ondijitclick:_onClick\" data-dojo-attach-point=\"_buttonNode\"\n\t\t><span class=\"dijitReset dijitStretch dijitButtonContents\"\n\t\t\tdata-dojo-attach-point=\"focusNode,titleNode,_arrowWrapperNode\"\n\t\t\trole=\"button\" aria-haspopup=\"true\" aria-labelledby=\"${id}_label\"\n\t\t\t><span class=\"dijitReset dijitInline dijitIcon\"\n\t\t\t\tdata-dojo-attach-point=\"iconNode\"\n\t\t\t></span\n\t\t\t><span class=\"dijitReset dijitInline dijitButtonText\"\n\t\t\t\tdata-dojo-attach-point=\"containerNode,_popupStateNode\"\n\t\t\t\tid=\"${id}_label\"\n\t\t\t></span\n\t\t\t><span class=\"dijitReset dijitInline dijitArrowButtonInner\"></span\n\t\t\t><span class=\"dijitReset dijitInline dijitArrowButtonChar\">&#9660;</span\n\t\t></span\n\t></span\n\t><input ${!nameAttrSetting} type=\"${type}\" value=\"${value}\" class=\"dijitOffScreen\" tabIndex=\"-1\"\n\t\tdata-dojo-attach-point=\"valueNode\"\n/></span>\n"}});
+'url:dijit/form/templates/DropDownButton.html':"<span class=\"dijit dijitReset dijitInline\"\n\t><span class='dijitReset dijitInline dijitButtonNode'\n\t\tdata-dojo-attach-event=\"ondijitclick:_onClick\" data-dojo-attach-point=\"_buttonNode\"\n\t\t><span class=\"dijitReset dijitStretch dijitButtonContents\"\n\t\t\tdata-dojo-attach-point=\"focusNode,titleNode,_arrowWrapperNode\"\n\t\t\trole=\"button\" aria-haspopup=\"true\" aria-labelledby=\"${id}_label\"\n\t\t\t><span class=\"dijitReset dijitInline dijitIcon\"\n\t\t\t\tdata-dojo-attach-point=\"iconNode\"\n\t\t\t></span\n\t\t\t><span class=\"dijitReset dijitInline dijitButtonText\"\n\t\t\t\tdata-dojo-attach-point=\"containerNode,_popupStateNode\"\n\t\t\t\tid=\"${id}_label\"\n\t\t\t></span\n\t\t\t><span class=\"dijitReset dijitInline dijitArrowButtonInner\"></span\n\t\t\t><span class=\"dijitReset dijitInline dijitArrowButtonChar\">&#9660;</span\n\t\t></span\n\t></span\n\t><input ${!nameAttrSetting} type=\"${type}\" value=\"${value}\" class=\"dijitOffScreen\" tabIndex=\"-1\"\n\t\tdata-dojo-attach-point=\"valueNode\" role=\"presentation\"\n/></span>\n"}});
 define("dijit/form/DropDownButton", [
 	"dojo/_base/declare", // declare
+	"dojo/_base/lang",	// hitch
 	"dojo/query", // query
 	"../registry",	// registry.byNode
 	"../popup",		// dijit.popup2.hide
@@ -10,18 +10,10 @@ define("dijit/form/DropDownButton", [
 	"../_Container",
 	"../_HasDropDown",
 	"dojo/text!./templates/DropDownButton.html"
-], function(declare, query, registry, popup, Button, _Container, _HasDropDown, template){
-
-/*=====
-	Button = dijit.form.Button;
-	_Container = dijit._Container;
-	_HasDropDown = dijit._HasDropDown;
-=====*/
+], function(declare, lang, query, registry, popup, Button, _Container, _HasDropDown, template){
 
 // module:
 //		dijit/form/DropDownButton
-// summary:
-//		A button with a drop down
 
 
 return declare("dijit.form.DropDownButton", [Button, _Container, _HasDropDown], {
@@ -29,13 +21,13 @@ return declare("dijit.form.DropDownButton", [Button, _Container, _HasDropDown], 
 	//		A button with a drop down
 	//
 	// example:
-	// |	<button data-dojo-type="dijit.form.DropDownButton">
+	// |	<button data-dojo-type="dijit/form/DropDownButton">
 	// |		Hello world
-	// |		<div data-dojo-type="dijit.Menu">...</div>
+	// |		<div data-dojo-type="dijit/Menu">...</div>
 	// |	</button>
 	//
 	// example:
-	// |	var button1 = new dijit.form.DropDownButton({ label: "hi", dropDown: new dijit.Menu(...) });
+	// |	var button1 = new DropDownButton({ label: "hi", dropDown: new dijit.Menu(...) });
 	// |	win.body().appendChild(button1);
 	//
 
@@ -85,19 +77,16 @@ return declare("dijit.form.DropDownButton", [Button, _Container, _HasDropDown], 
 		return (!!dropDown && (!dropDown.href || dropDown.isLoaded));
 	},
 
-	loadDropDown: function(){
-		// Loads our dropdown
+	loadDropDown: function(/*Function*/ callback){
+		// Default implementation assumes that drop down already exists,
+		// but hasn't loaded it's data (ex: ContentPane w/href).
+		// App must override if the drop down is lazy-created.
 		var dropDown = this.dropDown;
-		if(!dropDown){ return; }
-		if(!this.isLoaded()){
-			var handler = dropDown.on("load", this, function(){
-				handler.remove();
-				this.openDropDown();
-			});
-			dropDown.refresh();
-		}else{
-			this.openDropDown();
-		}
+		var handler = dropDown.on("load", lang.hitch(this, function(){
+			handler.remove();
+			callback();
+		}));
+		dropDown.refresh();		// tell it to load
 	},
 
 	isFocusable: function(){

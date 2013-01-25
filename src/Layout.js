@@ -13,8 +13,40 @@
  * limitations under the License.
  */
 
+/*
+    Pulls major portions from dojox.mobile.FixedSplitter:
+
+    https://dojotoolkit.org/reference-guide/1.8/dojox/mobile/FixedSplitter.html
+
+    Copyright (c) 2005-2012, The Dojo Foundation
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the name of the Dojo Foundation nor the names of its contributors
+    may be used to endorse or promote products derived from this software
+    without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+    OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 /**
- * Layout, as the name implies, handles the physical laying out of Panes by utilizing dojox/mobile/FixedSplitted.
+ * Layout, as the name implies, handles the physical laying out of Panes.
  *
  * Think of Scene as the topmost level as a pool or collection of views. Layout (which is the only
  * component of Scene) organizes the app into distinct groups (tiers) and handles the identificaton
@@ -43,7 +75,9 @@ define('argos/Layout', [
     'dojo/dom-geometry',
     'dojo/dom-construct',
     'dojo/topic',
-    'dojox/mobile/FixedSplitter',
+    "dijit/_Contained",
+    "dijit/_Container",
+    "dijit/_WidgetBase",
     './_UiComponent',
     './Pane'
 ], function(
@@ -58,11 +92,13 @@ define('argos/Layout', [
     domGeom,
     domConstruct,
     topic,
-    FixedSplitter,
+    _Contained,
+    _Container,
+    _WidgetBase,
     _UiComponent,
     Pane
 ) {
-    return declare('argos.Layout', [FixedSplitter, _UiComponent], {
+    return declare('argos.Layout', [_WidgetBase, _Contained, _Container, _UiComponent], {
         /**
          * @cfg {Object[]}
          * Array of component definitions.
@@ -108,7 +144,8 @@ define('argos/Layout', [
             }
         },
         /**
-         * Overrides dojox.mobile.FixedSplitter to include test for non-layout panes.
+         * Layout adjusts the width (or height) and offsets of panes within.
+         *
          * It only includes Panes in the splitter width calculations if the css class
          * `mblFixedSplitterPane` is found on the child node.
          *
@@ -150,6 +187,11 @@ define('argos/Layout', [
                 if(child.resize){ child.resize(); }
             });
         },
+        buildRendering: function(){
+            this.domNode = this.containerNode = this.srcNodeRef ? this.srcNodeRef : win.doc.createElement("DIV");
+            domClass.add(this.domNode, "mblFixedSpliter");
+        },
+
         hideNativeUrlBar: function() {
             if (!this.heightFixNode) this.heightFixNode = this._createHeightFixNode();
 
@@ -168,6 +210,27 @@ define('argos/Layout', [
                 self.resize();
             }, 0);
         },
+        startup: function(){
+            if(this._started){ return; }
+            var children = array.filter(this.domNode.childNodes, function(node){ return node.nodeType == 1; });
+            array.forEach(children, function(node){
+                domClass.add(node, "mblFixedSplitterPane"+this.orientation);
+            }, this);
+            this.inherited(arguments);
+
+            var _this = this;
+            setTimeout(function(){
+                var parent = _this.getParent && _this.getParent();
+                if(!parent || !parent.resize){ // top level widget
+                    _this.resize();
+                }
+            }, 0);
+        },
+        addChild: function(widget, /*Number?*/insertIndex){
+            domClass.add(widget.domNode, "mblFixedSplitterPane"+this.orientation);
+            this.inherited(arguments);
+        },
+
         constructor: function() {
             this.panes = {};
             this.panesByTier = [];
@@ -292,6 +355,7 @@ define('argos/Layout', [
                 });
                 */
             }
+            this.layout();
 
             this.inherited(arguments);
         }

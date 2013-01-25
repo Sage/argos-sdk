@@ -1,46 +1,50 @@
 /*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Copyright (c) 2004-2012, The Dojo Foundation All Rights Reserved.
 	Available via Academic Free License >= 2.1 OR the modified BSD license.
 	see: http://dojotoolkit.org/license for details
 */
 
 //>>built
-define("dojo/window",["./_base/kernel","./_base/lang","./_base/sniff","./_base/window","./dom","./dom-geometry","./dom-style"],function(_1,_2,_3,_4,_5,_6,_7){
-_2.getObject("window",true,_1);
-_1.window.getBox=function(){
-var _8=(_4.doc.compatMode=="BackCompat")?_4.body():_4.doc.documentElement;
-var _9=_6.docScroll();
-var _a=_4.doc.parentWindow||_4.doc.defaultView;
-return {l:_9.x,t:_9.y,w:_a.innerWidth||_8.clientWidth,h:_a.innerHeight||_8.clientHeight};
-};
-_1.window.get=function(_b){
-if(_3("ie")&&window!==document.parentWindow){
-_b.parentWindow.execScript("document._parentWindow = window;","Javascript");
-var _c=_b._parentWindow;
-_b._parentWindow=null;
-return _c;
+define("dojo/window",["./_base/lang","./sniff","./_base/window","./dom","./dom-geometry","./dom-style"],function(_1,_2,_3,_4,_5,_6){
+var _7={getBox:function(_8){
+_8=_8||_3.doc;
+var _9=(_8.compatMode=="BackCompat")?_3.body(_8):_8.documentElement,_a=_5.docScroll(_8),w,h;
+if(_2("touch")){
+var _b=_7.get(_8);
+w=_b.innerWidth||_9.clientWidth;
+h=_b.innerHeight||_9.clientHeight;
+}else{
+w=_9.clientWidth;
+h=_9.clientHeight;
 }
-return _b.parentWindow||_b.defaultView;
-};
-_1.window.scrollIntoView=function(_d,_e){
+return {l:_a.x,t:_a.y,w:w,h:h};
+},get:function(_c){
+if(_2("ie")&&_7!==document.parentWindow){
+_c.parentWindow.execScript("document._parentWindow = window;","Javascript");
+var _d=_c._parentWindow;
+_c._parentWindow=null;
+return _d;
+}
+return _c.parentWindow||_c.defaultView;
+},scrollIntoView:function(_e,_f){
 try{
-_d=_5.byId(_d);
-var _f=_d.ownerDocument||_4.doc,_10=_f.body||_4.body(),_11=_f.documentElement||_10.parentNode,_12=_3("ie"),_13=_3("webkit");
-if((!(_3("mozilla")||_12||_13||_3("opera"))||_d==_10||_d==_11)&&(typeof _d.scrollIntoView!="undefined")){
-_d.scrollIntoView(false);
+_e=_4.byId(_e);
+var doc=_e.ownerDocument||_3.doc,_10=_3.body(doc),_11=doc.documentElement||_10.parentNode,_12=_2("ie"),_13=_2("webkit");
+if((!(_2("mozilla")||_12||_13||_2("opera"))||_e==_10||_e==_11)&&(typeof _e.scrollIntoView!="undefined")){
+_e.scrollIntoView(false);
 return;
 }
-var _14=_f.compatMode=="BackCompat",_15=(_12>=9&&_d.ownerDocument.parentWindow.frameElement)?((_11.clientHeight>0&&_11.clientWidth>0&&(_10.clientHeight==0||_10.clientWidth==0||_10.clientHeight>_11.clientHeight||_10.clientWidth>_11.clientWidth))?_11:_10):(_14?_10:_11),_16=_13?_10:_15,_17=_15.clientWidth,_18=_15.clientHeight,rtl=!_6.isBodyLtr(),_19=_e||_6.position(_d),el=_d.parentNode,_1a=function(el){
-return ((_12<=6||(_12&&_14))?false:(_7.get(el,"position").toLowerCase()=="fixed"));
+var _14=doc.compatMode=="BackCompat",_15=(_12>=9&&"frameElement" in _e.ownerDocument.parentWindow)?((_11.clientHeight>0&&_11.clientWidth>0&&(_10.clientHeight==0||_10.clientWidth==0||_10.clientHeight>_11.clientHeight||_10.clientWidth>_11.clientWidth))?_11:_10):(_14?_10:_11),_16=_13?_10:_15,_17=_15.clientWidth,_18=_15.clientHeight,rtl=!_5.isBodyLtr(doc),_19=_f||_5.position(_e),el=_e.parentNode,_1a=function(el){
+return ((_12<=6||(_12&&_14))?false:(_6.get(el,"position").toLowerCase()=="fixed"));
 };
-if(_1a(_d)){
+if(_1a(_e)){
 return;
 }
 while(el){
 if(el==_10){
 el=_16;
 }
-var _1b=_6.position(el),_1c=_1a(el);
+var _1b=_5.position(el),_1c=_1a(el);
 if(el==_16){
 _1b.w=_17;
 _1b.h=_18;
@@ -54,7 +58,7 @@ if(_1b.y<0||!_12){
 _1b.y=0;
 }
 }else{
-var pb=_6.getPadBorderExtents(el);
+var pb=_5.getPadBorderExtents(el);
 _1b.w-=pb.w;
 _1b.h-=pb.h;
 _1b.x+=pb.l;
@@ -106,8 +110,9 @@ el=(el!=_16)&&!_1c&&el.parentNode;
 }
 catch(error){
 console.error("scrollIntoView: "+error);
-_d.scrollIntoView(false);
+_e.scrollIntoView(false);
 }
-};
-return _1.window;
+}};
+1&&_1.setObject("dojo.window",_7);
+return _7;
 });
