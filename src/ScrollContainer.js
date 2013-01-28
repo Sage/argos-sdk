@@ -114,6 +114,7 @@ define('argos/ScrollContainer', [
          * to then invoke the related action in {@link #onScrollEnd onScrollEnd}.
          */
         _pulledUp: null,
+        topOffset: null,
 
         startup: function() {
             this.inherited(arguments);
@@ -133,12 +134,18 @@ define('argos/ScrollContainer', [
 
                 if (this.enableFormFix) options.onBeforeScrollStart = onBeforeScrollStart;
 
-                if (this.onMove || this.onStart || this.onEnd)
+                if (this.topOffset)
+                {
+                    options.topOffset = this.topOffset;
+                }
+
+                if (this.onMove || this.onStart || this.onEnd || this.onRefresh)
                 {
                     var scope = this.getComponentOwner();
                     if (this.onMove) options.onScrollMove = utility.expand(scope, this.onMove);
                     if (this.onStart) options.onScrollStart = utility.expand(scope, this.onStart);
                     if (this.onEnd) options.onScrollEnd = utility.expand(scope, this.onEnd);
+                    if (this.onRefresh) options.onRefresh = utility.expand(scope, this.onRefresh);
                 }
 
                 if (this.onPullDown || this.onPullUp)
@@ -146,7 +153,6 @@ define('argos/ScrollContainer', [
                     options.onScrollMove = this._onScrollMove.bindDelegate(this);
                     options.onScrollEnd = this._onScrollEnd.bindDelegate(this);
                 }
-
 
                 this._scroll = new iScroll(this.domNode, options);
             }
