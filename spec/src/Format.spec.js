@@ -238,6 +238,14 @@ return describe('argos.format', function() {
         var testStr = '1-800-CALL-JEFF';
         expect(format.phone(testStr)).toEqual('180022555333');
     });
+    it('Can format a phone number with preceding 1', function() {
+        var testStr = '18001234567';
+        expect(format.phone(testStr)).toEqual('1-800-123-4567');
+    });
+    it('Can format a phone number with preceding 1 and extension', function() {
+        var testStr = '18001234567x89';
+        expect(format.phone(testStr)).toEqual('1-800-123-4567x89');
+    });
 
 
 });

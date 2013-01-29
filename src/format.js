@@ -199,8 +199,14 @@ define('argos/format', [
             test: /^(\d{3})(\d{3})(\d{2,4})$/, // 555 555 5555
             format: '(${3})-${4}-${5}'
         },{
+            test: /^1(\d{3})(\d{3})(\d{4})$/, // 1 555 555 5555
+            format: '1-${3}-${4}-${5}'
+        },{
             test: /^(\d{3})(\d{3})(\d{2,4})([^0-9]{1,}.*)$/, // 555 555 5555x
             format: '(${3})-${4}-${5}${6}'
+        },{
+            test: /^1(\d{3})(\d{3})(\d{4})([^0-9]{1,}.*)$/, // 1 555 555 5555x
+            format: '1-${3}-${4}-${5}${6}'
         },{
             test: /^(\d{11,})(.*)$/,
             format: '${1}'
@@ -450,7 +456,10 @@ define('argos/format', [
                 var formatter = formatters[i],
                     match;
                 if ((match = formatter.test.exec(clean)))
+                {
                     formattedMatch = string.substitute(formatter.format, [val, clean].concat(match));
+                    break;
+                }
             }
 
             if (formattedMatch)
