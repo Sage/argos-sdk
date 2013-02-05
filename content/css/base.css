@@ -332,9 +332,10 @@
     width: 24px;
     height: 24px;
     color: #ff0;
-    position: absolute;
     top: 6px;
     left: 6px;
+    float: left;
+    padding: 0px 5px 0px 0px;
 }
 
 /* grouped list */
