@@ -497,7 +497,7 @@ define('argos/Application', [
             for (var i = list.length - 2, j = 0; i >= 0 && (depth <= 0 || j < depth); i--, j++)
             {
                 var set = list[i];
-                for (var k = 0; k < set.length; k++)
+                for (var k = set.length - 1; k >= 0; k--)
                     if (list[i][k] && predicate.call(scope || this, list[i][k].context))
                         return list[i][k].context;
             }
