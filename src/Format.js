@@ -48,6 +48,35 @@ define('Sage/Platform/Mobile/Format', [
         return { width: w, height: h };
     };
 
+    var phoneLettersMap = [
+        {
+            test: /[ABC]/gi,
+            val: '2'
+        },{
+            test: /[DEF]/gi,
+            val: '3'
+        },{
+            test: /[GHI]/gi,
+            val: '4'
+        },{
+            test: /[JKL]/gi,
+            val: '5'
+        },{
+            test: /[MNO]/gi,
+            val: '6'
+        },{
+            test: /[PQRS]/gi,
+            val: '7'
+        },{
+            test: /[TUV]/gi,
+            val: '8'
+        },{
+            test: /[WXYZwyz]/g, // Note lowercase 'x' should stay for extensions
+            val: '9'
+        }
+    ];
+
+
     function isEmpty(val) {
         if (typeof val !== 'string') return !val;
 
@@ -134,6 +163,45 @@ define('Sage/Platform/Mobile/Format', [
          * @return {Boolean} If passed item is empty
          */
         isEmpty: isEmpty,
+        /**
+         * @property {Object[]}
+         * Array of objects that have the keys `test` and `format` where `test` is a RegExp that
+         * matches the phone grouping and `format` is the string format to be replaced.
+         *
+         * The RegExp may have capture groups but when you are defining the format strings use:
+         *
+         * * `${0}` - original value
+         * * `${1}` - cleaned value
+         * * `${2}` - entire match (against clean value)
+         * * `${3..n}` - match groups (against clean value)
+         *
+         * The `clean value` is taking the inputted numbers/text and removing any non-number
+         * and non-"x" and it replaces A-Z to their respective phone number character.
+         *
+         * The three default formatters are:
+         * * `nnn-nnnn`
+         * * `(nnn)-nnn-nnnn`
+         * * `(nnn)-nnn-nnnxnnnn`
+         *
+         * If you plan to override this value make sure you include the default ones provided.
+         *
+         */
+        phoneFormat: [{
+            test: /^\+.*/,
+            format: '${0}'
+        },{
+            test: /^(\d{3})(\d{3,4})$/,
+            format: '${3}-${4}'
+        },{
+            test: /^(\d{3})(\d{3})(\d{2,4})$/, // 555 555 5555
+            format: '(${3})-${4}-${5}'
+        },{
+            test: /^(\d{3})(\d{3})(\d{2,4})([^0-9]{1,}.*)$/, // 555 555 5555x
+            format: '(${3})-${4}-${5}${6}'
+        },{
+            test: /^(\d{11,})(.*)$/,
+            format: '${1}'
+        }],
         /**
          * Takes a url string and wraps it with an `<a>` element with `href=` pointing to the url.
          * @param {String} val Url string to be wrapped
@@ -349,6 +417,51 @@ define('Sage/Platform/Mobile/Format', [
                     '<img src="${0}" width="${1}" height="${2}" alt="${3}" />',
                     [img, options.width, options.height, options.title || ''])
                 : img;
+        },
+        /**
+         * Takes a string phone input and attempts to match it against the predefined
+         * phone formats - if a match is found it is returned formatted if not it is returned
+         * as is.
+         * @param val {String} String inputted phone number to format
+         * @param asLink {Boolean} True to put the phone in an anchor element pointing to a tel: uri
+         * @returns {String}
+         */
+        phone: function(val, asLink) {
+            if (typeof val !== 'string')
+                return val;
+
+            val = Sage.Platform.Mobile.Format.alphaToPhoneNumeric(val);
+
+            var formatters = Sage.Platform.Mobile.Format.phoneFormat,
+                clean = /^\+/.test(val)
+                    ? val
+                    : val.replace(/[^0-9x]/ig, ''),
+                formattedMatch;
+
+            for (var i = 0; i < formatters.length; i++)
+            {
+                var formatter = formatters[i],
+                    match;
+                if ((match = formatter.test.exec(clean)))
+                    formattedMatch = string.substitute(formatter.format, [val, clean].concat(match));
+            }
+
+            if (formattedMatch)
+                return asLink ? string.substitute('<a href="tel:${0}">${1}</a>', [clean, formattedMatch]) : formattedMatch;
+
+            return val;
+        },
+        /**
+         * Takes a string input and converts A-Z to their respective phone number character
+         * `1800CALLME` -> `1800225563`
+         * @param val
+         * @returns {String}
+         */
+        alphaToPhoneNumeric: function(val) {
+            for (var i = 0; i < phoneLettersMap.length; i++) {
+                val = val.replace(phoneLettersMap[i].test, phoneLettersMap[i].val);
+            }
+            return val;
         }
     });
 });

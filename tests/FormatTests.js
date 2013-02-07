@@ -205,5 +205,40 @@ return describe('Sage.Platform.Mobile.Format', function() {
         var testStr = 'test';
         expect(format.timespan(testStr)).toEqual('');
     });
+
+    it('Can format A-Z to their phone number equivalents', function() {
+        var testStr = 'ABCDEFHGIJKLMNOPQRSTUVWXYZ';
+        expect(format.alphaToPhoneNumeric(testStr)).toEqual('22233344455566677778889999');
+    });
+    it('Can format a-z (except x) to their phone number equivalents', function() {
+        var testStr = 'abcdefghijklmnopqrstuvwxyz';
+        expect(format.alphaToPhoneNumeric(testStr)).toEqual('22233344455566677778889x99');
+    });
+
+    it('Can format a 7 digit phone number to be nnn-nnnn', function() {
+        var testStr = '1234567';
+        expect(format.phone(testStr)).toEqual('123-4567');
+    });
+    it('Can format a 10 digit phone number to be (nnn)-nnn-nnnn', function() {
+        var testStr = '1234567890';
+        expect(format.phone(testStr)).toEqual('(123)-456-7890');
+    });
+    it('Can format a 10 digit phone number with extension to be (nnn)-nnn-nnnnxnnn', function() {
+        var testStr = '1234567890x123';
+        expect(format.phone(testStr)).toEqual('(123)-456-7890x123');
+    });
+    it('Can call alphaToPhoneNumeric when formatting a phone number', function() {
+        spyOn(format, 'alphaToPhoneNumeric').andReturn('test');
+
+        format.phone('test');
+
+        expect(format.alphaToPhoneNumeric).toHaveBeenCalled();
+    });
+    it('Can format a phone number with mixed numbers and alphas', function() {
+        var testStr = '1-800-CALL-JEFF';
+        expect(format.phone(testStr)).toEqual('180022555333');
+    });
+
+
 });
 });
