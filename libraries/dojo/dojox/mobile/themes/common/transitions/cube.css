@@ -38,6 +38,7 @@
 	50% { -webkit-transform: scale(.5,1) skew(0deg,3deg); }
 	100% { -webkit-transform: scale(1,1) skew(0deg,0deg); }
 }
+
 .dj_iphone .mblCube {
 	-webkit-transform-style: preserve-3d !important;
 }
@@ -137,6 +138,7 @@
 		-webkit-transform: scale3d(0.77,0.77,0.77) rotateY(0deg) translateZ(240px);
 	}
 }
+
 .dj_ipad.dj_iphone .mblCube.mblOut {
 	-webkit-animation-name: mblCubeOut_ipad;
 	-webkit-transform-origin: 50% 50% !important;

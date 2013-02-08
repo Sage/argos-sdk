@@ -58,6 +58,10 @@
 .tundra .dojoxCalendarColumnView .dojoxCalendarGridTable .quarterhour {
   border-top: dotted 1px #eeeeee;
 }
+/* 
+ * The dojoxCalendarToday & dojoxCalendarWeekend classes is added by the 
+ * ColumnView.styleGridColumn method that can be subclassed to add/remove css classes
+ */
 .tundra .dojoxCalendarColumnView .dojoxCalendarGridTable .dojoxCalendarToday {
   background-color: #fff2d2;
 }
@@ -170,6 +174,10 @@
 .tundra .dojoxCalendarColumnView .dojoxCalendarColumnHeaderTable td.last-child {
   border-right: 1px solid #cccccc;
 }
+/* 
+ * The dojoxCalendarToday & dojoxCalendarWeekend classes is added by the 
+ * ColumnView.styleColumnHeaderCell method that can be subclassed to add/remove css classes
+ */
 .tundra .dojoxCalendarColumnView .dojoxCalendarColumnHeaderTable .dojoxCalendarToday {
   font-weight: bold;
   color: #ff2200;
@@ -208,6 +216,9 @@
 .tundra .dojoxCalendarColumnView .dojoxCalendarRowHeaderTable td.dummy {
   border-top: 1px solid #f8f8f8;
 }
+/* 
+ * The ColumnView.styleRowHeaderCell method that can be subclassed to add/remove css classes per hour.
+ */
 .tundra .dojoxCalendarColumnView .dojoxCalendarRowHeaderTable td {
   vertical-align: top;
   text-align: right;
