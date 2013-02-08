@@ -914,6 +914,7 @@ h2 > .collapsed-indicator
 }
 
 .is-collapsed + ul,
+.is-collapsed + fieldset,
 .is-collapsed + div
 {
     display: none !important;

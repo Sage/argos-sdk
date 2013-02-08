@@ -142,7 +142,7 @@ define('argos/Edit', [
          */
         rowTemplate: new Simplate([
             '<div class="row row-edit {%= $.containerClass || $.cls %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
-            '<label for="{%= $.name %}">{%: $.label %}</label>',
+            '{% if (false !== $.label) { %}<label for="{%= $.name %}">{%: $.label %}</label>{% } %}',
             '</div>'
         ]),
         /**
