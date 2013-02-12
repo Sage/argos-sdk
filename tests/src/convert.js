@@ -79,9 +79,7 @@ define(["doh/runner", "argos/convert"], function(doh, convert){
         },
         
         function testToDateFromStringISOZ() {
-            console.log('B0');
             var foo = '2011-01-01T08:30:00Z';
-            console.log('B1');
             doh.assertEqual(convert.toDateFromString(foo), new Date(Date.UTC(2011, 0, 1, 8, 30, 0)));
         },
         function testToDateFromStringISOOffset() {

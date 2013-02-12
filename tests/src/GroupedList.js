@@ -1,5 +1,12 @@
-define(["doh/runner", "dojo/dom-class", "argos/GroupedList"],
-    function(doh, domClass, GroupedList) {
+define([
+    "doh/runner",
+    "dojo/dom-class",
+    "argos/GroupedList"
+], function(
+    doh,
+    domClass,
+    GroupedList
+) {
     doh.register("argos-tests/src/GroupedList", [
         {
             name: 'AddCollapsedTagToToggledUnCollapsedNode',
@@ -32,6 +39,22 @@ define(["doh/runner", "dojo/dom-class", "argos/GroupedList"],
             tearDown: function() {
                 this.groupedList.destroy();
             }
-        }
+        },
+        {
+            name: 'CallsOnContentChangeWhenToggleGroup',
+            setUp: function() {
+                this.groupedList = new GroupedList();
+            },
+            runTest: function() {
+                var spy = doh.spyOn(this.groupedList, 'onContentChange');
+
+                this.groupedList.toggleGroup();
+
+                doh.assertWasCalled(spy);
+            },
+            tearDown: function() {
+                this.groupedList.destroy();
+            }
+        },
     ]);
 });
