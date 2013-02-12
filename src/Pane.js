@@ -41,7 +41,7 @@ define('argos/Pane', [
     'dojo/dom-style',
     'dojo/dom-class',
     'dojo/dom-attr',
-    'dojox/mobile/FixedSplitterPane',
+    'dojox/mobile/Container',
     './_UiComponent',
     './Toolbar',
     './TitleBar',
@@ -55,13 +55,13 @@ define('argos/Pane', [
     domStyle,
     domClass,
     domAttr,
-    FixedSplitterPane,
+    Container,
     _UiComponent,
     Toolbar,
     TitleBar,
     transition
 ) {
-    return declare('argos.Pane', [FixedSplitterPane, _UiComponent], {
+    return declare('argos.Pane', [Container, _UiComponent], {
         components: [
             {name: 'top', type: TitleBar, attachEvent: 'onPositionChange:_onToolbarPositionChange', props: {managed: true, visible: false}},
             {name: 'container', tag: 'div', attrs: {'class': 'view-container'}, attachPoint: 'viewContainerNode'}
@@ -280,7 +280,7 @@ define('argos/Pane', [
             delete this._signals;
         },
         resize: function() {
-            // do not call base implementation (FixedSplitterPane)
+            // do not call base implementation (Container)
             // only resize active child (for performance)
             if (this.active && this.active.resize)
                 this.active.resize();

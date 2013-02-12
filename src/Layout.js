@@ -64,9 +64,11 @@
  * @requires Pane
  */
 define('argos/Layout', [
+    'dojo/has',
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
+    'dojo/_base/connect',
     'dojo/_base/window',
     'dojo/_base/Deferred',
     'dojo/DeferredList',
@@ -75,15 +77,15 @@ define('argos/Layout', [
     'dojo/dom-geometry',
     'dojo/dom-construct',
     'dojo/topic',
-    "dijit/_Contained",
-    "dijit/_Container",
-    "dijit/_WidgetBase",
+    'dojox/mobile/FixedSplitter',
     './_UiComponent',
     './Pane'
 ], function(
+    has,
     declare,
     lang,
     array,
+    connect,
     win,
     Deferred,
     DeferredList,
@@ -92,164 +94,175 @@ define('argos/Layout', [
     domGeom,
     domConstruct,
     topic,
-    _Contained,
-    _Container,
-    _WidgetBase,
+    FixedSplitter,
     _UiComponent,
     Pane
 ) {
-    return declare('argos.Layout', [_WidgetBase, _Contained, _Container, _UiComponent], {
-        /**
-         * @cfg {Object[]}
-         * Array of component definitions.
-         *
-         * In the special case of Layout each of the components should be some derivative of Pane.
-         *
-         * Also, if the domNode of the Pane includes the CSS class `mblFixedSplitterPane` then it
-         * will be styled (width/height) accordingly in regards to the other Panes (fitting them onto
-         * the screen).
-         *
-         */
-        components: [
-            {name: 'navigation', type: Pane, attachPoint: 'panes.navigation', props:{'class':'layout-left', tier: false}},
-            {name: 'list', type: Pane, attachPoint: 'panes.list', props:{'class':'layout-center', tier: 0}},
-            {name: 'detail', type: Pane, attachPoint: 'panes.detail', props:{'class':'layout-right', tier: 1}}
-        ],
+return declare('argos.Layout', [FixedSplitter, _UiComponent], {
+    /**
+     * @cfg {Object[]}
+     * Array of component definitions.
+     *
+     * In the special case of Layout each of the components should be some derivative of Pane.
+     *
+     * Also, if the domNode of the Pane includes the CSS class `mblFixedSplitterPane` then it
+     * will be styled (width/height) accordingly in regards to the other Panes (fitting them onto
+     * the screen).
+     *
+     */
+    components: [
+        {name: 'navigation', type: Pane, attachPoint: 'panes.navigation', props:{'class':'layout-left', tier: false}},
+        {name: 'list', type: Pane, attachPoint: 'panes.list', props:{'class':'layout-center', tier: 0}},
+        {name: 'detail', type: Pane, attachPoint: 'panes.detail', props:{'class':'layout-right', tier: 1}}
+    ],
 
-        _onCheckViewportHeightHandle: null,
-        _lastViewportHeight: null,
+    _onCheckViewportHeightHandle: null,
+    _lastViewportHeight: null,
 
-        /**
-         * @property {Object}
-         * This object will be populated by the resulting panes from the child components as noted by
-         * the `attachPoint: 'panes.list'`, `panes.detail` etc.
-         */
-        panes: null,
-        panesByTier: null,
-        tiers: 2,
-        maximized: -1,
-        orientation: 'H',
-        heightFixNode: null,
+    /**
+     * @property {Object}
+     * This object will be populated by the resulting panes from the child components as noted by
+     * the `attachPoint: 'panes.list'`, `panes.detail` etc.
+     */
+    panes: null,
+    panesByTier: null,
+    tiers: 2,
+    maximized: -1,
+    orientation: 'H',
+    heightFixNode: null,
 
-        _createHeightFixNode: function() {
-            return domConstruct.create('div', {
-                'class': 'layout-height-fix is-hidden'
-            }, win.body());
-        },
-        _onCheckViewportHeight: function() {
-            if (window.innerHeight != this._lastViewportHeight)
-            {
-                this.resize();
-                this._lastViewportHeight = window.innerHeight;
+    _createHeightFixNode: function() {
+        return domConstruct.create('div', {
+            'class': 'layout-height-fix is-hidden'
+        }, win.body());
+    },
+    _onCheckViewportHeight: function() {
+        if (window.innerHeight != this._lastViewportHeight)
+        {
+            this.resize();
+            this._lastViewportHeight = window.innerHeight;
+        }
+    },
+    /**
+     * Layout adjusts the width (or height) and offsets of panes within.
+     *
+     * It only includes Panes in the splitter width calculations if the css class
+     * `mblFixedSplitterPane` is found on the child node.
+     *
+     * This enables Panes to be layered as needed.
+     */
+    layout: function(){
+        var sz = this.orientation == "H" ? "w" : "h";
+
+        var children = [];
+
+        if (!this._isTablet()) {
+            if (this.panes && this.panes.detail) {
+                this.panes.detail.tier = false;
             }
-        },
-        /**
-         * Layout adjusts the width (or height) and offsets of panes within.
-         *
-         * It only includes Panes in the splitter width calculations if the css class
-         * `mblFixedSplitterPane` is found on the child node.
-         *
-         * This enables Panes to be layered as needed.
-         */
-        layout: function(){
-            var sz = this.orientation == "H" ? "w" : "h";
-
-            var children = [];
-            for (var paneId in this.panes)
-            {
-                var pane = this.panes[paneId];
-                if (pane.tier !== false)
-                    children.push(pane.domNode);
+        } else {
+            if (this.panes && this.panes.detail) {
+                this.panes.detail.tier = 1;
             }
+        }
 
-            var offset = 0;
-            for(var i = 0; i < children.length; i++){
-                domGeom.setMarginBox(children[i], this.orientation == "H" ? {l:offset} : {t:offset});
-                if(i < children.length - 1){
-                    offset += domGeom.getMarginBox(children[i])[sz];
+        for (var paneId in this.panes)
+        {
+            var pane = this.panes[paneId];
+            if (pane.tier !== false)
+                children.push(pane.domNode);
+        }
+
+        var offset = 0;
+        for(var i = 0; i < children.length; i++){
+            domGeom.setMarginBox(children[i], this.orientation == "H" ? {l:offset} : {t:offset});
+            if(i < children.length - 1){
+                offset += domGeom.getMarginBox(children[i])[sz];
+            }
+        }
+
+        var h;
+        if(this.orientation == "V"){
+            if(this.domNode.parentNode.tagName == "BODY"){
+                if(array.filter(win.body().childNodes, function(node){ return node.nodeType == 1; }).length == 1){
+                    h = (win.global.innerHeight||win.doc.documentElement.clientHeight);
                 }
             }
+        }
+        var l = (h || domGeom.getMarginBox(this.domNode)[sz]) - offset;
+        var props = {};
+        props[sz] = l;
+        domGeom.setMarginBox(children[children.length - 1], props);
 
-            var h;
-            if(this.orientation == "V"){
-                if(this.domNode.parentNode.tagName == "BODY"){
-                    if(array.filter(win.body().childNodes, function(node){ return node.nodeType == 1; }).length == 1){
-                        h = (win.global.innerHeight||win.doc.documentElement.clientHeight);
-                    }
-                }
+        array.forEach(this.getChildren(), function(child){
+            if(child.resize){ child.resize(); }
+        });
+    },
+    buildRendering: function(){
+        this.domNode = this.containerNode = this.srcNodeRef ? this.srcNodeRef : win.doc.createElement("DIV");
+        domClass.add(this.domNode, "mblFixedSpliter");
+    },
+
+    hideNativeUrlBar: function() {
+        if (!this.heightFixNode) this.heightFixNode = this._createHeightFixNode();
+
+        domClass.remove(this.heightFixNode, 'is-hidden');
+
+        var self = this;
+        setTimeout(function () {
+            window.scrollTo(0,1);
+        }, 0);
+
+        setTimeout(function() {
+            window.scrollTo(0,0);
+
+            domClass.add(self.heightFixNode, 'is-hidden');
+
+            self.resize();
+        }, 0);
+    },
+    startup: function(){
+        if(this._started){ return; }
+
+
+        var children = array.filter(this.domNode.childNodes, function(node){ return node.nodeType == 1; });
+        array.forEach(children, function(node){
+            domClass.add(node, "mblFixedSplitterPane"+this.orientation);
+        }, this);
+        this.inherited(arguments);
+
+        var _this = this;
+        setTimeout(function(){
+            var parent = _this.getParent && _this.getParent();
+            if(!parent || !parent.resize){ // top level widget
+                _this.resize();
             }
-            var l = (h || domGeom.getMarginBox(this.domNode)[sz]) - offset;
-            var props = {};
-            props[sz] = l;
-            domGeom.setMarginBox(children[children.length - 1], props);
+        }, 0);
+    },
+    addChild: function(widget, /*Number?*/insertIndex){
+        domClass.add(widget.domNode, "mblFixedSplitterPane"+this.orientation);
+        this.inherited(arguments);
+    },
 
-            array.forEach(this.getChildren(), function(child){
-                if(child.resize){ child.resize(); }
-            });
-        },
-        buildRendering: function(){
-            this.domNode = this.containerNode = this.srcNodeRef ? this.srcNodeRef : win.doc.createElement("DIV");
-            domClass.add(this.domNode, "mblFixedSpliter");
-        },
+    constructor: function() {
+        this.panes = {};
+        this.panesByTier = [];
+    },
+    onStartup: function() {
+        this.inherited(arguments);
 
-        hideNativeUrlBar: function() {
-            if (!this.heightFixNode) this.heightFixNode = this._createHeightFixNode();
+        this.connect(window, 'onresize', this.resize);
 
-            domClass.remove(this.heightFixNode, 'is-hidden');
+        for (var name in this.panes)
+        {
+            if (this.panes[name].tier !== false)
+                this.panesByTier[this.panes[name].tier] = this.panes[name];
+        }
 
-            var self = this;
-            setTimeout(function () {
-                window.scrollTo(0,1);
-            }, 0);
-
-            setTimeout(function() {
-                window.scrollTo(0,0);
-
-                domClass.add(self.heightFixNode, 'is-hidden');
-
-                self.resize();
-            }, 0);
-        },
-        startup: function(){
-            if(this._started){ return; }
-            var children = array.filter(this.domNode.childNodes, function(node){ return node.nodeType == 1; });
-            array.forEach(children, function(node){
-                domClass.add(node, "mblFixedSplitterPane"+this.orientation);
-            }, this);
-            this.inherited(arguments);
-
-            var _this = this;
-            setTimeout(function(){
-                var parent = _this.getParent && _this.getParent();
-                if(!parent || !parent.resize){ // top level widget
-                    _this.resize();
-                }
-            }, 0);
-        },
-        addChild: function(widget, /*Number?*/insertIndex){
-            domClass.add(widget.domNode, "mblFixedSplitterPane"+this.orientation);
-            this.inherited(arguments);
-        },
-
-        constructor: function() {
-            this.panes = {};
-            this.panesByTier = [];
-        },
-        onStartup: function() {
-            this.inherited(arguments);
-
-            this.connect(window, 'onresize', this.resize);
-
-            for (var name in this.panes)
-            {
-                if (this.panes[name].tier !== false)
-                    this.panesByTier[this.panes[name].tier] = this.panes[name];
-            }
-
-            /* todo: this BREAKS input focus scrolling on iOS (sizes are calculated wrong) */
-            /*
-            var hasTouch = 'ontouchstart' in window;
-            if (hasTouch)
+        /* todo: this BREAKS input focus scrolling on iOS (sizes are calculated wrong) */
+        /*
+        var hasTouch = 'ontouchstart' in window;
+        if (hasTouch)
             {
                 this.hideNativeUrlBar();
 
@@ -300,11 +313,15 @@ define('argos/Layout', [
                 };
             }
         },
+        _isTablet: function() {
+            return Math.max(window.innerHeight, window.innerWidth) >= 960;
+        },
         apply: function(viewSet) {
-            var wait = [];
+            var wait = [], pane;
 
-            for (var tier = 0; tier < viewSet.length; tier++)
-            {
+            for (var tier = 0; tier < viewSet.length; tier++) {
+                pane = this._isTablet() ? this.panesByTier[tier] : this.panes['list'];
+
                 var item = viewSet[tier],
                     transitionOptions = this._createTransitionOptionsFor(item.view, item);
 
@@ -312,20 +329,17 @@ define('argos/Layout', [
                 {
                     topic.publish('/app/layout/change', {
                         tier: tier,
-                        pane: this.panesByTier[tier]
+                        pane: pane 
                     });
-                    wait.push(this.panesByTier[tier].show(item.view, transitionOptions));
-                }
-                else
-                {
-                    wait.push(this.panesByTier[tier].empty(transitionOptions));
+                    wait.push(pane.show(item.view, transitionOptions));
+                } else if (this._isTablet()) {
+                    wait.push(pane.empty(transitionOptions));
                 }
             }
 
             return new DeferredList(wait, false, true, true);
         },
         show: function(view, at, transitionOptions) {
-
             topic.publish('/app/layout/change', {
                 tier: at,
                 pane: this.panes[at]
