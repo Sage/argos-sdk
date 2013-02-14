@@ -58,7 +58,7 @@ define('argos/Fields/TextAreaField', [
          *
          */
         widgetTemplate: new Simplate([
-            '<textarea data-dojo-attach-point="inputNode" name="{%= $.name %}" rows="{%: $.rows %}" placeholder="{%: $.placeHolder %}" {% if ($.readonly) { %} readonly {% } %}></textarea>'
+            '<textarea data-dojo-attach-point="inputNode" data-dojo-attach-event="onkeyup: _onKeyUp, onblur: _onBlur, onfocus: _onFocus, onmouseup: _onMouseUp" name="{%= $.name %}" rows="{%: $.rows %}" placeholder="{%: $.placeHolder %}" {% if ($.readonly) { %} readonly {% } %}></textarea>'
         ])
     });
 });
