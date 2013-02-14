@@ -445,9 +445,15 @@
 .row-disabled > div > div,
 .row-disabled > button,
 .row-disabled > input,
-.row-disabled > div
+.row-disabled > div,
+.row-readonly > div > button,
+.row-readonly > div > input,
+.row-readonly > div > div,
+.row-readonly > button,
+.row-readonly > input,
+.row-readonly > div
 {
-    opacity: 0.3;
+    opacity: 0.5;
     cursor: default;
 }
 

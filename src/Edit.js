@@ -197,7 +197,7 @@ define('Sage/Platform/Mobile/Edit', [
          */
         propertyTemplate: new Simplate([
             '<a name="{%= $.name || $.property %}"></a>',
-            '<div class="row row-edit {%= $.cls %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
+            '<div class="row row-edit {%= $.cls %}{% if ($.readonly) { %}row-readonly{% } %}" data-field="{%= $.name || $.property %}" data-field-type="{%= $.type %}">',
             '</div>'
         ]),
 
