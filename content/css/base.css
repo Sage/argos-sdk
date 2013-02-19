@@ -327,6 +327,17 @@
     height: 24px;
 }
 
+.list .item-static-icon
+{
+    width: 24px;
+    height: 24px;
+    color: #ff0;
+    top: 6px;
+    left: 6px;
+    float: left;
+    padding: 0px 5px 0px 0px;
+}
+
 /* grouped list */
 .group-content > h2
 {
