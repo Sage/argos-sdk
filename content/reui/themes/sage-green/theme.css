@@ -58,9 +58,8 @@ body > .toolbar
     border-bottom: 1px solid #3c4f18;
     border-top: 1px transparent #3c4f18;
     background-color: #c0d298;
-    /* was 0,39,39,100 */
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #dae6c6 0%,
         #d1e0b7 50%,
         #cbdcae 50%,
@@ -86,12 +85,16 @@ body > .toolbar
     -moz-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
     -webkit-box-shadow: rgba(0,0,0,0.5) 0px 2px 3px;
 
+}
+
+.ie9 body > .toolbar
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#dae6c6, endColorstr=#c1d59f)";
 }
 
 .toolbar > h1
 {
-	color: #000;
+    color: #000;
     text-shadow: #fff 0px 1px 0px;
 }
 
@@ -105,21 +108,21 @@ body > .toolbar
 .dialog .toolbar > h1
 {
     color: #000;
-	text-shadow: rgba(255, 255, 255, 1) 1px 1px 0;
+    text-shadow: rgba(255, 255, 255, 1) 1px 1px 0;
 }
 
 .dialog > fieldset
-{	
+{
     background-color: #e6e6e6;
-    background-image: linear-gradient(top, #e6e6e6, #b3b3b3);
+    background: linear-gradient(top, #e6e6e6, #b3b3b3);
     background-image: -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #e6e6e6),
-		color-stop(1, #b3b3b3)
-	);  
-	background-image: -moz-linear-gradient(top, #e6e6e6, #b3b3b3);
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e6e6e6),
+        color-stop(1, #b3b3b3)
+    );  
+    background-image: -moz-linear-gradient(top, #e6e6e6, #b3b3b3);
     -moz-border-radius-bottomleft: 8px;
     -webkit-border-bottom-left-radius: 8px;
     -moz-border-radius-bottomright: 8px;
@@ -128,7 +131,10 @@ body > .toolbar
     background-clip: padding-box;
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
+}
 
+.ie9 .dialog > fieldset
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#b3b3b3)";
 }
 
@@ -158,7 +164,7 @@ body > .toolbar
     border-bottom: 1px solid #000;
     border-top: 1px solid #000;
     background-color: #e6e6e6;
-    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background: linear-gradient(top, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
         linear,
         left top,
@@ -173,7 +179,10 @@ body > .toolbar
     color: #000;
     text-shadow: #fff 0px 1px 0px;
     font-weight: bold;
+}
 
+.ie9 .panel-content > h2
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#cccccc)";
 }
 
@@ -182,7 +191,7 @@ body > .toolbar
     border-bottom: 1px solid #000;
     border-top: 1px solid #000;
     background-color: #de6464;
-    background-image: linear-gradient(top, #de6464, #b33737);
+    background: linear-gradient(top, #de6464, #b33737);
     background-image: -webkit-gradient(
 		linear,
 		left top,
@@ -197,7 +206,10 @@ body > .toolbar
     color: #fff;
     text-shadow: #000 0px 1px 0px;
     font-weight: bold;
+}
 
+.ie9 .panel-validation-summary > h2
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#de6464, endColorstr=#b33737)";
 }
 
@@ -315,16 +327,16 @@ textarea:focus
     -moz-box-sizing: border-box;
     display: block;
     
-	color: #000;
-	text-align: center;
-	text-decoration: none;
+    color: #000;
+    text-align: center;
+    text-decoration: none;
     text-shadow: #fff 0px 1px 0px;
 
-	font-weight: bold;
-	font-size: .8em;
+    font-weight: bold;
+    font-size: .8em;
 
-    border-radius: 3px;
-	-webkit-border-radius: 3px;
+    border-radius: 4px;
+    -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
 
     border-style: solid;
@@ -334,8 +346,8 @@ textarea:focus
     cursor: pointer;
 
     background-color: #f2f2f2;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #f2f2f2 0%,
         #e6e6e6 50%,
         #cccccc 50%,
@@ -364,15 +376,18 @@ textarea:focus
     background-clip: padding-box;
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
+}
 
-    /*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f2f2f2, endColorstr=#e6e6e6)";*/
+.ie9 > .button
+{
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f2f2f2, endColorstr=#e6e6e6)";
 }
 
 .button:active
 {
     background-color: #e6e6e6;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #f2f2f2 0%,
         #e6e6e6 100%,
         #cccccc 100%,
@@ -405,8 +420,8 @@ textarea:focus
     border-color: #002838;
 
     background-color: #00a1de;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #00a1de 0%,
         #0079a7 50%,
         #00516f 50%,
@@ -428,7 +443,11 @@ textarea:focus
         #00516f 50%,
         #0079a7 100%
     );
+}
 
+.ie9 .taskButton,
+.ie9 .blueButton
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00a1de, endColorstr=#0079a7)";
 }
 
@@ -436,8 +455,8 @@ textarea:focus
 .blueButton:active
 {    
     background-color: #0079a7;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #00a1de 0%,
         #0079a7 100%,
         #00516f 100%,
@@ -470,8 +489,8 @@ textarea:focus
     border-color: #421f34;
 
     background-color: #a44e81;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #a44e81 0%,
         #833f67 50%,
         #632f4e 50%,
@@ -493,7 +512,11 @@ textarea:focus
         #632f4e 50%,
         #833f67 100%
     );
+}
 
+.ie9 .cancelButton,
+.ie9 .purpleButton
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#a44e81, endColorstr=#833f67)";
 }
 
@@ -501,8 +524,8 @@ textarea:focus
 .purpleButton:active
 {
     background-color: #833f67;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #a44e81 0%,
         #833f67 100%,
         #632f4e 100%,
@@ -536,8 +559,8 @@ textarea:focus
     border-color: #a4bf7d;
 
     background-color: #eaf1df;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #eaf1df 0%,
         #d6e3bf 50%,
         #c1d59f 50%,
@@ -562,7 +585,12 @@ textarea:focus
 
     -moz-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
     -webkit-box-shadow: rgba(255,255,255,1.0) 0px 0px 1px inset;
+}
 
+.ie9 .toolButton,
+.ie9 .headerButton,
+.ie9 .lightGreenButton
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#eaf1df, endColorstr=#d6e3bf)";
 }
 
@@ -571,8 +599,8 @@ textarea:focus
 .lightGreenButton:active
 {
     background-color: #d6e3bf;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #eaf1df 0%,
         #d6e3bf 100%,
         #c1d59f 100%,
@@ -610,8 +638,8 @@ textarea:focus
     border-color: #b3b3b3;
 
     background-color: #f2f2f2;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #f2f2f2 0%,
         #e6e6e6 50%,
         #cccccc 50%,
@@ -633,16 +661,14 @@ textarea:focus
         #cccccc 50%,
         #e6e6e6 100%
     );
-
-    /*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#f2f2f2, endColorstr=#e6e6e6)";*/
 }
 
 .subHeaderButton:active,
 .whiteButton:active,
 {
     background-color: #e6e6e6;
-    background-image: linear-gradient(
-        center top,
+    background: linear-gradient(
+        to bottom,
         #f2f2f2 0%,
         #e6e6e6 100%,
         #cccccc 100%,
@@ -675,7 +701,7 @@ textarea:focus
     border-color: #b3b3b3;
     
     background-color: #e6e6e6;
-    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background: linear-gradient(to bottom, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
         linear,
         left top,
@@ -684,15 +710,13 @@ textarea:focus
         color-stop(1, #cccccc)
     );
     background-image: -moz-linear-gradient(top, #e6e6e6, #cccccc);
-
-    /*-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e6e6e6, endColorstr=#cccccc)";*/
 }
 
 .simpleSubHeaderButton:active,
 .nonGlossWhiteButton:active
 {
     background-color: #cccccc;
-    background-image: linear-gradient(bottom, #e6e6e6, #cccccc);
+    background: linear-gradient(to bottom, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
         linear,
         left bottom,
@@ -711,7 +735,7 @@ textarea:focus
     border-color: #ececec;
 
     background-color: #ffffff;
-    background-image: linear-gradient(top, #fcfcfc, #dfdfdf);
+    background: linear-gradient(to bottom, #fcfcfc, #dfdfdf);
     background-image: -webkit-gradient(
         linear,
         left top,
@@ -725,7 +749,7 @@ textarea:focus
 .nonGlossExtraWhiteButton:active
 {
     background-color: #ffffff;
-    background-image: linear-gradient(bottom, #e6e6e6, #cccccc);
+    background: linear-gradient(to bottom, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
         linear,
         left bottom,

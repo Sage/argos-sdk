@@ -123,7 +123,7 @@
 .list-search
 {
     background-color: #e6e6e6;
-    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background-image: linear-gradient(to bottom, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
         linear,
         left top,
@@ -223,7 +223,7 @@
     border: 1px solid #ececec;
 
     background-color: #ffffff;
-    background-image: linear-gradient(top, #fcfcfc, #dfdfdf);
+    background-image: linear-gradient(to bottom, #fcfcfc, #dfdfdf);
     background-image: -webkit-gradient(
         linear,
         left top,
@@ -358,7 +358,7 @@
     border-bottom: 1px solid #000;
     border-top: 1px solid #000;
     background-color: #e6e6e6;
-    background-image: linear-gradient(top, #e6e6e6, #cccccc);
+    background: linear-gradient(to bottom, #e6e6e6, #cccccc);
     background-image: -webkit-gradient(
         linear,
         left top,
@@ -702,16 +702,19 @@ div.text-field-active > button.clear-button
 {
     color: #000;
     background-color: #e9eed7;
-    background-image: linear-gradient(top, #e9eed7, #dae2bb);
+    background-image: linear-gradient(to bottom, #e9eed7, #dae2bb);
     background-image: -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #e9eed7),
-		color-stop(1, #dae2bb)
-	);
-	background-image: -moz-linear-gradient(top, #e9eed7, #dae2bb);
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #e9eed7),
+        color-stop(1, #dae2bb)
+    );
+    background-image: -moz-linear-gradient(top, #e9eed7, #dae2bb);
+}
 
+.ie9 .calendar-day
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#e9eed7, endColorstr=#dae2bb)";
 }
 
@@ -719,16 +722,19 @@ div.text-field-active > button.clear-button
 {
     color: #fff;
     background-color: #4e5b2f;
-    background-image: linear-gradient(top, #4e5b2f, #8a9e57);
+    background-image: linear-gradient(to bottom, #4e5b2f, #8a9e57);
     background-image: -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #4e5b2f),
-		color-stop(1, #8a9e57)
-	);
-	background-image: -moz-linear-gradient(top, #4e5b2f, #8a9e57);
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #4e5b2f),
+        color-stop(1, #8a9e57)
+    );
+    background-image: -moz-linear-gradient(top, #4e5b2f, #8a9e57);
+}
 
+.ie9 .calendar-day.today
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4e5b2f, endColorstr=#8a9e57)";
 }
 
@@ -736,16 +742,19 @@ div.text-field-active > button.clear-button
 .calendar-day.weekend
 {
     background-color: #c4cfa5;
-    background-image: linear-gradient(top, #c4cfa5, #a6b979);
+    background-image: linear-gradient(to bottom, #c4cfa5, #a6b979);
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
         color-stop(0, #c4cfa5),
         color-stop(1, #a6b979)
-	);
+    );
     background-image: -moz-linear-gradient(top, #c4cfa5, #a6b979);
+}
 
+.ie9 .calendar-day.weekend
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#c4cfa5, endColorstr=#a6b979)";
 }
 
@@ -753,16 +762,19 @@ div.text-field-active > button.clear-button
 {
     color: #000;
     background-color: #CAE2EB;
-    background-image: linear-gradient(top, #CAE2EB, #7EB7CC);
+    background-image: linear-gradient(to bottom, #CAE2EB, #7EB7CC);
     background-image: -webkit-gradient(
-		linear,
-		left top,
-		left bottom,
-		color-stop(0, #CAE2EB),
-		color-stop(1, #7EB7CC)
-	);
-	background-image: -moz-linear-gradient(top, #CAE2EB, #7EB7CC);
+        linear,
+        left top,
+        left bottom,
+        color-stop(0, #CAE2EB),
+        color-stop(1, #7EB7CC)
+    );
+    background-image: -moz-linear-gradient(top, #CAE2EB, #7EB7CC);
+}
 
+.ie9 .calendar-day.selected
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#CAE2EB, endColorstr=#7EB7CC)";
 }
 
@@ -770,7 +782,7 @@ div.text-field-active > button.clear-button
 {
     border: 1px solid #1a250f;
     background-color: #69923a;
-    background-image: linear-gradient(bottom, #4f6e2c, #35491d);
+    background-image: linear-gradient(to bottom, #4f6e2c, #35491d);
     background-image: -webkit-gradient(
         linear,
         left bottom,
@@ -779,7 +791,10 @@ div.text-field-active > button.clear-button
         color-stop(1, #35491d)
     );
     background-image: -moz-linear-gradient(bottom, #4f6e2c, #35491d);
+}
 
+.ie9 .time-content > .date-tt > .toggle
+{
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4f6e2c, endColorstr=#35491d)";
 }
 
