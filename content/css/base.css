@@ -615,7 +615,8 @@ div.search-widget button.clear-button
     position: static; height: 30px;
 }
 div.search-active button.clear-button,
-div.text-field-active > button.clear-button
+div.text-field-active > button.clear-button,
+button.clear-button:focus
 {
     background: url('../images/delete.png') no-repeat 50% 50%;
 }
