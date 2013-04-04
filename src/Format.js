@@ -144,7 +144,13 @@ define('Sage/Platform/Mobile/Format', [
          * Text used in {@link #timespan timespan} formatter for exactly one minute
          */
         minuteText: 'minute',
-
+        /**
+        * @property {String}
+        * format string for percent
+         * * `${0}` - percent value
+         * * `${1}` - percent synmbol "%"
+        */
+        percentFormatText: '${0}${1}',
         /**
          * Takes a String and encodes `&`, `<`, `>`, `"` to HTML entities
          * @param {String} String to encode
@@ -285,8 +291,19 @@ define('Sage/Platform/Mobile/Format', [
          * @return {String} Number as a percentage with % sign.
          */
         percent: function(val) {
-            var intVal = Math.floor(100 * (parseFloat(val) || 0));
-            return intVal + "%";
+            //var intVal = Math.floor(100 * (parseFloat(val) || 0));
+            var intVal = 100 * (parseFloat(val) || 0.00);
+            var v = intVal.toFixed(2); // only 2 decimal places
+            var f = Math.floor((100 * (v - Math.floor(v))).toPrecision(2)); // for fractional part, only need 2 significant digits
+            var numberFormated = string.substitute(
+                '${0}'
+                + Mobile.CultureInfo.numberFormat.percentDecimalSeparator
+                + '${1}', [
+                    (Math.floor(v)).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + Mobile.CultureInfo.numberFormat.percentGroupSeparator.replace("\\.", '.')),
+                    (f.toString().length < 2) ? '0' + f.toString() : f.toString()
+                ]
+            ).replace(/ /g, '\u00A0'); //keep numbers from breaking
+            return string.substitute(Sage.Platform.Mobile.Format.percentFormatText, [numberFormated, Mobile.CultureInfo.numberFormat.percentSymbol]);
         },
         /**
          * Takes a boolean value and returns the string Yes or No for true or false
