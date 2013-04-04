@@ -296,7 +296,7 @@ define('Sage/Platform/Mobile/Format', [
         percent: function(val, places) {
             var intVal, v, dp, wp, numberFormated
 
-            if (typeof places !== 'number') {
+            if (isNaN(places)) {
                 places = 2
             }
 
