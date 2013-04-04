@@ -828,26 +828,32 @@ define('Sage/Platform/Mobile/List', [
             var selectedItems = this.get('selectionModel').getSelections(),
                 selection = null;
 
-            for (var key in selectedItems)
-            {
+            for (var key in selectedItems) {
                 selection = selectedItems[key];
                 break;
             }
 
-            for (var i = 0; i < this.actions.length; i++)
-            {
+            // IE10 is destroying the child notes of the actionsNode when the list view refreshes,
+            // re-create the action DOM before moving on.
+            if (this.actionsNode.childNodes.length === 0 && this.actions.length > 0) {
+                this.createActions(this._createCustomizedLayout(this.createActionLayout(), 'actions'));
+            }
+
+            for (var i = 0; i < this.actions.length; i++) {
                 var action = this.actions[i];
 
                 action.isEnabled = (typeof action['enabled'] === 'undefined')
                     ? true
                     : this.expandExpression(action['enabled'], action, selection);
 
-                if (!action.hasAccess)
+                if (!action.hasAccess) {
                     action.isEnabled = false;
+                }
 
-                domClass.toggle(this.actionsNode.childNodes[i], 'toolButton-disabled', !action.isEnabled);
+                if (this.actionsNode.childNodes[i]) {
+                    domClass.toggle(this.actionsNode.childNodes[i], 'toolButton-disabled', !action.isEnabled);
+                }
             }
-
         },
         /**
          * Handler for showing the list-action panel/bar - it needs to do several things:
