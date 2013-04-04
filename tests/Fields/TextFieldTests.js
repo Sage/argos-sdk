@@ -237,6 +237,17 @@ return describe('Sage.Platform.Mobile.Fields.TextField', function() {
 
         expect(field.previousValue).toEqual('changed');
     });
+    it('Can set previous value to new value when value check fails in the notification handler', function() {
+        var field = new TextField();
+
+        field.previousValue = 'test';
+
+        spyOn(field, 'getValue').andReturn('changed');
+
+        field.onNotificationTrigger();
+
+        expect(field.previousValue).toEqual('changed');
+    });
 
     it('Can add error class if validate fails in onValidation handler', function() {
         var field = new TextField();
@@ -280,6 +291,13 @@ return describe('Sage.Platform.Mobile.Fields.TextField', function() {
         expect(field.clearNode).toEqual(null);
     });
 
+    it('Can set input value with no trigger', function() {
+        var field = new TextField();
+
+        field.setValueNoTrigger('test');
+       
+        expect(field.previousValue).toEqual(field.getValue());
+    });
 
 });
 });

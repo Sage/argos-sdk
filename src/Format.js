@@ -282,27 +282,44 @@ define('Sage/Platform/Mobile/Format', [
             return v;
         },
         /**
-         * Takes a decimal number, multiplies by 100 and adds the % sign.
-         *
-         * `perecent(0.35)` => `'35%'`
-         * `percent(2)` => `'200%'`
+         * Takes a decimal number, multiplies by 100 and adds the % sign with the number of palces to the right.
+         *  
+         * `perecent(0.35)` => `'35.00%'`
+         * `perecent(0.35, 0)` => `'35%'`
+         * `percent(2.9950)` => `'299.50%'`
+         * `percent(2.9950,0)` => `'300%'`
          *
          * @param {Number/String} val The value will be `parseFloat` before operating.
+         * @param {Number/String} places If no value is given the default value will be set to 2.
          * @return {String} Number as a percentage with % sign.
          */
-        percent: function(val) {
-            //var intVal = Math.floor(100 * (parseFloat(val) || 0));
-            var intVal = 100 * (parseFloat(val) || 0.00);
-            var v = intVal.toFixed(2); // only 2 decimal places
-            var f = Math.floor((100 * (v - Math.floor(v))).toPrecision(2)); // for fractional part, only need 2 significant digits
-            var numberFormated = string.substitute(
-                '${0}'
-                + Mobile.CultureInfo.numberFormat.percentDecimalSeparator
-                + '${1}', [
-                    (Math.floor(v)).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + Mobile.CultureInfo.numberFormat.percentGroupSeparator.replace("\\.", '.')),
-                    (f.toString().length < 2) ? '0' + f.toString() : f.toString()
-                ]
-            ).replace(/ /g, '\u00A0'); //keep numbers from breaking
+        percent: function(val, places) {
+            var intVal, v, dp, wp, numberFormated
+
+            if (isNaN(places)) {
+                places = 2
+            }
+
+            places = Math.floor(places);
+            intVal = 100 * (parseFloat(val) || 0.00);
+            v = intVal.toFixed(places);
+            //get the whole number part
+            wp = (Math.floor(v)).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + Mobile.CultureInfo.numberFormat.percentGroupSeparator.replace("\\.", '.'))
+
+            if (places < 1) { // format with out decimal part
+                numberFormated = string.substitute('${0}', [wp]).replace(/ /g, '\u00A0'); //keep numbers from breaking
+            } else {
+                dp = v % 1; //get the decimal part
+                dp = dp.toPrecision(places+1); // round to significant pecsion
+                dp = dp.toString(); 
+                dp = dp.substr(2, places); //get the whole decimal part
+                numberFormated = string.substitute(
+                    '${0}'
+                    + Mobile.CultureInfo.numberFormat.percentDecimalSeparator
+                    + '${1}', [wp, dp]
+                ).replace(/ /g, '\u00A0'); //keep numbers from breaking
+            }
+
             return string.substitute(Sage.Platform.Mobile.Format.percentFormatText, [numberFormated, Mobile.CultureInfo.numberFormat.percentSymbol]);
         },
         /**
