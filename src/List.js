@@ -826,9 +826,9 @@ define('Sage/Platform/Mobile/List', [
          */
         checkActionState: function() {
             var selectedItems = this.get('selectionModel').getSelections(),
-                selection = null;
+                selection = null, i, action, key;
 
-            for (var key in selectedItems) {
+            for (key in selectedItems) {
                 selection = selectedItems[key];
                 break;
             }
@@ -839,8 +839,8 @@ define('Sage/Platform/Mobile/List', [
                 this.createActions(this._createCustomizedLayout(this.createActionLayout(), 'actions'));
             }
 
-            for (var i = 0; i < this.actions.length; i++) {
-                var action = this.actions[i];
+            for (i = 0; i < this.actions.length; i++) {
+                action = this.actions[i];
 
                 action.isEnabled = (typeof action['enabled'] === 'undefined')
                     ? true
