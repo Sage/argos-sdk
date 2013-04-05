@@ -24,13 +24,15 @@ define('Sage/Platform/Mobile/Format', [
     'dojo/_base/lang',
     'dojo/dom-construct',
     'dojo/string',
-    'Sage/Platform/Mobile/Convert'
+    'Sage/Platform/Mobile/Convert',
+    'Sage/Platform/Mobile/Utility'
 ], function(
     json,
     lang,
     domConstruct,
     string,
-    convert
+    convert,
+    utility
 ) {
 
     var getVectorMaxSize = function (v) {
@@ -299,9 +301,10 @@ define('Sage/Platform/Mobile/Format', [
             if (isNaN(places)) {
                 places = 2
             }
+
             places = Math.floor(places);
             intVal = 100 * (parseFloat(val) || 0.00);
-            v = Sage.Platform.Mobile.Utility.roundNumberTo(intVal, places);
+            v = utility.roundNumberTo(intVal, places);
 
             //get the whole number part
             wp = (Math.floor(v)).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + Mobile.CultureInfo.numberFormat.percentGroupSeparator.replace("\\.", '.'))
@@ -321,7 +324,7 @@ define('Sage/Platform/Mobile/Format', [
             }
 
             return string.substitute(Sage.Platform.Mobile.Format.percentFormatText, [numberFormated, Mobile.CultureInfo.numberFormat.percentSymbol]);
-        },        
+        },
         /**
          * Takes a boolean value and returns the string Yes or No for true or false
          * @param {Boolean/String} val If string it tests if the string is `true` for true, else assumes false
