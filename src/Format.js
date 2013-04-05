@@ -299,10 +299,10 @@ define('Sage/Platform/Mobile/Format', [
             if (isNaN(places)) {
                 places = 2
             }
-
             places = Math.floor(places);
             intVal = 100 * (parseFloat(val) || 0.00);
-            v = intVal.toFixed(places);
+            v = Sage.Platform.Mobile.Utility.roundNumberTo(intVal, places);
+
             //get the whole number part
             wp = (Math.floor(v)).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + Mobile.CultureInfo.numberFormat.percentGroupSeparator.replace("\\.", '.'))
 
@@ -321,6 +321,10 @@ define('Sage/Platform/Mobile/Format', [
             }
 
             return string.substitute(Sage.Platform.Mobile.Format.percentFormatText, [numberFormated, Mobile.CultureInfo.numberFormat.percentSymbol]);
+        },
+        roundTo: function (number, n) {
+            var k = Math.pow(10, n);
+            return (Math.round(number * k) / k);
         },
         /**
          * Takes a boolean value and returns the string Yes or No for true or false

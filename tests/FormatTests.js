@@ -179,7 +179,7 @@ return describe('Sage.Platform.Mobile.Format', function() {
         expect(format.percent(testStr, places)).toEqual('1,999.99%');
     });
     it('Can present as percent - quad digit with places set to 2 round up', function() {
-        var testStr = 19.99996;
+        var testStr = 19.99995;
         var places = 2;
         expect(format.percent(testStr, places)).toEqual('2,000.00%');
     });

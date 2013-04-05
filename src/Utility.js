@@ -87,6 +87,10 @@ define('Sage/Platform/Mobile/Utility', [
                 return expression.apply(scope, Array.prototype.slice.call(arguments, 2));
             else
                 return expression;
+        },
+        roundNumberTo: function(number, precision) {
+            var k = Math.pow(10, precision);
+            return (Math.round(number * k) / k);
         }
     });
 });
