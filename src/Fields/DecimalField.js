@@ -18,12 +18,14 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
     'dojo/_base/declare',
     'dojo/string',
     'Sage/Platform/Mobile/Fields/TextField',
-    'Sage/Platform/Mobile/FieldManager'
+    'Sage/Platform/Mobile/FieldManager',
+    'Sage/Platform/Mobile/Utility'
 ], function(
     declare,
     string,
     TextField,
-    FieldManager
+    FieldManager,
+    Utility
 ) {
     /**
      * The Decimal Field is used for inputting numbers and extends {@link TextField TextField} with:
@@ -62,7 +64,8 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
          * @param {Number/String} val Value to be set
          */
         setValue: function(val) {
-            val = parseFloat(val).toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
+            val = Utility.roundNumberTo(parseFloat(val), this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
+            val = val.toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
             val = isNaN(val)
                 ? string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.'])
                 : string.substitute('${0}${1}${2}',
