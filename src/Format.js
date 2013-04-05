@@ -321,11 +321,7 @@ define('Sage/Platform/Mobile/Format', [
             }
 
             return string.substitute(Sage.Platform.Mobile.Format.percentFormatText, [numberFormated, Mobile.CultureInfo.numberFormat.percentSymbol]);
-        },
-        roundTo: function (number, n) {
-            var k = Math.pow(10, n);
-            return (Math.round(number * k) / k);
-        },
+        },        
         /**
          * Takes a boolean value and returns the string Yes or No for true or false
          * @param {Boolean/String} val If string it tests if the string is `true` for true, else assumes false
