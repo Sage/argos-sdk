@@ -24,13 +24,15 @@ define('Sage/Platform/Mobile/Format', [
     'dojo/_base/lang',
     'dojo/dom-construct',
     'dojo/string',
-    'Sage/Platform/Mobile/Convert'
+    'Sage/Platform/Mobile/Convert',
+    'Sage/Platform/Mobile/Utility'
 ], function(
     json,
     lang,
     domConstruct,
     string,
-    convert
+    convert,
+    utility
 ) {
 
     var getVectorMaxSize = function (v) {
@@ -302,7 +304,8 @@ define('Sage/Platform/Mobile/Format', [
 
             places = Math.floor(places);
             intVal = 100 * (parseFloat(val) || 0.00);
-            v = intVal.toFixed(places);
+            v = utility.roundNumberTo(intVal, places);
+
             //get the whole number part
             wp = (Math.floor(v)).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + Mobile.CultureInfo.numberFormat.percentGroupSeparator.replace("\\.", '.'))
 
