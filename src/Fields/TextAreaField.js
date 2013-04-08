@@ -64,7 +64,7 @@ define('Sage/Platform/Mobile/Fields/TextAreaField', [
             '<textarea data-dojo-attach-point="inputNode" name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %}></textarea>'
         ]),
         setValue: function(val, initial) {
-            if(val === null){
+            if (val === null || typeof val === 'undefined') {
                 val = '';
             }
             if (initial) this.originalValue = val;
