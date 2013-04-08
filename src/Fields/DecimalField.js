@@ -63,13 +63,10 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
          * and thousands punctuation.
          * @param {Number/String} val Value to be set
          */
-        setValue: function(val) {            
+        setValue: function(val) {
             var perc;
-            if (this.precision === 0) {
-                perc = this.precision
-            } else {
-                perc = this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits;
-            }
+
+            perc = this.getPrecision();            
             val = Utility.roundNumberTo(parseFloat(val), perc);
             val = val.toFixed(perc);
             if(isNaN(val)){
@@ -104,6 +101,19 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
                 .replace(Mobile.CultureInfo.numberFormat.currencyDecimalSeparator, '.')
                 .replace(Mobile.CultureInfo.numberFormat.numberDecimalSeparator, '.');
             return parseFloat(value);
+        },
+        /**
+         * Retrieves the precision the value will be formated and ronded to.
+         * @return {Number}
+         */
+        getPrecision: function() {
+            var perc;
+            if (this.precision === 0) {
+                perc = this.precision
+            } else {
+                perc = this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits;
+            }
+            return perc;
         }
     });
 
