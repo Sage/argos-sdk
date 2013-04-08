@@ -62,7 +62,17 @@ define('Sage/Platform/Mobile/Fields/TextAreaField', [
         widgetTemplate: new Simplate([
             '<label for="{%= $.name %}">{%: $.label %}</label>',
             '<textarea data-dojo-attach-point="inputNode" name="{%= $.name %}" rows="{%: $.rows %}" {% if ($.readonly) { %} readonly {% } %}></textarea>'
-        ])
+        ]),
+        setValue: function(val, initial) {
+            if (val === null || typeof val === 'undefined') {
+                val = '';
+            }
+            if (initial) this.originalValue = val;
+
+            this.previousValue = false;
+
+            this.set('inputValue', val);
+        }
     });
 
     return FieldManager.register('textarea', control);
