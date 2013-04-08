@@ -64,17 +64,27 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
          * @param {Number/String} val Value to be set
          */
         setValue: function(val) {
-            val = Utility.roundNumberTo(parseFloat(val), this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
-            val = val.toFixed(this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits);
-            val = isNaN(val)
-                ? string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.'])
-                : string.substitute('${0}${1}${2}',
-                    [
-                        parseInt(val, 10),
-                        Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.',
-                        val.substr(- Mobile.CultureInfo.numberFormat.currencyDecimalDigits)
-                    ]);
+            var perc;
 
+            perc = this.getPrecision();            
+            val = Utility.roundNumberTo(parseFloat(val), perc);
+            val = val.toFixed(perc);
+            if(isNaN(val)){
+                if (perc === 0) {
+                    val = "0";
+                } else {
+                    val = string.substitute('0${0}00', [Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.']);
+                }                
+            }else{
+                if (perc !== 0) {
+                    val = string.substitute('${0}${1}${2}',
+                        [
+                            parseInt(val, 10),
+                            Mobile.CultureInfo.numberFormat.currencyDecimalSeparator || '.',
+                            val.substr(-perc)
+                        ]);
+                }
+            }
             this.inherited(arguments, [val]);
         },
         /**
@@ -91,6 +101,19 @@ define('Sage/Platform/Mobile/Fields/DecimalField', [
                 .replace(Mobile.CultureInfo.numberFormat.currencyDecimalSeparator, '.')
                 .replace(Mobile.CultureInfo.numberFormat.numberDecimalSeparator, '.');
             return parseFloat(value);
+        },
+        /**
+         * Retrieves the precision the value will be formated and ronded to.
+         * @return {Number}
+         */
+        getPrecision: function() {
+            var perc;
+            if (this.precision === 0) {
+                perc = this.precision
+            } else {
+                perc = this.precision || Mobile.CultureInfo.numberFormat.currencyDecimalDigits;
+            }
+            return perc;
         }
     });
 
