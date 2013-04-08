@@ -103,14 +103,14 @@ return describe('Sage.Platform.Mobile.Fields.DecimalField', function() {
         field.setValue(value);
         expect(field.getValue()).toEqual(1000.24);
     });
-    it('Can format invalid number of persion 0', function() {
+    it('Can format invalid number of precision 0', function() {
         var field = new DecimalField();
         var value = null;
         field.precision = 0;
         field.setValue(value);
         expect(field.getValue()).toEqual(0);
     });
-    it('Can format invalid number of persion 0', function() {
+    it('Can format invalid number of precision 0', function() {
         var field = new DecimalField();
         var value = null;
         field.setValue(value);
