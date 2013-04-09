@@ -270,9 +270,15 @@ define('Sage/Platform/Mobile/Fields/TextField', [
          * @param {Boolean} initial True if the value is the default/clean value, false if it is a meant as a dirty value
          */
         setValue: function(val, initial) {
-            if (initial) this.originalValue = val;
+            if (initial) {
+                this.originalValue = val;
+            }
 
             this.previousValue = false;
+
+            if (val === null || typeof val === 'undefined') {
+                val = '';
+            }
 
             this.set('inputValue', val);
         },
