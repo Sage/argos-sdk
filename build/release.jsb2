@@ -76,11 +76,11 @@
           "path": "../src"
         },
         {
-          "text": "Format.js",
+          "text": "Utility.js",
           "path": "../src"
         },
         {
-          "text": "Utility.js",
+          "text": "Format.js",
           "path": "../src"
         },
         {
@@ -217,3 +217,4 @@
     }
   ]
 }
+
